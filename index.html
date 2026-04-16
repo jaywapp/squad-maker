@@ -55,17 +55,18 @@ h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; }
 
 .mode-pills {
   display: flex;
+  flex-wrap: wrap;
   background: #1e293b;
   border: 1px solid #334155;
   border-radius: 8px;
   overflow: hidden;
 }
 .mode-pill {
-  padding: 7px 14px;
+  padding: 7px 11px;
   border: none;
   background: none;
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
@@ -261,6 +262,36 @@ const MODES_CONFIG = {
       '2-1-1': [{count:2, y:510, prefix:'수비'}, {count:1, y:370, prefix:'미드'}, {count:1, y:230, prefix:'공격'}],
     }
   },
+  '6v6': {
+    label: '6 vs 6',
+    maxPlayers: 6,
+    formations: {
+      '2-2-1': [{count:2, y:510, prefix:'수비'}, {count:2, y:380, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
+      '3-2':   [{count:3, y:510, prefix:'수비'}, {count:2, y:310, prefix:'공격'}],
+      '2-3':   [{count:2, y:510, prefix:'수비'}, {count:3, y:310, prefix:'공격'}],
+      '1-3-1': [{count:1, y:510, prefix:'수비'}, {count:3, y:380, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
+    }
+  },
+  '7v7': {
+    label: '7 vs 7',
+    maxPlayers: 7,
+    formations: {
+      '3-2-1': [{count:3, y:510, prefix:'수비'}, {count:2, y:385, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
+      '2-3-1': [{count:2, y:510, prefix:'수비'}, {count:3, y:385, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
+      '2-2-2': [{count:2, y:510, prefix:'수비'}, {count:2, y:385, prefix:'미드'}, {count:2, y:240, prefix:'공격'}],
+      '3-3':   [{count:3, y:510, prefix:'수비'}, {count:3, y:310, prefix:'공격'}],
+    }
+  },
+  '8v8': {
+    label: '8 vs 8',
+    maxPlayers: 8,
+    formations: {
+      '3-3-1': [{count:3, y:510, prefix:'수비'}, {count:3, y:385, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
+      '3-2-2': [{count:3, y:510, prefix:'수비'}, {count:2, y:385, prefix:'미드'}, {count:2, y:240, prefix:'공격'}],
+      '2-3-2': [{count:2, y:510, prefix:'수비'}, {count:3, y:385, prefix:'미드'}, {count:2, y:240, prefix:'공격'}],
+      '4-3':   [{count:4, y:510, prefix:'수비'}, {count:3, y:310, prefix:'공격'}],
+    }
+  },
   '9v9': {
     label: '9 vs 9',
     maxPlayers: 9,
@@ -270,6 +301,16 @@ const MODES_CONFIG = {
       '4-3-1': [{count:4, y:510, prefix:'수비'}, {count:3, y:380, prefix:'미드'}, {count:1, y:230, prefix:'공격'}],
       '2-4-2': [{count:2, y:510, prefix:'수비'}, {count:4, y:385, prefix:'미드'}, {count:2, y:240, prefix:'공격'}],
       '3-4-1': [{count:3, y:510, prefix:'수비'}, {count:4, y:385, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
+    }
+  },
+  '10v10': {
+    label: '10 vs 10',
+    maxPlayers: 10,
+    formations: {
+      '4-4-1': [{count:4, y:510, prefix:'수비'}, {count:4, y:380, prefix:'미드'}, {count:1, y:230, prefix:'공격'}],
+      '4-3-2': [{count:4, y:510, prefix:'수비'}, {count:3, y:380, prefix:'미드'}, {count:2, y:230, prefix:'공격'}],
+      '3-4-2': [{count:3, y:510, prefix:'수비'}, {count:4, y:380, prefix:'미드'}, {count:2, y:230, prefix:'공격'}],
+      '3-5-1': [{count:3, y:510, prefix:'수비'}, {count:5, y:380, prefix:'미드'}, {count:1, y:230, prefix:'공격'}],
     }
   },
   '11v11': {
