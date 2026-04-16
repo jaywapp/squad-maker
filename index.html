@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>9v9 스쿼드 메이커</title>
+<title>스쿼드 메이커</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -16,31 +16,81 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 20px 16px;
-  gap: 14px;
+  gap: 12px;
 }
 
 h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; }
 
+/* ── Top bar ── */
 .top-bar {
   display: flex;
   align-items: center;
   gap: 10px;
   width: 480px;
+  flex-wrap: wrap;
 }
 
 .team-name-input {
   flex: 1;
+  min-width: 140px;
   padding: 8px 14px;
   border: 1px solid #334155;
   border-radius: 8px;
   background: #1e293b;
   color: white;
-  font-size: 1rem;
+  font-size: 0.95rem;
   outline: none;
 }
 .team-name-input:focus { border-color: #60a5fa; }
 .team-name-input::placeholder { color: #475569; }
 
+/* ── Mode + formation row ── */
+.mode-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 480px;
+  flex-wrap: wrap;
+}
+
+.mode-pills {
+  display: flex;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.mode-pill {
+  padding: 7px 14px;
+  border: none;
+  background: none;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.mode-pill:not(:last-child) { border-right: 1px solid #334155; }
+.mode-pill.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.formation-select {
+  padding: 7px 12px;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  background: #1e293b;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+.formation-select:focus { border-color: #60a5fa; }
+
+/* ── Field ── */
 #field {
   position: relative;
   width: 480px;
@@ -51,43 +101,23 @@ h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; }
   box-shadow: 0 8px 32px rgba(0,0,0,0.6);
   flex-shrink: 0;
 }
-
 #field::before {
   content: '';
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent 44px,
-    rgba(0,0,0,0.07) 44px,
-    rgba(0,0,0,0.07) 88px
+    to bottom, transparent 0, transparent 44px,
+    rgba(0,0,0,0.07) 44px, rgba(0,0,0,0.07) 88px
   );
   pointer-events: none;
   z-index: 0;
 }
 
-.fl { /* field line */
-  position: absolute;
-  background: rgba(255,255,255,0.8);
-  pointer-events: none;
-  z-index: 1;
-}
-.fc { /* field circle */
-  position: absolute;
-  border: 2px solid rgba(255,255,255,0.8);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 1;
-}
-.fd { /* field dot */
-  position: absolute;
-  background: rgba(255,255,255,0.8);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 1;
-}
+.fl { position: absolute; background: rgba(255,255,255,0.8); pointer-events: none; z-index: 1; }
+.fc { position: absolute; border: 2px solid rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 1; }
+.fd { position: absolute; background: rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 1; }
 
+/* ── Players ── */
 .player {
   position: absolute;
   width: 60px;
@@ -128,7 +158,7 @@ h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; }
   text-overflow: ellipsis;
 }
 
-/* Context menu */
+/* ── Context menu ── */
 #ctx-menu {
   position: fixed;
   background: #1e293b;
@@ -160,7 +190,7 @@ h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; }
 .ctx-btn.danger { color: #f87171; }
 .ctx-divider { height: 1px; background: #334155; margin: 6px 0; }
 
-/* Bottom controls */
+/* ── Bottom controls ── */
 .controls {
   display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
 }
@@ -169,21 +199,26 @@ h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; }
   cursor: pointer; font-size: 0.9rem; font-weight: 600;
   transition: opacity 0.15s, transform 0.1s;
 }
-.btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn:hover  { opacity: 0.85; transform: translateY(-1px); }
 .btn:active { transform: translateY(0); }
-.btn-green  { background: #22c55e; color: white; }
-.btn-blue   { background: #3b82f6; color: white; }
-.btn-slate  { background: #475569; color: white; }
+.btn-green { background: #22c55e; color: white; }
+.btn-blue  { background: #3b82f6; color: white; }
+.btn-slate { background: #475569; color: white; }
 
 .hint { font-size: 0.73rem; color: #475569; }
 </style>
 </head>
 <body>
 
-<h1>⚽ 9v9 스쿼드 메이커</h1>
+<h1>⚽ 스쿼드 메이커</h1>
 
 <div class="top-bar">
   <input class="team-name-input" id="teamName" type="text" placeholder="팀 이름 (선택)..." maxlength="20" />
+</div>
+
+<div class="mode-bar">
+  <div class="mode-pills" id="modePills"></div>
+  <select class="formation-select" id="formationSelect" onchange="onFormationChange()"></select>
 </div>
 
 <div id="field"></div>
@@ -206,31 +241,125 @@ h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; }
 
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script>
+// ─── Constants ────────────────────────────────────────────────────
 const COLORS = [
   '#E53935','#1E88E5','#43A047','#FB8C00',
   '#8E24AA','#00ACC1','#F06292','#FFD600',
   '#546E7A','#ffffff'
 ];
-
 const FIELD_W = 480, FIELD_H = 660;
-const MARGIN = 20;
 
+// ─── Formation data ───────────────────────────────────────────────
+// rows: [{count, y, prefix}] — GK always added automatically at y=622
+const MODES_CONFIG = {
+  '5v5': {
+    label: '5 vs 5',
+    maxPlayers: 5,
+    formations: {
+      '2-2':   [{count:2, y:490, prefix:'수비'}, {count:2, y:270, prefix:'공격'}],
+      '1-2-1': [{count:1, y:510, prefix:'수비'}, {count:2, y:370, prefix:'미드'}, {count:1, y:230, prefix:'공격'}],
+      '2-1-1': [{count:2, y:510, prefix:'수비'}, {count:1, y:370, prefix:'미드'}, {count:1, y:230, prefix:'공격'}],
+    }
+  },
+  '9v9': {
+    label: '9 vs 9',
+    maxPlayers: 9,
+    formations: {
+      '3-3-2': [{count:3, y:510, prefix:'수비'}, {count:3, y:385, prefix:'미드'}, {count:2, y:240, prefix:'공격'}],
+      '3-2-3': [{count:3, y:510, prefix:'수비'}, {count:2, y:385, prefix:'미드'}, {count:3, y:240, prefix:'공격'}],
+      '4-3-1': [{count:4, y:510, prefix:'수비'}, {count:3, y:380, prefix:'미드'}, {count:1, y:230, prefix:'공격'}],
+      '2-4-2': [{count:2, y:510, prefix:'수비'}, {count:4, y:385, prefix:'미드'}, {count:2, y:240, prefix:'공격'}],
+      '3-4-1': [{count:3, y:510, prefix:'수비'}, {count:4, y:385, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
+    }
+  },
+  '11v11': {
+    label: '11 vs 11',
+    maxPlayers: 11,
+    formations: {
+      '4-4-2':   [{count:4, y:510, prefix:'수비'}, {count:4, y:380, prefix:'미드'}, {count:2, y:230, prefix:'공격'}],
+      '4-3-3':   [{count:4, y:510, prefix:'수비'}, {count:3, y:370, prefix:'미드'}, {count:3, y:220, prefix:'공격'}],
+      '3-5-2':   [{count:3, y:510, prefix:'수비'}, {count:5, y:375, prefix:'미드'}, {count:2, y:230, prefix:'공격'}],
+      '4-2-3-1': [{count:4, y:520, prefix:'수비'}, {count:2, y:415, prefix:'수비형MF'}, {count:3, y:305, prefix:'공격형MF'}, {count:1, y:200, prefix:'공격'}],
+      '5-3-2':   [{count:5, y:510, prefix:'수비'}, {count:3, y:370, prefix:'미드'}, {count:2, y:230, prefix:'공격'}],
+      '3-4-3':   [{count:3, y:510, prefix:'수비'}, {count:4, y:375, prefix:'미드'}, {count:3, y:225, prefix:'공격'}],
+    }
+  }
+};
+
+// ─── State ────────────────────────────────────────────────────────
 let players = [];
 let nextId = 1;
 let selectedPlayer = null;
 let dragState = null;
+let currentMode = '9v9';
 
-const DEFAULT_LAYOUT = [
-  {name:'GK',    x:240, y:622, color:'#E53935'},
-  {name:'수비1',  x: 96, y:510, color:'#1E88E5'},
-  {name:'수비2',  x:240, y:530, color:'#1E88E5'},
-  {name:'수비3',  x:384, y:510, color:'#1E88E5'},
-  {name:'미드1',  x: 96, y:385, color:'#1E88E5'},
-  {name:'미드2',  x:240, y:365, color:'#1E88E5'},
-  {name:'미드3',  x:384, y:385, color:'#1E88E5'},
-  {name:'공격1',  x:150, y:240, color:'#1E88E5'},
-  {name:'공격2',  x:330, y:240, color:'#1E88E5'},
-];
+// ─── Mode & formation helpers ─────────────────────────────────────
+function rowX(count, index) {
+  // Distribute players evenly across usable width (x: 20~460)
+  return Math.round(20 + (index + 1) * 440 / (count + 1));
+}
+
+function buildPlayers(modeKey, formationKey) {
+  const rows = MODES_CONFIG[modeKey].formations[formationKey];
+  const list = [];
+  let id = 1;
+
+  // GK
+  list.push({ id: id++, name: 'GK', x: 240, y: 622, color: '#E53935' });
+
+  rows.forEach(row => {
+    for (let i = 0; i < row.count; i++) {
+      list.push({
+        id: id++,
+        name: `${row.prefix}${i + 1}`,
+        x: rowX(row.count, i),
+        y: row.y,
+        color: '#1E88E5',
+      });
+    }
+  });
+
+  return list;
+}
+
+function applyFormation(modeKey, formationKey) {
+  nextId = 1;
+  players = buildPlayers(modeKey, formationKey);
+  // renumber from 1
+  players.forEach((p, i) => { p.id = i + 1; });
+  nextId = players.length + 1;
+  renderPlayers();
+}
+
+// ─── UI builders ──────────────────────────────────────────────────
+function buildModePills() {
+  const container = document.getElementById('modePills');
+  container.innerHTML = Object.entries(MODES_CONFIG).map(([key, cfg]) =>
+    `<button class="mode-pill${key === currentMode ? ' active' : ''}"
+             onclick="onModeChange('${key}')">${cfg.label}</button>`
+  ).join('');
+}
+
+function buildFormationSelect(modeKey) {
+  const sel = document.getElementById('formationSelect');
+  const formations = Object.keys(MODES_CONFIG[modeKey].formations);
+  sel.innerHTML = formations.map(f =>
+    `<option value="${f}">${f}</option>`
+  ).join('');
+}
+
+function onModeChange(modeKey) {
+  currentMode = modeKey;
+  buildModePills();
+  buildFormationSelect(modeKey);
+  const firstFormation = Object.keys(MODES_CONFIG[modeKey].formations)[0];
+  applyFormation(modeKey, firstFormation);
+}
+
+function onFormationChange() {
+  const formation = document.getElementById('formationSelect').value;
+  applyFormation(currentMode, formation);
+}
 
 // ─── Field drawing ────────────────────────────────────────────────
 function drawField() {
@@ -246,60 +375,32 @@ function drawField() {
   function circle(cx, cy, r) {
     const el = document.createElement('div');
     el.className = 'fc';
-    el.style.cssText = `left:${cx-r}px;top:${cy-r}px;width:${r*2}px;height:${r*2}px;`;
+    el.style.cssText = `left:${cx - r}px;top:${cy - r}px;width:${r * 2}px;height:${r * 2}px;`;
     f.appendChild(el);
   }
   function dot(cx, cy, r) {
     const el = document.createElement('div');
     el.className = 'fd';
-    el.style.cssText = `left:${cx-r}px;top:${cy-r}px;width:${r*2}px;height:${r*2}px;`;
+    el.style.cssText = `left:${cx - r}px;top:${cy - r}px;width:${r * 2}px;height:${r * 2}px;`;
     f.appendChild(el);
   }
 
   // Boundary
-  line(20, 20, 440, 2);   // top
-  line(20, 638, 440, 2);  // bottom
-  line(20, 20, 2, 620);   // left
-  line(458, 20, 2, 620);  // right
-
-  // Center line
+  line(20, 20, 440, 2); line(20, 638, 440, 2);
+  line(20, 20, 2, 620); line(458, 20, 2, 620);
+  // Center
   line(20, 330, 440, 2);
-
-  // Center circle & dot
-  circle(240, 330, 60);
-  dot(240, 330, 4);
-
-  // ── Bottom (our half) ──
-  // Penalty area
-  line(130, 558, 220, 2);
-  line(130, 558, 2, 82);
-  line(348, 558, 2, 82);
-  // Goal area
-  line(184, 598, 112, 2);
-  line(184, 598, 2, 42);
-  line(294, 598, 2, 42);
-  // Penalty spot
+  circle(240, 330, 60); dot(240, 330, 4);
+  // Bottom: penalty area, goal area, spot, goal
+  line(130, 558, 220, 2); line(130, 558, 2, 82); line(348, 558, 2, 82);
+  line(184, 598, 112, 2); line(184, 598, 2, 42); line(294, 598, 2, 42);
   dot(240, 530, 3);
-  // Goal
-  line(194, 638, 92, 8);
-  line(194, 638, 2, 10);
-  line(284, 638, 2, 10);
-
-  // ── Top (opponent half) ──
-  // Penalty area
-  line(130, 100, 220, 2);
-  line(130, 20, 2, 82);
-  line(348, 20, 2, 82);
-  // Goal area
-  line(184, 60, 112, 2);
-  line(184, 20, 2, 42);
-  line(294, 20, 2, 42);
-  // Penalty spot
+  line(194, 638, 92, 8); line(194, 638, 2, 10); line(284, 638, 2, 10);
+  // Top: penalty area, goal area, spot, goal
+  line(130, 100, 220, 2); line(130, 20, 2, 82); line(348, 20, 2, 82);
+  line(184, 60, 112, 2);  line(184, 20, 2, 42);  line(294, 20, 2, 42);
   dot(240, 128, 3);
-  // Goal
-  line(194, 12, 92, 8);
-  line(194, 12, 2, 10);
-  line(284, 12, 2, 10);
+  line(194, 12, 92, 8);  line(194, 12, 2, 10);  line(284, 12, 2, 10);
 }
 
 // ─── Player rendering ─────────────────────────────────────────────
@@ -322,7 +423,6 @@ function renderPlayers() {
       e.stopPropagation();
       startInlineEdit(el, p);
     });
-
     el.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -337,113 +437,10 @@ function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// ─── Drag (mouse) ─────────────────────────────────────────────────
-const fieldEl = document.getElementById('field');
-
-fieldEl.addEventListener('mousedown', (e) => {
-  if (e.button !== 0) return;
-  const playerEl = e.target.closest('.player');
-  if (!playerEl) return;
-  const player = players.find(p => p.id == playerEl.dataset.id);
-  if (!player) return;
-
-  hideCtxMenu();
-  dragState = {
-    player, el: playerEl,
-    startMX: e.clientX, startMY: e.clientY,
-    startPX: player.x,  startPY: player.y,
-  };
-  playerEl.classList.add('dragging');
-  e.preventDefault();
-});
-
-document.addEventListener('mousemove', (e) => {
-  if (!dragState) return;
-  applyDrag(
-    dragState.startPX + (e.clientX - dragState.startMX),
-    dragState.startPY + (e.clientY - dragState.startMY)
-  );
-});
-
-document.addEventListener('mouseup', endDrag);
-
-// ─── Drag (touch) ─────────────────────────────────────────────────
-fieldEl.addEventListener('touchstart', (e) => {
-  const playerEl = e.target.closest('.player');
-  if (!playerEl) return;
-  const player = players.find(p => p.id == playerEl.dataset.id);
-  if (!player) return;
-  const t = e.touches[0];
-  dragState = {
-    player, el: playerEl,
-    startMX: t.clientX, startMY: t.clientY,
-    startPX: player.x,  startPY: player.y,
-  };
-  playerEl.classList.add('dragging');
-  e.preventDefault();
-}, { passive: false });
-
-document.addEventListener('touchmove', (e) => {
-  if (!dragState) return;
-  const t = e.touches[0];
-  applyDrag(
-    dragState.startPX + (t.clientX - dragState.startMX),
-    dragState.startPY + (t.clientY - dragState.startMY)
-  );
-  e.preventDefault();
-}, { passive: false });
-
-document.addEventListener('touchend', endDrag);
-
-function applyDrag(rawX, rawY) {
-  const x = Math.max(26, Math.min(FIELD_W - 26, rawX));
-  const y = Math.max(26, Math.min(FIELD_H - 26, rawY));
-  dragState.player.x = x;
-  dragState.player.y = y;
-  dragState.el.style.left = x + 'px';
-  dragState.el.style.top  = y + 'px';
-}
-
-function endDrag() {
-  if (!dragState) return;
-  dragState.el.classList.remove('dragging');
-  dragState = null;
-}
-
-// ─── Context menu ─────────────────────────────────────────────────
-function showCtxMenu(x, y, player) {
-  selectedPlayer = player;
-  const menu = document.getElementById('ctx-menu');
-  const palette = document.getElementById('colorPalette');
-
-  palette.innerHTML = COLORS.map(c =>
-    `<div class="swatch${c === player.color ? ' active' : ''}"
-         style="background:${c};${c==='#ffffff'?'border-color:#475569;':''}"
-         onclick="changeColor('${c}')"></div>`
-  ).join('');
-
-  menu.style.left = Math.min(x, window.innerWidth  - 180) + 'px';
-  menu.style.top  = Math.min(y, window.innerHeight - 180) + 'px';
-  menu.classList.add('visible');
-}
-
-function hideCtxMenu() {
-  document.getElementById('ctx-menu').classList.remove('visible');
-}
-
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('#ctx-menu')) hideCtxMenu();
-});
-document.addEventListener('contextmenu', (e) => {
-  if (!e.target.closest('.player')) hideCtxMenu();
-});
-
 // ─── Inline name editing ──────────────────────────────────────────
 function startInlineEdit(playerEl, player) {
   const nameEl = playerEl.querySelector('.player-name');
   const original = player.name;
-
-  // Replace name div with input
   const input = document.createElement('input');
   input.type = 'text';
   input.value = original;
@@ -454,41 +451,105 @@ function startInlineEdit(playerEl, player) {
     border-radius:4px; padding:1px 4px; outline:none; margin-top:3px;
     font-family:inherit;
   `;
-
   nameEl.replaceWith(input);
   input.select();
   input.focus();
 
   function commit() {
-    const val = input.value.trim().slice(0, 12);
-    player.name = val || original;
+    player.name = input.value.trim().slice(0, 12) || original;
     renderPlayers();
   }
-
   input.addEventListener('blur', commit);
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    if (e.key === 'Enter')  { e.preventDefault(); input.blur(); }
     if (e.key === 'Escape') { input.value = original; input.blur(); }
     e.stopPropagation();
   });
   input.addEventListener('mousedown', (e) => e.stopPropagation());
 }
 
+// ─── Drag — mouse ─────────────────────────────────────────────────
+const fieldEl = document.getElementById('field');
+
+fieldEl.addEventListener('mousedown', (e) => {
+  if (e.button !== 0) return;
+  const playerEl = e.target.closest('.player');
+  if (!playerEl) return;
+  const player = players.find(p => p.id == playerEl.dataset.id);
+  if (!player) return;
+  hideCtxMenu();
+  dragState = { player, el: playerEl, startMX: e.clientX, startMY: e.clientY, startPX: player.x, startPY: player.y };
+  playerEl.classList.add('dragging');
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!dragState) return;
+  applyDrag(dragState.startPX + (e.clientX - dragState.startMX), dragState.startPY + (e.clientY - dragState.startMY));
+});
+document.addEventListener('mouseup', endDrag);
+
+// ─── Drag — touch ─────────────────────────────────────────────────
+fieldEl.addEventListener('touchstart', (e) => {
+  const playerEl = e.target.closest('.player');
+  if (!playerEl) return;
+  const player = players.find(p => p.id == playerEl.dataset.id);
+  if (!player) return;
+  const t = e.touches[0];
+  dragState = { player, el: playerEl, startMX: t.clientX, startMY: t.clientY, startPX: player.x, startPY: player.y };
+  playerEl.classList.add('dragging');
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchmove', (e) => {
+  if (!dragState) return;
+  const t = e.touches[0];
+  applyDrag(dragState.startPX + (t.clientX - dragState.startMX), dragState.startPY + (t.clientY - dragState.startMY));
+  e.preventDefault();
+}, { passive: false });
+document.addEventListener('touchend', endDrag);
+
+function applyDrag(rawX, rawY) {
+  const x = Math.max(26, Math.min(FIELD_W - 26, rawX));
+  const y = Math.max(26, Math.min(FIELD_H - 26, rawY));
+  dragState.player.x = x;
+  dragState.player.y = y;
+  dragState.el.style.left = x + 'px';
+  dragState.el.style.top  = y + 'px';
+}
+function endDrag() {
+  if (!dragState) { return; }
+  dragState.el.classList.remove('dragging');
+  dragState = null;
+}
+
+// ─── Context menu ─────────────────────────────────────────────────
+function showCtxMenu(x, y, player) {
+  selectedPlayer = player;
+  document.getElementById('colorPalette').innerHTML = COLORS.map(c =>
+    `<div class="swatch${c === player.color ? ' active' : ''}"
+         style="background:${c};${c === '#ffffff' ? 'border-color:#475569;' : ''}"
+         onclick="changeColor('${c}')"></div>`
+  ).join('');
+  const menu = document.getElementById('ctx-menu');
+  menu.style.left = Math.min(x, window.innerWidth  - 180) + 'px';
+  menu.style.top  = Math.min(y, window.innerHeight - 180) + 'px';
+  menu.classList.add('visible');
+}
+function hideCtxMenu() { document.getElementById('ctx-menu').classList.remove('visible'); }
+document.addEventListener('click',       (e) => { if (!e.target.closest('#ctx-menu')) hideCtxMenu(); });
+document.addEventListener('contextmenu', (e) => { if (!e.target.closest('.player'))   hideCtxMenu(); });
+
 function changeColor(color) {
   if (selectedPlayer) { selectedPlayer.color = color; renderPlayers(); }
   hideCtxMenu();
 }
-
 function renamePlayer() {
   if (!selectedPlayer) return;
   const name = prompt('선수 이름:', selectedPlayer.name);
-  if (name !== null) {
-    selectedPlayer.name = name.trim().slice(0, 12) || selectedPlayer.name;
-    renderPlayers();
-  }
+  if (name !== null) { selectedPlayer.name = name.trim().slice(0, 12) || selectedPlayer.name; renderPlayers(); }
   hideCtxMenu();
 }
-
 function removePlayer() {
   if (!selectedPlayer) return;
   players = players.filter(p => p.id !== selectedPlayer.id);
@@ -498,24 +559,23 @@ function removePlayer() {
 
 // ─── Controls ─────────────────────────────────────────────────────
 function addPlayer() {
-  if (players.length >= 11) { alert('최대 11명까지 추가할 수 있습니다.'); return; }
+  const max = MODES_CONFIG[currentMode].maxPlayers;
+  if (players.length >= max) { alert(`${MODES_CONFIG[currentMode].label} 모드는 최대 ${max}명입니다.`); return; }
   players.push({ id: nextId++, name: `선수${players.length + 1}`, x: 240, y: 330, color: '#1E88E5' });
   renderPlayers();
 }
 
 function resetLayout() {
-  if (!confirm('초기 배치로 돌아갑니다. 계속하시겠어요?')) return;
-  nextId = 1;
-  players = DEFAULT_LAYOUT.map(p => ({ ...p, id: nextId++ }));
-  renderPlayers();
+  const formation = document.getElementById('formationSelect').value;
+  applyFormation(currentMode, formation);
 }
 
 // ─── Save image ───────────────────────────────────────────────────
 function saveImage() {
   const teamName = document.getElementById('teamName').value.trim();
+  const formation = document.getElementById('formationSelect').value;
   const f = document.getElementById('field');
 
-  // Temporarily inject team name banner inside field
   let banner = null;
   if (teamName) {
     banner = document.createElement('div');
@@ -526,32 +586,30 @@ function saveImage() {
       z-index:200; white-space:nowrap; pointer-events:none;
       font-family:'Segoe UI',Tahoma,sans-serif; letter-spacing:0.5px;
     `;
-    banner.textContent = teamName;
+    banner.textContent = `${teamName}  [${formation}]`;
     f.appendChild(banner);
   }
 
-  html2canvas(f, {
-    scale: 2.5,
-    backgroundColor: '#276d41',
-    useCORS: true,
-    logging: false,
-  }).then(canvas => {
-    if (banner) f.removeChild(banner);
-    const link = document.createElement('a');
-    link.download = `${teamName || '스쿼드'}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  }).catch(err => {
-    if (banner) f.removeChild(banner);
-    console.error(err);
-    alert('이미지 저장에 실패했습니다.');
-  });
+  html2canvas(f, { scale: 2.5, backgroundColor: '#276d41', useCORS: true, logging: false })
+    .then(canvas => {
+      if (banner) f.removeChild(banner);
+      const link = document.createElement('a');
+      link.download = `${teamName || '스쿼드'}_${formation}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    })
+    .catch(err => {
+      if (banner) f.removeChild(banner);
+      console.error(err);
+      alert('이미지 저장에 실패했습니다.');
+    });
 }
 
 // ─── Init ─────────────────────────────────────────────────────────
 drawField();
-players = DEFAULT_LAYOUT.map(p => ({ ...p, id: nextId++ }));
-renderPlayers();
+buildModePills();
+buildFormationSelect(currentMode);
+applyFormation(currentMode, '3-3-2');
 </script>
 </body>
 </html>
