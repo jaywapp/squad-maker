@@ -210,6 +210,111 @@ body {
 #gifProgress p { color: white; font-weight: 600; font-size: 1rem; }
 #gifProgressBar { width: 240px; height: 8px; background: #334155; border-radius: 4px; overflow: hidden; }
 #gifProgressFill { height: 100%; background: #22c55e; border-radius: 4px; transition: width 0.1s; }
+
+/* ── Strategy tab ── */
+#strategyUI { width: 480px; display: none; flex-direction: column; gap: 12px; }
+
+.strategy-card {
+  background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px;
+}
+.strategy-card h3 {
+  font-size: 0.85rem; font-weight: 700; color: #94a3b8; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.strategy-form { display: flex; flex-direction: column; gap: 10px; }
+.strategy-field { display: flex; flex-direction: column; gap: 4px; }
+.strategy-field label { font-size: 0.75rem; color: #64748b; font-weight: 600; }
+.strategy-input {
+  padding: 8px 12px; border: 1px solid #334155; border-radius: 8px;
+  background: #0f172a; color: white; font-size: 0.88rem; outline: none;
+  font-family: inherit;
+}
+.strategy-input:focus { border-color: #60a5fa; }
+.strategy-input::placeholder { color: #475569; }
+textarea.strategy-input { resize: vertical; min-height: 72px; line-height: 1.5; }
+
+.squad-summary { font-size: 0.8rem; color: #94a3b8; line-height: 1.8; }
+.squad-summary .formation-badge {
+  display: inline-block; background: #3b82f6; color: white;
+  padding: 2px 10px; border-radius: 12px; font-weight: 700; font-size: 0.78rem; margin-bottom: 8px;
+}
+.player-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.player-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: #0f172a; border: 1px solid #334155; border-radius: 20px;
+  padding: 3px 10px; font-size: 0.75rem;
+}
+.player-chip .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pattern-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.pattern-chip {
+  background: #0f172a; border: 1px solid #f59e0b; color: #fbbf24;
+  border-radius: 20px; padding: 3px 10px; font-size: 0.75rem; font-weight: 600;
+}
+
+.generate-row { display: flex; gap: 8px; align-items: center; }
+.api-key-btn {
+  background: none; border: 1px solid #334155; border-radius: 8px;
+  color: #64748b; padding: 8px 12px; cursor: pointer; font-size: 0.8rem;
+  transition: border-color 0.15s, color 0.15s; white-space: nowrap;
+}
+.api-key-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+.api-key-btn.set { border-color: #22c55e; color: #22c55e; }
+
+/* ── Manual output ── */
+.manual-output {
+  background: #0f172a; border: 1px solid #334155; border-radius: 8px;
+  padding: 14px; font-size: 0.82rem; line-height: 1.7; color: #cbd5e1;
+  white-space: pre-wrap; word-break: break-word; max-height: 480px; overflow-y: auto;
+}
+.manual-output .section-title {
+  color: #60a5fa; font-weight: 700; font-size: 0.88rem; margin: 10px 0 4px;
+}
+.manual-loading {
+  display: flex; align-items: center; gap: 10px; color: #64748b; font-size: 0.85rem;
+}
+.spinner {
+  width: 18px; height: 18px; border: 2px solid #334155; border-top-color: #3b82f6;
+  border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.output-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── API key modal ── */
+#apiKeyModal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); z-index: 3000;
+  align-items: center; justify-content: center;
+}
+#apiKeyModal.visible { display: flex; }
+.modal-box {
+  background: #1e293b; border: 1px solid #334155; border-radius: 14px;
+  padding: 24px; width: 340px; max-width: 90vw;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.modal-box h3 { font-size: 1rem; font-weight: 700; }
+.modal-box p { font-size: 0.8rem; color: #64748b; line-height: 1.5; }
+.modal-row { display: flex; gap: 8px; }
+.modal-row input {
+  flex: 1; padding: 8px 12px; border: 1px solid #334155; border-radius: 8px;
+  background: #0f172a; color: white; font-size: 0.85rem; outline: none; font-family: inherit;
+}
+.modal-row input:focus { border-color: #60a5fa; }
+
+.tactic-section { margin-bottom: 14px; }
+.tactic-section-title {
+  color: #60a5fa; font-weight: 700; font-size: 0.85rem;
+  border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 8px;
+}
+.tactic-player-title { color: #fbbf24; font-weight: 700; font-size: 0.82rem; margin: 10px 0 3px; }
+.tactic-line { color: #cbd5e1; font-size: 0.8rem; line-height: 1.7; padding-left: 12px; }
+.tactic-line::before { content: '• '; color: #475569; }
+.tactic-tag {
+  display: inline-block; background: #1e3a5f; color: #93c5fd;
+  border-radius: 10px; padding: 1px 8px; font-size: 0.72rem; font-weight: 600; margin-right: 4px;
+}
+.tactic-tag.green { background: #14532d; color: #86efac; }
+.tactic-tag.amber { background: #451a03; color: #fde68a; }
+.tactic-tag.red   { background: #450a0a; color: #fca5a5; }
 </style>
 </head>
 <body>
@@ -220,6 +325,7 @@ body {
 <div class="app-tabs">
   <button class="app-tab active" data-mode="squad" onclick="setAppMode('squad')">⚽ 스쿼드</button>
   <button class="app-tab" data-mode="pattern" onclick="setAppMode('pattern')">🎯 공격 패턴</button>
+  <button class="app-tab" data-mode="strategy" onclick="setAppMode('strategy')">📋 매치 전략</button>
 </div>
 
 <!-- Squad UI -->
@@ -276,6 +382,51 @@ body {
   <div class="ctx-divider"></div>
   <button class="ctx-btn" onclick="ctxRename()">✏️ 이름 변경</button>
   <button class="ctx-btn danger" onclick="ctxRemove()">🗑️ 삭제</button>
+</div>
+
+<!-- Strategy UI -->
+<div id="strategyUI">
+  <!-- Match info -->
+  <div class="strategy-card">
+    <h3>경기 정보</h3>
+    <div class="strategy-form">
+      <div class="strategy-field">
+        <label>상대팀</label>
+        <input class="strategy-input" id="opponent" type="text" placeholder="ex) FC 서울, 이웃동네팀..." maxlength="30" />
+      </div>
+      <div class="strategy-field">
+        <label>경기 일시</label>
+        <input class="strategy-input" id="matchDate" type="datetime-local" />
+      </div>
+      <div class="strategy-field">
+        <label>감독 메모 (선택)</label>
+        <textarea class="strategy-input" id="matchNotes" placeholder="특이사항, 상대팀 약점, 주의사항 등..." maxlength="300"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Squad summary -->
+  <div class="strategy-card">
+    <h3>현재 스쿼드 요약</h3>
+    <div id="squadSummary" class="squad-summary"></div>
+  </div>
+
+  <!-- Generate button -->
+  <div class="strategy-card" style="padding:12px 16px;">
+    <div class="generate-row">
+      <button class="btn btn-blue" style="flex:1;" onclick="generateManual()">📄 전술 지침서 생성</button>
+    </div>
+  </div>
+
+  <!-- Output -->
+  <div class="strategy-card" id="manualCard" style="display:none;">
+    <h3>전술 지침서</h3>
+    <div id="manualOutput"></div>
+    <div class="output-actions" style="margin-top:12px;">
+      <button class="btn btn-slate" onclick="copyManual()">📋 클립보드 복사</button>
+      <button class="btn btn-slate" onclick="saveManualTxt()">💾 텍스트 저장</button>
+    </div>
+  </div>
 </div>
 
 <!-- GIF progress overlay -->
@@ -375,16 +526,21 @@ function setAppMode(mode) {
   document.getElementById('squadUI').style.display       = mode === 'squad'   ? '' : 'none';
   document.getElementById('squadControls').style.display = mode === 'squad'   ? '' : 'none';
   document.getElementById('patternUI').style.display     = mode === 'pattern' ? '' : 'none';
+  document.getElementById('fieldWrapper').style.display  = mode === 'strategy'? 'none' : '';
   document.getElementById('field').style.display         = mode === 'squad'   ? '' : 'none';
   document.getElementById('patternCanvas').style.display = mode === 'pattern' ? '' : 'none';
-  document.getElementById('hintText').textContent = mode === 'squad'
-    ? '드래그: 위치 이동 | 더블클릭: 이름 수정 | 우클릭: 색상 / 삭제'
-    : '선수를 클릭-드래그하여 이동 경로 설정 | 우클릭 화살표: 경로 삭제';
+  document.getElementById('strategyUI').style.display    = mode === 'strategy'? 'flex' : 'none';
+  document.getElementById('hintText').style.display      = mode === 'strategy'? 'none' : '';
 
-  if (mode === 'pattern') {
+  if (mode === 'squad') {
+    document.getElementById('hintText').textContent = '드래그: 위치 이동 | 더블클릭: 이름 수정 | 우클릭: 색상 / 삭제';
+  } else if (mode === 'pattern') {
+    document.getElementById('hintText').textContent = '선수를 클릭-드래그하여 이동 경로 설정 | 우클릭 화살표: 경로 삭제';
     stopAnimation();
     updatePatternUI();
     renderPatternFrame(0);
+  } else if (mode === 'strategy') {
+    refreshSquadSummary();
   }
 }
 
@@ -1059,6 +1215,254 @@ function canvasFieldOff(ctx) {
 function setProgress(ratio, text) {
   document.getElementById('gifProgressText').textContent = text;
   document.getElementById('gifProgressFill').style.width = Math.round(ratio * 100) + '%';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STRATEGY — SQUAD SUMMARY
+// ═══════════════════════════════════════════════════════════════
+function classifyPlayer(p) {
+  if (p.y >= 590) return 'GK';
+  if (p.y >= 450) return '수비';
+  if (p.y >= 300) return '미드필더';
+  return '공격';
+}
+
+function refreshSquadSummary() {
+  const formation = document.getElementById('formationSelect').value;
+  const modeLabel = MODES_CONFIG[currentMode].label;
+  const el = document.getElementById('squadSummary');
+
+  const roleCounts = { GK: 0, 수비: 0, 미드필더: 0, 공격: 0 };
+  players.forEach(p => roleCounts[classifyPlayer(p)]++);
+
+  const patCount = patterns.filter(pt => Object.keys(pt.moves).length > 0).length;
+
+  el.innerHTML = `
+    <div style="margin-bottom:8px;">
+      <span class="formation-badge">${modeLabel} / ${formation}</span>
+    </div>
+    <div style="font-size:0.75rem;color:#64748b;margin-bottom:6px;">
+      GK ${roleCounts.GK} &nbsp;|&nbsp; 수비 ${roleCounts.수비} &nbsp;|&nbsp; 미드 ${roleCounts.미드필더} &nbsp;|&nbsp; 공격 ${roleCounts.공격}
+      &nbsp;&nbsp;·&nbsp;&nbsp; 공격패턴 ${patCount}개
+    </div>
+    <div class="player-list">
+      ${players.map((p,i) => `
+        <div class="player-chip">
+          <div class="dot" style="background:${p.color};"></div>
+          <span>${i+1}. ${escHtml(p.name)}</span>
+        </div>`).join('')}
+    </div>
+    ${patCount > 0 ? `<div class="pattern-chips" style="margin-top:8px;">
+      ${patterns.filter(pt=>Object.keys(pt.moves).length>0).map(pt=>`<span class="pattern-chip">🎯 ${escHtml(pt.name)}</span>`).join('')}
+    </div>` : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STRATEGY — MANUAL GENERATION (rule-based)
+// ═══════════════════════════════════════════════════════════════
+let lastManualText = '';
+
+function generateManual() {
+  const opponent = document.getElementById('opponent').value.trim() || '상대팀';
+  const matchDate = document.getElementById('matchDate').value;
+  const notes     = document.getElementById('matchNotes').value.trim();
+  const formation = document.getElementById('formationSelect').value;
+  const modeLabel = MODES_CONFIG[currentMode].label;
+
+  // ── Tactical profile from formation ──────────────────────────
+  const roleCounts = { GK: 0, 수비: 0, 미드필더: 0, 공격: 0 };
+  players.forEach(p => roleCounts[classifyPlayer(p)]++);
+
+  const defRatio = roleCounts.수비 / (players.length - 1 || 1);
+  let tacticalStyle, pressLine, defLine, transitionMsg;
+  if (defRatio >= 0.45) {
+    tacticalStyle = '수비 우선 / 역습';
+    pressLine     = '하프라인 뒤로 물러나 수비 블록을 형성한다.';
+    defLine       = '수비 라인은 컴팩트하게 유지하고, 상대 공격수 침투 공간을 최소화한다.';
+    transitionMsg = '공 탈취 후 빠른 전환으로 역습 찬스를 노린다. 전방 공격수로 즉시 연결한다.';
+  } else if (defRatio <= 0.28) {
+    tacticalStyle = '공격적 / 전방 압박';
+    pressLine     = '상대 빌드업 시 전방부터 압박하여 실수를 유도한다.';
+    defLine       = '수비 라인은 높게 유지하여 미드필더와 간격을 좁힌다. 오프사이드 트랩을 적극 활용한다.';
+    transitionMsg = '공 소유 시 빠른 패스 전개로 상대 수비 재조직 전에 공격한다.';
+  } else {
+    tacticalStyle = '밸런스 / 점유 기반';
+    pressLine     = '미드필드에서 수비 블록을 형성하고, 공 소유 시 빌드업 플레이를 진행한다.';
+    defLine       = '수비 라인과 미드필더 간격을 30m 이내로 유지한다.';
+    transitionMsg = '공 탈취 후 무리한 전진보다 안전한 패스로 점유를 유지한다.';
+  }
+
+  // ── Pattern analysis ─────────────────────────────────────────
+  const activePats = patterns.filter(pt => Object.keys(pt.moves).length > 0);
+
+  // Per-player movement tendencies across all patterns
+  const playerMoves = {}; // id → [{patName, dx, dy, toX, toY}]
+  activePats.forEach(pt => {
+    Object.entries(pt.moves).forEach(([id, move]) => {
+      const p = players.find(p => p.id == id);
+      if (!p) return;
+      if (!playerMoves[id]) playerMoves[id] = [];
+      playerMoves[id].push({
+        patName: pt.name,
+        dx: move.toX - p.x,
+        dy: move.toY - p.y,
+        toX: move.toX,
+        toY: move.toY,
+      });
+    });
+  });
+
+  function describeMoves(id) {
+    const mvs = playerMoves[id];
+    if (!mvs || mvs.length === 0) return [];
+    return mvs.map(m => {
+      const dir = moveDir(m.dx, m.dy);
+      return `[${escHtml(m.patName)}] ${dir} 이동`;
+    });
+  }
+
+  function moveDir(dx, dy) {
+    const angle = Math.atan2(-dy, dx) * 180 / Math.PI; // flip y (canvas top=0)
+    if (Math.abs(dx) < 30 && Math.abs(dy) < 30) return '제자리 유지';
+    if (dy < -40) return '전방 침투';
+    if (dy > 40)  return '후방 지원';
+    if (dx > 40 && dy < 0)  return '우측 전방 침투';
+    if (dx < -40 && dy < 0) return '좌측 전방 침투';
+    if (dx > 40)  return '우측 오버랩';
+    if (dx < -40) return '좌측 오버랩';
+    return '사선 이동';
+  }
+
+  // ── Build team-wide section ───────────────────────────────────
+  const dateStr = matchDate
+    ? new Date(matchDate).toLocaleString('ko-KR', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })
+    : '미정';
+
+  const teamLines = [
+    `상대: ${opponent} | 일시: ${dateStr}`,
+    `포메이션: ${modeLabel} ${formation} (${tacticalStyle})`,
+    `압박 전략: ${pressLine}`,
+    `수비 원칙: ${defLine}`,
+    `전환 원칙: ${transitionMsg}`,
+  ];
+
+  if (activePats.length > 0) {
+    teamLines.push(`공격 패턴 ${activePats.length}가지(${activePats.map(p=>p.name).join(', ')})를 숙지한다.`);
+    teamLines.push('세트피스 및 빠른 전환 상황에서 해당 패턴을 우선 시도한다.');
+  }
+  if (notes) {
+    teamLines.push(`감독 지시: ${notes}`);
+  }
+
+  // ── Build individual sections ─────────────────────────────────
+  const roleInstructions = {
+    GK: [
+      '골 라인 수비 및 페널티 구역 제공권을 장악한다.',
+      '수비진과 지속적으로 소통하여 위험 상황을 사전에 차단한다.',
+      '점유 시 빌드업 첫 번째 패스 역할을 담당한다.',
+    ],
+    수비: (p, i) => {
+      const isFlank = p.x < 160 || p.x > 320;
+      const base = [
+        '수비 라인 위치와 간격을 유지한다.',
+        isFlank ? '측면 공간 커버 및 상대 윙어 대인 마크를 담당한다.' : '중앙 공간 차단 및 헤더 경합을 우선시한다.',
+        '공 소유 시 안전한 옆패스 또는 GK에게 리셋한다.',
+      ];
+      return base;
+    },
+    미드필더: (p) => {
+      const isFlank = p.x < 160 || p.x > 320;
+      return [
+        isFlank ? '측면 공간을 활용한 드리블 돌파와 크로스를 시도한다.' : '중앙 연결 및 공 순환 역할을 담당한다.',
+        '수비 시 빠른 압박으로 상대 전진을 차단한다.',
+        '공격 시 공격수와의 원투패스 콤비네이션을 적극 활용한다.',
+      ];
+    },
+    공격: (p) => {
+      const isFlank = p.x < 160 || p.x > 320;
+      return [
+        isFlank ? '측면에서 상대 수비를 끌어낸 뒤 중앙으로 컷인 또는 크로스를 시도한다.' : '중앙에서 침투 움직임으로 상대 수비 라인을 압박한다.',
+        '득점 기회에서 과감하게 슈팅한다.',
+        '수비 전환 시 전방에서 압박의 첫 번째 역할을 수행한다.',
+      ];
+    },
+  };
+
+  const playerSections = players.map((p, i) => {
+    const role = classifyPlayer(p);
+    let baseLines;
+    if (role === 'GK') {
+      baseLines = roleInstructions.GK;
+    } else if (role === '수비') {
+      baseLines = roleInstructions.수비(p, i);
+    } else if (role === '미드필더') {
+      baseLines = roleInstructions.미드필더(p);
+    } else {
+      baseLines = roleInstructions.공격(p);
+    }
+    const mvLines = describeMoves(p.id);
+    return { player: p, num: i + 1, role, lines: [...baseLines, ...mvLines] };
+  });
+
+  // ── Render HTML ───────────────────────────────────────────────
+  const card = document.getElementById('manualCard');
+  const out  = document.getElementById('manualOutput');
+  card.style.display = '';
+
+  out.innerHTML = `
+    <div class="tactic-section">
+      <div class="tactic-section-title">📢 팀 전체 전달사항</div>
+      ${teamLines.map(l => `<div class="tactic-line">${escHtml(l)}</div>`).join('')}
+    </div>
+    <div class="tactic-section">
+      <div class="tactic-section-title">👤 개별 선수 지침</div>
+      ${playerSections.map(s => `
+        <div class="tactic-player-title">
+          ${s.num}. ${escHtml(s.player.name)}
+          <span class="tactic-tag ${s.role==='GK'?'red':s.role==='수비'?'green':s.role==='미드필더'?'':'amber'}">${s.role}</span>
+        </div>
+        ${s.lines.map(l => `<div class="tactic-line">${escHtml(l)}</div>`).join('')}
+      `).join('')}
+    </div>
+  `;
+
+  // Plain text for copy/save
+  lastManualText = buildPlainText(opponent, dateStr, formation, modeLabel, tacticalStyle, teamLines, playerSections);
+
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildPlainText(opponent, dateStr, formation, modeLabel, style, teamLines, playerSections) {
+  const sep = '─'.repeat(40);
+  let t = `⚽ 전술 지침서\n${sep}\n`;
+  t += `상대: ${opponent}  |  일시: ${dateStr}\n포메이션: ${modeLabel} ${formation} (${style})\n${sep}\n`;
+  t += `▶ 팀 전체 전달사항\n`;
+  teamLines.forEach(l => t += `  • ${l}\n`);
+  t += `\n▶ 개별 선수 지침\n`;
+  playerSections.forEach(s => {
+    t += `\n[${s.num}] ${s.player.name} (${s.role})\n`;
+    s.lines.forEach(l => t += `  • ${l}\n`);
+  });
+  return t;
+}
+
+function copyManual() {
+  if (!lastManualText) return;
+  navigator.clipboard.writeText(lastManualText)
+    .then(() => { alert('클립보드에 복사되었습니다.'); })
+    .catch(() => { alert('복사 실패 — 브라우저 권한을 확인하세요.'); });
+}
+
+function saveManualTxt() {
+  if (!lastManualText) return;
+  const opponent = document.getElementById('opponent').value.trim() || '전술지침서';
+  const blob = new Blob([lastManualText], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.download = `${opponent}_전술지침서.txt`;
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 // ═══════════════════════════════════════════════════════════════
