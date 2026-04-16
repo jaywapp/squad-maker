@@ -15,353 +15,294 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px;
+  padding: 16px 16px 40px;
   gap: 10px;
 }
 
-/* ── App tabs ── */
-.app-tabs {
-  display: flex;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 10px;
-  overflow: hidden;
-  width: 480px;
-}
-.app-tab {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  background: none;
-  color: #64748b;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-.app-tab:not(:last-child) { border-right: 1px solid #334155; }
-.app-tab.active { background: #3b82f6; color: white; }
+h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 
-/* ── Squad sub-tabs ── */
-.squad-sub-tabs {
-  display: flex;
+/* ── 팀 설정 카드 ── */
+.team-setup {
   width: 480px;
   background: #1e293b;
   border: 1px solid #334155;
-  border-radius: 8px;
-  overflow: hidden;
-}
-.squad-sub-tab {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  background: none;
-  color: #64748b;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-.squad-sub-tab:not(:last-child) { border-right: 1px solid #334155; }
-.squad-sub-tab.active { background: #0f172a; color: #f1f5f9; }
-.squad-sub-tab[data-squad="attack"].active  { color: #f97316; }
-.squad-sub-tab[data-squad="defense"].active { color: #60a5fa; }
-
-/* ── Shared top bar ── */
-.top-bar {
+  border-radius: 12px;
+  padding: 14px 16px;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 480px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 10px;
 }
-.name-input {
-  flex: 1; min-width: 120px;
+.setup-row { display: flex; align-items: center; gap: 8px; }
+.setup-label { font-size: 0.75rem; font-weight: 700; color: #64748b; white-space: nowrap; }
+.team-name-input {
+  flex: 1;
   padding: 7px 12px;
   border: 1px solid #334155; border-radius: 8px;
-  background: #1e293b; color: white; font-size: 0.9rem; outline: none;
+  background: #0f172a; color: white; font-size: 0.9rem; outline: none;
 }
-.name-input:focus { border-color: #60a5fa; }
-.name-input::placeholder { color: #475569; }
+.team-name-input:focus { border-color: #60a5fa; }
+.team-name-input::placeholder { color: #334155; }
 
-/* ── Mode + formation bar ── */
-.mode-bar {
-  display: flex; align-items: center; gap: 8px;
-  width: 480px; flex-wrap: wrap;
-}
+/* ── 인원수 pills ── */
 .mode-pills {
   display: flex; flex-wrap: wrap;
-  background: #1e293b; border: 1px solid #334155; border-radius: 8px; overflow: hidden;
+  background: #0f172a; border: 1px solid #334155; border-radius: 8px; overflow: hidden;
+  flex: 1;
 }
 .mode-pill {
-  padding: 6px 10px; border: none; background: none;
-  color: #94a3b8; font-size: 0.78rem; font-weight: 700; cursor: pointer;
-  transition: background 0.15s, color 0.15s; white-space: nowrap;
+  flex: 1;
+  padding: 6px 4px; border: none; background: none;
+  color: #64748b; font-size: 0.75rem; font-weight: 700; cursor: pointer;
+  transition: background 0.15s, color 0.15s; white-space: nowrap; text-align: center;
 }
 .mode-pill:not(:last-child) { border-right: 1px solid #334155; }
 .mode-pill.active { background: #3b82f6; color: white; }
+
+/* ── 포메이션 셀렉트 ── */
 .formation-select {
   padding: 6px 10px; border: 1px solid #334155; border-radius: 8px;
-  background: #1e293b; color: white; font-size: 0.82rem; font-weight: 600;
+  background: #0f172a; color: white; font-size: 0.82rem; font-weight: 600;
   outline: none; cursor: pointer;
 }
 
-/* ── Field wrapper ── */
+/* ── 스쿼드 서브탭 ── */
+.squad-tabs {
+  display: flex; width: 480px;
+  background: #1e293b; border: 1px solid #334155; border-radius: 10px; overflow: hidden;
+}
+.squad-tab {
+  flex: 1; padding: 10px 6px; border: none; background: none;
+  color: #64748b; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+  transition: background 0.15s, color 0.15s; text-align: center;
+}
+.squad-tab:not(:last-child) { border-right: 1px solid #334155; }
+.squad-tab[data-squad="basic"].active   { background: #1d4ed8; color: white; }
+.squad-tab[data-squad="attack"].active  { background: #c2410c; color: white; }
+.squad-tab[data-squad="defense"].active { background: #1e40af; color: white; }
+
+/* ── 포메이션 바 ── */
+.formation-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 480px; gap: 8px;
+}
+.squad-badge {
+  font-size: 0.78rem; font-weight: 700; padding: 4px 12px;
+  border-radius: 20px; white-space: nowrap;
+}
+.squad-badge.basic   { background: #1d4ed8; color: white; }
+.squad-badge.attack  { background: #c2410c; color: white; }
+.squad-badge.defense { background: #1e40af; color: white; }
+
+/* ── Field ── */
 #fieldWrapper {
-  position: relative;
-  width: 480px; height: 660px;
-  flex-shrink: 0;
+  position: relative; width: 480px; height: 660px; flex-shrink: 0;
 }
 #field {
   position: absolute; top: 0; left: 0;
-  width: 480px; height: 660px;
-  border-radius: 6px;
-  background: #276d41;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-  overflow: hidden;
+  width: 480px; height: 660px; border-radius: 6px;
+  background: #276d41; box-shadow: 0 8px 32px rgba(0,0,0,0.6); overflow: hidden;
 }
 #field::before {
-  content: '';
-  position: absolute; inset: 0;
+  content: ''; position: absolute; inset: 0;
   background: repeating-linear-gradient(
     to bottom, transparent 0, transparent 44px,
     rgba(0,0,0,0.07) 44px, rgba(0,0,0,0.07) 88px
   );
   pointer-events: none; z-index: 0;
 }
+.fl { position:absolute; background:rgba(255,255,255,0.8); pointer-events:none; z-index:1; }
+.fc { position:absolute; border:2px solid rgba(255,255,255,0.8); border-radius:50%; pointer-events:none; z-index:1; }
+.fd { position:absolute; background:rgba(255,255,255,0.8); border-radius:50%; pointer-events:none; z-index:1; }
 
-/* ── HTML field elements ── */
-.fl { position: absolute; background: rgba(255,255,255,0.8); pointer-events: none; z-index: 1; }
-.fc { position: absolute; border: 2px solid rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 1; }
-.fd { position: absolute; background: rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 1; }
-
-/* ── HTML players ── */
+/* ── Players ── */
 .player {
-  position: absolute; width: 60px; text-align: center;
-  transform: translate(-50%, -50%);
-  cursor: grab; user-select: none; z-index: 10; touch-action: none;
+  position:absolute; width:60px; text-align:center;
+  transform:translate(-50%,-50%);
+  cursor:grab; user-select:none; z-index:10; touch-action:none;
 }
-.player.dragging { cursor: grabbing; z-index: 50; }
+.player.dragging { cursor:grabbing; z-index:50; }
 .player-circle {
-  width: 44px; height: 44px; border-radius: 50%; margin: 0 auto;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 0.85rem;
-  border: 2.5px solid rgba(255,255,255,0.9); color: white;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.5); transition: transform 0.1s;
+  width:44px; height:44px; border-radius:50%; margin:0 auto;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:0.85rem;
+  border:2.5px solid rgba(255,255,255,0.9); color:white;
+  box-shadow:0 3px 10px rgba(0,0,0,0.5); transition:transform 0.1s;
 }
-.player-circle:hover { transform: scale(1.08); }
+.player-circle:hover { transform:scale(1.08); }
 .player-name {
-  font-size: 0.65rem; font-weight: 600; color: white;
-  text-shadow: 0 1px 4px rgba(0,0,0,1); margin-top: 3px;
-  white-space: nowrap; max-width: 68px; overflow: hidden; text-overflow: ellipsis;
+  font-size:0.65rem; font-weight:600; color:white;
+  text-shadow:0 1px 4px rgba(0,0,0,1); margin-top:3px;
+  white-space:nowrap; max-width:68px; overflow:hidden; text-overflow:ellipsis;
 }
+
+/* ── Controls ── */
+.controls { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.btn {
+  padding:9px 16px; border:none; border-radius:8px;
+  cursor:pointer; font-size:0.85rem; font-weight:600;
+  transition:opacity 0.15s, transform 0.1s;
+}
+.btn:hover  { opacity:0.85; transform:translateY(-1px); }
+.btn:active { transform:translateY(0); }
+.btn-green  { background:#22c55e; color:white; }
+.btn-blue   { background:#3b82f6; color:white; }
+.btn-slate  { background:#475569; color:white; }
+.btn-orange { background:#f97316; color:white; }
 
 /* ── Context menu ── */
 #ctxMenu {
-  position: fixed; background: #1e293b; border: 1px solid #334155;
-  border-radius: 10px; padding: 10px; z-index: 1000; display: none;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6); min-width: 168px;
+  position:fixed; background:#1e293b; border:1px solid #334155;
+  border-radius:10px; padding:10px; z-index:1000; display:none;
+  box-shadow:0 8px 24px rgba(0,0,0,0.6); min-width:168px;
 }
-#ctxMenu.visible { display: block; }
-.ctx-label { font-size: 0.72rem; color: #94a3b8; margin-bottom: 8px; font-weight: 600; }
-.color-palette { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+#ctxMenu.visible { display:block; }
+.ctx-label { font-size:0.72rem; color:#94a3b8; margin-bottom:8px; font-weight:600; }
+.color-palette { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
 .swatch {
-  width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
-  border: 2px solid transparent; transition: transform 0.1s;
+  width:24px; height:24px; border-radius:50%; cursor:pointer;
+  border:2px solid transparent; transition:transform 0.1s;
 }
-.swatch:hover { transform: scale(1.25); border-color: white; }
-.swatch.active { border-color: white; transform: scale(1.2); }
+.swatch:hover { transform:scale(1.25); border-color:white; }
+.swatch.active { border-color:white; transform:scale(1.2); }
 .ctx-btn {
-  display: block; width: 100%; padding: 7px 10px;
-  background: none; border: none; color: #f1f5f9;
-  text-align: left; cursor: pointer; font-size: 0.85rem;
-  border-radius: 6px; transition: background 0.1s;
+  display:block; width:100%; padding:7px 10px;
+  background:none; border:none; color:#f1f5f9;
+  text-align:left; cursor:pointer; font-size:0.85rem;
+  border-radius:6px; transition:background 0.1s;
 }
-.ctx-btn:hover { background: #334155; }
-.ctx-btn.danger { color: #f87171; }
-.ctx-divider { height: 1px; background: #334155; margin: 6px 0; }
+.ctx-btn:hover { background:#334155; }
+.ctx-btn.danger { color:#f87171; }
+.ctx-divider { height:1px; background:#334155; margin:6px 0; }
 
-/* ── Buttons ── */
-.controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-.btn {
-  padding: 9px 16px; border: none; border-radius: 8px;
-  cursor: pointer; font-size: 0.85rem; font-weight: 600;
-  transition: opacity 0.15s, transform 0.1s;
-}
-.btn:hover  { opacity: 0.85; transform: translateY(-1px); }
-.btn:active { transform: translateY(0); }
-.btn-green  { background: #22c55e; color: white; }
-.btn-blue   { background: #3b82f6; color: white; }
-.btn-slate  { background: #475569; color: white; }
-
-.hint { font-size: 0.72rem; color: #475569; }
-
-/* ── Notes panel ── */
-.notes-panel {
-  width: 480px;
-  display: flex; flex-direction: column; gap: 10px;
+/* ── Notes ── */
+.notes-wrap {
+  width:480px; display:flex; flex-direction:column; gap:10px;
 }
 .notes-card {
-  background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 14px;
+  background:#1e293b; border:1px solid #334155; border-radius:12px; padding:14px;
 }
-.notes-card h3 {
-  font-size: 0.75rem; font-weight: 700; color: #64748b;
-  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;
+.notes-card-title {
+  font-size:0.72rem; font-weight:700; color:#64748b;
+  text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px;
 }
 .notes-textarea {
-  width: 100%; padding: 10px 12px;
-  border: 1px solid #334155; border-radius: 8px;
-  background: #0f172a; color: #e2e8f0;
-  font-size: 0.85rem; font-family: inherit; line-height: 1.6;
-  outline: none; resize: vertical; min-height: 80px;
+  width:100%; padding:10px 12px;
+  border:1px solid #334155; border-radius:8px;
+  background:#0f172a; color:#e2e8f0;
+  font-size:0.85rem; font-family:inherit; line-height:1.6;
+  outline:none; resize:vertical; min-height:76px;
+  transition:border-color 0.15s;
 }
-.notes-textarea:focus { border-color: #60a5fa; }
-.notes-textarea::placeholder { color: #334155; }
+.notes-textarea:focus { border-color:#475569; }
+.notes-textarea::placeholder { color:#1e3a5f; }
 
-.player-note-list { display: flex; flex-direction: column; gap: 8px; }
-.player-note-row {
-  display: flex; flex-direction: column; gap: 5px;
-}
+.player-note-list { display:flex; flex-direction:column; gap:8px; }
+.player-note-row { display:flex; flex-direction:column; gap:4px; }
 .player-note-header {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 0.8rem; font-weight: 600; color: #94a3b8;
+  display:flex; align-items:center; gap:7px;
+  font-size:0.78rem; font-weight:600; color:#94a3b8;
 }
-.player-note-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.player-note-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
 .player-note-input {
-  width: 100%; padding: 7px 10px;
-  border: 1px solid #1e293b; border-radius: 6px;
-  background: #0f172a; color: #cbd5e1;
-  font-size: 0.8rem; font-family: inherit; line-height: 1.5;
-  outline: none; resize: none; min-height: 52px;
-  transition: border-color 0.15s;
+  width:100%; padding:7px 10px;
+  border:1px solid #1e293b; border-radius:6px;
+  background:#0f172a; color:#cbd5e1;
+  font-size:0.8rem; font-family:inherit; line-height:1.5;
+  outline:none; resize:none; height:48px;
+  transition:border-color 0.15s;
 }
-.player-note-input:focus { border-color: #334155; }
-.player-note-input::placeholder { color: #1e3a5f; }
+.player-note-input:focus { border-color:#334155; }
+.player-note-input::placeholder { color:#1e3a5f; }
 
-/* ── Strategy tab ── */
-#strategyUI { width: 480px; display: none; flex-direction: column; gap: 12px; }
+/* ── Share modal ── */
+#shareModal {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.75); z-index:2000;
+  align-items:flex-start; justify-content:center;
+  padding:20px 12px; overflow-y:auto;
+}
+#shareModal.visible { display:flex; }
+.share-box {
+  background:#1e293b; border:1px solid #334155; border-radius:14px;
+  width:100%; max-width:480px; padding:20px;
+  display:flex; flex-direction:column; gap:14px;
+}
+.share-box h3 { font-size:1rem; font-weight:700; }
+.share-text {
+  background:#0f172a; border:1px solid #334155; border-radius:8px;
+  padding:14px; font-size:0.8rem; color:#cbd5e1;
+  white-space:pre-wrap; word-break:break-word;
+  max-height:50vh; overflow-y:auto; line-height:1.7;
+  font-family:'Segoe UI', Tahoma, monospace;
+}
+.share-actions { display:flex; gap:8px; flex-wrap:wrap; }
 
-.strategy-card {
-  background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px;
-}
-.strategy-card h3 {
-  font-size: 0.85rem; font-weight: 700; color: #94a3b8;
-  margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;
-}
-.strategy-form { display: flex; flex-direction: column; gap: 10px; }
-.strategy-field { display: flex; flex-direction: column; gap: 4px; }
-.strategy-field label { font-size: 0.75rem; color: #64748b; font-weight: 600; }
-.strategy-input {
-  padding: 8px 12px; border: 1px solid #334155; border-radius: 8px;
-  background: #0f172a; color: white; font-size: 0.88rem; outline: none;
-  font-family: inherit;
-}
-.strategy-input:focus { border-color: #60a5fa; }
-.strategy-input::placeholder { color: #475569; }
-textarea.strategy-input { resize: vertical; min-height: 72px; line-height: 1.5; }
-
-.squad-summary { font-size: 0.8rem; color: #94a3b8; line-height: 1.8; }
-.squad-summary .formation-badge {
-  display: inline-block; background: #3b82f6; color: white;
-  padding: 2px 10px; border-radius: 12px; font-weight: 700; font-size: 0.78rem; margin-bottom: 8px;
-}
-.player-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-.player-chip {
-  display: flex; align-items: center; gap: 5px;
-  background: #0f172a; border: 1px solid #334155; border-radius: 20px;
-  padding: 3px 10px; font-size: 0.75rem;
-}
-.player-chip .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
-.manual-output { display: flex; flex-direction: column; gap: 4px; }
-.tactic-section { margin-bottom: 14px; }
-.tactic-section-title {
-  color: #60a5fa; font-weight: 700; font-size: 0.85rem;
-  border-bottom: 1px solid #1e3a5f; padding-bottom: 4px; margin-bottom: 8px;
-}
-.tactic-subsection-title {
-  color: #f97316; font-weight: 700; font-size: 0.8rem; margin: 10px 0 4px;
-}
-.tactic-subsection-title.defense { color: #60a5fa; }
-.tactic-player-title {
-  color: #fbbf24; font-weight: 700; font-size: 0.82rem; margin: 8px 0 3px;
-  display: flex; align-items: center; gap: 6px;
-}
-.tactic-line { color: #cbd5e1; font-size: 0.8rem; line-height: 1.7; padding-left: 12px; }
-.tactic-line::before { content: '• '; color: #475569; }
-.tactic-tag {
-  display: inline-block; border-radius: 10px; padding: 1px 8px;
-  font-size: 0.72rem; font-weight: 600;
-  background: #1e3a5f; color: #93c5fd;
-}
-.tactic-tag.green { background: #14532d; color: #86efac; }
-.tactic-tag.amber { background: #451a03; color: #fde68a; }
-.tactic-tag.red   { background: #450a0a; color: #fca5a5; }
-.tactic-note-line {
-  color: #a3e635; font-size: 0.8rem; line-height: 1.7; padding-left: 12px;
-  font-style: italic;
-}
-.tactic-note-line::before { content: '✎ '; color: #4d7c0f; }
-
-.output-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.hint { font-size:0.72rem; color:#334155; }
 </style>
 </head>
 <body>
 
 <h1>⚽ 스쿼드 메이커</h1>
 
-<!-- App mode tabs -->
-<div class="app-tabs">
-  <button class="app-tab active" data-mode="squad"    onclick="setAppMode('squad')">⚽ 스쿼드</button>
-  <button class="app-tab"        data-mode="strategy" onclick="setAppMode('strategy')">📋 매치 전략</button>
-</div>
-
-<!-- Squad sub-tabs -->
-<div class="squad-sub-tabs" id="squadSubTabs">
-  <button class="squad-sub-tab active" data-squad="attack"  onclick="switchSquad('attack')">⚔️ 공격 스쿼드</button>
-  <button class="squad-sub-tab"        data-squad="defense" onclick="switchSquad('defense')">🛡 수비 스쿼드</button>
-</div>
-
-<!-- Squad UI -->
-<div id="squadUI">
-  <div class="top-bar">
-    <input class="name-input" id="teamName" type="text" placeholder="팀 이름 (선택)..." maxlength="20" />
+<!-- 팀 설정 -->
+<div class="team-setup">
+  <div class="setup-row">
+    <span class="setup-label">팀명</span>
+    <input class="team-name-input" id="teamName" type="text" placeholder="팀 이름 입력..." maxlength="20" />
   </div>
-  <div class="mode-bar">
+  <div class="setup-row">
+    <span class="setup-label">인원</span>
     <div class="mode-pills" id="modePills"></div>
-    <select class="formation-select" id="formationSelect" onchange="onFormationChange()"></select>
   </div>
 </div>
 
-<!-- Field wrapper -->
+<!-- 스쿼드 탭 -->
+<div class="squad-tabs">
+  <button class="squad-tab active" data-squad="basic"   onclick="switchSquad('basic')">🔵 기본 스쿼드</button>
+  <button class="squad-tab"        data-squad="attack"  onclick="switchSquad('attack')">⚔️ 공격 스쿼드</button>
+  <button class="squad-tab"        data-squad="defense" onclick="switchSquad('defense')">🛡 수비 스쿼드</button>
+</div>
+
+<!-- 포메이션 바 -->
+<div class="formation-bar">
+  <span class="squad-badge basic" id="squadBadge">🔵 기본</span>
+  <select class="formation-select" id="formationSelect" onchange="onFormationChange()"></select>
+  <button class="btn btn-slate" style="padding:6px 12px;font-size:0.8rem;" onclick="resetLayout()">↺ 초기화</button>
+</div>
+
+<!-- 필드 -->
 <div id="fieldWrapper">
   <div id="field"></div>
 </div>
 
-<!-- Squad controls -->
-<div id="squadControls" class="controls">
+<!-- 선수 컨트롤 -->
+<div class="controls">
   <button class="btn btn-blue"  onclick="addPlayer()">+ 선수 추가</button>
   <button class="btn btn-green" onclick="saveImage()">📸 이미지 저장</button>
-  <button class="btn btn-slate" onclick="resetLayout()">↺ 초기화</button>
 </div>
 
-<!-- Notes panel -->
-<div class="notes-panel" id="notesPanel">
+<!-- 지침 입력 -->
+<div class="notes-wrap" id="notesWrap">
   <div class="notes-card">
-    <h3 id="teamNoteLabel">⚔️ 공격 스쿼드 — 전체 지침</h3>
+    <div class="notes-card-title" id="teamNoteLabel">🔵 기본 스쿼드 — 전체 지침</div>
     <textarea class="notes-textarea" id="teamNote"
-      placeholder="팀 전체에게 전달할 전술 지침을 입력하세요..."
+      placeholder="팀 전체에게 전달할 전술 지침..."
       oninput="saveTeamNote()"></textarea>
   </div>
   <div class="notes-card">
-    <h3>개별 선수 지침</h3>
+    <div class="notes-card-title">개별 선수 지침</div>
     <div class="player-note-list" id="playerNotes"></div>
   </div>
 </div>
 
-<p class="hint">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭: 색상 / 삭제</p>
+<p class="hint">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭: 색상·삭제</p>
 
-<!-- Context menu -->
+<!-- 공유 버튼 -->
+<div class="controls">
+  <button class="btn btn-orange" onclick="openShare()">📤 단톡방 공유 텍스트 생성</button>
+</div>
+
+<!-- 컨텍스트 메뉴 -->
 <div id="ctxMenu">
   <div class="ctx-label">색상</div>
   <div class="color-palette" id="colorPalette"></div>
@@ -370,41 +311,15 @@ textarea.strategy-input { resize: vertical; min-height: 72px; line-height: 1.5; 
   <button class="ctx-btn danger" onclick="ctxRemove()">🗑️ 삭제</button>
 </div>
 
-<!-- Strategy UI -->
-<div id="strategyUI">
-  <div class="strategy-card">
-    <h3>경기 정보</h3>
-    <div class="strategy-form">
-      <div class="strategy-field">
-        <label>상대팀</label>
-        <input class="strategy-input" id="opponent" type="text" placeholder="ex) FC 서울, 이웃동네팀..." maxlength="30" />
-      </div>
-      <div class="strategy-field">
-        <label>경기 일시</label>
-        <input class="strategy-input" id="matchDate" type="datetime-local" />
-      </div>
-      <div class="strategy-field">
-        <label>감독 메모 (선택)</label>
-        <textarea class="strategy-input" id="matchNotes" placeholder="특이사항, 상대팀 약점, 주의사항 등..." maxlength="300"></textarea>
-      </div>
-    </div>
-  </div>
-
-  <div class="strategy-card">
-    <h3>스쿼드 요약</h3>
-    <div id="squadSummary"></div>
-  </div>
-
-  <div class="strategy-card" style="padding:12px 16px;">
-    <button class="btn btn-blue" style="width:100%;" onclick="generateManual()">📄 전술 지침서 생성</button>
-  </div>
-
-  <div class="strategy-card" id="manualCard" style="display:none;">
-    <h3>전술 지침서</h3>
-    <div id="manualOutput" class="manual-output"></div>
-    <div class="output-actions">
-      <button class="btn btn-slate" onclick="copyManual()">📋 클립보드 복사</button>
-      <button class="btn btn-slate" onclick="saveManualTxt()">💾 텍스트 저장</button>
+<!-- 공유 모달 -->
+<div id="shareModal">
+  <div class="share-box">
+    <h3>📤 단톡방 공유 텍스트</h3>
+    <div class="share-text" id="shareText"></div>
+    <div class="share-actions">
+      <button class="btn btn-blue" onclick="copyShareText()">📋 클립보드 복사</button>
+      <button class="btn btn-slate" onclick="saveShareTxt()">💾 파일 저장</button>
+      <button class="btn btn-slate" onclick="closeShare()">✕ 닫기</button>
     </div>
   </div>
 </div>
@@ -418,201 +333,238 @@ const COLORS = ['#E53935','#1E88E5','#43A047','#FB8C00','#8E24AA','#00ACC1','#F0
 const FIELD_W = 480, FIELD_H = 660;
 
 const MODES_CONFIG = {
-  '5v5':  { label:'5 vs 5',  maxPlayers:5,  formations:{
-    '2-2':   [{count:2,y:490,prefix:'수비'},{count:2,y:270,prefix:'공격'}],
-    '1-2-1': [{count:1,y:510,prefix:'수비'},{count:2,y:370,prefix:'미드'},{count:1,y:230,prefix:'공격'}],
-    '2-1-1': [{count:2,y:510,prefix:'수비'},{count:1,y:370,prefix:'미드'},{count:1,y:230,prefix:'공격'}],
+  '5v5':  { label:'5vs5',  max:5,  formations:{
+    '2-2':   [{count:2,y:490,pre:'수비'},{count:2,y:270,pre:'공격'}],
+    '1-2-1': [{count:1,y:510,pre:'수비'},{count:2,y:370,pre:'미드'},{count:1,y:230,pre:'공격'}],
+    '2-1-1': [{count:2,y:510,pre:'수비'},{count:1,y:370,pre:'미드'},{count:1,y:230,pre:'공격'}],
   }},
-  '6v6':  { label:'6 vs 6',  maxPlayers:6,  formations:{
-    '2-2-1': [{count:2,y:510,prefix:'수비'},{count:2,y:380,prefix:'미드'},{count:1,y:240,prefix:'공격'}],
-    '3-2':   [{count:3,y:510,prefix:'수비'},{count:2,y:310,prefix:'공격'}],
-    '2-3':   [{count:2,y:510,prefix:'수비'},{count:3,y:310,prefix:'공격'}],
-    '1-3-1': [{count:1,y:510,prefix:'수비'},{count:3,y:380,prefix:'미드'},{count:1,y:240,prefix:'공격'}],
+  '6v6':  { label:'6vs6',  max:6,  formations:{
+    '2-2-1': [{count:2,y:510,pre:'수비'},{count:2,y:380,pre:'미드'},{count:1,y:240,pre:'공격'}],
+    '3-2':   [{count:3,y:510,pre:'수비'},{count:2,y:310,pre:'공격'}],
+    '2-3':   [{count:2,y:510,pre:'수비'},{count:3,y:310,pre:'공격'}],
+    '1-3-1': [{count:1,y:510,pre:'수비'},{count:3,y:380,pre:'미드'},{count:1,y:240,pre:'공격'}],
   }},
-  '7v7':  { label:'7 vs 7',  maxPlayers:7,  formations:{
-    '3-2-1': [{count:3,y:510,prefix:'수비'},{count:2,y:385,prefix:'미드'},{count:1,y:240,prefix:'공격'}],
-    '2-3-1': [{count:2,y:510,prefix:'수비'},{count:3,y:385,prefix:'미드'},{count:1,y:240,prefix:'공격'}],
-    '2-2-2': [{count:2,y:510,prefix:'수비'},{count:2,y:385,prefix:'미드'},{count:2,y:240,prefix:'공격'}],
-    '3-3':   [{count:3,y:510,prefix:'수비'},{count:3,y:310,prefix:'공격'}],
+  '7v7':  { label:'7vs7',  max:7,  formations:{
+    '3-2-1': [{count:3,y:510,pre:'수비'},{count:2,y:385,pre:'미드'},{count:1,y:240,pre:'공격'}],
+    '2-3-1': [{count:2,y:510,pre:'수비'},{count:3,y:385,pre:'미드'},{count:1,y:240,pre:'공격'}],
+    '2-2-2': [{count:2,y:510,pre:'수비'},{count:2,y:385,pre:'미드'},{count:2,y:240,pre:'공격'}],
+    '3-3':   [{count:3,y:510,pre:'수비'},{count:3,y:310,pre:'공격'}],
   }},
-  '8v8':  { label:'8 vs 8',  maxPlayers:8,  formations:{
-    '3-3-1': [{count:3,y:510,prefix:'수비'},{count:3,y:385,prefix:'미드'},{count:1,y:240,prefix:'공격'}],
-    '3-2-2': [{count:3,y:510,prefix:'수비'},{count:2,y:385,prefix:'미드'},{count:2,y:240,prefix:'공격'}],
-    '2-3-2': [{count:2,y:510,prefix:'수비'},{count:3,y:385,prefix:'미드'},{count:2,y:240,prefix:'공격'}],
-    '4-3':   [{count:4,y:510,prefix:'수비'},{count:3,y:310,prefix:'공격'}],
+  '8v8':  { label:'8vs8',  max:8,  formations:{
+    '3-3-1': [{count:3,y:510,pre:'수비'},{count:3,y:385,pre:'미드'},{count:1,y:240,pre:'공격'}],
+    '3-2-2': [{count:3,y:510,pre:'수비'},{count:2,y:385,pre:'미드'},{count:2,y:240,pre:'공격'}],
+    '2-3-2': [{count:2,y:510,pre:'수비'},{count:3,y:385,pre:'미드'},{count:2,y:240,pre:'공격'}],
+    '4-3':   [{count:4,y:510,pre:'수비'},{count:3,y:310,pre:'공격'}],
   }},
-  '9v9':  { label:'9 vs 9',  maxPlayers:9,  formations:{
-    '3-3-2': [{count:3,y:510,prefix:'수비'},{count:3,y:385,prefix:'미드'},{count:2,y:240,prefix:'공격'}],
-    '3-2-3': [{count:3,y:510,prefix:'수비'},{count:2,y:385,prefix:'미드'},{count:3,y:240,prefix:'공격'}],
-    '4-3-1': [{count:4,y:510,prefix:'수비'},{count:3,y:380,prefix:'미드'},{count:1,y:230,prefix:'공격'}],
-    '2-4-2': [{count:2,y:510,prefix:'수비'},{count:4,y:385,prefix:'미드'},{count:2,y:240,prefix:'공격'}],
-    '3-4-1': [{count:3,y:510,prefix:'수비'},{count:4,y:385,prefix:'미드'},{count:1,y:240,prefix:'공격'}],
+  '9v9':  { label:'9vs9',  max:9,  formations:{
+    '3-3-2': [{count:3,y:510,pre:'수비'},{count:3,y:385,pre:'미드'},{count:2,y:240,pre:'공격'}],
+    '3-2-3': [{count:3,y:510,pre:'수비'},{count:2,y:385,pre:'미드'},{count:3,y:240,pre:'공격'}],
+    '4-3-1': [{count:4,y:510,pre:'수비'},{count:3,y:380,pre:'미드'},{count:1,y:230,pre:'공격'}],
+    '2-4-2': [{count:2,y:510,pre:'수비'},{count:4,y:385,pre:'미드'},{count:2,y:240,pre:'공격'}],
+    '3-4-1': [{count:3,y:510,pre:'수비'},{count:4,y:385,pre:'미드'},{count:1,y:240,pre:'공격'}],
   }},
-  '10v10':{ label:'10 vs 10',maxPlayers:10, formations:{
-    '4-4-1': [{count:4,y:510,prefix:'수비'},{count:4,y:380,prefix:'미드'},{count:1,y:230,prefix:'공격'}],
-    '4-3-2': [{count:4,y:510,prefix:'수비'},{count:3,y:380,prefix:'미드'},{count:2,y:230,prefix:'공격'}],
-    '3-4-2': [{count:3,y:510,prefix:'수비'},{count:4,y:380,prefix:'미드'},{count:2,y:230,prefix:'공격'}],
-    '3-5-1': [{count:3,y:510,prefix:'수비'},{count:5,y:380,prefix:'미드'},{count:1,y:230,prefix:'공격'}],
+  '10v10':{ label:'10vs10',max:10, formations:{
+    '4-4-1': [{count:4,y:510,pre:'수비'},{count:4,y:380,pre:'미드'},{count:1,y:230,pre:'공격'}],
+    '4-3-2': [{count:4,y:510,pre:'수비'},{count:3,y:380,pre:'미드'},{count:2,y:230,pre:'공격'}],
+    '3-4-2': [{count:3,y:510,pre:'수비'},{count:4,y:380,pre:'미드'},{count:2,y:230,pre:'공격'}],
+    '3-5-1': [{count:3,y:510,pre:'수비'},{count:5,y:380,pre:'미드'},{count:1,y:230,pre:'공격'}],
   }},
-  '11v11':{ label:'11 vs 11',maxPlayers:11, formations:{
-    '4-4-2':   [{count:4,y:510,prefix:'수비'},{count:4,y:380,prefix:'미드'},{count:2,y:230,prefix:'공격'}],
-    '4-3-3':   [{count:4,y:510,prefix:'수비'},{count:3,y:370,prefix:'미드'},{count:3,y:220,prefix:'공격'}],
-    '3-5-2':   [{count:3,y:510,prefix:'수비'},{count:5,y:375,prefix:'미드'},{count:2,y:230,prefix:'공격'}],
-    '4-2-3-1': [{count:4,y:520,prefix:'수비'},{count:2,y:415,prefix:'수비형MF'},{count:3,y:305,prefix:'공격형MF'},{count:1,y:200,prefix:'공격'}],
-    '5-3-2':   [{count:5,y:510,prefix:'수비'},{count:3,y:370,prefix:'미드'},{count:2,y:230,prefix:'공격'}],
-    '3-4-3':   [{count:3,y:510,prefix:'수비'},{count:4,y:375,prefix:'미드'},{count:3,y:225,prefix:'공격'}],
+  '11v11':{ label:'11vs11',max:11, formations:{
+    '4-4-2':   [{count:4,y:510,pre:'수비'},{count:4,y:380,pre:'미드'},{count:2,y:230,pre:'공격'}],
+    '4-3-3':   [{count:4,y:510,pre:'수비'},{count:3,y:370,pre:'미드'},{count:3,y:220,pre:'공격'}],
+    '3-5-2':   [{count:3,y:510,pre:'수비'},{count:5,y:375,pre:'미드'},{count:2,y:230,pre:'공격'}],
+    '4-2-3-1': [{count:4,y:520,pre:'수비'},{count:2,y:415,pre:'수비형MF'},{count:3,y:305,pre:'공격형MF'},{count:1,y:200,pre:'공격'}],
+    '5-3-2':   [{count:5,y:510,pre:'수비'},{count:3,y:370,pre:'미드'},{count:2,y:230,pre:'공격'}],
+    '3-4-3':   [{count:3,y:510,pre:'수비'},{count:4,y:375,pre:'미드'},{count:3,y:225,pre:'공격'}],
   }},
+};
+
+const SQUAD_META = {
+  basic:   { label:'기본 스쿼드', icon:'🔵', badge:'basic',   notePrefix:'🔵 기본' },
+  attack:  { label:'공격 스쿼드', icon:'⚔️', badge:'attack',  notePrefix:'⚔️ 공격' },
+  defense: { label:'수비 스쿼드', icon:'🛡', badge:'defense', notePrefix:'🛡 수비' },
 };
 
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-let appMode = 'squad';
-let currentSquadType = 'attack'; // 'attack' | 'defense'
+let currentMode   = '9v9';
+let currentSquad  = 'basic';  // 'basic' | 'attack' | 'defense'
+let selectedPlayer = null;
+let dragState      = null;
+let nextId         = 1;
 
-// Each squad stores its own players, mode, formation, notes
+// 공유 명단 (이름·색상만, 전 스쿼드 공유)
+// roster[i] = { id, name, color }
+let roster = [];
+
+// 스쿼드별 데이터
+// squads[type] = { formation, positions: { id: {x,y} }, teamNote, playerNotes: { id: '' } }
 const squads = {
-  attack:  { mode: '9v9', formation: '3-3-2', players: [], teamNote: '', playerNotes: {} },
-  defense: { mode: '9v9', formation: '4-3-1', players: [], teamNote: '', playerNotes: {} },
+  basic:   { formation: '3-3-2', positions: {}, teamNote: '', playerNotes: {} },
+  attack:  { formation: '3-2-3', positions: {}, teamNote: '', playerNotes: {} },
+  defense: { formation: '4-3-1', positions: {}, teamNote: '', playerNotes: {} },
 };
 
-// Active working copies (aliased to current squad)
-let players = [];
-let currentMode = '9v9';
-let nextId = 1;
-let selectedPlayer = null;
-let dragState = null;
-
-let lastManualText = '';
-
-// ═══════════════════════════════════════════════════════════════
-// APP MODE
-// ═══════════════════════════════════════════════════════════════
-function setAppMode(mode) {
-  appMode = mode;
-  document.querySelectorAll('.app-tab').forEach(t =>
-    t.classList.toggle('active', t.dataset.mode === mode)
-  );
-  const isSquad = mode === 'squad';
-  document.getElementById('squadSubTabs').style.display  = isSquad ? '' : 'none';
-  document.getElementById('squadUI').style.display       = isSquad ? '' : 'none';
-  document.getElementById('fieldWrapper').style.display  = isSquad ? '' : 'none';
-  document.getElementById('squadControls').style.display = isSquad ? '' : 'none';
-  document.getElementById('notesPanel').style.display    = isSquad ? '' : 'none';
-  document.getElementById('strategyUI').style.display    = isSquad ? 'none' : 'flex';
-
-  if (mode === 'strategy') {
-    refreshSquadSummary();
-  }
+// 현재 화면에 표시되는 players (roster + 현 스쿼드 positions 합성)
+function getPlayers() {
+  const pos = squads[currentSquad].positions;
+  return roster.map(r => ({ ...r, x: pos[r.id]?.x ?? 240, y: pos[r.id]?.y ?? 330 }));
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SQUAD SWITCHING (attack ↔ defense)
+// FORMATION HELPERS
 // ═══════════════════════════════════════════════════════════════
-function saveCurrentSquadState() {
-  const sq = squads[currentSquadType];
-  sq.players    = players.map(p => ({ ...p }));
-  sq.mode       = currentMode;
-  sq.formation  = document.getElementById('formationSelect').value;
-  sq.teamNote   = document.getElementById('teamNote').value;
-  // save individual player notes from DOM
+function rowX(count, i) { return Math.round(20 + (i + 1) * 440 / (count + 1)); }
+
+function defaultPositions(modeKey, formKey) {
+  // Returns { id: {x,y} } based on roster order
+  const rows = MODES_CONFIG[modeKey].formations[formKey];
+  const coords = [{ x: 240, y: 622 }]; // GK
+  rows.forEach(row => {
+    for (let i = 0; i < row.count; i++)
+      coords.push({ x: rowX(row.count, i), y: row.y });
+  });
+  const result = {};
+  roster.forEach((r, i) => {
+    if (coords[i]) result[r.id] = { ...coords[i] };
+  });
+  return result;
+}
+
+function defaultRoster(modeKey, formKey) {
+  const rows = MODES_CONFIG[modeKey].formations[formKey];
+  const list = [{ id: 1, name: 'GK', color: '#E53935' }];
+  let id = 2;
+  rows.forEach(row => {
+    for (let i = 0; i < row.count; i++)
+      list.push({ id: id++, name: `${row.pre}${i+1}`, color: '#1E88E5' });
+  });
+  return list;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODE CHANGE (인원수)
+// ═══════════════════════════════════════════════════════════════
+function buildModePills() {
+  document.getElementById('modePills').innerHTML =
+    Object.entries(MODES_CONFIG).map(([k, c]) =>
+      `<button class="mode-pill${k===currentMode?' active':''}" onclick="onModeChange('${k}')">${c.label}</button>`
+    ).join('');
+}
+
+function onModeChange(k) {
+  if (k === currentMode) return;
+  const hasNotes = Object.values(squads).some(sq =>
+    sq.teamNote.trim() || Object.values(sq.playerNotes).some(n => n.trim())
+  );
+  if (hasNotes && !confirm('인원수를 변경하면 모든 스쿼드와 지침이 초기화됩니다. 계속하시겠습니까?')) return;
+
+  currentMode = k;
+  buildModePills();
+  initAllSquads();
+}
+
+function initAllSquads() {
+  // Build default roster from current mode's first formation
+  const defaultForm = Object.keys(MODES_CONFIG[currentMode].formations)[0];
+  roster = defaultRoster(currentMode, defaultForm);
+  nextId = roster.length + 1;
+
+  // Reset all squad data
+  const formKeys = {
+    basic:   Object.keys(MODES_CONFIG[currentMode].formations)[0],
+    attack:  Object.keys(MODES_CONFIG[currentMode].formations)[Math.min(1, Object.keys(MODES_CONFIG[currentMode].formations).length-1)],
+    defense: Object.keys(MODES_CONFIG[currentMode].formations)[Math.min(2, Object.keys(MODES_CONFIG[currentMode].formations).length-1)],
+  };
+  ['basic','attack','defense'].forEach(type => {
+    squads[type].formation  = formKeys[type];
+    squads[type].positions  = defaultPositions(currentMode, formKeys[type]);
+    squads[type].teamNote   = '';
+    squads[type].playerNotes = {};
+  });
+
+  buildFormationSelect();
+  document.getElementById('formationSelect').value = squads[currentSquad].formation;
+  renderPlayers();
+  renderNotesPanel();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SQUAD SWITCHING
+// ═══════════════════════════════════════════════════════════════
+function saveCurrentNotes() {
+  squads[currentSquad].teamNote = document.getElementById('teamNote').value;
+  const players = getPlayers();
   players.forEach(p => {
     const el = document.getElementById('pnote_' + p.id);
-    if (el) sq.playerNotes[p.id] = el.value;
+    if (el) squads[currentSquad].playerNotes[p.id] = el.value;
   });
 }
 
 function switchSquad(type) {
-  if (type === currentSquadType) return;
-  saveCurrentSquadState();
+  if (type === currentSquad) return;
+  saveCurrentNotes();
+  currentSquad = type;
 
-  currentSquadType = type;
-  const sq = squads[type];
-  currentMode = sq.mode;
-  players = sq.players.map(p => ({ ...p }));
-  nextId = players.length ? Math.max(...players.map(p => p.id)) + 1 : 1;
-
-  // Update sub-tab highlight
-  document.querySelectorAll('.squad-sub-tab').forEach(t =>
+  // Update tab highlight
+  document.querySelectorAll('.squad-tab').forEach(t =>
     t.classList.toggle('active', t.dataset.squad === type)
   );
 
-  // Update team note label
-  const label = type === 'attack' ? '⚔️ 공격 스쿼드 — 전체 지침' : '🛡 수비 스쿼드 — 전체 지침';
-  document.getElementById('teamNoteLabel').textContent = label;
+  // Update badge
+  const meta = SQUAD_META[type];
+  const badge = document.getElementById('squadBadge');
+  badge.textContent = `${meta.icon} ${meta.label.replace(' 스쿼드','')}`;
+  badge.className = `squad-badge ${type}`;
 
-  buildModePills();
-  buildFormationSelect(currentMode);
-  document.getElementById('formationSelect').value = sq.formation;
+  // Update note label
+  document.getElementById('teamNoteLabel').textContent =
+    `${meta.icon} ${meta.label} — 전체 지침`;
+
+  buildFormationSelect();
+  document.getElementById('formationSelect').value = squads[type].formation;
   renderPlayers();
   renderNotesPanel();
 }
 
 // ═══════════════════════════════════════════════════════════════
-// FORMATION / SQUAD
+// FORMATION SELECT
 // ═══════════════════════════════════════════════════════════════
-function rowX(count, i) { return Math.round(20 + (i + 1) * 440 / (count + 1)); }
-
-function buildPlayers(modeKey, formKey) {
-  const rows = MODES_CONFIG[modeKey].formations[formKey];
-  let id = 1;
-  const list = [{ id: id++, name: 'GK', x: 240, y: 622, color: '#E53935' }];
-  rows.forEach(row => {
-    for (let i = 0; i < row.count; i++)
-      list.push({ id: id++, name: `${row.prefix}${i+1}`, x: rowX(row.count, i), y: row.y, color: '#1E88E5' });
-  });
-  list.forEach((p, i) => { p.id = i + 1; });
-  return list;
-}
-
-function applyFormation(modeKey, formKey) {
-  const sq = squads[currentSquadType];
-  // Preserve existing player names/colors where possible
-  const oldPlayers = players.slice();
-  players = buildPlayers(modeKey, formKey);
-  players.forEach((p, i) => {
-    if (oldPlayers[i]) { p.name = oldPlayers[i].name; p.color = oldPlayers[i].color; }
-  });
-  nextId = players.length + 1;
-  // Reset playerNotes for players no longer in list
-  const ids = new Set(players.map(p => p.id));
-  Object.keys(sq.playerNotes).forEach(id => { if (!ids.has(Number(id))) delete sq.playerNotes[id]; });
-  renderPlayers();
-  renderNotesPanel();
-}
-
-function buildModePills() {
-  document.getElementById('modePills').innerHTML = Object.entries(MODES_CONFIG).map(([k, c]) =>
-    `<button class="mode-pill${k===currentMode?' active':''}" onclick="onModeChange('${k}')">${c.label}</button>`
-  ).join('');
-}
-
-function buildFormationSelect(modeKey) {
+function buildFormationSelect() {
   document.getElementById('formationSelect').innerHTML =
-    Object.keys(MODES_CONFIG[modeKey].formations).map(f => `<option value="${f}">${f}</option>`).join('');
-}
-
-function onModeChange(k) {
-  currentMode = k;
-  buildModePills();
-  buildFormationSelect(k);
-  applyFormation(k, Object.keys(MODES_CONFIG[k].formations)[0]);
+    Object.keys(MODES_CONFIG[currentMode].formations)
+      .map(f => `<option value="${f}">${f}</option>`).join('');
 }
 
 function onFormationChange() {
-  applyFormation(currentMode, document.getElementById('formationSelect').value);
-}
-
-function addPlayer() {
-  const max = MODES_CONFIG[currentMode].maxPlayers;
-  if (players.length >= max) { alert(`${MODES_CONFIG[currentMode].label} 모드는 최대 ${max}명입니다.`); return; }
-  players.push({ id: nextId++, name: `선수${players.length+1}`, x: 240, y: 330, color: '#1E88E5' });
+  const form = document.getElementById('formationSelect').value;
+  squads[currentSquad].formation = form;
+  // Recalculate default positions, preserving existing overrides
+  const defaults = defaultPositions(currentMode, form);
+  // Only reset positions (keep names from roster)
+  squads[currentSquad].positions = defaults;
   renderPlayers();
-  renderNotesPanel();
 }
 
 function resetLayout() {
-  applyFormation(currentMode, document.getElementById('formationSelect').value);
+  squads[currentSquad].positions = defaultPositions(currentMode, squads[currentSquad].formation);
+  renderPlayers();
+}
+
+function addPlayer() {
+  const max = MODES_CONFIG[currentMode].max;
+  if (roster.length >= max) {
+    alert(`${MODES_CONFIG[currentMode].label} 모드는 최대 ${max}명입니다.`); return;
+  }
+  const newP = { id: nextId++, name: `선수${roster.length+1}`, color: '#1E88E5' };
+  roster.push(newP);
+  // Give default position in all squads
+  ['basic','attack','defense'].forEach(type => {
+    squads[type].positions[newP.id] = { x: 240, y: 330 };
+  });
+  renderPlayers();
+  renderNotesPanel();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -621,26 +573,26 @@ function resetLayout() {
 function drawHtmlField() {
   const f = document.getElementById('field');
   f.querySelectorAll('.fl,.fc,.fd').forEach(e => e.remove());
-  const L = (x,y,w,h) => { const e=document.createElement('div'); e.className='fl'; e.style.cssText=`left:${x}px;top:${y}px;width:${w}px;height:${h}px;`; f.appendChild(e); };
-  const C = (cx,cy,r) => { const e=document.createElement('div'); e.className='fc'; e.style.cssText=`left:${cx-r}px;top:${cy-r}px;width:${r*2}px;height:${r*2}px;`; f.appendChild(e); };
-  const D = (cx,cy,r) => { const e=document.createElement('div'); e.className='fd'; e.style.cssText=`left:${cx-r}px;top:${cy-r}px;width:${r*2}px;height:${r*2}px;`; f.appendChild(e); };
-  L(20,20,440,2); L(20,638,440,2); L(20,20,2,620); L(458,20,2,620);
-  L(20,330,440,2); C(240,330,60); D(240,330,4);
-  L(130,558,220,2); L(130,558,2,82); L(348,558,2,82);
-  L(184,598,112,2); L(184,598,2,42); L(294,598,2,42); D(240,530,3);
-  L(194,638,92,8); L(194,638,2,10); L(284,638,2,10);
-  L(130,100,220,2); L(130,20,2,82); L(348,20,2,82);
-  L(184,60,112,2); L(184,20,2,42); L(294,20,2,42); D(240,128,3);
-  L(194,12,92,8); L(194,12,2,10); L(284,12,2,10);
+  const L=(x,y,w,h)=>{const e=document.createElement('div');e.className='fl';e.style.cssText=`left:${x}px;top:${y}px;width:${w}px;height:${h}px;`;f.appendChild(e);};
+  const C=(cx,cy,r)=>{const e=document.createElement('div');e.className='fc';e.style.cssText=`left:${cx-r}px;top:${cy-r}px;width:${r*2}px;height:${r*2}px;`;f.appendChild(e);};
+  const D=(cx,cy,r)=>{const e=document.createElement('div');e.className='fd';e.style.cssText=`left:${cx-r}px;top:${cy-r}px;width:${r*2}px;height:${r*2}px;`;f.appendChild(e);};
+  L(20,20,440,2);L(20,638,440,2);L(20,20,2,620);L(458,20,2,620);
+  L(20,330,440,2);C(240,330,60);D(240,330,4);
+  L(130,558,220,2);L(130,558,2,82);L(348,558,2,82);
+  L(184,598,112,2);L(184,598,2,42);L(294,598,2,42);D(240,530,3);
+  L(194,638,92,8);L(194,638,2,10);L(284,638,2,10);
+  L(130,100,220,2);L(130,20,2,82);L(348,20,2,82);
+  L(184,60,112,2);L(184,20,2,42);L(294,20,2,42);D(240,128,3);
+  L(194,12,92,8);L(194,12,2,10);L(284,12,2,10);
 }
 
 // ═══════════════════════════════════════════════════════════════
-// HTML PLAYER RENDERING
+// PLAYER RENDERING
 // ═══════════════════════════════════════════════════════════════
 function renderPlayers() {
   const f = document.getElementById('field');
   f.querySelectorAll('.player').forEach(e => e.remove());
-  players.forEach((p, i) => {
+  getPlayers().forEach((p, i) => {
     const el = document.createElement('div');
     el.className = 'player';
     el.dataset.id = p.id;
@@ -655,7 +607,9 @@ function renderPlayers() {
   });
 }
 
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 
 function startInlineEdit(playerEl, player) {
   const nameEl = playerEl.querySelector('.player-name');
@@ -668,7 +622,10 @@ function startInlineEdit(playerEl, player) {
   nameEl.replaceWith(input);
   input.select(); input.focus();
   const commit = () => {
-    player.name = input.value.trim().slice(0,12) || original;
+    const newName = input.value.trim().slice(0,12) || original;
+    // Sync name across all roster entries (shared)
+    const r = roster.find(r => r.id === player.id);
+    if (r) r.name = newName;
     renderPlayers();
     renderNotesPanel();
   };
@@ -682,7 +639,7 @@ function startInlineEdit(playerEl, player) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// DRAG — squad mode
+// DRAG
 // ═══════════════════════════════════════════════════════════════
 const fieldEl = document.getElementById('field');
 
@@ -690,10 +647,11 @@ fieldEl.addEventListener('mousedown', e => {
   if (e.button !== 0) return;
   const pe = e.target.closest('.player');
   if (!pe) return;
-  const p = players.find(p => p.id == pe.dataset.id);
+  const id = Number(pe.dataset.id);
+  const p = getPlayers().find(p => p.id === id);
   if (!p) return;
   hideCtxMenu();
-  dragState = { p, el:pe, sx:e.clientX, sy:e.clientY, px:p.x, py:p.y };
+  dragState = { id, el: pe, sx: e.clientX, sy: e.clientY, px: p.x, py: p.y };
   pe.classList.add('dragging');
   e.preventDefault();
 });
@@ -701,20 +659,22 @@ document.addEventListener('mousemove', e => {
   if (!dragState) return;
   const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + e.clientX - dragState.sx));
   const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + e.clientY - dragState.sy));
-  dragState.p.x = x; dragState.p.y = y;
-  dragState.el.style.left = x+'px'; dragState.el.style.top = y+'px';
+  squads[currentSquad].positions[dragState.id] = { x, y };
+  dragState.el.style.left = x+'px';
+  dragState.el.style.top  = y+'px';
 });
 document.addEventListener('mouseup', () => {
-  if (!dragState) return;
-  dragState.el.classList.remove('dragging'); dragState = null;
+  if (dragState) { dragState.el.classList.remove('dragging'); dragState = null; }
 });
+
 fieldEl.addEventListener('touchstart', e => {
   const pe = e.target.closest('.player');
   if (!pe) return;
-  const p = players.find(p => p.id == pe.dataset.id);
+  const id = Number(pe.dataset.id);
+  const p = getPlayers().find(p => p.id === id);
   if (!p) return;
   const t = e.touches[0];
-  dragState = { p, el:pe, sx:t.clientX, sy:t.clientY, px:p.x, py:p.y };
+  dragState = { id, el: pe, sx: t.clientX, sy: t.clientY, px: p.x, py: p.y };
   pe.classList.add('dragging'); e.preventDefault();
 }, { passive: false });
 document.addEventListener('touchmove', e => {
@@ -722,14 +682,17 @@ document.addEventListener('touchmove', e => {
   const t = e.touches[0];
   const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + t.clientX - dragState.sx));
   const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + t.clientY - dragState.sy));
-  dragState.p.x = x; dragState.p.y = y;
-  dragState.el.style.left = x+'px'; dragState.el.style.top = y+'px';
+  squads[currentSquad].positions[dragState.id] = { x, y };
+  dragState.el.style.left = x+'px';
+  dragState.el.style.top  = y+'px';
   e.preventDefault();
 }, { passive: false });
-document.addEventListener('touchend', () => { if (dragState) { dragState.el.classList.remove('dragging'); dragState=null; } });
+document.addEventListener('touchend', () => {
+  if (dragState) { dragState.el.classList.remove('dragging'); dragState = null; }
+});
 
 // ═══════════════════════════════════════════════════════════════
-// SQUAD CONTEXT MENU
+// CONTEXT MENU
 // ═══════════════════════════════════════════════════════════════
 function showCtxMenu(x, y, player) {
   selectedPlayer = player;
@@ -747,17 +710,32 @@ function hideCtxMenu() { document.getElementById('ctxMenu').classList.remove('vi
 document.addEventListener('click', e => { if (!e.target.closest('#ctxMenu')) hideCtxMenu(); });
 document.addEventListener('contextmenu', e => { if (!e.target.closest('.player')) hideCtxMenu(); });
 
-function ctxColor(c) { if (selectedPlayer) { selectedPlayer.color=c; renderPlayers(); renderNotesPanel(); } hideCtxMenu(); }
+function ctxColor(c) {
+  if (!selectedPlayer) return;
+  // Sync color across roster (shared)
+  const r = roster.find(r => r.id === selectedPlayer.id);
+  if (r) r.color = c;
+  renderPlayers(); renderNotesPanel(); hideCtxMenu();
+}
 function ctxRename() {
   if (!selectedPlayer) return;
   const n = prompt('선수 이름:', selectedPlayer.name);
-  if (n !== null) { selectedPlayer.name = n.trim().slice(0,12) || selectedPlayer.name; renderPlayers(); renderNotesPanel(); }
+  if (n !== null) {
+    const r = roster.find(r => r.id === selectedPlayer.id);
+    if (r) r.name = n.trim().slice(0,12) || selectedPlayer.name;
+    renderPlayers(); renderNotesPanel();
+  }
   hideCtxMenu();
 }
 function ctxRemove() {
   if (!selectedPlayer) return;
-  delete squads[currentSquadType].playerNotes[selectedPlayer.id];
-  players = players.filter(p => p.id !== selectedPlayer.id);
+  if (roster.length <= 1) { alert('선수가 1명 이하면 삭제할 수 없습니다.'); return; }
+  const id = selectedPlayer.id;
+  roster = roster.filter(r => r.id !== id);
+  ['basic','attack','defense'].forEach(type => {
+    delete squads[type].positions[id];
+    delete squads[type].playerNotes[id];
+  });
   renderPlayers(); renderNotesPanel(); hideCtxMenu();
 }
 
@@ -766,14 +744,13 @@ function ctxRemove() {
 // ═══════════════════════════════════════════════════════════════
 function saveImage() {
   const teamName = document.getElementById('teamName').value.trim();
-  const formation = document.getElementById('formationSelect').value;
-  const squadLabel = currentSquadType === 'attack' ? '공격' : '수비';
-  const f = document.getElementById('field');
-  let banner = null;
-  const label = teamName ? `${teamName} [${squadLabel}] ${formation}` : `[${squadLabel}] ${formation}`;
-  banner = document.createElement('div');
+  const form     = squads[currentSquad].formation;
+  const meta     = SQUAD_META[currentSquad];
+  const f        = document.getElementById('field');
+  const label    = `${teamName ? teamName + ' ' : ''}${meta.icon} ${meta.label} [${form}]`;
+  const banner   = document.createElement('div');
   banner.style.cssText = `position:absolute;top:28px;left:50%;transform:translateX(-50%);
-    background:rgba(0,0,0,0.55);color:white;font-weight:700;font-size:15px;
+    background:rgba(0,0,0,0.55);color:white;font-weight:700;font-size:14px;
     padding:5px 18px;border-radius:20px;z-index:200;white-space:nowrap;pointer-events:none;`;
   banner.textContent = label;
   f.appendChild(banner);
@@ -781,20 +758,20 @@ function saveImage() {
     .then(canvas => {
       f.removeChild(banner);
       const a = document.createElement('a');
-      a.download = `${teamName||'스쿼드'}_${squadLabel}_${formation}.png`;
+      a.download = `${teamName||'스쿼드'}_${meta.label}_${form}.png`;
       a.href = canvas.toDataURL('image/png'); a.click();
-    }).catch(() => { if (banner && banner.parentNode) f.removeChild(banner); });
+    }).catch(() => { if (banner.parentNode) f.removeChild(banner); });
 }
 
 // ═══════════════════════════════════════════════════════════════
 // NOTES PANEL
 // ═══════════════════════════════════════════════════════════════
 function renderNotesPanel() {
-  const sq = squads[currentSquadType];
+  const sq = squads[currentSquad];
   document.getElementById('teamNote').value = sq.teamNote || '';
 
-  const container = document.getElementById('playerNotes');
-  container.innerHTML = players.map((p, i) => `
+  const players = getPlayers();
+  document.getElementById('playerNotes').innerHTML = players.map((p, i) => `
     <div class="player-note-row">
       <div class="player-note-header">
         <div class="player-note-dot" style="background:${p.color};"></div>
@@ -811,213 +788,101 @@ function renderNotesPanel() {
 }
 
 function saveTeamNote() {
-  squads[currentSquadType].teamNote = document.getElementById('teamNote').value;
+  squads[currentSquad].teamNote = document.getElementById('teamNote').value;
 }
-
 function savePlayerNote(id) {
   const el = document.getElementById('pnote_' + id);
-  if (el) squads[currentSquadType].playerNotes[id] = el.value;
+  if (el) squads[currentSquad].playerNotes[id] = el.value;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// STRATEGY — SQUAD SUMMARY
+// SHARE TEXT GENERATION
 // ═══════════════════════════════════════════════════════════════
-function classifyPlayer(p) {
-  if (p.y >= 590) return 'GK';
-  if (p.y >= 450) return '수비';
-  if (p.y >= 300) return '미드필더';
-  return '공격';
-}
+function buildShareText() {
+  saveCurrentNotes();
 
-function refreshSquadSummary() {
-  // Make sure current squad state is saved before reading
-  saveCurrentSquadState();
+  const teamName = document.getElementById('teamName').value.trim() || '우리팀';
+  const modeLabel = MODES_CONFIG[currentMode].label;
+  const line = '─'.repeat(22);
 
-  const el = document.getElementById('squadSummary');
-  let html = '';
+  let t = `⚽ ${teamName} 전술 공유 (${modeLabel})\n${line}\n\n`;
 
-  ['attack', 'defense'].forEach(type => {
-    const sq = squads[type];
-    if (!sq.players.length) return;
-    const icon  = type === 'attack' ? '⚔️' : '🛡';
-    const label = type === 'attack' ? '공격 스쿼드' : '수비 스쿼드';
-    const modeLabel = MODES_CONFIG[sq.mode].label;
-    const roleCounts = { GK:0, 수비:0, 미드필더:0, 공격:0 };
-    sq.players.forEach(p => roleCounts[classifyPlayer(p)]++);
-
-    html += `
-      <div style="margin-bottom:14px;">
-        <div style="font-weight:700;font-size:0.82rem;color:#e2e8f0;margin-bottom:6px;">${icon} ${label}</div>
-        <span class="formation-badge">${modeLabel} / ${sq.formation}</span>
-        <div style="font-size:0.75rem;color:#64748b;margin:4px 0 6px;">
-          GK ${roleCounts.GK} &nbsp;|&nbsp; 수비 ${roleCounts.수비} &nbsp;|&nbsp; 미드 ${roleCounts.미드필더} &nbsp;|&nbsp; 공격 ${roleCounts.공격}
-        </div>
-        <div class="player-list">
-          ${sq.players.map((p,i) => `
-            <div class="player-chip">
-              <div class="dot" style="background:${p.color};"></div>
-              <span>${i+1}. ${escHtml(p.name)}</span>
-            </div>`).join('')}
-        </div>
-      </div>`;
-  });
-
-  el.innerHTML = html || '<div style="color:#475569;font-size:0.82rem;">스쿼드 탭에서 선수를 먼저 설정하세요.</div>';
-}
-
-// ═══════════════════════════════════════════════════════════════
-// STRATEGY — MANUAL GENERATION
-// ═══════════════════════════════════════════════════════════════
-function generateManual() {
-  saveCurrentSquadState();
-
-  const opponent = document.getElementById('opponent').value.trim() || '상대팀';
-  const matchDate = document.getElementById('matchDate').value;
-  const notes     = document.getElementById('matchNotes').value.trim();
-
-  const dateStr = matchDate
-    ? new Date(matchDate).toLocaleString('ko-KR', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })
-    : '미정';
-
-  let htmlOut = '';
-  let txtOut  = `⚽ 전술 지침서\n${'─'.repeat(40)}\n상대: ${opponent}  |  일시: ${dateStr}\n`;
-  if (notes) txtOut += `감독 메모: ${notes}\n`;
-  txtOut += '\n';
-
-  ['attack', 'defense'].forEach(type => {
-    const sq = squads[type];
-    if (!sq.players.length) return;
-
-    const icon      = type === 'attack' ? '⚔️' : '🛡';
-    const label     = type === 'attack' ? '공격 스쿼드' : '수비 스쿼드';
-    const modeLabel = MODES_CONFIG[sq.mode]?.label || sq.mode;
-    const roleClass = type === 'attack' ? '' : 'defense';
-
-    // Tactical profile
-    const roleCounts = { GK:0, 수비:0, 미드필더:0, 공격:0 };
-    sq.players.forEach(p => roleCounts[classifyPlayer(p)]++);
-    const defRatio = roleCounts.수비 / (sq.players.length - 1 || 1);
-    let style, pressLine, defLine, transLine;
-    if (defRatio >= 0.45) {
-      style = '수비 우선 / 역습';
-      pressLine = '하프라인 뒤로 물러나 수비 블록을 형성한다.';
-      defLine   = '수비 라인은 컴팩트하게 유지하고 침투 공간을 최소화한다.';
-      transLine = '공 탈취 후 빠른 전환으로 전방 공격수에게 즉시 연결한다.';
-    } else if (defRatio <= 0.28) {
-      style = '공격적 / 전방 압박';
-      pressLine = '상대 빌드업 시 전방부터 압박하여 실수를 유도한다.';
-      defLine   = '수비 라인을 높게 유지하고 오프사이드 트랩을 적극 활용한다.';
-      transLine = '공 소유 시 빠른 패스 전개로 상대 수비 재조직 전에 공격한다.';
-    } else {
-      style = '밸런스 / 점유 기반';
-      pressLine = '미드필드에서 수비 블록을 형성하고 점유 시 빌드업을 진행한다.';
-      defLine   = '수비 라인과 미드필더 간격을 30m 이내로 유지한다.';
-      transLine = '공 탈취 후 안전한 패스로 점유를 유지하며 기회를 노린다.';
-    }
-
-    // Team-wide lines
-    const teamLines = [
-      `포메이션: ${modeLabel} ${sq.formation} (${style})`,
-      `압박: ${pressLine}`,
-      `수비: ${defLine}`,
-      `전환: ${transLine}`,
-    ];
-    if (sq.teamNote.trim()) {
-      teamLines.push(`지침: ${sq.teamNote.trim()}`);
-    }
-    if (notes) teamLines.push(`감독 지시: ${notes}`);
-
-    // Section HTML
-    htmlOut += `
-      <div class="tactic-section">
-        <div class="tactic-subsection-title ${roleClass}">${icon} ${label} — 팀 전체 지침</div>
-        <div style="font-size:0.75rem;color:#64748b;margin-bottom:6px;">${modeLabel} / ${sq.formation}</div>
-        ${teamLines.map(l => `<div class="tactic-line">${escHtml(l)}</div>`).join('')}
-      </div>
-      <div class="tactic-section">
-        <div class="tactic-subsection-title ${roleClass}">${icon} ${label} — 개별 선수 지침</div>
-        ${sq.players.map((p, i) => {
-          const role = classifyPlayer(p);
-          const tagClass = role==='GK'?'red':role==='수비'?'green':role==='공격'?'amber':'';
-          const baseLines = roleBaseLines(p, role);
-          const customNote = (sq.playerNotes[p.id] || '').trim();
-          return `
-            <div class="tactic-player-title">
-              ${i+1}. ${escHtml(p.name)} <span class="tactic-tag ${tagClass}">${role}</span>
-            </div>
-            ${baseLines.map(l => `<div class="tactic-line">${escHtml(l)}</div>`).join('')}
-            ${customNote ? `<div class="tactic-note-line">${escHtml(customNote)}</div>` : ''}
-          `;
-        }).join('')}
-      </div>`;
-
-    // Plain text
-    txtOut += `${'═'.repeat(38)}\n${icon} ${label} (${modeLabel} ${sq.formation} / ${style})\n${'─'.repeat(38)}\n`;
-    txtOut += `▶ 팀 전체 지침\n`;
-    teamLines.forEach(l => txtOut += `  • ${l}\n`);
-    txtOut += `\n▶ 개별 선수 지침\n`;
-    sq.players.forEach((p, i) => {
-      const role = classifyPlayer(p);
-      const customNote = (sq.playerNotes[p.id] || '').trim();
-      txtOut += `\n[${i+1}] ${p.name} (${role})\n`;
-      roleBaseLines(p, role).forEach(l => txtOut += `  • ${l}\n`);
-      if (customNote) txtOut += `  ✎ ${customNote}\n`;
+  // 스쿼드별 명단
+  ['basic','attack','defense'].forEach(type => {
+    const sq   = squads[type];
+    const meta = SQUAD_META[type];
+    const players = roster.map((r, i) => {
+      const pos = sq.positions[r.id];
+      return { ...r, x: pos?.x ?? 240, y: pos?.y ?? 330, num: i+1 };
     });
-    txtOut += '\n';
+    t += `${meta.icon} ${meta.label} [${sq.formation}]\n`;
+    players.forEach(p => { t += `  ${numCircle(p.num)} ${p.name}\n`; });
+    t += '\n';
   });
 
-  // Header HTML
-  const headerHtml = `
-    <div class="tactic-section">
-      <div class="tactic-section-title">📋 전술 지침서</div>
-      <div class="tactic-line">${escHtml('상대: ' + opponent + '  |  일시: ' + dateStr)}</div>
-      ${notes ? `<div class="tactic-line">${escHtml('감독 메모: ' + notes)}</div>` : ''}
-    </div>`;
+  // 스쿼드별 전체 지침
+  const hasAnyTeamNote = ['basic','attack','defense'].some(type => squads[type].teamNote.trim());
+  if (hasAnyTeamNote) {
+    t += `${line}\n📢 스쿼드별 전체 지침\n`;
+    ['basic','attack','defense'].forEach(type => {
+      const note = squads[type].teamNote.trim();
+      if (!note) return;
+      const meta = SQUAD_META[type];
+      t += `\n${meta.icon} ${meta.label}\n${note}\n`;
+    });
+    t += '\n';
+  }
 
-  document.getElementById('manualOutput').innerHTML = headerHtml + htmlOut;
-  document.getElementById('manualCard').style.display = '';
-  lastManualText = txtOut;
-  document.getElementById('manualCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // 개별 선수 지침 (전 스쿼드 통합)
+  // 선수별로 스쿼드별 노트 합산
+  const hasAnyPlayerNote = roster.some(r =>
+    ['basic','attack','defense'].some(type => (squads[type].playerNotes[r.id] || '').trim())
+  );
+  if (hasAnyPlayerNote) {
+    t += `${line}\n👤 개별 선수 지침\n`;
+    roster.forEach((r, i) => {
+      const notesBySquad = ['basic','attack','defense']
+        .map(type => {
+          const note = (squads[type].playerNotes[r.id] || '').trim();
+          return note ? `  ${SQUAD_META[type].icon} ${note}` : null;
+        }).filter(Boolean);
+      if (notesBySquad.length === 0) return;
+      t += `\n${numCircle(i+1)} ${r.name}\n${notesBySquad.join('\n')}\n`;
+    });
+  }
+
+  return t.trim();
 }
 
-function roleBaseLines(p, role) {
-  const isFlank = p.x < 160 || p.x > 320;
-  if (role === 'GK') return [
-    '골 라인 수비 및 페널티 구역 제공권을 장악한다.',
-    '수비진과 지속적으로 소통하여 위험 상황을 사전에 차단한다.',
-    '점유 시 빌드업 첫 번째 패스 역할을 담당한다.',
-  ];
-  if (role === '수비') return [
-    '수비 라인 위치와 간격을 유지한다.',
-    isFlank ? '측면 공간 커버 및 상대 윙어 대인 마크를 담당한다.' : '중앙 공간 차단 및 헤더 경합을 우선시한다.',
-    '공 소유 시 안전한 옆패스 또는 GK에게 리셋한다.',
-  ];
-  if (role === '미드필더') return [
-    isFlank ? '측면 공간을 활용한 드리블 돌파와 크로스를 시도한다.' : '중앙 연결 및 공 순환 역할을 담당한다.',
-    '수비 시 빠른 압박으로 상대 전진을 차단한다.',
-    '공격 시 공격수와의 원투패스 콤비네이션을 적극 활용한다.',
-  ];
-  // 공격
-  return [
-    isFlank ? '측면에서 상대 수비를 끌어낸 뒤 중앙으로 컷인 또는 크로스를 시도한다.' : '중앙에서 침투 움직임으로 상대 수비 라인을 압박한다.',
-    '득점 기회에서 과감하게 슈팅한다.',
-    '수비 전환 시 전방에서 압박의 첫 번째 역할을 수행한다.',
-  ];
+function numCircle(n) {
+  const circles = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪'];
+  return circles[n-1] || `${n}.`;
 }
 
-function copyManual() {
-  if (!lastManualText) return;
-  navigator.clipboard.writeText(lastManualText)
-    .then(() => alert('클립보드에 복사되었습니다.'))
+let lastShareText = '';
+
+function openShare() {
+  lastShareText = buildShareText();
+  document.getElementById('shareText').textContent = lastShareText;
+  document.getElementById('shareModal').classList.add('visible');
+}
+function closeShare() {
+  document.getElementById('shareModal').classList.remove('visible');
+}
+document.getElementById('shareModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('shareModal')) closeShare();
+});
+
+function copyShareText() {
+  navigator.clipboard.writeText(lastShareText)
+    .then(() => alert('클립보드에 복사되었습니다!\n카카오톡 단톡방에 붙여넣기 하세요.'))
     .catch(() => alert('복사 실패 — 브라우저 권한을 확인하세요.'));
 }
-
-function saveManualTxt() {
-  if (!lastManualText) return;
-  const opponent = document.getElementById('opponent').value.trim() || '전술지침서';
-  const blob = new Blob([lastManualText], { type: 'text/plain;charset=utf-8' });
+function saveShareTxt() {
+  const teamName = document.getElementById('teamName').value.trim() || '전술공유';
+  const blob = new Blob([lastShareText], { type: 'text/plain;charset=utf-8' });
   const a = document.createElement('a');
-  a.download = `${opponent}_전술지침서.txt`;
+  a.download = `${teamName}_전술.txt`;
   a.href = URL.createObjectURL(blob);
   a.click();
   URL.revokeObjectURL(a.href);
@@ -1028,22 +893,7 @@ function saveManualTxt() {
 // ═══════════════════════════════════════════════════════════════
 drawHtmlField();
 buildModePills();
-buildFormationSelect(currentMode);
-
-// Init attack squad
-squads.attack.players  = buildPlayers('9v9', '3-3-2');
-squads.attack.formation = '3-3-2';
-
-// Init defense squad
-squads.defense.players  = buildPlayers('9v9', '4-3-1');
-squads.defense.formation = '4-3-1';
-squads.defense.mode = '9v9';
-
-// Load attack squad as default
-players = squads.attack.players.map(p => ({ ...p }));
-nextId  = players.length + 1;
-renderPlayers();
-renderNotesPanel();
+initAllSquads();
 </script>
 </body>
 </html>
