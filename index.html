@@ -15,169 +15,159 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 16px;
-  gap: 12px;
-}
-
-h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; }
-
-/* ── Top bar ── */
-.top-bar {
-  display: flex;
-  align-items: center;
+  padding: 16px;
   gap: 10px;
-  width: 480px;
-  flex-wrap: wrap;
 }
 
-.team-name-input {
-  flex: 1;
-  min-width: 140px;
-  padding: 8px 14px;
-  border: 1px solid #334155;
-  border-radius: 8px;
+/* ── App tabs ── */
+.app-tabs {
+  display: flex;
   background: #1e293b;
-  color: white;
-  font-size: 0.95rem;
-  outline: none;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 480px;
 }
-.team-name-input:focus { border-color: #60a5fa; }
-.team-name-input::placeholder { color: #475569; }
+.app-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.app-tab:not(:last-child) { border-right: 1px solid #334155; }
+.app-tab.active { background: #3b82f6; color: white; }
 
-/* ── Mode + formation row ── */
-.mode-bar {
+/* ── Shared top bar ── */
+.top-bar {
   display: flex;
   align-items: center;
   gap: 8px;
   width: 480px;
   flex-wrap: wrap;
 }
+.name-input {
+  flex: 1; min-width: 120px;
+  padding: 7px 12px;
+  border: 1px solid #334155; border-radius: 8px;
+  background: #1e293b; color: white; font-size: 0.9rem; outline: none;
+}
+.name-input:focus { border-color: #60a5fa; }
+.name-input::placeholder { color: #475569; }
 
+/* ── Mode + formation bar ── */
+.mode-bar {
+  display: flex; align-items: center; gap: 8px;
+  width: 480px; flex-wrap: wrap;
+}
 .mode-pills {
-  display: flex;
-  flex-wrap: wrap;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  overflow: hidden;
+  display: flex; flex-wrap: wrap;
+  background: #1e293b; border: 1px solid #334155; border-radius: 8px; overflow: hidden;
 }
 .mode-pill {
-  padding: 7px 11px;
-  border: none;
-  background: none;
-  color: #94a3b8;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  white-space: nowrap;
+  padding: 6px 10px; border: none; background: none;
+  color: #94a3b8; font-size: 0.78rem; font-weight: 700; cursor: pointer;
+  transition: background 0.15s, color 0.15s; white-space: nowrap;
 }
 .mode-pill:not(:last-child) { border-right: 1px solid #334155; }
-.mode-pill.active {
-  background: #3b82f6;
-  color: white;
-}
-
+.mode-pill.active { background: #3b82f6; color: white; }
 .formation-select {
-  padding: 7px 12px;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  background: #1e293b;
-  color: white;
-  font-size: 0.85rem;
-  font-weight: 600;
-  outline: none;
-  cursor: pointer;
+  padding: 6px 10px; border: 1px solid #334155; border-radius: 8px;
+  background: #1e293b; color: white; font-size: 0.82rem; font-weight: 600;
+  outline: none; cursor: pointer;
 }
-.formation-select:focus { border-color: #60a5fa; }
 
-/* ── Field ── */
-#field {
+/* ── Field wrapper ── */
+#fieldWrapper {
   position: relative;
-  width: 480px;
-  height: 660px;
-  background: #276d41;
-  border-radius: 6px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  width: 480px; height: 660px;
   flex-shrink: 0;
+}
+#field, #patternCanvas {
+  position: absolute; top: 0; left: 0;
+  width: 480px; height: 660px;
+  border-radius: 6px;
+}
+#field {
+  background: #276d41;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  overflow: hidden;
 }
 #field::before {
   content: '';
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background: repeating-linear-gradient(
     to bottom, transparent 0, transparent 44px,
     rgba(0,0,0,0.07) 44px, rgba(0,0,0,0.07) 88px
   );
-  pointer-events: none;
-  z-index: 0;
+  pointer-events: none; z-index: 0;
+}
+#patternCanvas {
+  display: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  cursor: crosshair;
 }
 
+/* ── HTML field elements ── */
 .fl { position: absolute; background: rgba(255,255,255,0.8); pointer-events: none; z-index: 1; }
 .fc { position: absolute; border: 2px solid rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 1; }
 .fd { position: absolute; background: rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 1; }
 
-/* ── Players ── */
+/* ── HTML players ── */
 .player {
-  position: absolute;
-  width: 60px;
-  text-align: center;
+  position: absolute; width: 60px; text-align: center;
   transform: translate(-50%, -50%);
-  cursor: grab;
-  user-select: none;
-  z-index: 10;
-  touch-action: none;
+  cursor: grab; user-select: none; z-index: 10; touch-action: none;
 }
 .player.dragging { cursor: grabbing; z-index: 50; }
-
 .player-circle {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.85rem;
-  border: 2.5px solid rgba(255,255,255,0.9);
-  color: white;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
-  transition: transform 0.1s;
+  width: 44px; height: 44px; border-radius: 50%; margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.85rem;
+  border: 2.5px solid rgba(255,255,255,0.9); color: white;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5); transition: transform 0.1s;
 }
 .player-circle:hover { transform: scale(1.08); }
 .player-name {
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: white;
-  text-shadow: 0 1px 4px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,0.9);
-  margin-top: 3px;
-  white-space: nowrap;
-  max-width: 68px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.65rem; font-weight: 600; color: white;
+  text-shadow: 0 1px 4px rgba(0,0,0,1); margin-top: 3px;
+  white-space: nowrap; max-width: 68px; overflow: hidden; text-overflow: ellipsis;
 }
 
-/* ── Context menu ── */
-#ctx-menu {
-  position: fixed;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 10px;
-  padding: 10px;
-  z-index: 1000;
-  display: none;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-  min-width: 168px;
+/* ── Pattern controls bar ── */
+.pattern-bar {
+  display: flex; align-items: center; gap: 8px;
+  width: 480px; flex-wrap: wrap;
 }
-#ctx-menu.visible { display: block; }
+.pattern-nav {
+  display: flex; align-items: center; gap: 6px;
+  background: #1e293b; border: 1px solid #334155; border-radius: 8px;
+  padding: 4px 8px;
+}
+.pattern-nav button {
+  background: none; border: none; color: #94a3b8;
+  font-size: 1rem; cursor: pointer; padding: 2px 6px;
+  border-radius: 4px; transition: background 0.1s;
+}
+.pattern-nav button:hover { background: #334155; color: white; }
+.pattern-nav span { font-size: 0.8rem; color: #cbd5e1; white-space: nowrap; }
+
+/* ── Context menu ── */
+#ctxMenu {
+  position: fixed; background: #1e293b; border: 1px solid #334155;
+  border-radius: 10px; padding: 10px; z-index: 1000; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6); min-width: 168px;
+}
+#ctxMenu.visible { display: block; }
 .ctx-label { font-size: 0.72rem; color: #94a3b8; margin-bottom: 8px; font-weight: 600; }
 .color-palette { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
 .swatch {
-  width: 24px; height: 24px; border-radius: 50%;
-  cursor: pointer; border: 2px solid transparent;
-  transition: transform 0.1s;
+  width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
+  border: 2px solid transparent; transition: transform 0.1s;
 }
 .swatch:hover { transform: scale(1.25); border-color: white; }
 .swatch.active { border-color: white; transform: scale(1.2); }
@@ -191,264 +181,453 @@ h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; }
 .ctx-btn.danger { color: #f87171; }
 .ctx-divider { height: 1px; background: #334155; margin: 6px 0; }
 
-/* ── Bottom controls ── */
-.controls {
-  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
-}
+/* ── Buttons ── */
+.controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 .btn {
-  padding: 10px 20px; border: none; border-radius: 8px;
-  cursor: pointer; font-size: 0.9rem; font-weight: 600;
+  padding: 9px 16px; border: none; border-radius: 8px;
+  cursor: pointer; font-size: 0.85rem; font-weight: 600;
   transition: opacity 0.15s, transform 0.1s;
 }
 .btn:hover  { opacity: 0.85; transform: translateY(-1px); }
 .btn:active { transform: translateY(0); }
-.btn-green { background: #22c55e; color: white; }
-.btn-blue  { background: #3b82f6; color: white; }
-.btn-slate { background: #475569; color: white; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-green  { background: #22c55e; color: white; }
+.btn-blue   { background: #3b82f6; color: white; }
+.btn-amber  { background: #f59e0b; color: white; }
+.btn-purple { background: #8b5cf6; color: white; }
+.btn-slate  { background: #475569; color: white; }
+.btn-red    { background: #ef4444; color: white; }
 
-.hint { font-size: 0.73rem; color: #475569; }
+.hint { font-size: 0.72rem; color: #475569; }
+
+/* ── Progress overlay ── */
+#gifProgress {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); z-index: 2000;
+  align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+}
+#gifProgress.visible { display: flex; }
+#gifProgress p { color: white; font-weight: 600; font-size: 1rem; }
+#gifProgressBar { width: 240px; height: 8px; background: #334155; border-radius: 4px; overflow: hidden; }
+#gifProgressFill { height: 100%; background: #22c55e; border-radius: 4px; transition: width 0.1s; }
+
+/* ── Strategy tab ── */
+#strategyUI { width: 480px; display: none; flex-direction: column; gap: 12px; }
+
+.strategy-card {
+  background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px;
+}
+.strategy-card h3 {
+  font-size: 0.85rem; font-weight: 700; color: #94a3b8; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.strategy-form { display: flex; flex-direction: column; gap: 10px; }
+.strategy-field { display: flex; flex-direction: column; gap: 4px; }
+.strategy-field label { font-size: 0.75rem; color: #64748b; font-weight: 600; }
+.strategy-input {
+  padding: 8px 12px; border: 1px solid #334155; border-radius: 8px;
+  background: #0f172a; color: white; font-size: 0.88rem; outline: none;
+  font-family: inherit;
+}
+.strategy-input:focus { border-color: #60a5fa; }
+.strategy-input::placeholder { color: #475569; }
+textarea.strategy-input { resize: vertical; min-height: 72px; line-height: 1.5; }
+
+.squad-summary { font-size: 0.8rem; color: #94a3b8; line-height: 1.8; }
+.squad-summary .formation-badge {
+  display: inline-block; background: #3b82f6; color: white;
+  padding: 2px 10px; border-radius: 12px; font-weight: 700; font-size: 0.78rem; margin-bottom: 8px;
+}
+.player-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.player-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: #0f172a; border: 1px solid #334155; border-radius: 20px;
+  padding: 3px 10px; font-size: 0.75rem;
+}
+.player-chip .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pattern-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.pattern-chip {
+  background: #0f172a; border: 1px solid #f59e0b; color: #fbbf24;
+  border-radius: 20px; padding: 3px 10px; font-size: 0.75rem; font-weight: 600;
+}
+
+.generate-row { display: flex; gap: 8px; align-items: center; }
+.api-key-btn {
+  background: none; border: 1px solid #334155; border-radius: 8px;
+  color: #64748b; padding: 8px 12px; cursor: pointer; font-size: 0.8rem;
+  transition: border-color 0.15s, color 0.15s; white-space: nowrap;
+}
+.api-key-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+.api-key-btn.set { border-color: #22c55e; color: #22c55e; }
+
+/* ── Manual output ── */
+.manual-output {
+  background: #0f172a; border: 1px solid #334155; border-radius: 8px;
+  padding: 14px; font-size: 0.82rem; line-height: 1.7; color: #cbd5e1;
+  white-space: pre-wrap; word-break: break-word; max-height: 480px; overflow-y: auto;
+}
+.manual-output .section-title {
+  color: #60a5fa; font-weight: 700; font-size: 0.88rem; margin: 10px 0 4px;
+}
+.manual-loading {
+  display: flex; align-items: center; gap: 10px; color: #64748b; font-size: 0.85rem;
+}
+.spinner {
+  width: 18px; height: 18px; border: 2px solid #334155; border-top-color: #3b82f6;
+  border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.output-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── API key modal ── */
+#apiKeyModal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); z-index: 3000;
+  align-items: center; justify-content: center;
+}
+#apiKeyModal.visible { display: flex; }
+.modal-box {
+  background: #1e293b; border: 1px solid #334155; border-radius: 14px;
+  padding: 24px; width: 340px; max-width: 90vw;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.modal-box h3 { font-size: 1rem; font-weight: 700; }
+.modal-box p { font-size: 0.8rem; color: #64748b; line-height: 1.5; }
+.modal-row { display: flex; gap: 8px; }
+.modal-row input {
+  flex: 1; padding: 8px 12px; border: 1px solid #334155; border-radius: 8px;
+  background: #0f172a; color: white; font-size: 0.85rem; outline: none; font-family: inherit;
+}
+.modal-row input:focus { border-color: #60a5fa; }
+
+.tactic-section { margin-bottom: 14px; }
+.tactic-section-title {
+  color: #60a5fa; font-weight: 700; font-size: 0.85rem;
+  border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 8px;
+}
+.tactic-player-title { color: #fbbf24; font-weight: 700; font-size: 0.82rem; margin: 10px 0 3px; }
+.tactic-line { color: #cbd5e1; font-size: 0.8rem; line-height: 1.7; padding-left: 12px; }
+.tactic-line::before { content: '• '; color: #475569; }
+.tactic-tag {
+  display: inline-block; background: #1e3a5f; color: #93c5fd;
+  border-radius: 10px; padding: 1px 8px; font-size: 0.72rem; font-weight: 600; margin-right: 4px;
+}
+.tactic-tag.green { background: #14532d; color: #86efac; }
+.tactic-tag.amber { background: #451a03; color: #fde68a; }
+.tactic-tag.red   { background: #450a0a; color: #fca5a5; }
 </style>
 </head>
 <body>
 
 <h1>⚽ 스쿼드 메이커</h1>
 
-<div class="top-bar">
-  <input class="team-name-input" id="teamName" type="text" placeholder="팀 이름 (선택)..." maxlength="20" />
+<!-- App mode tabs -->
+<div class="app-tabs">
+  <button class="app-tab active" data-mode="squad" onclick="setAppMode('squad')">⚽ 스쿼드</button>
+  <button class="app-tab" data-mode="pattern" onclick="setAppMode('pattern')">🎯 공격 패턴</button>
+  <button class="app-tab" data-mode="strategy" onclick="setAppMode('strategy')">📋 매치 전략</button>
 </div>
 
-<div class="mode-bar">
-  <div class="mode-pills" id="modePills"></div>
-  <select class="formation-select" id="formationSelect" onchange="onFormationChange()"></select>
+<!-- Squad UI -->
+<div id="squadUI">
+  <div class="top-bar">
+    <input class="name-input" id="teamName" type="text" placeholder="팀 이름 (선택)..." maxlength="20" />
+  </div>
+  <div class="mode-bar">
+    <div class="mode-pills" id="modePills"></div>
+    <select class="formation-select" id="formationSelect" onchange="onFormationChange()"></select>
+  </div>
 </div>
 
-<div id="field"></div>
+<!-- Field wrapper (shared) -->
+<div id="fieldWrapper">
+  <div id="field"></div>
+  <canvas id="patternCanvas" width="480" height="660"></canvas>
+</div>
 
-<div class="controls">
+<!-- Squad controls -->
+<div id="squadControls" class="controls">
   <button class="btn btn-blue"  onclick="addPlayer()">+ 선수 추가</button>
   <button class="btn btn-green" onclick="saveImage()">📸 이미지 저장</button>
   <button class="btn btn-slate" onclick="resetLayout()">↺ 초기화</button>
 </div>
 
-<p class="hint">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭: 색상 / 삭제</p>
+<!-- Pattern UI -->
+<div id="patternUI" style="display:none">
+  <div class="pattern-bar">
+    <input class="name-input" id="patternName" placeholder="패턴 이름..." maxlength="20"
+           style="width:160px;flex:none;" onchange="renameCurrentPattern()" />
+    <div class="pattern-nav">
+      <button onclick="prevPattern()">‹</button>
+      <span id="patternCounter">1 / 1</span>
+      <button onclick="nextPattern()">›</button>
+    </div>
+    <button class="btn btn-blue"  onclick="addPattern()"    style="padding:7px 12px;">+ 추가</button>
+    <button class="btn btn-red"   onclick="deletePattern()" style="padding:7px 12px;">✕ 삭제</button>
+  </div>
+  <div class="controls">
+    <button class="btn btn-green"  id="playBtn"   onclick="togglePlay()">▶ 미리보기</button>
+    <button class="btn btn-slate"  onclick="clearCurrentPattern()">↺ 경로 초기화</button>
+    <button class="btn btn-amber"  id="gifBtn"    onclick="exportGif(false)">🎞 GIF 저장</button>
+    <button class="btn btn-purple" id="gifAllBtn" onclick="exportGif(true)">📋 전체 패턴 GIF</button>
+  </div>
+</div>
 
-<div id="ctx-menu">
+<p class="hint" id="hintText">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭: 색상 / 삭제</p>
+
+<!-- Squad context menu -->
+<div id="ctxMenu">
   <div class="ctx-label">색상</div>
   <div class="color-palette" id="colorPalette"></div>
   <div class="ctx-divider"></div>
-  <button class="ctx-btn" onclick="renamePlayer()">✏️ 이름 변경</button>
-  <button class="ctx-btn danger" onclick="removePlayer()">🗑️ 삭제</button>
+  <button class="ctx-btn" onclick="ctxRename()">✏️ 이름 변경</button>
+  <button class="ctx-btn danger" onclick="ctxRemove()">🗑️ 삭제</button>
+</div>
+
+<!-- Strategy UI -->
+<div id="strategyUI">
+  <!-- Match info -->
+  <div class="strategy-card">
+    <h3>경기 정보</h3>
+    <div class="strategy-form">
+      <div class="strategy-field">
+        <label>상대팀</label>
+        <input class="strategy-input" id="opponent" type="text" placeholder="ex) FC 서울, 이웃동네팀..." maxlength="30" />
+      </div>
+      <div class="strategy-field">
+        <label>경기 일시</label>
+        <input class="strategy-input" id="matchDate" type="datetime-local" />
+      </div>
+      <div class="strategy-field">
+        <label>감독 메모 (선택)</label>
+        <textarea class="strategy-input" id="matchNotes" placeholder="특이사항, 상대팀 약점, 주의사항 등..." maxlength="300"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Squad summary -->
+  <div class="strategy-card">
+    <h3>현재 스쿼드 요약</h3>
+    <div id="squadSummary" class="squad-summary"></div>
+  </div>
+
+  <!-- Generate button -->
+  <div class="strategy-card" style="padding:12px 16px;">
+    <div class="generate-row">
+      <button class="btn btn-blue" style="flex:1;" onclick="generateManual()">📄 전술 지침서 생성</button>
+    </div>
+  </div>
+
+  <!-- Output -->
+  <div class="strategy-card" id="manualCard" style="display:none;">
+    <h3>전술 지침서</h3>
+    <div id="manualOutput"></div>
+    <div class="output-actions" style="margin-top:12px;">
+      <button class="btn btn-slate" onclick="copyManual()">📋 클립보드 복사</button>
+      <button class="btn btn-slate" onclick="saveManualTxt()">💾 텍스트 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- GIF progress overlay -->
+<div id="gifProgress">
+  <p id="gifProgressText">GIF 생성 중...</p>
+  <div id="gifProgressBar"><div id="gifProgressFill" style="width:0%"></div></div>
 </div>
 
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
 <script>
-// ─── Constants ────────────────────────────────────────────────────
-const COLORS = [
-  '#E53935','#1E88E5','#43A047','#FB8C00',
-  '#8E24AA','#00ACC1','#F06292','#FFD600',
-  '#546E7A','#ffffff'
-];
+// ═══════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+const COLORS = ['#E53935','#1E88E5','#43A047','#FB8C00','#8E24AA','#00ACC1','#F06292','#FFD600','#546E7A','#ffffff'];
 const FIELD_W = 480, FIELD_H = 660;
+const PLAYER_R = 22;
 
-// ─── Formation data ───────────────────────────────────────────────
-// rows: [{count, y, prefix}] — GK always added automatically at y=622
 const MODES_CONFIG = {
-  '5v5': {
-    label: '5 vs 5',
-    maxPlayers: 5,
-    formations: {
-      '2-2':   [{count:2, y:490, prefix:'수비'}, {count:2, y:270, prefix:'공격'}],
-      '1-2-1': [{count:1, y:510, prefix:'수비'}, {count:2, y:370, prefix:'미드'}, {count:1, y:230, prefix:'공격'}],
-      '2-1-1': [{count:2, y:510, prefix:'수비'}, {count:1, y:370, prefix:'미드'}, {count:1, y:230, prefix:'공격'}],
-    }
-  },
-  '6v6': {
-    label: '6 vs 6',
-    maxPlayers: 6,
-    formations: {
-      '2-2-1': [{count:2, y:510, prefix:'수비'}, {count:2, y:380, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
-      '3-2':   [{count:3, y:510, prefix:'수비'}, {count:2, y:310, prefix:'공격'}],
-      '2-3':   [{count:2, y:510, prefix:'수비'}, {count:3, y:310, prefix:'공격'}],
-      '1-3-1': [{count:1, y:510, prefix:'수비'}, {count:3, y:380, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
-    }
-  },
-  '7v7': {
-    label: '7 vs 7',
-    maxPlayers: 7,
-    formations: {
-      '3-2-1': [{count:3, y:510, prefix:'수비'}, {count:2, y:385, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
-      '2-3-1': [{count:2, y:510, prefix:'수비'}, {count:3, y:385, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
-      '2-2-2': [{count:2, y:510, prefix:'수비'}, {count:2, y:385, prefix:'미드'}, {count:2, y:240, prefix:'공격'}],
-      '3-3':   [{count:3, y:510, prefix:'수비'}, {count:3, y:310, prefix:'공격'}],
-    }
-  },
-  '8v8': {
-    label: '8 vs 8',
-    maxPlayers: 8,
-    formations: {
-      '3-3-1': [{count:3, y:510, prefix:'수비'}, {count:3, y:385, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
-      '3-2-2': [{count:3, y:510, prefix:'수비'}, {count:2, y:385, prefix:'미드'}, {count:2, y:240, prefix:'공격'}],
-      '2-3-2': [{count:2, y:510, prefix:'수비'}, {count:3, y:385, prefix:'미드'}, {count:2, y:240, prefix:'공격'}],
-      '4-3':   [{count:4, y:510, prefix:'수비'}, {count:3, y:310, prefix:'공격'}],
-    }
-  },
-  '9v9': {
-    label: '9 vs 9',
-    maxPlayers: 9,
-    formations: {
-      '3-3-2': [{count:3, y:510, prefix:'수비'}, {count:3, y:385, prefix:'미드'}, {count:2, y:240, prefix:'공격'}],
-      '3-2-3': [{count:3, y:510, prefix:'수비'}, {count:2, y:385, prefix:'미드'}, {count:3, y:240, prefix:'공격'}],
-      '4-3-1': [{count:4, y:510, prefix:'수비'}, {count:3, y:380, prefix:'미드'}, {count:1, y:230, prefix:'공격'}],
-      '2-4-2': [{count:2, y:510, prefix:'수비'}, {count:4, y:385, prefix:'미드'}, {count:2, y:240, prefix:'공격'}],
-      '3-4-1': [{count:3, y:510, prefix:'수비'}, {count:4, y:385, prefix:'미드'}, {count:1, y:240, prefix:'공격'}],
-    }
-  },
-  '10v10': {
-    label: '10 vs 10',
-    maxPlayers: 10,
-    formations: {
-      '4-4-1': [{count:4, y:510, prefix:'수비'}, {count:4, y:380, prefix:'미드'}, {count:1, y:230, prefix:'공격'}],
-      '4-3-2': [{count:4, y:510, prefix:'수비'}, {count:3, y:380, prefix:'미드'}, {count:2, y:230, prefix:'공격'}],
-      '3-4-2': [{count:3, y:510, prefix:'수비'}, {count:4, y:380, prefix:'미드'}, {count:2, y:230, prefix:'공격'}],
-      '3-5-1': [{count:3, y:510, prefix:'수비'}, {count:5, y:380, prefix:'미드'}, {count:1, y:230, prefix:'공격'}],
-    }
-  },
-  '11v11': {
-    label: '11 vs 11',
-    maxPlayers: 11,
-    formations: {
-      '4-4-2':   [{count:4, y:510, prefix:'수비'}, {count:4, y:380, prefix:'미드'}, {count:2, y:230, prefix:'공격'}],
-      '4-3-3':   [{count:4, y:510, prefix:'수비'}, {count:3, y:370, prefix:'미드'}, {count:3, y:220, prefix:'공격'}],
-      '3-5-2':   [{count:3, y:510, prefix:'수비'}, {count:5, y:375, prefix:'미드'}, {count:2, y:230, prefix:'공격'}],
-      '4-2-3-1': [{count:4, y:520, prefix:'수비'}, {count:2, y:415, prefix:'수비형MF'}, {count:3, y:305, prefix:'공격형MF'}, {count:1, y:200, prefix:'공격'}],
-      '5-3-2':   [{count:5, y:510, prefix:'수비'}, {count:3, y:370, prefix:'미드'}, {count:2, y:230, prefix:'공격'}],
-      '3-4-3':   [{count:3, y:510, prefix:'수비'}, {count:4, y:375, prefix:'미드'}, {count:3, y:225, prefix:'공격'}],
-    }
-  }
+  '5v5':  { label:'5 vs 5',  maxPlayers:5,  formations:{
+    '2-2':   [{count:2,y:490,prefix:'수비'},{count:2,y:270,prefix:'공격'}],
+    '1-2-1': [{count:1,y:510,prefix:'수비'},{count:2,y:370,prefix:'미드'},{count:1,y:230,prefix:'공격'}],
+    '2-1-1': [{count:2,y:510,prefix:'수비'},{count:1,y:370,prefix:'미드'},{count:1,y:230,prefix:'공격'}],
+  }},
+  '6v6':  { label:'6 vs 6',  maxPlayers:6,  formations:{
+    '2-2-1': [{count:2,y:510,prefix:'수비'},{count:2,y:380,prefix:'미드'},{count:1,y:240,prefix:'공격'}],
+    '3-2':   [{count:3,y:510,prefix:'수비'},{count:2,y:310,prefix:'공격'}],
+    '2-3':   [{count:2,y:510,prefix:'수비'},{count:3,y:310,prefix:'공격'}],
+    '1-3-1': [{count:1,y:510,prefix:'수비'},{count:3,y:380,prefix:'미드'},{count:1,y:240,prefix:'공격'}],
+  }},
+  '7v7':  { label:'7 vs 7',  maxPlayers:7,  formations:{
+    '3-2-1': [{count:3,y:510,prefix:'수비'},{count:2,y:385,prefix:'미드'},{count:1,y:240,prefix:'공격'}],
+    '2-3-1': [{count:2,y:510,prefix:'수비'},{count:3,y:385,prefix:'미드'},{count:1,y:240,prefix:'공격'}],
+    '2-2-2': [{count:2,y:510,prefix:'수비'},{count:2,y:385,prefix:'미드'},{count:2,y:240,prefix:'공격'}],
+    '3-3':   [{count:3,y:510,prefix:'수비'},{count:3,y:310,prefix:'공격'}],
+  }},
+  '8v8':  { label:'8 vs 8',  maxPlayers:8,  formations:{
+    '3-3-1': [{count:3,y:510,prefix:'수비'},{count:3,y:385,prefix:'미드'},{count:1,y:240,prefix:'공격'}],
+    '3-2-2': [{count:3,y:510,prefix:'수비'},{count:2,y:385,prefix:'미드'},{count:2,y:240,prefix:'공격'}],
+    '2-3-2': [{count:2,y:510,prefix:'수비'},{count:3,y:385,prefix:'미드'},{count:2,y:240,prefix:'공격'}],
+    '4-3':   [{count:4,y:510,prefix:'수비'},{count:3,y:310,prefix:'공격'}],
+  }},
+  '9v9':  { label:'9 vs 9',  maxPlayers:9,  formations:{
+    '3-3-2': [{count:3,y:510,prefix:'수비'},{count:3,y:385,prefix:'미드'},{count:2,y:240,prefix:'공격'}],
+    '3-2-3': [{count:3,y:510,prefix:'수비'},{count:2,y:385,prefix:'미드'},{count:3,y:240,prefix:'공격'}],
+    '4-3-1': [{count:4,y:510,prefix:'수비'},{count:3,y:380,prefix:'미드'},{count:1,y:230,prefix:'공격'}],
+    '2-4-2': [{count:2,y:510,prefix:'수비'},{count:4,y:385,prefix:'미드'},{count:2,y:240,prefix:'공격'}],
+    '3-4-1': [{count:3,y:510,prefix:'수비'},{count:4,y:385,prefix:'미드'},{count:1,y:240,prefix:'공격'}],
+  }},
+  '10v10':{ label:'10 vs 10',maxPlayers:10, formations:{
+    '4-4-1': [{count:4,y:510,prefix:'수비'},{count:4,y:380,prefix:'미드'},{count:1,y:230,prefix:'공격'}],
+    '4-3-2': [{count:4,y:510,prefix:'수비'},{count:3,y:380,prefix:'미드'},{count:2,y:230,prefix:'공격'}],
+    '3-4-2': [{count:3,y:510,prefix:'수비'},{count:4,y:380,prefix:'미드'},{count:2,y:230,prefix:'공격'}],
+    '3-5-1': [{count:3,y:510,prefix:'수비'},{count:5,y:380,prefix:'미드'},{count:1,y:230,prefix:'공격'}],
+  }},
+  '11v11':{ label:'11 vs 11',maxPlayers:11, formations:{
+    '4-4-2':   [{count:4,y:510,prefix:'수비'},{count:4,y:380,prefix:'미드'},{count:2,y:230,prefix:'공격'}],
+    '4-3-3':   [{count:4,y:510,prefix:'수비'},{count:3,y:370,prefix:'미드'},{count:3,y:220,prefix:'공격'}],
+    '3-5-2':   [{count:3,y:510,prefix:'수비'},{count:5,y:375,prefix:'미드'},{count:2,y:230,prefix:'공격'}],
+    '4-2-3-1': [{count:4,y:520,prefix:'수비'},{count:2,y:415,prefix:'수비형MF'},{count:3,y:305,prefix:'공격형MF'},{count:1,y:200,prefix:'공격'}],
+    '5-3-2':   [{count:5,y:510,prefix:'수비'},{count:3,y:370,prefix:'미드'},{count:2,y:230,prefix:'공격'}],
+    '3-4-3':   [{count:3,y:510,prefix:'수비'},{count:4,y:375,prefix:'미드'},{count:3,y:225,prefix:'공격'}],
+  }},
 };
 
-// ─── State ────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let appMode = 'squad';
 let players = [];
 let nextId = 1;
-let selectedPlayer = null;
-let dragState = null;
 let currentMode = '9v9';
+let selectedPlayer = null;  // squad ctx menu
+let dragState = null;
 
-// ─── Mode & formation helpers ─────────────────────────────────────
-function rowX(count, index) {
-  // Distribute players evenly across usable width (x: 20~460)
-  return Math.round(20 + (index + 1) * 440 / (count + 1));
+// Pattern state
+let patterns = [{ name: '패턴 1', moves: {} }]; // moves: { playerId: {toX, toY} }
+let currentPatternIdx = 0;
+
+// Animation state
+let animRaf = null;
+let animStart = null;
+let isPlaying = false;
+const ANIM_MS = 2200;
+
+// Canvas drawing state
+let drawState = null; // { playerId, fromX, fromY, curX, curY }
+
+// ═══════════════════════════════════════════════════════════════
+// APP MODE
+// ═══════════════════════════════════════════════════════════════
+function setAppMode(mode) {
+  appMode = mode;
+  document.querySelectorAll('.app-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.mode === mode)
+  );
+  document.getElementById('squadUI').style.display       = mode === 'squad'   ? '' : 'none';
+  document.getElementById('squadControls').style.display = mode === 'squad'   ? '' : 'none';
+  document.getElementById('patternUI').style.display     = mode === 'pattern' ? '' : 'none';
+  document.getElementById('fieldWrapper').style.display  = mode === 'strategy'? 'none' : '';
+  document.getElementById('field').style.display         = mode === 'squad'   ? '' : 'none';
+  document.getElementById('patternCanvas').style.display = mode === 'pattern' ? '' : 'none';
+  document.getElementById('strategyUI').style.display    = mode === 'strategy'? 'flex' : 'none';
+  document.getElementById('hintText').style.display      = mode === 'strategy'? 'none' : '';
+
+  if (mode === 'squad') {
+    document.getElementById('hintText').textContent = '드래그: 위치 이동 | 더블클릭: 이름 수정 | 우클릭: 색상 / 삭제';
+  } else if (mode === 'pattern') {
+    document.getElementById('hintText').textContent = '선수를 클릭-드래그하여 이동 경로 설정 | 우클릭 화살표: 경로 삭제';
+    stopAnimation();
+    updatePatternUI();
+    renderPatternFrame(0);
+  } else if (mode === 'strategy') {
+    refreshSquadSummary();
+  }
 }
 
-function buildPlayers(modeKey, formationKey) {
-  const rows = MODES_CONFIG[modeKey].formations[formationKey];
-  const list = [];
+// ═══════════════════════════════════════════════════════════════
+// FORMATION / SQUAD
+// ═══════════════════════════════════════════════════════════════
+function rowX(count, i) { return Math.round(20 + (i + 1) * 440 / (count + 1)); }
+
+function buildPlayers(modeKey, formKey) {
+  const rows = MODES_CONFIG[modeKey].formations[formKey];
   let id = 1;
-
-  // GK
-  list.push({ id: id++, name: 'GK', x: 240, y: 622, color: '#E53935' });
-
+  const list = [{ id: id++, name: 'GK', x: 240, y: 622, color: '#E53935' }];
   rows.forEach(row => {
-    for (let i = 0; i < row.count; i++) {
-      list.push({
-        id: id++,
-        name: `${row.prefix}${i + 1}`,
-        x: rowX(row.count, i),
-        y: row.y,
-        color: '#1E88E5',
-      });
-    }
+    for (let i = 0; i < row.count; i++)
+      list.push({ id: id++, name: `${row.prefix}${i+1}`, x: rowX(row.count, i), y: row.y, color: '#1E88E5' });
   });
-
+  list.forEach((p, i) => { p.id = i + 1; });
   return list;
 }
 
-function applyFormation(modeKey, formationKey) {
+function applyFormation(modeKey, formKey) {
   nextId = 1;
-  players = buildPlayers(modeKey, formationKey);
-  // renumber from 1
-  players.forEach((p, i) => { p.id = i + 1; });
+  players = buildPlayers(modeKey, formKey);
   nextId = players.length + 1;
+  // Clear pattern moves when formation changes
+  patterns.forEach(p => { p.moves = {}; });
   renderPlayers();
 }
 
-// ─── UI builders ──────────────────────────────────────────────────
 function buildModePills() {
-  const container = document.getElementById('modePills');
-  container.innerHTML = Object.entries(MODES_CONFIG).map(([key, cfg]) =>
-    `<button class="mode-pill${key === currentMode ? ' active' : ''}"
-             onclick="onModeChange('${key}')">${cfg.label}</button>`
+  document.getElementById('modePills').innerHTML = Object.entries(MODES_CONFIG).map(([k, c]) =>
+    `<button class="mode-pill${k===currentMode?' active':''}" onclick="onModeChange('${k}')">${c.label}</button>`
   ).join('');
 }
 
 function buildFormationSelect(modeKey) {
-  const sel = document.getElementById('formationSelect');
-  const formations = Object.keys(MODES_CONFIG[modeKey].formations);
-  sel.innerHTML = formations.map(f =>
-    `<option value="${f}">${f}</option>`
-  ).join('');
+  document.getElementById('formationSelect').innerHTML =
+    Object.keys(MODES_CONFIG[modeKey].formations).map(f => `<option value="${f}">${f}</option>`).join('');
 }
 
-function onModeChange(modeKey) {
-  currentMode = modeKey;
+function onModeChange(k) {
+  currentMode = k;
   buildModePills();
-  buildFormationSelect(modeKey);
-  const firstFormation = Object.keys(MODES_CONFIG[modeKey].formations)[0];
-  applyFormation(modeKey, firstFormation);
+  buildFormationSelect(k);
+  applyFormation(k, Object.keys(MODES_CONFIG[k].formations)[0]);
 }
 
 function onFormationChange() {
-  const formation = document.getElementById('formationSelect').value;
-  applyFormation(currentMode, formation);
+  applyFormation(currentMode, document.getElementById('formationSelect').value);
 }
 
-// ─── Field drawing ────────────────────────────────────────────────
-function drawField() {
+function addPlayer() {
+  const max = MODES_CONFIG[currentMode].maxPlayers;
+  if (players.length >= max) { alert(`${MODES_CONFIG[currentMode].label} 모드는 최대 ${max}명입니다.`); return; }
+  players.push({ id: nextId++, name: `선수${players.length+1}`, x: 240, y: 330, color: '#1E88E5' });
+  renderPlayers();
+}
+
+function resetLayout() {
+  applyFormation(currentMode, document.getElementById('formationSelect').value);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HTML FIELD LINES
+// ═══════════════════════════════════════════════════════════════
+function drawHtmlField() {
   const f = document.getElementById('field');
-  f.querySelectorAll('.fl,.fc,.fd').forEach(el => el.remove());
-
-  function line(x, y, w, h) {
-    const el = document.createElement('div');
-    el.className = 'fl';
-    el.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px;`;
-    f.appendChild(el);
-  }
-  function circle(cx, cy, r) {
-    const el = document.createElement('div');
-    el.className = 'fc';
-    el.style.cssText = `left:${cx - r}px;top:${cy - r}px;width:${r * 2}px;height:${r * 2}px;`;
-    f.appendChild(el);
-  }
-  function dot(cx, cy, r) {
-    const el = document.createElement('div');
-    el.className = 'fd';
-    el.style.cssText = `left:${cx - r}px;top:${cy - r}px;width:${r * 2}px;height:${r * 2}px;`;
-    f.appendChild(el);
-  }
-
-  // Boundary
-  line(20, 20, 440, 2); line(20, 638, 440, 2);
-  line(20, 20, 2, 620); line(458, 20, 2, 620);
-  // Center
-  line(20, 330, 440, 2);
-  circle(240, 330, 60); dot(240, 330, 4);
-  // Bottom: penalty area, goal area, spot, goal
-  line(130, 558, 220, 2); line(130, 558, 2, 82); line(348, 558, 2, 82);
-  line(184, 598, 112, 2); line(184, 598, 2, 42); line(294, 598, 2, 42);
-  dot(240, 530, 3);
-  line(194, 638, 92, 8); line(194, 638, 2, 10); line(284, 638, 2, 10);
-  // Top: penalty area, goal area, spot, goal
-  line(130, 100, 220, 2); line(130, 20, 2, 82); line(348, 20, 2, 82);
-  line(184, 60, 112, 2);  line(184, 20, 2, 42);  line(294, 20, 2, 42);
-  dot(240, 128, 3);
-  line(194, 12, 92, 8);  line(194, 12, 2, 10);  line(284, 12, 2, 10);
+  f.querySelectorAll('.fl,.fc,.fd').forEach(e => e.remove());
+  const L = (x,y,w,h) => { const e=document.createElement('div'); e.className='fl'; e.style.cssText=`left:${x}px;top:${y}px;width:${w}px;height:${h}px;`; f.appendChild(e); };
+  const C = (cx,cy,r) => { const e=document.createElement('div'); e.className='fc'; e.style.cssText=`left:${cx-r}px;top:${cy-r}px;width:${r*2}px;height:${r*2}px;`; f.appendChild(e); };
+  const D = (cx,cy,r) => { const e=document.createElement('div'); e.className='fd'; e.style.cssText=`left:${cx-r}px;top:${cy-r}px;width:${r*2}px;height:${r*2}px;`; f.appendChild(e); };
+  L(20,20,440,2); L(20,638,440,2); L(20,20,2,620); L(458,20,2,620);
+  L(20,330,440,2); C(240,330,60); D(240,330,4);
+  L(130,558,220,2); L(130,558,2,82); L(348,558,2,82);
+  L(184,598,112,2); L(184,598,2,42); L(294,598,2,42); D(240,530,3);
+  L(194,638,92,8); L(194,638,2,10); L(284,638,2,10);
+  L(130,100,220,2); L(130,20,2,82); L(348,20,2,82);
+  L(184,60,112,2); L(184,20,2,42); L(294,20,2,42); D(240,128,3);
+  L(194,12,92,8); L(194,12,2,10); L(284,12,2,10);
 }
 
-// ─── Player rendering ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// HTML PLAYER RENDERING (squad mode)
+// ═══════════════════════════════════════════════════════════════
 function renderPlayers() {
   const f = document.getElementById('field');
-  f.querySelectorAll('.player').forEach(el => el.remove());
-
+  f.querySelectorAll('.player').forEach(e => e.remove());
   players.forEach((p, i) => {
     const el = document.createElement('div');
     el.className = 'player';
@@ -456,198 +635,840 @@ function renderPlayers() {
     el.style.left = p.x + 'px';
     el.style.top  = p.y + 'px';
     el.innerHTML = `
-      <div class="player-circle" style="background:${p.color};">${i + 1}</div>
-      <div class="player-name">${escHtml(p.name)}</div>
-    `;
-
-    el.addEventListener('dblclick', (e) => {
-      e.stopPropagation();
-      startInlineEdit(el, p);
-    });
-    el.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      showCtxMenu(e.clientX, e.clientY, p);
-    });
-
+      <div class="player-circle" style="background:${p.color};">${i+1}</div>
+      <div class="player-name">${escHtml(p.name)}</div>`;
+    el.addEventListener('dblclick', e => { e.stopPropagation(); startInlineEdit(el, p); });
+    el.addEventListener('contextmenu', e => { e.preventDefault(); e.stopPropagation(); showCtxMenu(e.clientX, e.clientY, p); });
     f.appendChild(el);
   });
 }
 
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// ─── Inline name editing ──────────────────────────────────────────
+// Inline name edit
 function startInlineEdit(playerEl, player) {
   const nameEl = playerEl.querySelector('.player-name');
   const original = player.name;
   const input = document.createElement('input');
-  input.type = 'text';
-  input.value = original;
-  input.maxLength = 12;
-  input.style.cssText = `
-    width:64px; font-size:0.65rem; font-weight:600; text-align:center;
-    background:rgba(0,0,0,0.7); color:white; border:1px solid #60a5fa;
-    border-radius:4px; padding:1px 4px; outline:none; margin-top:3px;
-    font-family:inherit;
-  `;
+  input.type = 'text'; input.value = original; input.maxLength = 12;
+  input.style.cssText = `width:64px;font-size:0.65rem;font-weight:600;text-align:center;
+    background:rgba(0,0,0,0.7);color:white;border:1px solid #60a5fa;border-radius:4px;
+    padding:1px 4px;outline:none;margin-top:3px;font-family:inherit;`;
   nameEl.replaceWith(input);
-  input.select();
-  input.focus();
-
-  function commit() {
-    player.name = input.value.trim().slice(0, 12) || original;
-    renderPlayers();
-  }
+  input.select(); input.focus();
+  const commit = () => { player.name = input.value.trim().slice(0,12) || original; renderPlayers(); };
   input.addEventListener('blur', commit);
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter')  { e.preventDefault(); input.blur(); }
-    if (e.key === 'Escape') { input.value = original; input.blur(); }
+  input.addEventListener('keydown', e => {
+    if (e.key==='Enter') { e.preventDefault(); input.blur(); }
+    if (e.key==='Escape') { input.value=original; input.blur(); }
     e.stopPropagation();
   });
-  input.addEventListener('mousedown', (e) => e.stopPropagation());
+  input.addEventListener('mousedown', e => e.stopPropagation());
 }
 
-// ─── Drag — mouse ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// DRAG — squad mode
+// ═══════════════════════════════════════════════════════════════
 const fieldEl = document.getElementById('field');
 
-fieldEl.addEventListener('mousedown', (e) => {
+fieldEl.addEventListener('mousedown', e => {
   if (e.button !== 0) return;
-  const playerEl = e.target.closest('.player');
-  if (!playerEl) return;
-  const player = players.find(p => p.id == playerEl.dataset.id);
-  if (!player) return;
+  const pe = e.target.closest('.player');
+  if (!pe) return;
+  const p = players.find(p => p.id == pe.dataset.id);
+  if (!p) return;
   hideCtxMenu();
-  dragState = { player, el: playerEl, startMX: e.clientX, startMY: e.clientY, startPX: player.x, startPY: player.y };
-  playerEl.classList.add('dragging');
+  dragState = { p, el:pe, sx:e.clientX, sy:e.clientY, px:p.x, py:p.y };
+  pe.classList.add('dragging');
   e.preventDefault();
 });
-
-document.addEventListener('mousemove', (e) => {
+document.addEventListener('mousemove', e => {
   if (!dragState) return;
-  applyDrag(dragState.startPX + (e.clientX - dragState.startMX), dragState.startPY + (e.clientY - dragState.startMY));
+  const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + e.clientX - dragState.sx));
+  const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + e.clientY - dragState.sy));
+  dragState.p.x = x; dragState.p.y = y;
+  dragState.el.style.left = x+'px'; dragState.el.style.top = y+'px';
 });
-document.addEventListener('mouseup', endDrag);
-
-// ─── Drag — touch ─────────────────────────────────────────────────
-fieldEl.addEventListener('touchstart', (e) => {
-  const playerEl = e.target.closest('.player');
-  if (!playerEl) return;
-  const player = players.find(p => p.id == playerEl.dataset.id);
-  if (!player) return;
+document.addEventListener('mouseup', () => {
+  if (!dragState) return;
+  dragState.el.classList.remove('dragging'); dragState = null;
+});
+fieldEl.addEventListener('touchstart', e => {
+  const pe = e.target.closest('.player');
+  if (!pe) return;
+  const p = players.find(p => p.id == pe.dataset.id);
+  if (!p) return;
   const t = e.touches[0];
-  dragState = { player, el: playerEl, startMX: t.clientX, startMY: t.clientY, startPX: player.x, startPY: player.y };
-  playerEl.classList.add('dragging');
-  e.preventDefault();
+  dragState = { p, el:pe, sx:t.clientX, sy:t.clientY, px:p.x, py:p.y };
+  pe.classList.add('dragging'); e.preventDefault();
 }, { passive: false });
-
-document.addEventListener('touchmove', (e) => {
+document.addEventListener('touchmove', e => {
   if (!dragState) return;
   const t = e.touches[0];
-  applyDrag(dragState.startPX + (t.clientX - dragState.startMX), dragState.startPY + (t.clientY - dragState.startMY));
+  const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + t.clientX - dragState.sx));
+  const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + t.clientY - dragState.sy));
+  dragState.p.x = x; dragState.p.y = y;
+  dragState.el.style.left = x+'px'; dragState.el.style.top = y+'px';
   e.preventDefault();
 }, { passive: false });
-document.addEventListener('touchend', endDrag);
+document.addEventListener('touchend', () => { if (dragState) { dragState.el.classList.remove('dragging'); dragState=null; } });
 
-function applyDrag(rawX, rawY) {
-  const x = Math.max(26, Math.min(FIELD_W - 26, rawX));
-  const y = Math.max(26, Math.min(FIELD_H - 26, rawY));
-  dragState.player.x = x;
-  dragState.player.y = y;
-  dragState.el.style.left = x + 'px';
-  dragState.el.style.top  = y + 'px';
-}
-function endDrag() {
-  if (!dragState) { return; }
-  dragState.el.classList.remove('dragging');
-  dragState = null;
-}
-
-// ─── Context menu ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// SQUAD CONTEXT MENU
+// ═══════════════════════════════════════════════════════════════
 function showCtxMenu(x, y, player) {
   selectedPlayer = player;
   document.getElementById('colorPalette').innerHTML = COLORS.map(c =>
-    `<div class="swatch${c === player.color ? ' active' : ''}"
-         style="background:${c};${c === '#ffffff' ? 'border-color:#475569;' : ''}"
-         onclick="changeColor('${c}')"></div>`
+    `<div class="swatch${c===player.color?' active':''}"
+         style="background:${c};${c==='#ffffff'?'border-color:#475569;':''}"
+         onclick="ctxColor('${c}')"></div>`
   ).join('');
-  const menu = document.getElementById('ctx-menu');
-  menu.style.left = Math.min(x, window.innerWidth  - 180) + 'px';
-  menu.style.top  = Math.min(y, window.innerHeight - 180) + 'px';
-  menu.classList.add('visible');
+  const m = document.getElementById('ctxMenu');
+  m.style.left = Math.min(x, innerWidth-180)+'px';
+  m.style.top  = Math.min(y, innerHeight-180)+'px';
+  m.classList.add('visible');
 }
-function hideCtxMenu() { document.getElementById('ctx-menu').classList.remove('visible'); }
-document.addEventListener('click',       (e) => { if (!e.target.closest('#ctx-menu')) hideCtxMenu(); });
-document.addEventListener('contextmenu', (e) => { if (!e.target.closest('.player'))   hideCtxMenu(); });
+function hideCtxMenu() { document.getElementById('ctxMenu').classList.remove('visible'); }
+document.addEventListener('click', e => { if (!e.target.closest('#ctxMenu')) hideCtxMenu(); });
+document.addEventListener('contextmenu', e => { if (!e.target.closest('.player')) hideCtxMenu(); });
 
-function changeColor(color) {
-  if (selectedPlayer) { selectedPlayer.color = color; renderPlayers(); }
-  hideCtxMenu();
-}
-function renamePlayer() {
+function ctxColor(c) { if (selectedPlayer) { selectedPlayer.color=c; renderPlayers(); } hideCtxMenu(); }
+function ctxRename() {
   if (!selectedPlayer) return;
-  const name = prompt('선수 이름:', selectedPlayer.name);
-  if (name !== null) { selectedPlayer.name = name.trim().slice(0, 12) || selectedPlayer.name; renderPlayers(); }
+  const n = prompt('선수 이름:', selectedPlayer.name);
+  if (n !== null) { selectedPlayer.name = n.trim().slice(0,12) || selectedPlayer.name; renderPlayers(); }
   hideCtxMenu();
 }
-function removePlayer() {
+function ctxRemove() {
   if (!selectedPlayer) return;
   players = players.filter(p => p.id !== selectedPlayer.id);
-  renderPlayers();
-  hideCtxMenu();
+  renderPlayers(); hideCtxMenu();
 }
 
-// ─── Controls ─────────────────────────────────────────────────────
-function addPlayer() {
-  const max = MODES_CONFIG[currentMode].maxPlayers;
-  if (players.length >= max) { alert(`${MODES_CONFIG[currentMode].label} 모드는 최대 ${max}명입니다.`); return; }
-  players.push({ id: nextId++, name: `선수${players.length + 1}`, x: 240, y: 330, color: '#1E88E5' });
-  renderPlayers();
-}
-
-function resetLayout() {
-  const formation = document.getElementById('formationSelect').value;
-  applyFormation(currentMode, formation);
-}
-
-// ─── Save image ───────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// SQUAD SAVE IMAGE
+// ═══════════════════════════════════════════════════════════════
 function saveImage() {
   const teamName = document.getElementById('teamName').value.trim();
   const formation = document.getElementById('formationSelect').value;
   const f = document.getElementById('field');
-
   let banner = null;
   if (teamName) {
     banner = document.createElement('div');
-    banner.style.cssText = `
-      position:absolute; top:28px; left:50%; transform:translateX(-50%);
-      background:rgba(0,0,0,0.55); color:white; font-weight:700;
-      font-size:15px; padding:5px 18px; border-radius:20px;
-      z-index:200; white-space:nowrap; pointer-events:none;
-      font-family:'Segoe UI',Tahoma,sans-serif; letter-spacing:0.5px;
-    `;
+    banner.style.cssText = `position:absolute;top:28px;left:50%;transform:translateX(-50%);
+      background:rgba(0,0,0,0.55);color:white;font-weight:700;font-size:15px;
+      padding:5px 18px;border-radius:20px;z-index:200;white-space:nowrap;pointer-events:none;`;
     banner.textContent = `${teamName}  [${formation}]`;
     f.appendChild(banner);
   }
-
-  html2canvas(f, { scale: 2.5, backgroundColor: '#276d41', useCORS: true, logging: false })
+  html2canvas(f, { scale:2.5, backgroundColor:'#276d41', useCORS:true, logging:false })
     .then(canvas => {
       if (banner) f.removeChild(banner);
-      const link = document.createElement('a');
-      link.download = `${teamName || '스쿼드'}_${formation}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    })
-    .catch(err => {
-      if (banner) f.removeChild(banner);
-      console.error(err);
-      alert('이미지 저장에 실패했습니다.');
-    });
+      const a = document.createElement('a');
+      a.download = `${teamName||'스쿼드'}_${formation}.png`;
+      a.href = canvas.toDataURL('image/png'); a.click();
+    }).catch(() => { if (banner) f.removeChild(banner); });
 }
 
-// ─── Init ─────────────────────────────────────────────────────────
-drawField();
+// ═══════════════════════════════════════════════════════════════
+// PATTERN SYSTEM
+// ═══════════════════════════════════════════════════════════════
+function currentPattern() { return patterns[currentPatternIdx]; }
+
+function updatePatternUI() {
+  document.getElementById('patternName').value = currentPattern().name;
+  document.getElementById('patternCounter').textContent = `${currentPatternIdx+1} / ${patterns.length}`;
+}
+
+function addPattern() {
+  patterns.push({ name: `패턴 ${patterns.length+1}`, moves: {} });
+  currentPatternIdx = patterns.length - 1;
+  updatePatternUI();
+  renderPatternFrame(0);
+}
+
+function deletePattern() {
+  if (patterns.length === 1) { alert('패턴이 1개이면 삭제할 수 없습니다.'); return; }
+  patterns.splice(currentPatternIdx, 1);
+  currentPatternIdx = Math.min(currentPatternIdx, patterns.length-1);
+  updatePatternUI();
+  renderPatternFrame(0);
+}
+
+function prevPattern() {
+  currentPatternIdx = (currentPatternIdx - 1 + patterns.length) % patterns.length;
+  updatePatternUI(); stopAnimation(); renderPatternFrame(0);
+}
+
+function nextPattern() {
+  currentPatternIdx = (currentPatternIdx + 1) % patterns.length;
+  updatePatternUI(); stopAnimation(); renderPatternFrame(0);
+}
+
+function renameCurrentPattern() {
+  currentPattern().name = document.getElementById('patternName').value.trim() || currentPattern().name;
+  updatePatternUI();
+}
+
+function clearCurrentPattern() {
+  currentPattern().moves = {};
+  stopAnimation(); renderPatternFrame(0);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CANVAS FIELD RENDERING
+// ═══════════════════════════════════════════════════════════════
+const pCanvas = document.getElementById('patternCanvas');
+const pCtx = pCanvas.getContext('2d');
+
+function canvasField(ctx) {
+  // Background + stripes
+  ctx.fillStyle = '#276d41';
+  ctx.fillRect(0, 0, FIELD_W, FIELD_H);
+  for (let y = 44; y < FIELD_H; y += 88) {
+    ctx.fillStyle = 'rgba(0,0,0,0.07)';
+    ctx.fillRect(0, y, FIELD_W, 44);
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+  ctx.lineWidth = 2;
+
+  function L(x,y,w,h) { ctx.fillRect(x,y,w,h); }
+  function C(cx,cy,r) { ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke(); }
+  function D(cx,cy,r) { ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); }
+
+  L(20,20,440,2); L(20,638,440,2); L(20,20,2,620); L(458,20,2,620);
+  L(20,330,440,2); C(240,330,60); D(240,330,4);
+  L(130,558,220,2); L(130,558,2,82); L(348,558,2,82);
+  L(184,598,112,2); L(184,598,2,42); L(294,598,2,42); D(240,530,3);
+  L(194,638,92,8); L(194,638,2,10); L(284,638,2,10);
+  L(130,100,220,2); L(130,20,2,82); L(348,20,2,82);
+  L(184,60,112,2); L(184,20,2,42); L(294,20,2,42); D(240,128,3);
+  L(194,12,92,8); L(194,12,2,10); L(284,12,2,10);
+}
+
+function canvasPlayer(ctx, color, name, num, x, y) {
+  // Shadow
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.55)';
+  ctx.shadowBlur = 8;
+  // Circle
+  ctx.beginPath(); ctx.arc(x, y, PLAYER_R, 0, Math.PI*2);
+  ctx.fillStyle = color; ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 2.5; ctx.stroke();
+  ctx.shadowBlur = 0;
+  // Number
+  ctx.fillStyle = 'white';
+  ctx.font = 'bold 13px Segoe UI, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(String(num), x, y);
+  // Name
+  ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 5;
+  ctx.font = 'bold 10px Segoe UI, sans-serif';
+  ctx.fillText(name.slice(0, 7), x, y + 32);
+  ctx.restore();
+}
+
+function canvasArrow(ctx, fx, fy, tx, ty, color, alpha) {
+  const angle = Math.atan2(ty-fy, tx-fx);
+  const len = Math.hypot(tx-fx, ty-fy);
+  if (len < 10) return;
+
+  const sx = fx + PLAYER_R * Math.cos(angle);
+  const sy = fy + PLAYER_R * Math.sin(angle);
+  const ex = tx - 13 * Math.cos(angle);
+  const ey = ty - 13 * Math.sin(angle);
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color; ctx.lineWidth = 3;
+  ctx.setLineDash([10, 5]);
+  ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(tx, ty);
+  ctx.lineTo(tx - 16*Math.cos(angle-Math.PI/6), ty - 16*Math.sin(angle-Math.PI/6));
+  ctx.lineTo(tx - 16*Math.cos(angle+Math.PI/6), ty - 16*Math.sin(angle+Math.PI/6));
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+function renderPatternFrame(t, patIdx) {
+  const pIdx = (patIdx !== undefined) ? patIdx : currentPatternIdx;
+  const pat = patterns[pIdx];
+  const ctx = pCtx;
+  canvasField(ctx);
+
+  const arrowAlpha = Math.max(0, 1 - t * 2);
+  const et = easeInOut(Math.min(t, 1));
+
+  // Draw arrows first (behind players)
+  if (pat) {
+    Object.entries(pat.moves).forEach(([id, move]) => {
+      const p = players.find(p => p.id == id);
+      if (!p) return;
+      canvasArrow(ctx, p.x, p.y, move.toX, move.toY, '#facc15', arrowAlpha);
+    });
+    // Draw in-progress arrow
+    if (drawState) {
+      canvasArrow(ctx, drawState.fromX, drawState.fromY, drawState.curX, drawState.curY, '#facc15', 0.7);
+    }
+  }
+
+  // Draw players
+  players.forEach((p, i) => {
+    const move = pat?.moves[p.id];
+    const x = move ? p.x + (move.toX - p.x) * et : p.x;
+    const y = move ? p.y + (move.toY - p.y) * et : p.y;
+    canvasPlayer(ctx, p.color, p.name, i+1, x, y);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CANVAS INTERACTION — arrow drawing
+// ═══════════════════════════════════════════════════════════════
+function hitPlayer(x, y) {
+  return players.find(p => Math.hypot(x - p.x, y - p.y) <= PLAYER_R + 4);
+}
+
+function hitArrow(x, y) {
+  // Check if click is near any arrow midpoint
+  const pat = currentPattern();
+  for (const [id, move] of Object.entries(pat.moves)) {
+    const p = players.find(p => p.id == id);
+    if (!p) continue;
+    const mx = (p.x + move.toX) / 2;
+    const my = (p.y + move.toY) / 2;
+    if (Math.hypot(x - mx, y - my) < 16) return Number(id);
+    // Also check tip
+    if (Math.hypot(x - move.toX, y - move.toY) < 16) return Number(id);
+  }
+  return null;
+}
+
+function canvasCoords(e) {
+  const rect = pCanvas.getBoundingClientRect();
+  const scaleX = FIELD_W / rect.width;
+  const scaleY = FIELD_H / rect.height;
+  const src = e.touches ? e.touches[0] : e;
+  return { x: (src.clientX - rect.left) * scaleX, y: (src.clientY - rect.top) * scaleY };
+}
+
+pCanvas.addEventListener('mousedown', e => {
+  if (e.button === 2) return; // right click handled separately
+  const { x, y } = canvasCoords(e);
+  const p = hitPlayer(x, y);
+  if (p) {
+    stopAnimation();
+    drawState = { playerId: p.id, fromX: p.x, fromY: p.y, curX: x, curY: y };
+    e.preventDefault();
+  }
+});
+
+pCanvas.addEventListener('mousemove', e => {
+  if (!drawState) return;
+  const { x, y } = canvasCoords(e);
+  drawState.curX = Math.max(5, Math.min(FIELD_W-5, x));
+  drawState.curY = Math.max(5, Math.min(FIELD_H-5, y));
+  renderPatternFrame(0);
+});
+
+pCanvas.addEventListener('mouseup', e => {
+  if (!drawState) return;
+  const { x, y } = canvasCoords(e);
+  const dist = Math.hypot(x - drawState.fromX, y - drawState.fromY);
+  if (dist > 15) {
+    currentPattern().moves[drawState.playerId] = {
+      toX: Math.max(5, Math.min(FIELD_W-5, x)),
+      toY: Math.max(5, Math.min(FIELD_H-5, y)),
+    };
+  }
+  drawState = null;
+  renderPatternFrame(0);
+});
+
+pCanvas.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  const { x, y } = canvasCoords(e);
+  const id = hitArrow(x, y);
+  if (id !== null) {
+    delete currentPattern().moves[id];
+    renderPatternFrame(0);
+  }
+});
+
+// Touch support for pattern canvas
+pCanvas.addEventListener('touchstart', e => {
+  const { x, y } = canvasCoords(e);
+  const p = hitPlayer(x, y);
+  if (p) {
+    stopAnimation();
+    drawState = { playerId: p.id, fromX: p.x, fromY: p.y, curX: x, curY: y };
+    e.preventDefault();
+  }
+}, { passive: false });
+
+pCanvas.addEventListener('touchmove', e => {
+  if (!drawState) return;
+  const { x, y } = canvasCoords(e);
+  drawState.curX = Math.max(5, Math.min(FIELD_W-5, x));
+  drawState.curY = Math.max(5, Math.min(FIELD_H-5, y));
+  renderPatternFrame(0);
+  e.preventDefault();
+}, { passive: false });
+
+pCanvas.addEventListener('touchend', e => {
+  if (!drawState) return;
+  const { x, y } = canvasCoords({ touches: e.changedTouches });
+  const dist = Math.hypot(x - drawState.fromX, y - drawState.fromY);
+  if (dist > 15) {
+    currentPattern().moves[drawState.playerId] = {
+      toX: Math.max(5, Math.min(FIELD_W-5, x)),
+      toY: Math.max(5, Math.min(FIELD_H-5, y)),
+    };
+  }
+  drawState = null;
+  renderPatternFrame(0);
+});
+
+// ═══════════════════════════════════════════════════════════════
+// ANIMATION
+// ═══════════════════════════════════════════════════════════════
+function togglePlay() {
+  isPlaying ? stopAnimation() : startAnimation();
+}
+
+function startAnimation() {
+  isPlaying = true;
+  animStart = null;
+  document.getElementById('playBtn').textContent = '⏸ 일시정지';
+  animRaf = requestAnimationFrame(animTick);
+}
+
+function stopAnimation() {
+  if (animRaf) { cancelAnimationFrame(animRaf); animRaf = null; }
+  isPlaying = false;
+  document.getElementById('playBtn').textContent = '▶ 미리보기';
+  renderPatternFrame(0);
+}
+
+function animTick(ts) {
+  if (!animStart) animStart = ts;
+  const t = (ts - animStart) / ANIM_MS;
+  renderPatternFrame(Math.min(t, 1));
+  if (t < 1) {
+    animRaf = requestAnimationFrame(animTick);
+  } else {
+    // Hold 1s then loop
+    setTimeout(() => {
+      if (isPlaying) {
+        animStart = null;
+        animRaf = requestAnimationFrame(animTick);
+      }
+    }, 1000);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GIF EXPORT
+// ═══════════════════════════════════════════════════════════════
+async function exportGif(allPatterns) {
+  stopAnimation();
+  const patsToExport = allPatterns ? patterns : [currentPattern()];
+  const filename = allPatterns ? '전체패턴' : (currentPattern().name || '공격패턴');
+
+  // Show progress
+  const prog = document.getElementById('gifProgress');
+  prog.classList.add('visible');
+  setProgress(0, 'GIF 생성 준비 중...');
+
+  // Fetch worker as blob to avoid CORS issues
+  let workerUrl;
+  try {
+    const resp = await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
+    const text = await resp.text();
+    workerUrl = URL.createObjectURL(new Blob([text], { type: 'application/javascript' }));
+  } catch {
+    workerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js';
+  }
+
+  const gif = new GIF({
+    workers: 2,
+    quality: 8,
+    width: FIELD_W,
+    height: FIELD_H,
+    workerScript: workerUrl,
+  });
+
+  // Offscreen canvas for clean frames
+  const off = document.createElement('canvas');
+  off.width = FIELD_W; off.height = FIELD_H;
+  const offCtx = off.getContext('2d');
+
+  const FRAMES = 36;        // frames per pattern animation
+  const HOLD_FRAMES = 10;   // frames to hold at end of each pattern
+  const FRAME_DELAY = 55;   // ms per frame ≈ 18fps
+  const HOLD_DELAY = 120;
+
+  let totalFrames = patsToExport.length * (FRAMES + HOLD_FRAMES);
+  let doneFrames = 0;
+
+  function renderOffscreen(t, patIdx) {
+    // Temporarily swap canvas context for rendering
+    const savedCtx = pCtx;
+    // Render directly to offscreen
+    canvasFieldOff(offCtx);
+    const pat = patsToExport[patIdx];
+    const et = easeInOut(Math.min(t, 1));
+    const arrowAlpha = Math.max(0, 1 - t * 2);
+
+    if (pat) {
+      Object.entries(pat.moves).forEach(([id, move]) => {
+        const p = players.find(p => p.id == id);
+        if (!p) return;
+        canvasArrow(offCtx, p.x, p.y, move.toX, move.toY, '#facc15', arrowAlpha);
+      });
+    }
+    players.forEach((p, i) => {
+      const move = pat?.moves[p.id];
+      const x = move ? p.x + (move.toX - p.x) * et : p.x;
+      const y = move ? p.y + (move.toY - p.y) * et : p.y;
+      canvasPlayer(offCtx, p.color, p.name, i+1, x, y);
+    });
+
+    // Pattern label
+    if (allPatterns && pat) {
+      offCtx.save();
+      offCtx.fillStyle = 'rgba(0,0,0,0.5)';
+      offCtx.beginPath();
+      offCtx.roundRect(10, 10, 140, 28, 6);
+      offCtx.fill();
+      offCtx.fillStyle = 'white';
+      offCtx.font = 'bold 13px Segoe UI, sans-serif';
+      offCtx.textAlign = 'left';
+      offCtx.textBaseline = 'middle';
+      offCtx.fillText(pat.name, 18, 24);
+      offCtx.restore();
+    }
+  }
+
+  for (let pi = 0; pi < patsToExport.length; pi++) {
+    const savedIdx = currentPatternIdx;
+    currentPatternIdx = patterns.indexOf(patsToExport[pi]);
+
+    for (let f = 0; f <= FRAMES; f++) {
+      const t = f / FRAMES;
+      renderOffscreen(t, pi);
+      gif.addFrame(offCtx, { delay: FRAME_DELAY, copy: true });
+      doneFrames++;
+      setProgress(doneFrames / totalFrames * 0.7, `패턴 ${pi+1}/${patsToExport.length} 렌더링 중...`);
+      await new Promise(r => setTimeout(r, 0)); // yield to browser
+    }
+    // Hold frames
+    for (let f = 0; f < HOLD_FRAMES; f++) {
+      renderOffscreen(1, pi);
+      gif.addFrame(offCtx, { delay: HOLD_DELAY, copy: true });
+      doneFrames++;
+    }
+
+    currentPatternIdx = savedIdx;
+  }
+
+  gif.on('progress', p => setProgress(0.7 + p * 0.3, `GIF 인코딩 중... ${Math.round(p*100)}%`));
+  gif.on('finished', blob => {
+    const a = document.createElement('a');
+    a.download = `${filename}.gif`;
+    a.href = URL.createObjectURL(blob);
+    a.click();
+    prog.classList.remove('visible');
+    renderPatternFrame(0);
+    if (workerUrl.startsWith('blob:')) URL.revokeObjectURL(workerUrl);
+  });
+
+  gif.render();
+}
+
+function canvasFieldOff(ctx) {
+  ctx.fillStyle = '#276d41'; ctx.fillRect(0, 0, FIELD_W, FIELD_H);
+  for (let y = 44; y < FIELD_H; y += 88) {
+    ctx.fillStyle = 'rgba(0,0,0,0.07)'; ctx.fillRect(0, y, FIELD_W, 44);
+  }
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 2;
+  const L=(x,y,w,h)=>ctx.fillRect(x,y,w,h);
+  const C=(cx,cy,r)=>{ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();};
+  const D=(cx,cy,r)=>{ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();};
+  L(20,20,440,2);L(20,638,440,2);L(20,20,2,620);L(458,20,2,620);
+  L(20,330,440,2);C(240,330,60);D(240,330,4);
+  L(130,558,220,2);L(130,558,2,82);L(348,558,2,82);
+  L(184,598,112,2);L(184,598,2,42);L(294,598,2,42);D(240,530,3);
+  L(194,638,92,8);L(194,638,2,10);L(284,638,2,10);
+  L(130,100,220,2);L(130,20,2,82);L(348,20,2,82);
+  L(184,60,112,2);L(184,20,2,42);L(294,20,2,42);D(240,128,3);
+  L(194,12,92,8);L(194,12,2,10);L(284,12,2,10);
+}
+
+function setProgress(ratio, text) {
+  document.getElementById('gifProgressText').textContent = text;
+  document.getElementById('gifProgressFill').style.width = Math.round(ratio * 100) + '%';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STRATEGY — SQUAD SUMMARY
+// ═══════════════════════════════════════════════════════════════
+function classifyPlayer(p) {
+  if (p.y >= 590) return 'GK';
+  if (p.y >= 450) return '수비';
+  if (p.y >= 300) return '미드필더';
+  return '공격';
+}
+
+function refreshSquadSummary() {
+  const formation = document.getElementById('formationSelect').value;
+  const modeLabel = MODES_CONFIG[currentMode].label;
+  const el = document.getElementById('squadSummary');
+
+  const roleCounts = { GK: 0, 수비: 0, 미드필더: 0, 공격: 0 };
+  players.forEach(p => roleCounts[classifyPlayer(p)]++);
+
+  const patCount = patterns.filter(pt => Object.keys(pt.moves).length > 0).length;
+
+  el.innerHTML = `
+    <div style="margin-bottom:8px;">
+      <span class="formation-badge">${modeLabel} / ${formation}</span>
+    </div>
+    <div style="font-size:0.75rem;color:#64748b;margin-bottom:6px;">
+      GK ${roleCounts.GK} &nbsp;|&nbsp; 수비 ${roleCounts.수비} &nbsp;|&nbsp; 미드 ${roleCounts.미드필더} &nbsp;|&nbsp; 공격 ${roleCounts.공격}
+      &nbsp;&nbsp;·&nbsp;&nbsp; 공격패턴 ${patCount}개
+    </div>
+    <div class="player-list">
+      ${players.map((p,i) => `
+        <div class="player-chip">
+          <div class="dot" style="background:${p.color};"></div>
+          <span>${i+1}. ${escHtml(p.name)}</span>
+        </div>`).join('')}
+    </div>
+    ${patCount > 0 ? `<div class="pattern-chips" style="margin-top:8px;">
+      ${patterns.filter(pt=>Object.keys(pt.moves).length>0).map(pt=>`<span class="pattern-chip">🎯 ${escHtml(pt.name)}</span>`).join('')}
+    </div>` : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STRATEGY — MANUAL GENERATION (rule-based)
+// ═══════════════════════════════════════════════════════════════
+let lastManualText = '';
+
+function generateManual() {
+  const opponent = document.getElementById('opponent').value.trim() || '상대팀';
+  const matchDate = document.getElementById('matchDate').value;
+  const notes     = document.getElementById('matchNotes').value.trim();
+  const formation = document.getElementById('formationSelect').value;
+  const modeLabel = MODES_CONFIG[currentMode].label;
+
+  // ── Tactical profile from formation ──────────────────────────
+  const roleCounts = { GK: 0, 수비: 0, 미드필더: 0, 공격: 0 };
+  players.forEach(p => roleCounts[classifyPlayer(p)]++);
+
+  const defRatio = roleCounts.수비 / (players.length - 1 || 1);
+  let tacticalStyle, pressLine, defLine, transitionMsg;
+  if (defRatio >= 0.45) {
+    tacticalStyle = '수비 우선 / 역습';
+    pressLine     = '하프라인 뒤로 물러나 수비 블록을 형성한다.';
+    defLine       = '수비 라인은 컴팩트하게 유지하고, 상대 공격수 침투 공간을 최소화한다.';
+    transitionMsg = '공 탈취 후 빠른 전환으로 역습 찬스를 노린다. 전방 공격수로 즉시 연결한다.';
+  } else if (defRatio <= 0.28) {
+    tacticalStyle = '공격적 / 전방 압박';
+    pressLine     = '상대 빌드업 시 전방부터 압박하여 실수를 유도한다.';
+    defLine       = '수비 라인은 높게 유지하여 미드필더와 간격을 좁힌다. 오프사이드 트랩을 적극 활용한다.';
+    transitionMsg = '공 소유 시 빠른 패스 전개로 상대 수비 재조직 전에 공격한다.';
+  } else {
+    tacticalStyle = '밸런스 / 점유 기반';
+    pressLine     = '미드필드에서 수비 블록을 형성하고, 공 소유 시 빌드업 플레이를 진행한다.';
+    defLine       = '수비 라인과 미드필더 간격을 30m 이내로 유지한다.';
+    transitionMsg = '공 탈취 후 무리한 전진보다 안전한 패스로 점유를 유지한다.';
+  }
+
+  // ── Pattern analysis ─────────────────────────────────────────
+  const activePats = patterns.filter(pt => Object.keys(pt.moves).length > 0);
+
+  // Per-player movement tendencies across all patterns
+  const playerMoves = {}; // id → [{patName, dx, dy, toX, toY}]
+  activePats.forEach(pt => {
+    Object.entries(pt.moves).forEach(([id, move]) => {
+      const p = players.find(p => p.id == id);
+      if (!p) return;
+      if (!playerMoves[id]) playerMoves[id] = [];
+      playerMoves[id].push({
+        patName: pt.name,
+        dx: move.toX - p.x,
+        dy: move.toY - p.y,
+        toX: move.toX,
+        toY: move.toY,
+      });
+    });
+  });
+
+  function describeMoves(id) {
+    const mvs = playerMoves[id];
+    if (!mvs || mvs.length === 0) return [];
+    return mvs.map(m => {
+      const dir = moveDir(m.dx, m.dy);
+      return `[${escHtml(m.patName)}] ${dir} 이동`;
+    });
+  }
+
+  function moveDir(dx, dy) {
+    const angle = Math.atan2(-dy, dx) * 180 / Math.PI; // flip y (canvas top=0)
+    if (Math.abs(dx) < 30 && Math.abs(dy) < 30) return '제자리 유지';
+    if (dy < -40) return '전방 침투';
+    if (dy > 40)  return '후방 지원';
+    if (dx > 40 && dy < 0)  return '우측 전방 침투';
+    if (dx < -40 && dy < 0) return '좌측 전방 침투';
+    if (dx > 40)  return '우측 오버랩';
+    if (dx < -40) return '좌측 오버랩';
+    return '사선 이동';
+  }
+
+  // ── Build team-wide section ───────────────────────────────────
+  const dateStr = matchDate
+    ? new Date(matchDate).toLocaleString('ko-KR', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })
+    : '미정';
+
+  const teamLines = [
+    `상대: ${opponent} | 일시: ${dateStr}`,
+    `포메이션: ${modeLabel} ${formation} (${tacticalStyle})`,
+    `압박 전략: ${pressLine}`,
+    `수비 원칙: ${defLine}`,
+    `전환 원칙: ${transitionMsg}`,
+  ];
+
+  if (activePats.length > 0) {
+    teamLines.push(`공격 패턴 ${activePats.length}가지(${activePats.map(p=>p.name).join(', ')})를 숙지한다.`);
+    teamLines.push('세트피스 및 빠른 전환 상황에서 해당 패턴을 우선 시도한다.');
+  }
+  if (notes) {
+    teamLines.push(`감독 지시: ${notes}`);
+  }
+
+  // ── Build individual sections ─────────────────────────────────
+  const roleInstructions = {
+    GK: [
+      '골 라인 수비 및 페널티 구역 제공권을 장악한다.',
+      '수비진과 지속적으로 소통하여 위험 상황을 사전에 차단한다.',
+      '점유 시 빌드업 첫 번째 패스 역할을 담당한다.',
+    ],
+    수비: (p, i) => {
+      const isFlank = p.x < 160 || p.x > 320;
+      const base = [
+        '수비 라인 위치와 간격을 유지한다.',
+        isFlank ? '측면 공간 커버 및 상대 윙어 대인 마크를 담당한다.' : '중앙 공간 차단 및 헤더 경합을 우선시한다.',
+        '공 소유 시 안전한 옆패스 또는 GK에게 리셋한다.',
+      ];
+      return base;
+    },
+    미드필더: (p) => {
+      const isFlank = p.x < 160 || p.x > 320;
+      return [
+        isFlank ? '측면 공간을 활용한 드리블 돌파와 크로스를 시도한다.' : '중앙 연결 및 공 순환 역할을 담당한다.',
+        '수비 시 빠른 압박으로 상대 전진을 차단한다.',
+        '공격 시 공격수와의 원투패스 콤비네이션을 적극 활용한다.',
+      ];
+    },
+    공격: (p) => {
+      const isFlank = p.x < 160 || p.x > 320;
+      return [
+        isFlank ? '측면에서 상대 수비를 끌어낸 뒤 중앙으로 컷인 또는 크로스를 시도한다.' : '중앙에서 침투 움직임으로 상대 수비 라인을 압박한다.',
+        '득점 기회에서 과감하게 슈팅한다.',
+        '수비 전환 시 전방에서 압박의 첫 번째 역할을 수행한다.',
+      ];
+    },
+  };
+
+  const playerSections = players.map((p, i) => {
+    const role = classifyPlayer(p);
+    let baseLines;
+    if (role === 'GK') {
+      baseLines = roleInstructions.GK;
+    } else if (role === '수비') {
+      baseLines = roleInstructions.수비(p, i);
+    } else if (role === '미드필더') {
+      baseLines = roleInstructions.미드필더(p);
+    } else {
+      baseLines = roleInstructions.공격(p);
+    }
+    const mvLines = describeMoves(p.id);
+    return { player: p, num: i + 1, role, lines: [...baseLines, ...mvLines] };
+  });
+
+  // ── Render HTML ───────────────────────────────────────────────
+  const card = document.getElementById('manualCard');
+  const out  = document.getElementById('manualOutput');
+  card.style.display = '';
+
+  out.innerHTML = `
+    <div class="tactic-section">
+      <div class="tactic-section-title">📢 팀 전체 전달사항</div>
+      ${teamLines.map(l => `<div class="tactic-line">${escHtml(l)}</div>`).join('')}
+    </div>
+    <div class="tactic-section">
+      <div class="tactic-section-title">👤 개별 선수 지침</div>
+      ${playerSections.map(s => `
+        <div class="tactic-player-title">
+          ${s.num}. ${escHtml(s.player.name)}
+          <span class="tactic-tag ${s.role==='GK'?'red':s.role==='수비'?'green':s.role==='미드필더'?'':'amber'}">${s.role}</span>
+        </div>
+        ${s.lines.map(l => `<div class="tactic-line">${escHtml(l)}</div>`).join('')}
+      `).join('')}
+    </div>
+  `;
+
+  // Plain text for copy/save
+  lastManualText = buildPlainText(opponent, dateStr, formation, modeLabel, tacticalStyle, teamLines, playerSections);
+
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildPlainText(opponent, dateStr, formation, modeLabel, style, teamLines, playerSections) {
+  const sep = '─'.repeat(40);
+  let t = `⚽ 전술 지침서\n${sep}\n`;
+  t += `상대: ${opponent}  |  일시: ${dateStr}\n포메이션: ${modeLabel} ${formation} (${style})\n${sep}\n`;
+  t += `▶ 팀 전체 전달사항\n`;
+  teamLines.forEach(l => t += `  • ${l}\n`);
+  t += `\n▶ 개별 선수 지침\n`;
+  playerSections.forEach(s => {
+    t += `\n[${s.num}] ${s.player.name} (${s.role})\n`;
+    s.lines.forEach(l => t += `  • ${l}\n`);
+  });
+  return t;
+}
+
+function copyManual() {
+  if (!lastManualText) return;
+  navigator.clipboard.writeText(lastManualText)
+    .then(() => { alert('클립보드에 복사되었습니다.'); })
+    .catch(() => { alert('복사 실패 — 브라우저 권한을 확인하세요.'); });
+}
+
+function saveManualTxt() {
+  if (!lastManualText) return;
+  const opponent = document.getElementById('opponent').value.trim() || '전술지침서';
+  const blob = new Blob([lastManualText], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.download = `${opponent}_전술지침서.txt`;
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+drawHtmlField();
 buildModePills();
 buildFormationSelect(currentMode);
 applyFormation(currentMode, '3-3-2');
