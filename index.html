@@ -237,12 +237,38 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 }
 .share-actions { display:flex; gap:8px; flex-wrap:wrap; }
 
+.share-divider { height:1px; background:#334155; }
+.share-link-section { display:flex; flex-direction:column; gap:8px; }
+.share-link-label { font-size:0.72rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em; }
+.share-link-row { display:flex; gap:8px; align-items:center; }
+.share-url-box {
+  flex:1; padding:8px 10px;
+  background:#0f172a; border:1px solid #334155; border-radius:8px;
+  color:#64748b; font-size:0.72rem; outline:none;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  cursor:text; user-select:all;
+}
+
+/* ── 읽기 전용 배너 ── */
+#readonlyBanner {
+  display:none; width:480px;
+  background:#451a03; border:1px solid #f97316; border-radius:10px;
+  padding:10px 14px; font-size:0.82rem; color:#fed7aa;
+  text-align:center; font-weight:600;
+}
+#readonlyBanner.visible { display:block; }
+
 .hint { font-size:0.72rem; color:#334155; }
 </style>
 </head>
 <body>
 
 <h1>⚽ 스쿼드 메이커</h1>
+
+<!-- 공유 링크로 열린 경우 안내 배너 -->
+<div id="readonlyBanner">
+  📤 공유된 스쿼드를 보고 있습니다. 수정은 본인 기기에만 적용됩니다.
+</div>
 
 <!-- 팀 설정 -->
 <div class="team-setup">
@@ -317,9 +343,17 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
     <h3>📤 단톡방 공유 텍스트</h3>
     <div class="share-text" id="shareText"></div>
     <div class="share-actions">
-      <button class="btn btn-blue" onclick="copyShareText()">📋 클립보드 복사</button>
+      <button class="btn btn-blue" onclick="copyShareText()">📋 텍스트 복사</button>
       <button class="btn btn-slate" onclick="saveShareTxt()">💾 파일 저장</button>
       <button class="btn btn-slate" onclick="closeShare()">✕ 닫기</button>
+    </div>
+    <div class="share-divider"></div>
+    <div class="share-link-section">
+      <div class="share-link-label">🔗 링크로 공유 (공유받은 사람이 동일한 화면을 볼 수 있습니다)</div>
+      <div class="share-link-row">
+        <div class="share-url-box" id="shareUrlBox" onclick="this.select()"></div>
+        <button class="btn btn-blue" style="white-space:nowrap;" onclick="copyShareUrl()">링크 복사</button>
+      </div>
     </div>
   </div>
 </div>
@@ -864,6 +898,9 @@ let lastShareText = '';
 function openShare() {
   lastShareText = buildShareText();
   document.getElementById('shareText').textContent = lastShareText;
+  // Generate share URL
+  const url = generateShareURL();
+  document.getElementById('shareUrlBox').textContent = url;
   document.getElementById('shareModal').classList.add('visible');
 }
 function closeShare() {
@@ -889,11 +926,115 @@ function saveShareTxt() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// URL STATE ENCODING / DECODING
+// ═══════════════════════════════════════════════════════════════
+function encodeState() {
+  saveCurrentNotes();
+  const snap = {
+    v: 1,
+    team: document.getElementById('teamName').value.trim(),
+    mode: currentMode,
+    squad: currentSquad,
+    roster: roster.map(r => ({ id: r.id, name: r.name, color: r.color })),
+    squads: {},
+  };
+  ['basic','attack','defense'].forEach(type => {
+    const sq = squads[type];
+    // Round positions to integers to keep URL compact
+    const pos = {};
+    Object.entries(sq.positions).forEach(([id, p]) => {
+      pos[id] = { x: Math.round(p.x), y: Math.round(p.y) };
+    });
+    snap.squads[type] = {
+      f:  sq.formation,
+      pos,
+      tn: sq.teamNote,
+      pn: sq.playerNotes,
+    };
+  });
+  try {
+    return btoa(unescape(encodeURIComponent(JSON.stringify(snap))));
+  } catch { return ''; }
+}
+
+function decodeState(encoded) {
+  try {
+    return JSON.parse(decodeURIComponent(escape(atob(encoded))));
+  } catch { return null; }
+}
+
+function generateShareURL() {
+  const enc = encodeState();
+  if (!enc) return location.href;
+  return `${location.origin}${location.pathname}#s=${enc}`;
+}
+
+function loadFromURL() {
+  const match = location.hash.match(/[#&]s=([A-Za-z0-9+/=]+)/);
+  if (!match) return false;
+  const state = decodeState(match[1]);
+  if (!state || state.v !== 1) return false;
+
+  // Restore
+  document.getElementById('teamName').value = state.team || '';
+  currentMode = state.mode || '9v9';
+  roster = (state.roster || []).map(r => ({ id: r.id, name: r.name, color: r.color }));
+  nextId = roster.length ? Math.max(...roster.map(r => r.id)) + 1 : 1;
+
+  ['basic','attack','defense'].forEach(type => {
+    const sq = state.squads?.[type];
+    if (!sq) return;
+    squads[type].formation   = sq.f   || Object.keys(MODES_CONFIG[currentMode].formations)[0];
+    squads[type].positions   = sq.pos || {};
+    squads[type].teamNote    = sq.tn  || '';
+    squads[type].playerNotes = sq.pn  || {};
+  });
+
+  currentSquad = state.squad || 'basic';
+  return true;
+}
+
+function copyShareUrl() {
+  const url = generateShareURL();
+  navigator.clipboard.writeText(url)
+    .then(() => alert('링크가 복사되었습니다!\n공유받은 사람이 링크를 열면 동일한 스쿼드를 볼 수 있습니다.'))
+    .catch(() => {
+      const box = document.getElementById('shareUrlBox');
+      box.focus();
+      document.execCommand('selectAll');
+      alert('자동 복사 실패 — 위 링크를 직접 선택해서 복사해주세요.');
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
 drawHtmlField();
 buildModePills();
-initAllSquads();
+
+const loadedFromUrl = loadFromURL();
+if (loadedFromUrl) {
+  // Restore from shared URL
+  buildModePills();
+  buildFormationSelect();
+  document.getElementById('formationSelect').value = squads[currentSquad].formation;
+  // Sync squad tab UI
+  document.querySelectorAll('.squad-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.squad === currentSquad)
+  );
+  const meta = SQUAD_META[currentSquad];
+  const badge = document.getElementById('squadBadge');
+  badge.textContent = `${meta.icon} ${meta.label.replace(' 스쿼드','')}`;
+  badge.className = `squad-badge ${currentSquad}`;
+  document.getElementById('teamNoteLabel').textContent =
+    `${meta.icon} ${meta.label} — 전체 지침`;
+  renderPlayers();
+  renderNotesPanel();
+  // Show banner
+  document.getElementById('readonlyBanner').classList.add('visible');
+} else {
+  initAllSquads();
+}
 </script>
 </body>
 </html>
