@@ -237,6 +237,74 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 }
 .share-actions { display:flex; gap:8px; flex-wrap:wrap; }
 
+/* ── 선수 시점 모달 ── */
+#playerViewModal {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.8); z-index:2000;
+  align-items:flex-start; justify-content:center;
+  padding:16px; overflow-y:auto;
+}
+#playerViewModal.visible { display:flex; }
+.pv-box {
+  background:#0f172a; border:1px solid #334155; border-radius:16px;
+  width:100%; max-width:480px; display:flex; flex-direction:column; overflow:hidden;
+}
+.pv-header {
+  display:flex; align-items:center; gap:12px;
+  padding:18px 20px; background:#1e293b; border-bottom:1px solid #334155;
+}
+.pv-avatar {
+  width:48px; height:48px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:1.1rem; color:white;
+  border:2.5px solid rgba(255,255,255,0.3);
+}
+.pv-header-info { flex:1; }
+.pv-header-name { font-size:1.1rem; font-weight:800; }
+.pv-header-num  { font-size:0.78rem; color:#64748b; margin-top:2px; }
+.pv-close { background:none; border:none; color:#64748b; font-size:1.4rem; cursor:pointer; padding:4px; line-height:1; }
+.pv-close:hover { color:#f87171; }
+.pv-selector-wrap {
+  padding:12px 20px; background:#1e293b; border-bottom:1px solid #334155;
+  display:flex; align-items:center; gap:10px;
+}
+.pv-selector-wrap label { font-size:0.75rem; color:#64748b; font-weight:600; white-space:nowrap; }
+.pv-selector {
+  flex:1; padding:7px 10px;
+  background:#0f172a; border:1px solid #334155; border-radius:8px;
+  color:white; font-size:0.85rem; outline:none; cursor:pointer;
+}
+.pv-squads { padding:16px 20px; display:flex; flex-direction:column; gap:14px; }
+.pv-squad-card { background:#1e293b; border:1px solid #334155; border-radius:12px; overflow:hidden; }
+.pv-squad-header {
+  display:flex; align-items:center; gap:8px;
+  padding:10px 14px; border-bottom:1px solid #334155;
+}
+.pv-squad-title { font-size:0.82rem; font-weight:700; }
+.pv-squad-form  { font-size:0.72rem; color:#64748b; margin-left:auto; }
+.pv-squad-body  { padding:12px 14px; display:flex; flex-direction:column; gap:10px; }
+.pv-field-wrap  { display:flex; gap:14px; align-items:flex-start; }
+.pv-mini-field {
+  position:relative; flex-shrink:0; width:140px; height:192px;
+  border-radius:4px; background:#276d41; overflow:hidden;
+  border:1px solid rgba(255,255,255,0.15);
+}
+.pv-mini-field::before {
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(to bottom,transparent 0,transparent 13px,rgba(0,0,0,0.07) 13px,rgba(0,0,0,0.07) 26px);
+  pointer-events:none;
+}
+.pv-mini-line { position:absolute; background:rgba(255,255,255,0.45); }
+.pv-mini-dot  { position:absolute; border-radius:50%; transform:translate(-50%,-50%); }
+.pv-mini-dot.other { width:8px;  height:8px;  background:rgba(255,255,255,0.3); }
+.pv-mini-dot.self  { width:13px; height:13px; border:2px solid white; box-shadow:0 0 0 4px rgba(250,204,21,0.35); }
+.pv-info { flex:1; display:flex; flex-direction:column; gap:8px; }
+.pv-zone-badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.72rem; font-weight:700; background:#1d4ed8; color:#93c5fd; }
+.pv-note-block { display:flex; flex-direction:column; gap:4px; }
+.pv-note-label { font-size:0.7rem; color:#475569; font-weight:600; }
+.pv-note-text  { font-size:0.8rem; color:#cbd5e1; line-height:1.6; white-space:pre-wrap; }
+.pv-note-empty { font-size:0.78rem; color:#334155; font-style:italic; }
+
 .share-divider { height:1px; background:#334155; }
 .share-link-section { display:flex; flex-direction:column; gap:8px; }
 .share-link-label { font-size:0.72rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em; }
@@ -326,6 +394,24 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 <!-- 공유 버튼 -->
 <div class="controls">
   <button class="btn btn-orange" onclick="openShare()">📤 단톡방 공유 텍스트 생성</button>
+  <button class="btn btn-blue"   onclick="openPlayerView(null)">👤 선수 시점 보기</button>
+</div>
+
+<!-- 선수 시점 모달 -->
+<div id="playerViewModal">
+  <div class="pv-box">
+    <div class="pv-header">
+      <div class="pv-avatar" id="pvAvatar"></div>
+      <div class="pv-header-info">
+        <div class="pv-selector-wrap">
+          <select class="pv-selector" id="pvSelector" onchange="onPvSelect()"></select>
+        </div>
+        <div id="pvSubtitle" style="font-size:12px;color:#aaa;margin-top:4px;"></div>
+      </div>
+      <button class="btn btn-slate" onclick="closePlayerView()" style="margin-left:auto;padding:4px 10px;font-size:13px;">✕</button>
+    </div>
+    <div id="pvCards"></div>
+  </div>
 </div>
 
 <!-- 컨텍스트 메뉴 -->
@@ -333,6 +419,7 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
   <div class="ctx-label">색상</div>
   <div class="color-palette" id="colorPalette"></div>
   <div class="ctx-divider"></div>
+  <button class="ctx-btn" onclick="ctxPlayerView()">👤 선수 시점 보기</button>
   <button class="ctx-btn" onclick="ctxRename()">✏️ 이름 변경</button>
   <button class="ctx-btn danger" onclick="ctxRemove()">🗑️ 삭제</button>
 </div>
@@ -1005,6 +1092,155 @@ function copyShareUrl() {
       alert('자동 복사 실패 — 위 링크를 직접 선택해서 복사해주세요.');
     });
 }
+
+// ═══════════════════════════════════════════════════════════════
+// PLAYER VIEW
+// ═══════════════════════════════════════════════════════════════
+const MINI_W = 140, MINI_H = 192;
+const MINI_SCALE = MINI_W / FIELD_W;
+
+function describeZone(x, y) {
+  const hz = x < FIELD_W * 0.35 ? '좌측' : x > FIELD_W * 0.65 ? '우측' : '중앙';
+  if (y >= 590) return 'GK';
+  if (y >= 450) return `수비 라인 ${hz}`;
+  if (y >= 300) return `미드필드 ${hz}`;
+  return `공격 라인 ${hz}`;
+}
+
+function openPlayerView(playerId) {
+  const modal = document.getElementById('playerViewModal');
+  const sel = document.getElementById('pvSelector');
+  sel.innerHTML = '';
+  roster.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r.id;
+    opt.textContent = r.name || '(이름 없음)';
+    if (r.id === playerId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  if (!playerId && roster.length > 0) playerId = roster[0].id;
+  modal.style.display = 'flex';
+  renderPlayerView(playerId);
+}
+
+function closePlayerView() {
+  document.getElementById('playerViewModal').style.display = 'none';
+}
+
+function onPvSelect() {
+  const id = parseInt(document.getElementById('pvSelector').value);
+  renderPlayerView(id);
+}
+
+function ctxPlayerView() {
+  hideCtxMenu();
+  openPlayerView(selectedPlayer ? selectedPlayer.id : null);
+}
+
+function renderPlayerView(playerId) {
+  const player = roster.find(r => r.id === playerId);
+  if (!player) return;
+
+  // header avatar
+  const avatar = document.getElementById('pvAvatar');
+  avatar.style.background = player.color || '#4fc3f7';
+  avatar.textContent = (player.name || '?')[0];
+
+  document.getElementById('pvSubtitle').textContent = `#${roster.indexOf(player) + 1} · ${player.name || '(이름 없음)'}`;
+
+  const SQUAD_LABELS = { basic: '기본', attack: '공격', defense: '수비' };
+  const cards = document.getElementById('pvCards');
+  cards.innerHTML = '';
+
+  ['basic', 'attack', 'defense'].forEach(type => {
+    const sq = squads[type];
+    const pos = sq.positions[playerId];
+
+    const card = document.createElement('div');
+    card.className = 'pv-squad-card';
+
+    const header = document.createElement('div');
+    header.className = 'pv-squad-header';
+    header.textContent = `${SQUAD_LABELS[type]} 스쿼드`;
+    card.appendChild(header);
+
+    const body = document.createElement('div');
+    body.className = 'pv-squad-body';
+
+    // mini field
+    const fieldWrap = document.createElement('div');
+    fieldWrap.className = 'pv-field-wrap';
+
+    const field = document.createElement('div');
+    field.className = 'pv-mini-field';
+    field.style.width  = MINI_W + 'px';
+    field.style.height = MINI_H + 'px';
+
+    // render all players as dots
+    Object.entries(sq.positions).forEach(([pid, p]) => {
+      const dot = document.createElement('div');
+      const isSelf = parseInt(pid) === playerId;
+      dot.className = 'pv-mini-dot ' + (isSelf ? 'self' : 'other');
+      dot.style.left = (p.x * MINI_SCALE) + 'px';
+      dot.style.top  = (p.y * MINI_SCALE) + 'px';
+      if (isSelf) {
+        const r = roster.find(r => r.id === playerId);
+        dot.style.background = r ? r.color : '#4fc3f7';
+      }
+      field.appendChild(dot);
+    });
+    fieldWrap.appendChild(field);
+
+    // zone badge
+    if (pos) {
+      const badge = document.createElement('div');
+      badge.className = 'pv-zone-badge';
+      badge.textContent = describeZone(pos.x, pos.y);
+      fieldWrap.appendChild(badge);
+    } else {
+      const badge = document.createElement('div');
+      badge.className = 'pv-zone-badge';
+      badge.style.color = '#888';
+      badge.textContent = '배치 없음';
+      fieldWrap.appendChild(badge);
+    }
+
+    body.appendChild(fieldWrap);
+
+    // notes block
+    const noteBlock = document.createElement('div');
+    noteBlock.className = 'pv-note-block';
+
+    const teamNoteLabel = document.createElement('div');
+    teamNoteLabel.className = 'pv-note-label';
+    teamNoteLabel.textContent = '팀 전체 지침';
+    noteBlock.appendChild(teamNoteLabel);
+
+    const teamNoteText = document.createElement('div');
+    teamNoteText.className = sq.teamNote ? 'pv-note-text' : 'pv-note-empty';
+    teamNoteText.textContent = sq.teamNote || '(없음)';
+    noteBlock.appendChild(teamNoteText);
+
+    const playerNoteLabel = document.createElement('div');
+    playerNoteLabel.className = 'pv-note-label';
+    playerNoteLabel.textContent = '개인 지침';
+    noteBlock.appendChild(playerNoteLabel);
+
+    const playerNote = sq.playerNotes[playerId] || '';
+    const playerNoteText = document.createElement('div');
+    playerNoteText.className = playerNote ? 'pv-note-text' : 'pv-note-empty';
+    playerNoteText.textContent = playerNote || '(없음)';
+    noteBlock.appendChild(playerNoteText);
+
+    body.appendChild(noteBlock);
+    card.appendChild(body);
+    cards.appendChild(card);
+  });
+}
+
+document.getElementById('playerViewModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('playerViewModal')) closePlayerView();
+});
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
