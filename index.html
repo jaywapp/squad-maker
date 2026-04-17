@@ -395,7 +395,10 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 <div class="controls">
   <button class="btn btn-orange" onclick="openShare()">📤 단톡방 공유 텍스트 생성</button>
   <button class="btn btn-blue"   onclick="openPlayerView(null)">👤 선수 시점 보기</button>
+  <button class="btn btn-green"  onclick="saveSquadFile()">💾 파일 저장</button>
+  <button class="btn btn-slate"  onclick="document.getElementById('sqFileInput').click()">📂 파일 불러오기</button>
 </div>
+<input type="file" id="sqFileInput" accept=".sq" style="display:none" onchange="loadSquadFile(event)">
 
 <!-- 선수 시점 모달 -->
 <div id="playerViewModal">
@@ -1016,29 +1019,7 @@ function saveShareTxt() {
 // URL STATE ENCODING / DECODING
 // ═══════════════════════════════════════════════════════════════
 function encodeState() {
-  saveCurrentNotes();
-  const snap = {
-    v: 1,
-    team: document.getElementById('teamName').value.trim(),
-    mode: currentMode,
-    squad: currentSquad,
-    roster: roster.map(r => ({ id: r.id, name: r.name, color: r.color })),
-    squads: {},
-  };
-  ['basic','attack','defense'].forEach(type => {
-    const sq = squads[type];
-    // Round positions to integers to keep URL compact
-    const pos = {};
-    Object.entries(sq.positions).forEach(([id, p]) => {
-      pos[id] = { x: Math.round(p.x), y: Math.round(p.y) };
-    });
-    snap.squads[type] = {
-      f:  sq.formation,
-      pos,
-      tn: sq.teamNote,
-      pn: sq.playerNotes,
-    };
-  });
+  const snap = buildStateSnap();
   try {
     // URL-safe base64: replace +→- /→_ and strip padding =
     return btoa(unescape(encodeURIComponent(JSON.stringify(snap))))
@@ -1066,13 +1047,11 @@ function loadFromURL() {
   if (!match) return false;
   const state = decodeState(match[1]);
   if (!state || state.v !== 1) return false;
-
-  // Restore
+  // Data-only restore — INIT block handles UI refresh
   document.getElementById('teamName').value = state.team || '';
   currentMode = state.mode || '9v9';
   roster = (state.roster || []).map(r => ({ id: r.id, name: r.name, color: r.color }));
   nextId = roster.length ? Math.max(...roster.map(r => r.id)) + 1 : 1;
-
   ['basic','attack','defense'].forEach(type => {
     const sq = state.squads?.[type];
     if (!sq) return;
@@ -1081,7 +1060,6 @@ function loadFromURL() {
     squads[type].teamNote    = sq.tn  || '';
     squads[type].playerNotes = sq.pn  || {};
   });
-
   currentSquad = state.squad || 'basic';
   return true;
 }
@@ -1096,6 +1074,94 @@ function copyShareUrl() {
       document.execCommand('selectAll');
       alert('자동 복사 실패 — 위 링크를 직접 선택해서 복사해주세요.');
     });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FILE SAVE / LOAD (.sq)
+// ═══════════════════════════════════════════════════════════════
+function buildStateSnap() {
+  saveCurrentNotes();
+  const snap = {
+    v: 1,
+    team: document.getElementById('teamName').value.trim(),
+    mode: currentMode,
+    squad: currentSquad,
+    roster: roster.map(r => ({ id: r.id, name: r.name, color: r.color })),
+    squads: {},
+  };
+  ['basic','attack','defense'].forEach(type => {
+    const sq = squads[type];
+    const pos = {};
+    Object.entries(sq.positions).forEach(([id, p]) => {
+      pos[id] = { x: Math.round(p.x), y: Math.round(p.y) };
+    });
+    snap.squads[type] = { f: sq.formation, pos, tn: sq.teamNote, pn: sq.playerNotes };
+  });
+  return snap;
+}
+
+function saveSquadFile() {
+  const snap = buildStateSnap();
+  const json = JSON.stringify(snap, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const teamName = snap.team || '스쿼드';
+  a.href     = url;
+  a.download = `${teamName}.sq`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function loadSquadFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const state = JSON.parse(e.target.result);
+      if (!state || state.v !== 1) { alert('올바른 .sq 파일이 아닙니다.'); return; }
+      applyState(state);
+    } catch {
+      alert('파일을 읽는 중 오류가 발생했습니다.');
+    }
+    // 같은 파일을 다시 불러올 수 있도록 값 초기화
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function applyState(state) {
+  document.getElementById('teamName').value = state.team || '';
+  currentMode = state.mode || '9v9';
+  roster = (state.roster || []).map(r => ({ id: r.id, name: r.name, color: r.color }));
+  nextId = roster.length ? Math.max(...roster.map(r => r.id)) + 1 : 1;
+  ['basic','attack','defense'].forEach(type => {
+    const sq = state.squads?.[type];
+    if (!sq) return;
+    squads[type].formation   = sq.f   || Object.keys(MODES_CONFIG[currentMode].formations)[0];
+    squads[type].positions   = sq.pos || {};
+    squads[type].teamNote    = sq.tn  || '';
+    squads[type].playerNotes = sq.pn  || {};
+  });
+  currentSquad = state.squad || 'basic';
+  // UI 업데이트
+  document.querySelectorAll('.mode-pill').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === currentMode));
+  document.querySelectorAll('.squad-tab').forEach(b =>
+    b.classList.toggle('active', b.dataset.squad === currentSquad));
+  const sqBadge = document.querySelector('.squad-badge');
+  if (sqBadge) { sqBadge.className = 'squad-badge ' + currentSquad; }
+  const SQUAD_LABELS = { basic:'기본', attack:'공격', defense:'수비' };
+  if (sqBadge) sqBadge.textContent = SQUAD_LABELS[currentSquad] + ' 스쿼드';
+  const fSelect = document.getElementById('formationSelect');
+  if (fSelect) {
+    fSelect.innerHTML = Object.keys(MODES_CONFIG[currentMode].formations)
+      .map(f => `<option value="${f}"${f === squads[currentSquad].formation ? ' selected' : ''}>${f}</option>`).join('');
+  }
+  drawHtmlField();
+  renderPlayers();
+  renderNotesPanel();
 }
 
 // ═══════════════════════════════════════════════════════════════
