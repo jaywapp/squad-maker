@@ -1040,13 +1040,18 @@ function encodeState() {
     };
   });
   try {
-    return btoa(unescape(encodeURIComponent(JSON.stringify(snap))));
+    // URL-safe base64: replace +→- /→_ and strip padding =
+    return btoa(unescape(encodeURIComponent(JSON.stringify(snap))))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
   } catch { return ''; }
 }
 
 function decodeState(encoded) {
   try {
-    return JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    // Restore URL-safe base64 to standard base64
+    let b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+    b64 += '=='.slice(0, (4 - b64.length % 4) % 4);
+    return JSON.parse(decodeURIComponent(escape(atob(b64))));
   } catch { return null; }
 }
 
@@ -1057,7 +1062,7 @@ function generateShareURL() {
 }
 
 function loadFromURL() {
-  const match = location.hash.match(/[#&]s=([A-Za-z0-9+/=]+)/);
+  const match = location.hash.match(/[#&]s=([A-Za-z0-9\-_]*)/);
   if (!match) return false;
   const state = decodeState(match[1]);
   if (!state || state.v !== 1) return false;
