@@ -1043,8 +1043,8 @@ function generateShareURL() {
 }
 
 function loadFromURL() {
-  const match = location.hash.match(/[#&]s=([A-Za-z0-9\-_]*)/);
-  if (!match) return false;
+  const match = location.hash.match(/[#&]s=([A-Za-z0-9\-_]+)/);
+  if (!match || !match[1]) return false;
   const state = decodeState(match[1]);
   if (!state || state.v !== 1) return false;
   // Data-only restore — INIT block handles UI refresh
