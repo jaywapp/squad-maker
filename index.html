@@ -327,6 +327,21 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 #readonlyBanner.visible { display:block; }
 
 .hint { font-size:0.72rem; color:#334155; }
+
+/* ── 접근성: 포커스 링 ── */
+:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+.formation-select:focus-visible,
+.team-name-input:focus-visible { outline: 2px solid #60a5fa; }
+
+/* 스크린리더 전용 텍스트 */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
 </style>
 </head>
 <body>
@@ -334,43 +349,46 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 <h1>⚽ 스쿼드 메이커</h1>
 
 <!-- 공유 링크로 열린 경우 안내 배너 -->
-<div id="readonlyBanner">
+<div id="readonlyBanner" role="status">
   📤 공유된 스쿼드를 보고 있습니다. 수정은 본인 기기에만 적용됩니다.
 </div>
 
+<main aria-label="스쿼드 메이커">
+
 <!-- 팀 설정 -->
-<div class="team-setup">
+<div class="team-setup" role="group" aria-label="팀 설정">
   <div class="setup-row">
-    <span class="setup-label">팀명</span>
-    <input class="team-name-input" id="teamName" type="text" placeholder="팀 이름 입력..." maxlength="20" />
+    <label class="setup-label" for="teamName">팀명</label>
+    <input class="team-name-input" id="teamName" type="text" placeholder="팀 이름 입력..." maxlength="20" autocomplete="off" />
   </div>
   <div class="setup-row">
-    <span class="setup-label">인원</span>
-    <div class="mode-pills" id="modePills"></div>
+    <span class="setup-label" id="modeLabel">인원</span>
+    <div class="mode-pills" id="modePills" role="group" aria-labelledby="modeLabel"></div>
   </div>
 </div>
 
 <!-- 스쿼드 탭 -->
-<div class="squad-tabs">
-  <button class="squad-tab active" data-squad="basic"   onclick="switchSquad('basic')">🔵 기본 스쿼드</button>
-  <button class="squad-tab"        data-squad="attack"  onclick="switchSquad('attack')">⚔️ 공격 스쿼드</button>
-  <button class="squad-tab"        data-squad="defense" onclick="switchSquad('defense')">🛡 수비 스쿼드</button>
+<div class="squad-tabs" role="tablist" aria-label="스쿼드 선택">
+  <button class="squad-tab active" role="tab" aria-selected="true"  data-squad="basic"   onclick="switchSquad('basic')">🔵 기본 스쿼드</button>
+  <button class="squad-tab"        role="tab" aria-selected="false" data-squad="attack"  onclick="switchSquad('attack')">⚔️ 공격 스쿼드</button>
+  <button class="squad-tab"        role="tab" aria-selected="false" data-squad="defense" onclick="switchSquad('defense')">🛡 수비 스쿼드</button>
 </div>
 
 <!-- 포메이션 바 -->
-<div class="formation-bar">
+<div class="formation-bar" role="group" aria-label="포메이션 설정">
   <span class="squad-badge basic" id="squadBadge">🔵 기본</span>
-  <select class="formation-select" id="formationSelect" onchange="onFormationChange()"></select>
-  <button class="btn btn-slate" style="padding:6px 12px;font-size:0.8rem;" onclick="resetLayout()">↺ 초기화</button>
+  <label for="formationSelect" class="sr-only">포메이션</label>
+  <select class="formation-select" id="formationSelect" aria-label="포메이션 선택" onchange="onFormationChange()"></select>
+  <button class="btn btn-slate" style="padding:6px 12px;font-size:0.8rem;" aria-label="포메이션 초기화" onclick="resetLayout()">↺ 초기화</button>
 </div>
 
 <!-- 필드 -->
 <div id="fieldWrapper">
-  <div id="field"></div>
+  <div id="field" role="region" aria-label="축구 필드 — 선수를 드래그해 위치를 조정하세요"></div>
 </div>
 
 <!-- 선수 컨트롤 -->
-<div class="controls">
+<div class="controls" role="toolbar" aria-label="선수 조작">
   <button class="btn btn-blue"  onclick="addPlayer()">+ 선수 추가</button>
   <button class="btn btn-green" onclick="saveImage()">📸 이미지 저장</button>
 </div>
@@ -379,8 +397,10 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 <div class="notes-wrap" id="notesWrap">
   <div class="notes-card">
     <div class="notes-card-title" id="teamNoteLabel">🔵 기본 스쿼드 — 전체 지침</div>
+    <label for="teamNote" class="sr-only">팀 전체 지침</label>
     <textarea class="notes-textarea" id="teamNote"
       placeholder="팀 전체에게 전달할 전술 지침..."
+      aria-labelledby="teamNoteLabel"
       oninput="saveTeamNote()"></textarea>
   </div>
   <div class="notes-card">
@@ -389,46 +409,49 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
   </div>
 </div>
 
-<p class="hint">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭: 색상·삭제</p>
+<p class="hint">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제</p>
 
 <!-- 공유 버튼 -->
-<div class="controls">
+<div class="controls" role="toolbar" aria-label="공유 및 파일">
   <button class="btn btn-orange" onclick="openShare()">📤 단톡방 공유 텍스트 생성</button>
   <button class="btn btn-blue"   onclick="openPlayerView(null)">👤 선수 시점 보기</button>
   <button class="btn btn-green"  onclick="saveSquadFile()">💾 파일 저장</button>
   <button class="btn btn-slate"  onclick="document.getElementById('sqFileInput').click()">📂 파일 불러오기</button>
 </div>
-<input type="file" id="sqFileInput" accept=".sq" style="display:none" onchange="loadSquadFile(event)">
+<input type="file" id="sqFileInput" accept=".sq" style="display:none" aria-hidden="true" onchange="loadSquadFile(event)">
+
+</main>
 
 <!-- 선수 시점 모달 -->
-<div id="playerViewModal">
+<div id="playerViewModal" role="dialog" aria-modal="true" aria-label="선수 시점 보기">
   <div class="pv-box">
     <div class="pv-header">
-      <div class="pv-avatar" id="pvAvatar"></div>
+      <div class="pv-avatar" id="pvAvatar" aria-hidden="true"></div>
       <div class="pv-header-info">
         <div class="pv-selector-wrap">
-          <select class="pv-selector" id="pvSelector" onchange="onPvSelect()"></select>
+          <label for="pvSelector" class="sr-only">선수 선택</label>
+          <select class="pv-selector" id="pvSelector" aria-label="선수 선택" onchange="onPvSelect()"></select>
         </div>
         <div id="pvSubtitle" style="font-size:12px;color:#aaa;margin-top:4px;"></div>
       </div>
-      <button class="btn btn-slate" onclick="closePlayerView()" style="margin-left:auto;padding:4px 10px;font-size:13px;">✕</button>
+      <button class="btn btn-slate" aria-label="닫기" onclick="closePlayerView()" style="margin-left:auto;padding:4px 10px;font-size:13px;">✕</button>
     </div>
     <div id="pvCards"></div>
   </div>
 </div>
 
 <!-- 컨텍스트 메뉴 -->
-<div id="ctxMenu">
-  <div class="ctx-label">색상</div>
-  <div class="color-palette" id="colorPalette"></div>
-  <div class="ctx-divider"></div>
-  <button class="ctx-btn" onclick="ctxPlayerView()">👤 선수 시점 보기</button>
-  <button class="ctx-btn" onclick="ctxRename()">✏️ 이름 변경</button>
-  <button class="ctx-btn danger" onclick="ctxRemove()">🗑️ 삭제</button>
+<div id="ctxMenu" role="menu" aria-label="선수 메뉴">
+  <div class="ctx-label" role="presentation">색상</div>
+  <div class="color-palette" id="colorPalette" role="group" aria-label="색상 선택"></div>
+  <div class="ctx-divider" role="separator"></div>
+  <button class="ctx-btn" role="menuitem" onclick="ctxPlayerView()">👤 선수 시점 보기</button>
+  <button class="ctx-btn" role="menuitem" onclick="ctxRename()">✏️ 이름 변경</button>
+  <button class="ctx-btn danger" role="menuitem" onclick="ctxRemove()">🗑️ 삭제</button>
 </div>
 
 <!-- 공유 모달 -->
-<div id="shareModal">
+<div id="shareModal" role="dialog" aria-modal="true" aria-label="단톡방 공유 텍스트">
   <div class="share-box">
     <h3>📤 단톡방 공유 텍스트</h3>
     <div class="share-text" id="shareText"></div>
@@ -631,10 +654,12 @@ function switchSquad(type) {
   saveCurrentNotes();
   currentSquad = type;
 
-  // Update tab highlight
-  document.querySelectorAll('.squad-tab').forEach(t =>
-    t.classList.toggle('active', t.dataset.squad === type)
-  );
+  // Update tab highlight + aria-selected
+  document.querySelectorAll('.squad-tab').forEach(t => {
+    const isActive = t.dataset.squad === type;
+    t.classList.toggle('active', isActive);
+    t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  });
 
   // Update badge
   const meta = SQUAD_META[type];
@@ -998,6 +1023,13 @@ function closeShare() {
 }
 document.getElementById('shareModal').addEventListener('click', e => {
   if (e.target === document.getElementById('shareModal')) closeShare();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('shareModal').classList.contains('visible')) { closeShare(); return; }
+  if (document.getElementById('playerViewModal').style.display === 'flex') { closePlayerView(); return; }
+  if (document.getElementById('ctxMenu').classList.contains('visible')) { hideCtxMenu(); }
 });
 
 function copyShareText() {
