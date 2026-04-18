@@ -144,6 +144,7 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 }
 .btn:hover  { opacity:0.85; transform:translateY(-1px); }
 .btn:active { transform:translateY(0); }
+.btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
 .btn-green  { background:#22c55e; color:white; }
 .btn-blue   { background:#3b82f6; color:white; }
 .btn-slate  { background:#475569; color:white; }
@@ -371,7 +372,7 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 
 <!-- 선수 컨트롤 -->
 <div class="controls">
-  <button class="btn btn-blue"  onclick="addPlayer()">+ 선수 추가</button>
+  <button class="btn btn-blue" id="addPlayerBtn" onclick="addPlayer()">+ 선수 추가</button>
   <button class="btn btn-green" onclick="saveImage()">📸 이미지 저장</button>
 </div>
 
@@ -612,6 +613,7 @@ function initAllSquads() {
   document.getElementById('formationSelect').value = squads[currentSquad].formation;
   renderPlayers();
   renderNotesPanel();
+  updateAddPlayerBtn();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -676,19 +678,44 @@ function resetLayout() {
   renderPlayers();
 }
 
+function updateAddPlayerBtn() {
+  const btn = document.getElementById('addPlayerBtn');
+  if (!btn) return;
+  const max = MODES_CONFIG[currentMode].max;
+  const atMax = roster.length >= max;
+  btn.disabled = atMax;
+  btn.title = atMax ? `${MODES_CONFIG[currentMode].label} 모드는 최대 ${max}명입니다` : '';
+}
+
 function addPlayer() {
   const max = MODES_CONFIG[currentMode].max;
-  if (roster.length >= max) {
-    alert(`${MODES_CONFIG[currentMode].label} 모드는 최대 ${max}명입니다.`); return;
-  }
+  if (roster.length >= max) return;
   const newP = { id: nextId++, name: `선수${roster.length+1}`, color: '#1E88E5' };
   roster.push(newP);
-  // Give default position in all squads
   ['basic','attack','defense'].forEach(type => {
     squads[type].positions[newP.id] = { x: 240, y: 330 };
   });
   renderPlayers();
   renderNotesPanel();
+  updateAddPlayerBtn();
+  showToast(`선수${roster.length} 추가됨`);
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_toast';
+    t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+      background:#1e293b;border:1px solid #334155;color:#f1f5f9;
+      padding:8px 18px;border-radius:8px;font-size:0.82rem;font-weight:600;
+      z-index:3000;pointer-events:none;transition:opacity 0.3s;`;
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.style.opacity = '0'; }, 1800);
 }
 
 // ═══════════════════════════════════════════════════════════════
