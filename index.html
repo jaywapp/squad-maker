@@ -21,9 +21,13 @@ body {
 
 h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 
+/* ── 공통 최대 너비 ── */
+.team-setup, .squad-tabs, .formation-bar, .notes-wrap, #fieldWrapper, #readonlyBanner {
+  width: 100%; max-width: 480px;
+}
+
 /* ── 팀 설정 카드 ── */
 .team-setup {
-  width: 480px;
   background: #1e293b;
   border: 1px solid #334155;
   border-radius: 12px;
@@ -67,7 +71,7 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 
 /* ── 스쿼드 서브탭 ── */
 .squad-tabs {
-  display: flex; width: 480px;
+  display: flex;
   background: #1e293b; border: 1px solid #334155; border-radius: 10px; overflow: hidden;
 }
 .squad-tab {
@@ -83,7 +87,7 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 /* ── 포메이션 바 ── */
 .formation-bar {
   display: flex; align-items: center; justify-content: space-between;
-  width: 480px; gap: 8px;
+  gap: 8px;
 }
 .squad-badge {
   font-size: 0.78rem; font-weight: 700; padding: 4px 12px;
@@ -136,7 +140,7 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 }
 
 /* ── Controls ── */
-.controls { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.controls { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%; max-width:480px; }
 .btn {
   padding:9px 16px; border:none; border-radius:8px;
   cursor:pointer; font-size:0.85rem; font-weight:600;
@@ -176,7 +180,7 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 
 /* ── Notes ── */
 .notes-wrap {
-  width:480px; display:flex; flex-direction:column; gap:10px;
+  display:flex; flex-direction:column; gap:10px;
 }
 .notes-card {
   background:#1e293b; border:1px solid #334155; border-radius:12px; padding:14px;
@@ -327,6 +331,24 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 #readonlyBanner.visible { display:block; }
 
 .hint { font-size:0.72rem; color:#334155; }
+
+/* ── 반응형 ── */
+@media (max-width: 500px) {
+  body { padding: 10px 10px 40px; }
+  /* 인원 pills: 두 줄로 래핑, 터치 영역 확보 */
+  .mode-pill { min-width: 44px; min-height: 44px; padding: 8px 2px; font-size: 0.7rem; }
+  .mode-pill:not(:last-child) { border-right: none; border-bottom: 1px solid #334155; }
+  .mode-pills { flex-wrap: wrap; }
+  /* 포메이션 바 줄바꿈 허용 */
+  .formation-bar { flex-wrap: wrap; }
+  /* 필드: 480px 유지(JS 좌표계 보존), 부모가 스크롤 허용 */
+  #fieldWrapper { overflow-x: auto; }
+}
+
+/* 데스크톱: 좌우 여백에 약간의 padding 추가로 답답함 해소 */
+@media (min-width: 960px) {
+  body { max-width: 960px; margin: 0 auto; }
+}
 </style>
 </head>
 <body>
