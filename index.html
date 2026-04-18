@@ -661,13 +661,30 @@ function buildFormationSelect() {
       .map(f => `<option value="${f}">${f}</option>`).join('');
 }
 
+const DEFAULT_NAME_RE = /^(GK|수비형MF|공격형MF|수비|미드|공격|선수)\d*$/;
+
+function hasDefaultNames() {
+  return roster.every(r => DEFAULT_NAME_RE.test(r.name));
+}
+
+function reassignRosterNames(formKey) {
+  const rows = MODES_CONFIG[currentMode].formations[formKey];
+  const newNames = ['GK'];
+  rows.forEach(row => {
+    for (let i = 0; i < row.count; i++) newNames.push(`${row.pre}${i + 1}`);
+  });
+  roster.forEach((r, i) => { if (newNames[i]) r.name = newNames[i]; });
+}
+
 function onFormationChange() {
   const form = document.getElementById('formationSelect').value;
   squads[currentSquad].formation = form;
-  // Recalculate default positions, preserving existing overrides
-  const defaults = defaultPositions(currentMode, form);
-  // Only reset positions (keep names from roster)
-  squads[currentSquad].positions = defaults;
+  squads[currentSquad].positions = defaultPositions(currentMode, form);
+
+  if (hasDefaultNames() && confirm('포메이션이 변경되었습니다.\n선수 역할 라벨(수비1, 미드1 등)을 새 포메이션에 맞게 자동 재할당할까요?')) {
+    reassignRosterNames(form);
+    renderNotesPanel();
+  }
   renderPlayers();
 }
 
