@@ -653,6 +653,7 @@ function initAllSquads() {
   renderPlayers();
   renderNotesPanel();
   updateAddPlayerBtn();
+  autoSave();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -729,11 +730,13 @@ function onFormationChange() {
     renderNotesPanel();
   }
   renderPlayers();
+  autoSave();
 }
 
 function resetLayout() {
   squads[currentSquad].positions = defaultPositions(currentMode, squads[currentSquad].formation);
   renderPlayers();
+  autoSave();
 }
 
 function updateAddPlayerBtn() {
@@ -757,6 +760,7 @@ function addPlayer() {
   renderNotesPanel();
   updateAddPlayerBtn();
   showToast(`선수${roster.length} 추가됨`);
+  autoSave();
 }
 
 function showToast(msg) {
@@ -1406,6 +1410,53 @@ document.getElementById('playerViewModal').addEventListener('click', e => {
 });
 
 // ═══════════════════════════════════════════════════════════════
+// LOCAL STORAGE AUTO-SAVE
+// ═══════════════════════════════════════════════════════════════
+const LS_KEY = 'squad-maker-v1';
+let _saveTimer = null;
+
+function autoSave() {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(buildStateSnap()));
+    } catch {}
+  }, 600);
+}
+
+function loadFromLocalStorage() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+    if (!state || state.v !== 1) return false;
+    applyState(state);
+    return true;
+  } catch { return false; }
+}
+
+// Hook auto-save into all state-mutating functions
+const _origSaveTeamNote = saveTeamNote;
+saveTeamNote = function() { _origSaveTeamNote(); autoSave(); };
+
+const _origSavePlayerNote = savePlayerNote;
+savePlayerNote = function(id) { _origSavePlayerNote(id); autoSave(); };
+
+const _origCtxColor = ctxColor;
+ctxColor = function(c) { _origCtxColor(c); autoSave(); };
+
+const _origCtxRename = ctxRename;
+ctxRename = function() { _origCtxRename(); autoSave(); };
+
+const _origCtxRemove = ctxRemove;
+ctxRemove = function() { _origCtxRemove(); autoSave(); };
+
+document.addEventListener('mouseup', () => { if (dragState) autoSave(); }, true);
+document.addEventListener('touchend', () => { if (dragState) autoSave(); }, true);
+
+document.getElementById('teamName').addEventListener('input', autoSave);
+
+// ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
 drawHtmlField();
@@ -1431,7 +1482,7 @@ if (loadedFromUrl) {
   renderNotesPanel();
   // Show banner
   document.getElementById('readonlyBanner').classList.add('visible');
-} else {
+} else if (!loadFromLocalStorage()) {
   initAllSquads();
 }
 </script>
