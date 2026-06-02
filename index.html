@@ -340,7 +340,7 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 
 /* ── 읽기 전용 배너 ── */
 #readonlyBanner {
-  display:none; width:480px;
+  display:none;
   background:#451a03; border:1px solid #f97316; border-radius:10px;
   padding:10px 14px; font-size:0.82rem; color:#fed7aa;
   text-align:center; font-weight:600;
@@ -348,6 +348,15 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 #readonlyBanner.visible { display:block; }
 
 .hint { font-size:0.72rem; color:#334155; }
+
+/* ── 토스트 알림 ── */
+.toast {
+  position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+  background:#1e293b; border:1px solid #334155; color:#f1f5f9;
+  padding:8px 18px; border-radius:8px; font-size:0.82rem; font-weight:600;
+  z-index:3000; pointer-events:none; opacity:0; transition:opacity 0.3s;
+}
+.toast.visible { opacity:1; }
 
 /* ── 접근성: 포커스 링 ── */
 :focus-visible {
@@ -728,7 +737,16 @@ function buildFormationSelect() {
       .map(f => `<option value="${f}">${f}</option>`).join('');
 }
 
-const DEFAULT_NAME_RE = /^(GK|수비형MF|공격형MF|수비|미드|공격|선수)\d*$/;
+// 역할 접두어는 MODES_CONFIG에서 파생 (포메이션 추가 시 자동 반영)
+const DEFAULT_NAME_RE = (() => {
+  const prefixes = new Set(['GK', '선수']);
+  Object.values(MODES_CONFIG).forEach(mode =>
+    Object.values(mode.formations).forEach(rows =>
+      rows.forEach(row => prefixes.add(row.pre))));
+  // 긴 접두어 우선 매칭 ('수비형MF'가 '수비'보다 먼저)
+  const alt = [...prefixes].sort((a, b) => b.length - a.length).join('|');
+  return new RegExp(`^(${alt})\\d*$`);
+})();
 
 function hasDefaultNames() {
   return roster.every(r => DEFAULT_NAME_RE.test(r.name));
@@ -791,16 +809,13 @@ function showToast(msg) {
   if (!t) {
     t = document.createElement('div');
     t.id = '_toast';
-    t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
-      background:#1e293b;border:1px solid #334155;color:#f1f5f9;
-      padding:8px 18px;border-radius:8px;font-size:0.82rem;font-weight:600;
-      z-index:3000;pointer-events:none;transition:opacity 0.3s;`;
+    t.className = 'toast';
     document.body.appendChild(t);
   }
   t.textContent = msg;
-  t.style.opacity = '1';
+  t.classList.add('visible');
   clearTimeout(t._tid);
-  t._tid = setTimeout(() => { t.style.opacity = '0'; }, 1800);
+  t._tid = setTimeout(() => { t.classList.remove('visible'); }, 1800);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -900,7 +915,7 @@ document.addEventListener('mousemove', e => {
   dragState.el.style.top  = y+'px';
 });
 document.addEventListener('mouseup', () => {
-  if (dragState) { dragState.el.classList.remove('dragging'); dragState = null; }
+  if (dragState) { dragState.el.classList.remove('dragging'); dragState = null; autoSave(); }
 });
 
 fieldEl.addEventListener('touchstart', e => {
@@ -924,7 +939,7 @@ document.addEventListener('touchmove', e => {
   e.preventDefault();
 }, { passive: false });
 document.addEventListener('touchend', () => {
-  if (dragState) { dragState.el.classList.remove('dragging'); dragState = null; }
+  if (dragState) { dragState.el.classList.remove('dragging'); dragState = null; autoSave(); }
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -1459,23 +1474,12 @@ function loadFromLocalStorage() {
 }
 
 // Hook auto-save into all state-mutating functions
-const _origSaveTeamNote = saveTeamNote;
-saveTeamNote = function() { _origSaveTeamNote(); autoSave(); };
-
-const _origSavePlayerNote = savePlayerNote;
-savePlayerNote = function(id) { _origSavePlayerNote(id); autoSave(); };
-
-const _origCtxColor = ctxColor;
-ctxColor = function(c) { _origCtxColor(c); autoSave(); };
-
-const _origCtxRename = ctxRename;
-ctxRename = function() { _origCtxRename(); autoSave(); };
-
-const _origCtxRemove = ctxRemove;
-ctxRemove = function() { _origCtxRemove(); autoSave(); };
-
-document.addEventListener('mouseup', () => { if (dragState) autoSave(); }, true);
-document.addEventListener('touchend', () => { if (dragState) autoSave(); }, true);
+const wrapAutoSave = fn => (...args) => { const r = fn(...args); autoSave(); return r; };
+saveTeamNote   = wrapAutoSave(saveTeamNote);
+savePlayerNote = wrapAutoSave(savePlayerNote);
+ctxColor       = wrapAutoSave(ctxColor);
+ctxRename      = wrapAutoSave(ctxRename);
+ctxRemove      = wrapAutoSave(ctxRemove);
 
 document.getElementById('teamName').addEventListener('input', autoSave);
 
