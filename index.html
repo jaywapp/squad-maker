@@ -349,6 +349,115 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 
 .hint { font-size:0.72rem; color:#334155; }
 
+/* ── 앱 모드 탭 ── */
+.app-tabs {
+  display:flex; width:100%; max-width:480px;
+  background:#1e293b; border:1px solid #334155; border-radius:10px; overflow:hidden;
+}
+.app-tab {
+  flex:1; padding:10px 6px; border:none; background:none;
+  color:#64748b; font-size:0.85rem; font-weight:700; cursor:pointer;
+  transition:background 0.15s, color 0.15s;
+}
+.app-tab:not(:last-child) { border-right:1px solid #334155; }
+.app-tab.active { background:#3b82f6; color:white; }
+
+.app-hidden { display:none !important; }
+
+/* ── 공격 패턴 모드 ── */
+#patternCanvas {
+  position:absolute; top:0; left:0; width:480px; height:660px;
+  border-radius:6px; box-shadow:0 8px 32px rgba(0,0,0,0.6);
+  cursor:crosshair; display:none;
+}
+#patternUI { display:none; flex-direction:column; gap:10px; width:100%; max-width:480px; }
+.pattern-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.pattern-name-input {
+  width:160px; padding:7px 12px;
+  border:1px solid #334155; border-radius:8px;
+  background:#0f172a; color:white; font-size:0.9rem; outline:none;
+}
+.pattern-name-input:focus { border-color:#60a5fa; }
+.pattern-nav {
+  display:flex; align-items:center; gap:6px;
+  background:#1e293b; border:1px solid #334155; border-radius:8px; padding:4px 8px;
+}
+.pattern-nav button {
+  background:none; border:none; color:#94a3b8;
+  font-size:1rem; cursor:pointer; padding:2px 6px;
+  border-radius:4px; transition:background 0.1s;
+}
+.pattern-nav button:hover { background:#334155; color:white; }
+.pattern-nav span { font-size:0.8rem; color:#cbd5e1; white-space:nowrap; }
+.btn-amber  { background:#f59e0b; color:white; }
+.btn-purple { background:#8b5cf6; color:white; }
+.btn-red    { background:#ef4444; color:white; }
+
+/* ── GIF 진행 오버레이 ── */
+#gifProgress {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.7); z-index:2000;
+  align-items:center; justify-content:center; flex-direction:column; gap:16px;
+}
+#gifProgress.visible { display:flex; }
+#gifProgress p { color:white; font-weight:600; font-size:1rem; }
+#gifProgressBar { width:240px; height:8px; background:#334155; border-radius:4px; overflow:hidden; }
+#gifProgressFill { height:100%; background:#22c55e; border-radius:4px; transition:width 0.1s; }
+
+/* ── 매치 전략 탭 ── */
+#strategyUI { width:100%; max-width:480px; display:none; flex-direction:column; gap:12px; }
+.strategy-card { background:#1e293b; border:1px solid #334155; border-radius:12px; padding:16px; }
+.strategy-card h3 {
+  font-size:0.85rem; font-weight:700; color:#94a3b8; margin-bottom:12px;
+  text-transform:uppercase; letter-spacing:0.05em;
+}
+.strategy-form { display:flex; flex-direction:column; gap:10px; }
+.strategy-field { display:flex; flex-direction:column; gap:4px; }
+.strategy-field label { font-size:0.75rem; color:#64748b; font-weight:600; }
+.strategy-input {
+  padding:8px 12px; border:1px solid #334155; border-radius:8px;
+  background:#0f172a; color:white; font-size:0.88rem; outline:none; font-family:inherit;
+}
+.strategy-input:focus { border-color:#60a5fa; }
+.strategy-input::placeholder { color:#475569; }
+textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
+
+.squad-summary { font-size:0.8rem; color:#94a3b8; line-height:1.8; }
+.squad-summary .formation-badge {
+  display:inline-block; background:#3b82f6; color:white;
+  padding:2px 10px; border-radius:12px; font-weight:700; font-size:0.78rem; margin-bottom:8px;
+}
+.player-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+.player-chip {
+  display:flex; align-items:center; gap:5px;
+  background:#0f172a; border:1px solid #334155; border-radius:20px;
+  padding:3px 10px; font-size:0.75rem;
+}
+.player-chip .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.pattern-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.pattern-chip {
+  background:#0f172a; border:1px solid #f59e0b; color:#fbbf24;
+  border-radius:20px; padding:3px 10px; font-size:0.75rem; font-weight:600;
+}
+.generate-row { display:flex; gap:8px; align-items:center; }
+
+.output-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+.tactic-section { margin-bottom:14px; }
+.tactic-section-title {
+  color:#60a5fa; font-weight:700; font-size:0.85rem;
+  border-bottom:1px solid #1e293b; padding-bottom:4px; margin-bottom:8px;
+}
+.tactic-player-title { color:#fbbf24; font-weight:700; font-size:0.82rem; margin:10px 0 3px; }
+.tactic-line { color:#cbd5e1; font-size:0.8rem; line-height:1.7; padding-left:12px; }
+.tactic-line::before { content:'· '; color:#475569; }
+.tactic-tag {
+  display:inline-block; background:#1e3a5f; color:#93c5fd;
+  border-radius:10px; padding:1px 8px; font-size:0.72rem; font-weight:600; margin-left:4px;
+}
+.tactic-tag.green { background:#14532d; color:#86efac; }
+.tactic-tag.amber { background:#451a03; color:#fde68a; }
+.tactic-tag.red   { background:#450a0a; color:#fca5a5; }
+
 /* ── 토스트 알림 ── */
 .toast {
   position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
@@ -401,10 +510,17 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
   📤 공유된 스쿼드를 보고 있습니다. 수정은 본인 기기에만 적용됩니다.
 </div>
 
+<!-- 앱 모드 탭 -->
+<div class="app-tabs" role="tablist" aria-label="앱 모드 선택">
+  <button class="app-tab active" role="tab" aria-selected="true"  data-app="squad"    onclick="setAppMode('squad')">⚽ 스쿼드</button>
+  <button class="app-tab"        role="tab" aria-selected="false" data-app="pattern"  onclick="setAppMode('pattern')">🎯 공격 패턴</button>
+  <button class="app-tab"        role="tab" aria-selected="false" data-app="strategy" onclick="setAppMode('strategy')">📋 매치 전략</button>
+</div>
+
 <main aria-label="스쿼드 메이커">
 
 <!-- 팀 설정 -->
-<div class="team-setup" role="group" aria-label="팀 설정">
+<div class="team-setup app-squad-only" role="group" aria-label="팀 설정">
   <div class="setup-row">
     <label class="setup-label" for="teamName">팀명</label>
     <input class="team-name-input" id="teamName" type="text" placeholder="팀 이름 입력..." maxlength="20" autocomplete="off" />
@@ -416,14 +532,14 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 </div>
 
 <!-- 스쿼드 탭 -->
-<div class="squad-tabs" role="tablist" aria-label="스쿼드 선택">
+<div class="squad-tabs app-squad-only" role="tablist" aria-label="스쿼드 선택">
   <button class="squad-tab active" role="tab" aria-selected="true"  data-squad="basic"   onclick="switchSquad('basic')">🔵 기본 스쿼드</button>
   <button class="squad-tab"        role="tab" aria-selected="false" data-squad="attack"  onclick="switchSquad('attack')">⚔️ 공격 스쿼드</button>
   <button class="squad-tab"        role="tab" aria-selected="false" data-squad="defense" onclick="switchSquad('defense')">🛡 수비 스쿼드</button>
 </div>
 
 <!-- 포메이션 바 -->
-<div class="formation-bar" role="group" aria-label="포메이션 설정">
+<div class="formation-bar app-squad-only" role="group" aria-label="포메이션 설정">
   <span class="squad-badge basic" id="squadBadge">🔵 기본</span>
   <label for="formationSelect" class="sr-only">포메이션</label>
   <select class="formation-select" id="formationSelect" aria-label="포메이션 선택" onchange="onFormationChange()"></select>
@@ -433,16 +549,38 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 <!-- 필드 -->
 <div id="fieldWrapper">
   <div id="field" role="region" aria-label="축구 필드 — 선수를 드래그해 위치를 조정하세요"></div>
+  <canvas id="patternCanvas" width="480" height="660" aria-label="공격 패턴 캔버스 — 선수를 드래그해 이동 경로를 그리세요"></canvas>
+</div>
+
+<!-- 공격 패턴 컨트롤 -->
+<div id="patternUI">
+  <div class="pattern-bar">
+    <label for="patternName" class="sr-only">패턴 이름</label>
+    <input class="pattern-name-input" id="patternName" placeholder="패턴 이름..." maxlength="20" onchange="renameCurrentPattern()" />
+    <div class="pattern-nav">
+      <button aria-label="이전 패턴" onclick="prevPattern()">◀</button>
+      <span id="patternCounter">1 / 1</span>
+      <button aria-label="다음 패턴" onclick="nextPattern()">▶</button>
+    </div>
+    <button class="btn btn-blue" onclick="addPattern()"    style="padding:7px 12px;">+ 추가</button>
+    <button class="btn btn-red"  onclick="deletePattern()" style="padding:7px 12px;">🗑 삭제</button>
+  </div>
+  <div class="controls">
+    <button class="btn btn-green"  id="playBtn"   onclick="togglePlay()">▶ 미리보기</button>
+    <button class="btn btn-slate"  onclick="clearCurrentPattern()">↺ 경로 초기화</button>
+    <button class="btn btn-amber"  id="gifBtn"    onclick="exportGif(false)">🎞 GIF 저장</button>
+    <button class="btn btn-purple" id="gifAllBtn" onclick="exportGif(true)">📋 전체 패턴 GIF</button>
+  </div>
 </div>
 
 <!-- 선수 컨트롤 -->
-<div class="controls" role="toolbar" aria-label="선수 조작">
+<div class="controls app-squad-only" role="toolbar" aria-label="선수 조작">
   <button class="btn btn-blue" id="addPlayerBtn" onclick="addPlayer()">+ 선수 추가</button>
   <button class="btn btn-green" onclick="saveImage()">📸 이미지 저장</button>
 </div>
 
 <!-- 지침 입력 -->
-<div class="notes-wrap" id="notesWrap">
+<div class="notes-wrap app-squad-only" id="notesWrap">
   <div class="notes-card">
     <div class="notes-card-title" id="teamNoteLabel">🔵 기본 스쿼드 — 전체 지침</div>
     <label for="teamNote" class="sr-only">팀 전체 지침</label>
@@ -457,16 +595,54 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
   </div>
 </div>
 
-<p class="hint">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제</p>
+<p class="hint" id="hintText">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제</p>
 
 <!-- 공유 버튼 -->
-<div class="controls" role="toolbar" aria-label="공유 및 파일">
+<div class="controls app-squad-only" role="toolbar" aria-label="공유 및 파일">
   <button class="btn btn-orange" onclick="openShare()">📤 단톡방 공유 텍스트 생성</button>
   <button class="btn btn-blue"   onclick="openPlayerView(null)">👤 선수 시점 보기</button>
   <button class="btn btn-green"  onclick="saveSquadFile()">💾 파일 저장</button>
   <button class="btn btn-slate"  onclick="document.getElementById('sqFileInput').click()">📂 파일 불러오기</button>
 </div>
 <input type="file" id="sqFileInput" accept=".sq" style="display:none" aria-hidden="true" onchange="loadSquadFile(event)">
+
+<!-- 매치 전략 -->
+<div id="strategyUI">
+  <div class="strategy-card">
+    <h3>매치 정보</h3>
+    <div class="strategy-form">
+      <div class="strategy-field">
+        <label for="opponent">상대팀</label>
+        <input class="strategy-input" id="opponent" type="text" placeholder="ex) FC 한강, 회사 동호회..." maxlength="30" />
+      </div>
+      <div class="strategy-field">
+        <label for="matchDate">매치 일시</label>
+        <input class="strategy-input" id="matchDate" type="datetime-local" />
+      </div>
+      <div class="strategy-field">
+        <label for="matchNotes">감독 메모 (선택)</label>
+        <textarea class="strategy-input" id="matchNotes" placeholder="특이사항, 상대팀 약점, 주의사항 등..." maxlength="300"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="strategy-card">
+    <h3>현재 스쿼드 요약</h3>
+    <div id="squadSummary" class="squad-summary"></div>
+  </div>
+  <div class="strategy-card" style="padding:12px 16px;">
+    <div class="generate-row">
+      <button class="btn btn-blue" style="flex:1;" onclick="generateManual()">📄 전술 지침서 생성</button>
+    </div>
+  </div>
+  <div class="strategy-card" id="manualCard" style="display:none;">
+    <h3>전술 지침서</h3>
+    <div id="manualOutput"></div>
+    <div class="output-actions">
+      <button class="btn btn-slate" onclick="copyManual()">📋 클립보드 복사</button>
+      <button class="btn btn-slate" onclick="saveManualTxt()">💾 텍스트 저장</button>
+    </div>
+  </div>
+</div>
 
 </main>
 
@@ -519,7 +695,14 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
   </div>
 </div>
 
+<!-- GIF 진행 오버레이 -->
+<div id="gifProgress" role="status">
+  <p id="gifProgressText">GIF 생성 중...</p>
+  <div id="gifProgressBar"><div id="gifProgressFill" style="width:0%"></div></div>
+</div>
+
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
 // CONSTANTS
@@ -608,6 +791,56 @@ function getPlayers() {
   return roster.map(r => ({ ...r, x: pos[r.id]?.x ?? 240, y: pos[r.id]?.y ?? 330 }));
 }
 
+// 앱 모드: 'squad' | 'pattern' | 'strategy'
+let appMode = 'squad';
+
+// 공격 패턴 — moves: { rosterId: {toX, toY} }, 시작 위치는 현재 스쿼드 배치에서 실시간 참조
+let patterns = [{ name: '패턴 1', moves: {} }];
+let currentPatternIdx = 0;
+
+// 패턴 애니메이션 / 경로 드로잉
+const PLAYER_R = 22;
+const ANIM_MS = 2200;
+let animRaf = null, animStart = null, isPlaying = false;
+let drawState = null; // { playerId, fromX, fromY, curX, curY }
+
+// ═══════════════════════════════════════════════════════════════
+// APP MODE (스쿼드 / 공격 패턴 / 매치 전략)
+// ═══════════════════════════════════════════════════════════════
+function setAppMode(mode) {
+  if (mode === appMode) return;
+  if (appMode === 'squad') saveCurrentNotes();
+  appMode = mode;
+
+  document.querySelectorAll('.app-tab').forEach(t => {
+    const isActive = t.dataset.app === mode;
+    t.classList.toggle('active', isActive);
+    t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  });
+  document.querySelectorAll('.app-squad-only').forEach(el =>
+    el.classList.toggle('app-hidden', mode !== 'squad'));
+
+  document.getElementById('fieldWrapper').style.display  = mode === 'strategy' ? 'none' : '';
+  document.getElementById('field').style.display         = mode === 'squad'    ? '' : 'none';
+  document.getElementById('patternCanvas').style.display = mode === 'pattern'  ? 'block' : 'none';
+  document.getElementById('patternUI').style.display     = mode === 'pattern'  ? 'flex' : 'none';
+  document.getElementById('strategyUI').style.display    = mode === 'strategy' ? 'flex' : 'none';
+
+  const hint = document.getElementById('hintText');
+  hint.style.display = mode === 'strategy' ? 'none' : '';
+  hint.innerHTML = mode === 'pattern'
+    ? '선수 클릭-드래그: 이동 경로 설정 &nbsp;|&nbsp; 우클릭 화살표: 경로 삭제'
+    : '드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제';
+
+  if (mode === 'pattern') {
+    stopAnimation();
+    updatePatternUI();
+    renderPatternFrame(0);
+  } else if (mode === 'strategy') {
+    refreshSquadSummary();
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════
 // FORMATION HELPERS
 // ═══════════════════════════════════════════════════════════════
@@ -680,6 +913,10 @@ function initAllSquads() {
     squads[type].playerNotes = {};
   });
 
+  // 인원수가 바뀌면 명단이 재구성되므로 패턴도 초기화
+  patterns = [{ name: '패턴 1', moves: {} }];
+  currentPatternIdx = 0;
+
   refreshUI();
   autoSave();
 }
@@ -720,6 +957,9 @@ function refreshUI() {
   renderPlayers();
   renderNotesPanel();
   updateAddPlayerBtn();
+
+  if (appMode === 'pattern') { updatePatternUI(); renderPatternFrame(0); }
+  else if (appMode === 'strategy') { refreshSquadSummary(); }
 }
 
 function switchSquad(type) {
@@ -998,6 +1238,7 @@ function ctxRemove() {
     delete squads[type].positions[id];
     delete squads[type].playerNotes[id];
   });
+  patterns.forEach(pt => { delete pt.moves[id]; });
   renderPlayers(); renderNotesPanel(); hideCtxMenu();
 }
 
@@ -1023,6 +1264,633 @@ function saveImage() {
       a.download = `${teamName||'스쿼드'}_${meta.label}_${form}.png`;
       a.href = canvas.toDataURL('image/png'); a.click();
     }).catch(() => { if (banner.parentNode) f.removeChild(banner); });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACK PATTERNS — 관리
+// ═══════════════════════════════════════════════════════════════
+function currentPattern() { return patterns[currentPatternIdx]; }
+
+function updatePatternUI() {
+  document.getElementById('patternName').value = currentPattern().name;
+  document.getElementById('patternCounter').textContent = `${currentPatternIdx+1} / ${patterns.length}`;
+}
+
+function addPattern() {
+  patterns.push({ name: `패턴 ${patterns.length+1}`, moves: {} });
+  currentPatternIdx = patterns.length - 1;
+  stopAnimation(); updatePatternUI(); renderPatternFrame(0); autoSave();
+}
+
+function deletePattern() {
+  if (patterns.length === 1) { showToast('패턴이 1개이면 삭제할 수 없습니다.'); return; }
+  patterns.splice(currentPatternIdx, 1);
+  currentPatternIdx = Math.min(currentPatternIdx, patterns.length-1);
+  stopAnimation(); updatePatternUI(); renderPatternFrame(0); autoSave();
+}
+
+function prevPattern() {
+  currentPatternIdx = (currentPatternIdx - 1 + patterns.length) % patterns.length;
+  stopAnimation(); updatePatternUI(); renderPatternFrame(0);
+}
+
+function nextPattern() {
+  currentPatternIdx = (currentPatternIdx + 1) % patterns.length;
+  stopAnimation(); updatePatternUI(); renderPatternFrame(0);
+}
+
+function renameCurrentPattern() {
+  const v = document.getElementById('patternName').value.trim().slice(0, 20);
+  if (v) currentPattern().name = v;
+  updatePatternUI(); autoSave();
+}
+
+function clearCurrentPattern() {
+  currentPattern().moves = {};
+  stopAnimation(); renderPatternFrame(0); autoSave();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACK PATTERNS — 캔버스 렌더링
+// ═══════════════════════════════════════════════════════════════
+const pCanvas = document.getElementById('patternCanvas');
+const pCtx = pCanvas.getContext('2d');
+
+function canvasField(ctx) {
+  ctx.fillStyle = '#276d41'; ctx.fillRect(0, 0, FIELD_W, FIELD_H);
+  for (let y = 44; y < FIELD_H; y += 88) {
+    ctx.fillStyle = 'rgba(0,0,0,0.07)'; ctx.fillRect(0, y, FIELD_W, 44);
+  }
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 2;
+  const L=(x,y,w,h)=>ctx.fillRect(x,y,w,h);
+  const C=(cx,cy,r)=>{ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();};
+  const D=(cx,cy,r)=>{ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();};
+  L(20,20,440,2);L(20,638,440,2);L(20,20,2,620);L(458,20,2,620);
+  L(20,330,440,2);C(240,330,60);D(240,330,4);
+  L(130,558,220,2);L(130,558,2,82);L(348,558,2,82);
+  L(184,598,112,2);L(184,598,2,42);L(294,598,2,42);D(240,530,3);
+  L(194,638,92,8);L(194,638,2,10);L(284,638,2,10);
+  L(130,100,220,2);L(130,20,2,82);L(348,20,2,82);
+  L(184,60,112,2);L(184,20,2,42);L(294,20,2,42);D(240,128,3);
+  L(194,12,92,8);L(194,12,2,10);L(284,12,2,10);
+}
+
+function canvasPlayer(ctx, color, name, num, x, y) {
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.55)';
+  ctx.shadowBlur = 8;
+  ctx.beginPath(); ctx.arc(x, y, PLAYER_R, 0, Math.PI*2);
+  ctx.fillStyle = color; ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 2.5; ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = 'white';
+  ctx.font = 'bold 13px Segoe UI, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(String(num), x, y);
+  ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 5;
+  ctx.font = 'bold 10px Segoe UI, sans-serif';
+  ctx.fillText(name.slice(0, 7), x, y + 32);
+  ctx.restore();
+}
+
+function canvasArrow(ctx, fx, fy, tx, ty, color, alpha) {
+  const angle = Math.atan2(ty-fy, tx-fx);
+  const len = Math.hypot(tx-fx, ty-fy);
+  if (len < 10) return;
+  const sx = fx + PLAYER_R * Math.cos(angle);
+  const sy = fy + PLAYER_R * Math.sin(angle);
+  const ex = tx - 13 * Math.cos(angle);
+  const ey = ty - 13 * Math.sin(angle);
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color; ctx.lineWidth = 3;
+  ctx.setLineDash([10, 5]);
+  ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(tx, ty);
+  ctx.lineTo(tx - 16*Math.cos(angle-Math.PI/6), ty - 16*Math.sin(angle-Math.PI/6));
+  ctx.lineTo(tx - 16*Math.cos(angle+Math.PI/6), ty - 16*Math.sin(angle+Math.PI/6));
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+function renderPatternFrame(t, patIdx) {
+  const pIdx = (patIdx !== undefined) ? patIdx : currentPatternIdx;
+  const pat = patterns[pIdx];
+  const players = getPlayers();
+  canvasField(pCtx);
+
+  const arrowAlpha = Math.max(0, 1 - t * 2);
+  const et = easeInOut(Math.min(t, 1));
+
+  if (pat) {
+    Object.entries(pat.moves).forEach(([id, move]) => {
+      const p = players.find(p => p.id == id);
+      if (!p) return;
+      canvasArrow(pCtx, p.x, p.y, move.toX, move.toY, '#facc15', arrowAlpha);
+    });
+    if (drawState) {
+      canvasArrow(pCtx, drawState.fromX, drawState.fromY, drawState.curX, drawState.curY, '#facc15', 0.7);
+    }
+  }
+
+  players.forEach((p, i) => {
+    const move = pat?.moves[p.id];
+    const x = move ? p.x + (move.toX - p.x) * et : p.x;
+    const y = move ? p.y + (move.toY - p.y) * et : p.y;
+    canvasPlayer(pCtx, p.color, p.name, i+1, x, y);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACK PATTERNS — 경로 드로잉 인터랙션
+// ═══════════════════════════════════════════════════════════════
+function hitPlayer(x, y) {
+  return getPlayers().find(p => Math.hypot(x - p.x, y - p.y) <= PLAYER_R + 4);
+}
+
+function hitArrow(x, y) {
+  const pat = currentPattern();
+  const players = getPlayers();
+  for (const [id, move] of Object.entries(pat.moves)) {
+    const p = players.find(p => p.id == id);
+    if (!p) continue;
+    const mx = (p.x + move.toX) / 2;
+    const my = (p.y + move.toY) / 2;
+    if (Math.hypot(x - mx, y - my) < 16) return Number(id);
+    if (Math.hypot(x - move.toX, y - move.toY) < 16) return Number(id);
+  }
+  return null;
+}
+
+function canvasCoords(e) {
+  const rect = pCanvas.getBoundingClientRect();
+  const scaleX = FIELD_W / rect.width;
+  const scaleY = FIELD_H / rect.height;
+  const src = e.touches ? e.touches[0] : e;
+  return { x: (src.clientX - rect.left) * scaleX, y: (src.clientY - rect.top) * scaleY };
+}
+
+pCanvas.addEventListener('mousedown', e => {
+  if (e.button === 2) return; // 우클릭은 contextmenu에서 처리
+  const { x, y } = canvasCoords(e);
+  const p = hitPlayer(x, y);
+  if (p) {
+    stopAnimation();
+    drawState = { playerId: p.id, fromX: p.x, fromY: p.y, curX: x, curY: y };
+    e.preventDefault();
+  }
+});
+
+pCanvas.addEventListener('mousemove', e => {
+  if (!drawState) return;
+  const { x, y } = canvasCoords(e);
+  drawState.curX = Math.max(5, Math.min(FIELD_W-5, x));
+  drawState.curY = Math.max(5, Math.min(FIELD_H-5, y));
+  renderPatternFrame(0);
+});
+
+pCanvas.addEventListener('mouseup', e => {
+  if (!drawState) return;
+  const { x, y } = canvasCoords(e);
+  const dist = Math.hypot(x - drawState.fromX, y - drawState.fromY);
+  if (dist > 15) {
+    currentPattern().moves[drawState.playerId] = {
+      toX: Math.max(5, Math.min(FIELD_W-5, x)),
+      toY: Math.max(5, Math.min(FIELD_H-5, y)),
+    };
+    autoSave();
+  }
+  drawState = null;
+  renderPatternFrame(0);
+});
+
+pCanvas.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  const { x, y } = canvasCoords(e);
+  const id = hitArrow(x, y);
+  if (id !== null) {
+    delete currentPattern().moves[id];
+    renderPatternFrame(0);
+    autoSave();
+  }
+});
+
+pCanvas.addEventListener('touchstart', e => {
+  const { x, y } = canvasCoords(e);
+  const p = hitPlayer(x, y);
+  if (p) {
+    stopAnimation();
+    drawState = { playerId: p.id, fromX: p.x, fromY: p.y, curX: x, curY: y };
+    e.preventDefault();
+  }
+}, { passive: false });
+
+pCanvas.addEventListener('touchmove', e => {
+  if (!drawState) return;
+  const { x, y } = canvasCoords(e);
+  drawState.curX = Math.max(5, Math.min(FIELD_W-5, x));
+  drawState.curY = Math.max(5, Math.min(FIELD_H-5, y));
+  renderPatternFrame(0);
+  e.preventDefault();
+}, { passive: false });
+
+pCanvas.addEventListener('touchend', e => {
+  if (!drawState) return;
+  const { x, y } = canvasCoords({ touches: e.changedTouches });
+  const dist = Math.hypot(x - drawState.fromX, y - drawState.fromY);
+  if (dist > 15) {
+    currentPattern().moves[drawState.playerId] = {
+      toX: Math.max(5, Math.min(FIELD_W-5, x)),
+      toY: Math.max(5, Math.min(FIELD_H-5, y)),
+    };
+    autoSave();
+  }
+  drawState = null;
+  renderPatternFrame(0);
+});
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACK PATTERNS — 애니메이션
+// ═══════════════════════════════════════════════════════════════
+function togglePlay() {
+  isPlaying ? stopAnimation() : startAnimation();
+}
+
+function startAnimation() {
+  isPlaying = true;
+  animStart = null;
+  document.getElementById('playBtn').textContent = '⏸ 일시정지';
+  animRaf = requestAnimationFrame(animTick);
+}
+
+function stopAnimation() {
+  if (animRaf) { cancelAnimationFrame(animRaf); animRaf = null; }
+  isPlaying = false;
+  document.getElementById('playBtn').textContent = '▶ 미리보기';
+  if (appMode === 'pattern') renderPatternFrame(0);
+}
+
+function animTick(ts) {
+  if (!animStart) animStart = ts;
+  const t = (ts - animStart) / ANIM_MS;
+  renderPatternFrame(Math.min(t, 1));
+  if (t < 1) {
+    animRaf = requestAnimationFrame(animTick);
+  } else {
+    // 끝 상태 1초 유지 후 루프
+    setTimeout(() => {
+      if (isPlaying) {
+        animStart = null;
+        animRaf = requestAnimationFrame(animTick);
+      }
+    }, 1000);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACK PATTERNS — GIF 내보내기
+// ═══════════════════════════════════════════════════════════════
+async function exportGif(allPatterns) {
+  stopAnimation();
+  const players = getPlayers();
+  const patsToExport = allPatterns ? patterns : [currentPattern()];
+  const filename = allPatterns ? '전체패턴' : (currentPattern().name || '공격패턴');
+
+  const prog = document.getElementById('gifProgress');
+  prog.classList.add('visible');
+  setProgress(0, 'GIF 생성 준비 중...');
+
+  // 워커 스크립트를 blob으로 가져와 CORS 문제 회피
+  let workerUrl;
+  try {
+    const resp = await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
+    const text = await resp.text();
+    workerUrl = URL.createObjectURL(new Blob([text], { type: 'application/javascript' }));
+  } catch {
+    workerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js';
+  }
+
+  const gif = new GIF({
+    workers: 2,
+    quality: 8,
+    width: FIELD_W,
+    height: FIELD_H,
+    workerScript: workerUrl,
+  });
+
+  const off = document.createElement('canvas');
+  off.width = FIELD_W; off.height = FIELD_H;
+  const offCtx = off.getContext('2d');
+
+  const FRAMES = 36;
+  const HOLD_FRAMES = 10;
+  const FRAME_DELAY = 55;   // ms/frame ≈ 18fps
+  const HOLD_DELAY = 120;
+
+  const totalFrames = patsToExport.length * (FRAMES + HOLD_FRAMES);
+  let doneFrames = 0;
+
+  function renderOffscreen(t, patIdx) {
+    canvasField(offCtx);
+    const pat = patsToExport[patIdx];
+    const et = easeInOut(Math.min(t, 1));
+    const arrowAlpha = Math.max(0, 1 - t * 2);
+
+    if (pat) {
+      Object.entries(pat.moves).forEach(([id, move]) => {
+        const p = players.find(p => p.id == id);
+        if (!p) return;
+        canvasArrow(offCtx, p.x, p.y, move.toX, move.toY, '#facc15', arrowAlpha);
+      });
+    }
+    players.forEach((p, i) => {
+      const move = pat?.moves[p.id];
+      const x = move ? p.x + (move.toX - p.x) * et : p.x;
+      const y = move ? p.y + (move.toY - p.y) * et : p.y;
+      canvasPlayer(offCtx, p.color, p.name, i+1, x, y);
+    });
+
+    if (allPatterns && pat) {
+      offCtx.save();
+      offCtx.fillStyle = 'rgba(0,0,0,0.5)';
+      offCtx.beginPath();
+      offCtx.roundRect(10, 10, 140, 28, 6);
+      offCtx.fill();
+      offCtx.fillStyle = 'white';
+      offCtx.font = 'bold 13px Segoe UI, sans-serif';
+      offCtx.textAlign = 'left';
+      offCtx.textBaseline = 'middle';
+      offCtx.fillText(pat.name, 18, 24);
+      offCtx.restore();
+    }
+  }
+
+  for (let pi = 0; pi < patsToExport.length; pi++) {
+    for (let f = 0; f <= FRAMES; f++) {
+      renderOffscreen(f / FRAMES, pi);
+      gif.addFrame(offCtx, { delay: FRAME_DELAY, copy: true });
+      doneFrames++;
+      setProgress(doneFrames / totalFrames * 0.7, `패턴 ${pi+1}/${patsToExport.length} 렌더링 중...`);
+      await new Promise(r => setTimeout(r, 0)); // 브라우저에 양보
+    }
+    for (let f = 0; f < HOLD_FRAMES; f++) {
+      renderOffscreen(1, pi);
+      gif.addFrame(offCtx, { delay: HOLD_DELAY, copy: true });
+      doneFrames++;
+    }
+  }
+
+  gif.on('progress', p => setProgress(0.7 + p * 0.3, `GIF 인코딩 중... ${Math.round(p*100)}%`));
+  gif.on('finished', blob => {
+    const a = document.createElement('a');
+    a.download = `${filename}.gif`;
+    a.href = URL.createObjectURL(blob);
+    a.click();
+    prog.classList.remove('visible');
+    renderPatternFrame(0);
+    if (workerUrl.startsWith('blob:')) URL.revokeObjectURL(workerUrl);
+  });
+
+  gif.render();
+}
+
+function setProgress(ratio, text) {
+  document.getElementById('gifProgressText').textContent = text;
+  document.getElementById('gifProgressFill').style.width = Math.round(ratio * 100) + '%';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MATCH STRATEGY — 스쿼드 요약
+// ═══════════════════════════════════════════════════════════════
+function classifyPlayer(p) {
+  if (p.y >= 590) return 'GK';
+  if (p.y >= 450) return '수비';
+  if (p.y >= 300) return '미드필더';
+  return '공격';
+}
+
+function refreshSquadSummary() {
+  const players = getPlayers();
+  const formation = squads[currentSquad].formation;
+  const modeLabel = MODES_CONFIG[currentMode].label;
+  const meta = SQUAD_META[currentSquad];
+  const el = document.getElementById('squadSummary');
+
+  const roleCounts = { GK: 0, 수비: 0, 미드필더: 0, 공격: 0 };
+  players.forEach(p => roleCounts[classifyPlayer(p)]++);
+
+  const activePats = patterns.filter(pt => Object.keys(pt.moves).length > 0);
+
+  el.innerHTML = `
+    <div style="margin-bottom:8px;">
+      <span class="formation-badge">${meta.icon} ${escHtml(meta.label)} · ${modeLabel} / ${escHtml(formation)}</span>
+    </div>
+    <div style="font-size:0.75rem;color:#64748b;margin-bottom:6px;">
+      GK ${roleCounts.GK} &nbsp;|&nbsp; 수비 ${roleCounts.수비} &nbsp;|&nbsp; 미드 ${roleCounts.미드필더} &nbsp;|&nbsp; 공격 ${roleCounts.공격}
+      &nbsp;&nbsp;·&nbsp;&nbsp; 공격패턴 ${activePats.length}개
+    </div>
+    <div class="player-list">
+      ${players.map((p,i) => `
+        <div class="player-chip">
+          <div class="dot" style="background:${p.color};"></div>
+          <span>${i+1}. ${escHtml(p.name)}</span>
+        </div>`).join('')}
+    </div>
+    ${activePats.length > 0 ? `<div class="pattern-chips">
+      ${activePats.map(pt=>`<span class="pattern-chip">🎯 ${escHtml(pt.name)}</span>`).join('')}
+    </div>` : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MATCH STRATEGY — 전술 지침서 생성 (규칙 기반)
+// ═══════════════════════════════════════════════════════════════
+let lastManualText = '';
+
+function generateManual() {
+  const players   = getPlayers();
+  const opponent  = document.getElementById('opponent').value.trim() || '상대팀';
+  const matchDate = document.getElementById('matchDate').value;
+  const notes     = document.getElementById('matchNotes').value.trim();
+  const formation = squads[currentSquad].formation;
+  const modeLabel = MODES_CONFIG[currentMode].label;
+
+  // ── 포메이션 기반 전술 성향 ──────────────────────────────────
+  const roleCounts = { GK: 0, 수비: 0, 미드필더: 0, 공격: 0 };
+  players.forEach(p => roleCounts[classifyPlayer(p)]++);
+
+  const defRatio = roleCounts.수비 / (players.length - 1 || 1);
+  let tacticalStyle, pressLine, defLine, transitionMsg;
+  if (defRatio >= 0.45) {
+    tacticalStyle = '수비 우선 / 역습';
+    pressLine     = '하프라인 뒤로 물러나 수비 블록을 형성한다.';
+    defLine       = '수비 라인은 컴팩트하게 유지하고, 상대 공격수 침투 공간을 최소화한다.';
+    transitionMsg = '공 탈취 후 빠른 전환으로 역습 찬스를 노린다. 전방 공격수로 즉시 연결한다.';
+  } else if (defRatio <= 0.28) {
+    tacticalStyle = '공격적 / 전방 압박';
+    pressLine     = '상대 빌드업 시 전방부터 압박하여 실수를 유도한다.';
+    defLine       = '수비 라인은 높게 유지하여 미드필더와 간격을 좁힌다. 오프사이드 트랩을 적극 활용한다.';
+    transitionMsg = '공 소유 시 빠른 패스 전개로 상대 수비 재조직 전에 공격한다.';
+  } else {
+    tacticalStyle = '밸런스 / 점유 기반';
+    pressLine     = '미드필드에서 수비 블록을 형성하고, 공 소유 시 빌드업 플레이를 진행한다.';
+    defLine       = '수비 라인과 미드필더 간격을 30m 이내로 유지한다.';
+    transitionMsg = '공 탈취 후 무리한 전진보다 안전한 패스로 점유를 유지한다.';
+  }
+
+  // ── 패턴 분석 ────────────────────────────────────────────────
+  const activePats = patterns.filter(pt => Object.keys(pt.moves).length > 0);
+
+  const playerMoves = {}; // id → [{patName, dx, dy}]
+  activePats.forEach(pt => {
+    Object.entries(pt.moves).forEach(([id, move]) => {
+      const p = players.find(p => p.id == id);
+      if (!p) return;
+      if (!playerMoves[id]) playerMoves[id] = [];
+      playerMoves[id].push({ patName: pt.name, dx: move.toX - p.x, dy: move.toY - p.y });
+    });
+  });
+
+  function moveDir(dx, dy) {
+    if (Math.abs(dx) < 30 && Math.abs(dy) < 30) return '제자리 유지';
+    if (dx > 40 && dy < -40)  return '우측 전방 침투';
+    if (dx < -40 && dy < -40) return '좌측 전방 침투';
+    if (dy < -40) return '전방 침투';
+    if (dy > 40)  return '후방 지원';
+    if (dx > 40)  return '우측 오버랩';
+    if (dx < -40) return '좌측 오버랩';
+    return '사선 이동';
+  }
+
+  function describeMoves(id) {
+    const mvs = playerMoves[id];
+    if (!mvs || mvs.length === 0) return [];
+    return mvs.map(m => `[${m.patName}] ${moveDir(m.dx, m.dy)} 이동`);
+  }
+
+  // ── 팀 전체 섹션 ─────────────────────────────────────────────
+  const dateStr = matchDate
+    ? new Date(matchDate).toLocaleString('ko-KR', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })
+    : '미정';
+
+  const teamLines = [
+    `상대: ${opponent} | 일시: ${dateStr}`,
+    `포메이션: ${modeLabel} ${formation} (${tacticalStyle})`,
+    `압박 전략: ${pressLine}`,
+    `수비 원칙: ${defLine}`,
+    `전환 원칙: ${transitionMsg}`,
+  ];
+
+  if (activePats.length > 0) {
+    teamLines.push(`공격 패턴 ${activePats.length}가지(${activePats.map(p=>p.name).join(', ')})를 숙지한다.`);
+    teamLines.push('세트피스 및 빠른 전환 상황에서 해당 패턴을 우선 시도한다.');
+  }
+  if (notes) {
+    teamLines.push(`감독 지시: ${notes}`);
+  }
+
+  // ── 개별 선수 섹션 ───────────────────────────────────────────
+  const roleInstructions = {
+    GK: () => [
+      '골 라인 수비 및 페널티 구역 제공권을 장악한다.',
+      '수비진과 지속적으로 소통하여 위험 상황을 사전에 차단한다.',
+      '점유 시 빌드업 첫 번째 패스 역할을 담당한다.',
+    ],
+    수비: (p) => {
+      const isFlank = p.x < 160 || p.x > 320;
+      return [
+        '수비 라인 위치와 간격을 유지한다.',
+        isFlank ? '측면 공간 커버 및 상대 윙어 대인 마크를 담당한다.' : '중앙 공간 차단 및 헤더 경합을 우선시한다.',
+        '공 소유 시 안전한 옆패스 또는 GK에게 리셋한다.',
+      ];
+    },
+    미드필더: (p) => {
+      const isFlank = p.x < 160 || p.x > 320;
+      return [
+        isFlank ? '측면 공간을 활용한 드리블 돌파와 크로스를 시도한다.' : '중앙 연결 및 공 순환 역할을 담당한다.',
+        '수비 시 빠른 압박으로 상대 전진을 차단한다.',
+        '공격 시 공격수와의 원투패스 콤비네이션을 적극 활용한다.',
+      ];
+    },
+    공격: (p) => {
+      const isFlank = p.x < 160 || p.x > 320;
+      return [
+        isFlank ? '측면에서 상대 수비를 끌어낸 뒤 중앙으로 컷인 또는 크로스를 시도한다.' : '중앙에서 침투 움직임으로 상대 수비 라인을 압박한다.',
+        '득점 기회에서 과감하게 슈팅한다.',
+        '수비 전환 시 전방에서 압박의 첫 번째 역할을 수행한다.',
+      ];
+    },
+  };
+
+  const playerSections = players.map((p, i) => {
+    const role = classifyPlayer(p);
+    const baseLines = roleInstructions[role](p);
+    return { player: p, num: i + 1, role, lines: [...baseLines, ...describeMoves(p.id)] };
+  });
+
+  // ── HTML 렌더링 ──────────────────────────────────────────────
+  const card = document.getElementById('manualCard');
+  const out  = document.getElementById('manualOutput');
+  card.style.display = '';
+
+  out.innerHTML = `
+    <div class="tactic-section">
+      <div class="tactic-section-title">📢 팀 전체 전달사항</div>
+      ${teamLines.map(l => `<div class="tactic-line">${escHtml(l)}</div>`).join('')}
+    </div>
+    <div class="tactic-section">
+      <div class="tactic-section-title">👤 개별 선수 지침</div>
+      ${playerSections.map(s => `
+        <div class="tactic-player-title">
+          ${s.num}. ${escHtml(s.player.name)}
+          <span class="tactic-tag ${s.role==='GK'?'red':s.role==='수비'?'green':s.role==='미드필더'?'':'amber'}">${s.role}</span>
+        </div>
+        ${s.lines.map(l => `<div class="tactic-line">${escHtml(l)}</div>`).join('')}
+      `).join('')}
+    </div>
+  `;
+
+  lastManualText = buildPlainText(opponent, dateStr, formation, modeLabel, tacticalStyle, teamLines, playerSections);
+
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildPlainText(opponent, dateStr, formation, modeLabel, style, teamLines, playerSections) {
+  const sep = '─'.repeat(40);
+  let t = `⚽ 전술 지침서\n${sep}\n`;
+  t += `상대: ${opponent}  |  일시: ${dateStr}\n포메이션: ${modeLabel} ${formation} (${style})\n${sep}\n`;
+  t += `▶ 팀 전체 전달사항\n`;
+  teamLines.forEach(l => t += `  • ${l}\n`);
+  t += `\n▶ 개별 선수 지침\n`;
+  playerSections.forEach(s => {
+    t += `\n[${s.num}] ${s.player.name} (${s.role})\n`;
+    s.lines.forEach(l => t += `  • ${l}\n`);
+  });
+  return t;
+}
+
+function copyManual() {
+  if (!lastManualText) return;
+  navigator.clipboard.writeText(lastManualText)
+    .then(() => showToast('클립보드에 복사되었습니다.'))
+    .catch(() => alert('복사 실패 — 브라우저 권한을 확인하세요.'));
+}
+
+function saveManualTxt() {
+  if (!lastManualText) return;
+  const opponent = document.getElementById('opponent').value.trim() || '전술지침서';
+  const blob = new Blob([lastManualText], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.download = `${opponent}_전술지침서.txt`;
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1229,6 +2097,13 @@ function buildStateSnap() {
     });
     snap.squads[type] = { f: sq.formation, pos, tn: sq.teamNote, pn: sq.playerNotes };
   });
+  snap.pat = patterns.map(pt => {
+    const m = {};
+    Object.entries(pt.moves).forEach(([id, mv]) => {
+      m[id] = { x: Math.round(mv.toX), y: Math.round(mv.toY) };
+    });
+    return { n: pt.name, m };
+  });
   return snap;
 }
 
@@ -1280,6 +2155,26 @@ function restoreState(state) {
     squads[type].playerNotes = sq.pn  || {};
   });
   currentSquad = SQUAD_META[state.squad] ? state.squad : 'basic';
+  patterns = sanitizePatterns(state.pat);
+  currentPatternIdx = 0;
+}
+
+// 복원된 패턴 데이터 정규화 — 이름 길이 제한, 좌표는 숫자·필드 범위로 강제
+function sanitizePatterns(list) {
+  const pats = (Array.isArray(list) ? list : []).map(pt => {
+    const moves = {};
+    Object.entries(pt?.m || {}).forEach(([id, mv]) => {
+      const toX = Number(mv?.x), toY = Number(mv?.y);
+      if (Number.isFinite(toX) && Number.isFinite(toY)) {
+        moves[id] = {
+          toX: Math.max(5, Math.min(FIELD_W-5, toX)),
+          toY: Math.max(5, Math.min(FIELD_H-5, toY)),
+        };
+      }
+    });
+    return { name: String(pt?.n ?? '패턴').slice(0, 20), moves };
+  });
+  return pats.length ? pats : [{ name: '패턴 1', moves: {} }];
 }
 
 function applyState(state) {
