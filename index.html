@@ -38,8 +38,32 @@ body {
 h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 
 /* ── 공통 최대 너비 ── */
-.team-setup, .squad-tabs, .formation-bar, .notes-wrap, #fieldWrapper, #readonlyBanner {
+.team-setup, .squad-tabs, .formation-bar, .notes-wrap, #fieldWrapper {
   width: 100%; max-width: 480px;
+}
+
+/* ── 2패널 레이아웃 ── */
+main { width: 100%; display: flex; flex-direction: column; align-items: center; }
+.layout { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.pane-field, .pane-side {
+  width: 100%; max-width: 480px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.pane-side:empty { display: none; }
+
+@media (min-width: 1024px) {
+  .layout {
+    flex-direction: row; align-items: flex-start; justify-content: center;
+    gap: 28px; max-width: 1160px;
+  }
+  .pane-field { max-width: 640px; position: sticky; top: 16px; }
+  /* 필드가 세로로도 화면에 들어오도록 높이 기준 폭 제한 (480/660 = 0.7273) */
+  .pane-field #fieldWrapper { max-width: min(640px, max(420px, calc((100vh - 210px) * 0.7273))); }
+  .pane-side { max-width: 440px; }
+  /* 매치 전략: 필드 없이 전체 폭 사용 */
+  body.mode-strategy .pane-field { display: none; }
+  body.mode-strategy .pane-side { max-width: 640px; }
+  body.mode-strategy .pane-side #strategyUI { max-width: 640px; }
 }
 
 /* ── 팀 설정 카드 ── */
@@ -505,13 +529,9 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   .formation-bar { flex-wrap: wrap; }
 }
 
-/* 데스크톱: 좌우 여백에 약간의 padding 추가로 답답함 해소 */
-@media (min-width: 960px) {
-  body { max-width: 960px; margin: 0 auto; }
-}
 </style>
 </head>
-<body>
+<body class="mode-squad">
 
 <h1>⚽ 스쿼드 메이커</h1>
 
@@ -530,18 +550,8 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 </div>
 
 <main aria-label="스쿼드 메이커">
-
-<!-- 팀 설정 -->
-<div class="team-setup app-squad-only editor-only" role="group" aria-label="팀 설정">
-  <div class="setup-row">
-    <label class="setup-label" for="teamName">팀명</label>
-    <input class="team-name-input" id="teamName" type="text" placeholder="팀 이름 입력..." maxlength="20" autocomplete="off" />
-  </div>
-  <div class="setup-row">
-    <span class="setup-label" id="modeLabel">인원</span>
-    <div class="mode-pills" id="modePills" role="group" aria-labelledby="modeLabel"></div>
-  </div>
-</div>
+<div class="layout">
+<div class="pane-field">
 
 <!-- 스쿼드 탭 -->
 <div class="squad-tabs app-squad-only" role="tablist" aria-label="스쿼드 선택">
@@ -562,6 +572,23 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 <div id="fieldWrapper">
   <div id="field" role="region" aria-label="축구 필드 — 선수를 드래그해 위치를 조정하세요"></div>
   <canvas id="patternCanvas" width="480" height="660" aria-label="전술 패턴 캔버스 — 선수를 드래그해 이동 경로를 그리세요"></canvas>
+</div>
+
+<p class="hint editor-only" id="hintText">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제</p>
+
+</div><!-- /pane-field -->
+<div class="pane-side">
+
+<!-- 팀 설정 -->
+<div class="team-setup app-squad-only editor-only" role="group" aria-label="팀 설정">
+  <div class="setup-row">
+    <label class="setup-label" for="teamName">팀명</label>
+    <input class="team-name-input" id="teamName" type="text" placeholder="팀 이름 입력..." maxlength="20" autocomplete="off" />
+  </div>
+  <div class="setup-row">
+    <span class="setup-label" id="modeLabel">인원</span>
+    <div class="mode-pills" id="modePills" role="group" aria-labelledby="modeLabel"></div>
+  </div>
 </div>
 
 <!-- 전술 패턴 컨트롤 -->
@@ -617,8 +644,6 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   </div>
 </div>
 
-<p class="hint editor-only" id="hintText">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제</p>
-
 <!-- 뷰어 전용: 선수 시점 -->
 <div class="controls app-squad-only viewer-only" role="toolbar" aria-label="열람 도구">
   <button class="btn btn-blue" onclick="openPlayerView(null)">👤 선수 시점 보기</button>
@@ -671,6 +696,8 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   </div>
 </div>
 
+</div><!-- /pane-side -->
+</div><!-- /layout -->
 </main>
 
 <!-- 선수 시점 모달 -->
@@ -850,6 +877,9 @@ function setAppMode(mode) {
   if (appMode === 'squad') saveCurrentNotes();
   appMode = mode;
 
+  ['squad','pattern','strategy'].forEach(m =>
+    document.body.classList.toggle('mode-' + m, m === mode));
+
   document.querySelectorAll('.app-tab').forEach(t => {
     const isActive = t.dataset.app === mode;
     t.classList.toggle('active', isActive);
@@ -869,6 +899,8 @@ function setAppMode(mode) {
   hint.innerHTML = mode === 'pattern'
     ? '선수·공 드래그: 이동 경로 &nbsp;|&nbsp; 공 살짝 끌기: 시작 위치 &nbsp;|&nbsp; 우클릭 화살표: 삭제'
     : '드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제';
+
+  applyFieldScale();
 
   if (mode === 'pattern') {
     stopAnimation();
