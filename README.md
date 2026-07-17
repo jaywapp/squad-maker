@@ -118,3 +118,58 @@ xdg-open index.html    # Linux
 ```
 
 > GIF 내보내기는 CDN에서 gif.js 워커를 불러오므로 인터넷 연결이 필요합니다.
+
+---
+
+## 🛠 개발 현황 (AI/개발 세션용, 2026-07-18 기준)
+
+> 다음 작업 세션이 프로젝트 컨텍스트를 빠르게 파악하기 위한 섹션입니다.
+
+### 아키텍처
+
+- **단일 파일 `index.html`** (~1,800줄): CSS + HTML + vanilla JS, 빌드 도구 없음
+- **상태 모델**
+  - `roster` — 전 스쿼드 공유 명단 `[{id, name(≤12자), color}]`
+  - `squads[basic|attack|defense]` — `{formation, positions:{id:{x,y}}, teamNote, playerNotes:{id:text}}`
+  - `patterns` — 전술 패턴 `[{name(≤20자), ballStart:{x,y}, steps:[{moves:{id:{toX,toY}}, ball:{toX,toY}|null}]}]`
+    (단계 N 시작 위치 = 단계 N-1 종료 위치 누적, 1단계 시작 = 현재 스쿼드 배치)
+- **앱 모드 3개**: `squad` / `pattern` / `strategy` — `setAppMode()`가 `.app-squad-only` 클래스와 개별 요소 표시를 토글
+- **영속화**: localStorage(`squad-maker-v1`) · 공유 URL `#s=`(URL-safe base64) · `.sq` JSON — 모두 `buildStateSnap()`/`restoreState()` 경유, 스냅샷 버전 `v:1`
+  - 복원 데이터는 반드시 `sanitizeRoster()`/`sanitizePatterns()`로 정규화 (XSS·크래시 방어). 구형 단일 화살표 패턴 `{n,m}`은 1단계 패턴으로 자동 마이그레이션
+- **외부 의존(CDN)**: html2canvas(PNG 저장, 제작자 도메인), gif.js 0.2.0 + worker(cdnjs, GIF 인코딩)
+
+### 배포
+
+- GitHub Pages — `main` 브랜치 자동 배포 → https://jaywapp.github.io/squad-maker/
+- 머지 후 확인: `gh api repos/jaywapp/squad-maker/pages/builds/latest` 로 빌드 상태·커밋 확인 후 라이브 콘텐츠 마커 curl 검증
+
+### 검증 방법
+
+1. 인라인 스크립트 추출 후 `node --check` 구문 검증
+2. **헤드리스 Chrome 하니스**: 테스트 페이지가 iframe으로 앱을 로드하고 단언 실행 →
+   `chrome --headless=new --virtual-time-budget=15000 --dump-dom http://localhost:<port>/test-harness.html`
+   - 주의: 앱의 최상위 `let/const`는 window 프로퍼티가 아니므로 `iframe.contentWindow.eval('...')`로 접근
+   - 하니스는 저장소에 커밋하지 않음 (실행 후 삭제)
+3. claude-in-chrome 확장이 연결되어 있으면 실브라우저 검증 우선
+
+### 최근 작업 (모두 머지·배포됨)
+
+| PR | 내용 |
+|----|------|
+| [#25](https://github.com/jaywapp/squad-maker/pull/25) | XSS 수정(escHtml 따옴표 이스케이프 + sanitize), 복원 로직 단일화(`restoreState`+`refreshUI`), og-image 추가 |
+| [#26](https://github.com/jaywapp/squad-maker/pull/26) | 공격 패턴 에디터·GIF·매치 전략 탭을 현 구조로 재이식 (구 feature 브랜치 3개는 이식 후 삭제) |
+| [#27](https://github.com/jaywapp/squad-maker/pull/27) | 다단계 전술 패턴 + 공 이동/패스 스냅 (설계: `docs/superpowers/specs/2026-07-18-multi-step-tactical-patterns-design.md`) |
+
+- 브랜치 상태: **main만 유지** — feature 브랜치는 PR 스쿼시 머지 후 삭제하는 흐름
+
+### 남은 후보 과제
+
+- [ ] 공유 URL(`#s=`)로 진입한 방문자가 조작하면 autoSave가 방문자의 기존 localStorage 스쿼드를 덮어씀 → 읽기전용 진입 시 저장 분리 필요
+- [ ] html2canvas를 제작자 개인 도메인 CDN에서 로드 중 → cdnjs + SRI로 하드닝 권장
+- [ ] 광고 삽입 계획 실행: `docs/ad-placement.md` (일부 라인 참조는 구식 — 적용 전 재확인)
+
+### 컨벤션
+
+- 커밋: conventional commits(영어) / UI 텍스트·문서: 한국어
+- `main` 직접 커밋 금지 — feature 브랜치 + PR(스쿼시 머지)
+- 복원(외부 입력) 경로에 새 필드를 추가할 때는 반드시 sanitize 함수에 검증 추가
