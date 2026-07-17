@@ -114,12 +114,15 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 .squad-badge.defense { background: #1e40af; color: white; }
 
 /* ── Field ── */
+/* 좌표계는 480×660 고정, 렌더링만 wrapper 폭에 맞춰 scale */
 #fieldWrapper {
-  position: relative; width: 480px; height: 660px; flex-shrink: 0;
+  position: relative; width: 100%; max-width: 480px;
+  aspect-ratio: 480 / 660; flex-shrink: 0;
 }
 #field {
   position: absolute; top: 0; left: 0;
   width: 480px; height: 660px; border-radius: 6px;
+  transform-origin: top left;
   background: #276d41; box-shadow: 0 8px 32px rgba(0,0,0,0.6); overflow: hidden;
 }
 #field::before {
@@ -366,7 +369,7 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 
 /* ── 전술 패턴 모드 ── */
 #patternCanvas {
-  position:absolute; top:0; left:0; width:480px; height:660px;
+  position:absolute; top:0; left:0;
   border-radius:6px; box-shadow:0 8px 32px rgba(0,0,0,0.6);
   cursor:crosshair; display:none;
 }
@@ -491,8 +494,6 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   .mode-pills { flex-wrap: wrap; }
   /* 포메이션 바 줄바꿈 허용 */
   .formation-bar { flex-wrap: wrap; }
-  /* 필드: 480px 유지(JS 좌표계 보존), 부모가 스크롤 허용 */
-  #fieldWrapper { overflow-x: auto; }
 }
 
 /* 데스크톱: 좌우 여백에 약간의 padding 추가로 답답함 해소 */
@@ -1171,14 +1172,14 @@ fieldEl.addEventListener('mousedown', e => {
   const p = getPlayers().find(p => p.id === id);
   if (!p) return;
   hideCtxMenu();
-  dragState = { id, el: pe, sx: e.clientX, sy: e.clientY, px: p.x, py: p.y };
+  dragState = { id, el: pe, sx: e.clientX, sy: e.clientY, px: p.x, py: p.y, sc: getFieldScale() };
   pe.classList.add('dragging');
   e.preventDefault();
 });
 document.addEventListener('mousemove', e => {
   if (!dragState) return;
-  const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + e.clientX - dragState.sx));
-  const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + e.clientY - dragState.sy));
+  const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + (e.clientX - dragState.sx) / dragState.sc));
+  const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + (e.clientY - dragState.sy) / dragState.sc));
   squads[currentSquad].positions[dragState.id] = { x, y };
   dragState.el.style.left = x+'px';
   dragState.el.style.top  = y+'px';
@@ -1194,14 +1195,14 @@ fieldEl.addEventListener('touchstart', e => {
   const p = getPlayers().find(p => p.id === id);
   if (!p) return;
   const t = e.touches[0];
-  dragState = { id, el: pe, sx: t.clientX, sy: t.clientY, px: p.x, py: p.y };
+  dragState = { id, el: pe, sx: t.clientX, sy: t.clientY, px: p.x, py: p.y, sc: getFieldScale() };
   pe.classList.add('dragging'); e.preventDefault();
 }, { passive: false });
 document.addEventListener('touchmove', e => {
   if (!dragState) return;
   const t = e.touches[0];
-  const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + t.clientX - dragState.sx));
-  const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + t.clientY - dragState.sy));
+  const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + (t.clientX - dragState.sx) / dragState.sc));
+  const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + (t.clientY - dragState.sy) / dragState.sc));
   squads[currentSquad].positions[dragState.id] = { x, y };
   dragState.el.style.left = x+'px';
   dragState.el.style.top  = y+'px';
@@ -1275,13 +1276,23 @@ function saveImage() {
     padding:5px 18px;border-radius:20px;z-index:200;white-space:nowrap;pointer-events:none;`;
   banner.textContent = label;
   f.appendChild(banner);
+  // 캡처 동안 스케일 해제 (transform 캡처 왜곡 회피)
+  const wrapper = document.getElementById('fieldWrapper');
+  const prevMax = wrapper.style.maxWidth, prevWidth = wrapper.style.width;
+  wrapper.style.maxWidth = '480px'; wrapper.style.width = '480px';
+  f.style.transform = 'none';
   html2canvas(f, { scale:2.5, backgroundColor:'#276d41', useCORS:true, logging:false })
     .then(canvas => {
-      f.removeChild(banner);
       const a = document.createElement('a');
       a.download = `${teamName||'스쿼드'}_${meta.label}_${form}.png`;
       a.href = canvas.toDataURL('image/png'); a.click();
-    }).catch(() => { if (banner.parentNode) f.removeChild(banner); });
+    })
+    .catch(() => {})
+    .finally(() => {
+      if (banner.parentNode) f.removeChild(banner);
+      wrapper.style.maxWidth = prevMax; wrapper.style.width = prevWidth;
+      applyFieldScale();
+    });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1391,6 +1402,28 @@ function ballPosAfter(pat, uptoStep) {
 // ═══════════════════════════════════════════════════════════════
 const pCanvas = document.getElementById('patternCanvas');
 const pCtx = pCanvas.getContext('2d');
+
+// ═══════════════════════════════════════════════════════════════
+// FIELD SCALE — 렌더링 배율 (좌표계는 480×660 고정)
+// ═══════════════════════════════════════════════════════════════
+function getFieldScale() {
+  const w = document.getElementById('fieldWrapper').getBoundingClientRect().width;
+  return w / FIELD_W || 1;
+}
+
+// 캔버스는 백킹 스토어를 s×dpr로 재설정해 확대 시에도 선명하게 유지
+function applyFieldScale() {
+  const s = getFieldScale();
+  document.getElementById('field').style.transform = `scale(${s})`;
+  const dpr = window.devicePixelRatio || 1;
+  pCanvas.style.width  = (FIELD_W * s) + 'px';
+  pCanvas.style.height = (FIELD_H * s) + 'px';
+  pCanvas.width  = Math.round(FIELD_W * s * dpr);
+  pCanvas.height = Math.round(FIELD_H * s * dpr);
+  pCtx.setTransform(s * dpr, 0, 0, s * dpr, 0, 0);
+  if (appMode === 'pattern' && !isPlaying) renderPatternFrame(0);
+}
+window.addEventListener('resize', applyFieldScale);
 
 function canvasField(ctx) {
   ctx.fillStyle = '#276d41'; ctx.fillRect(0, 0, FIELD_W, FIELD_H);
@@ -2565,6 +2598,7 @@ if (loadFromURL()) {
 } else if (!loadFromLocalStorage()) {
   initAllSquads();
 }
+applyFieldScale();
 </script>
 </body>
 </html>
