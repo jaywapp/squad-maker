@@ -341,14 +341,23 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
   cursor:text; user-select:all;
 }
 
-/* ── 읽기 전용 배너 ── */
-#readonlyBanner {
-  display:none;
-  background:#451a03; border:1px solid #f97316; border-radius:10px;
-  padding:10px 14px; font-size:0.82rem; color:#fed7aa;
-  text-align:center; font-weight:600;
+/* ── 뷰어 모드 (공유 링크 열람) ── */
+.viewer-mode .editor-only { display: none !important; }
+.viewer-only { display: none; }
+.viewer-mode .viewer-only { display: revert; }
+.viewer-mode .controls.viewer-only { display: flex; }
+#viewerBar {
+  width:100%; max-width:480px; display:none; align-items:center; gap:10px; flex-wrap:wrap;
+  background:#1e293b; border:1px solid #334155; border-radius:10px; padding:10px 14px;
 }
-#readonlyBanner.visible { display:block; }
+.viewer-mode #viewerBar { display:flex; }
+#viewerBar .vb-title { flex:1 1 100%; font-weight:700; font-size:0.9rem; }
+#viewerBar .btn { padding:7px 12px; font-size:0.8rem; }
+.viewer-note-text {
+  font-size:0.85rem; color:#cbd5e1; line-height:1.6; white-space:pre-wrap;
+}
+.viewer-note-row { margin-bottom:10px; }
+.viewer-note-row:last-child { margin-bottom:0; }
 
 .hint { font-size:0.72rem; color:#334155; }
 
@@ -506,22 +515,24 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 
 <h1>⚽ 스쿼드 메이커</h1>
 
-<!-- 공유 링크로 열린 경우 안내 배너 -->
-<div id="readonlyBanner" role="status">
-  📤 공유된 스쿼드를 보고 있습니다. 수정은 본인 기기에만 적용됩니다.
+<!-- 공유 링크로 열린 경우 뷰어 바 -->
+<div id="viewerBar" role="status">
+  <span class="vb-title" id="vbTitle"></span>
+  <button class="btn btn-blue" onclick="importSharedSquad()">내 스쿼드로 가져오기</button>
+  <button class="btn btn-slate" onclick="openMySquad()">내 스쿼드 열기</button>
 </div>
 
 <!-- 앱 모드 탭 -->
 <div class="app-tabs" role="tablist" aria-label="앱 모드 선택">
   <button class="app-tab active" role="tab" aria-selected="true"  data-app="squad"    onclick="setAppMode('squad')">⚽ 스쿼드</button>
   <button class="app-tab"        role="tab" aria-selected="false" data-app="pattern"  onclick="setAppMode('pattern')">🎯 전술 패턴</button>
-  <button class="app-tab"        role="tab" aria-selected="false" data-app="strategy" onclick="setAppMode('strategy')">📋 매치 전략</button>
+  <button class="app-tab editor-only" role="tab" aria-selected="false" data-app="strategy" onclick="setAppMode('strategy')">📋 매치 전략</button>
 </div>
 
 <main aria-label="스쿼드 메이커">
 
 <!-- 팀 설정 -->
-<div class="team-setup app-squad-only" role="group" aria-label="팀 설정">
+<div class="team-setup app-squad-only editor-only" role="group" aria-label="팀 설정">
   <div class="setup-row">
     <label class="setup-label" for="teamName">팀명</label>
     <input class="team-name-input" id="teamName" type="text" placeholder="팀 이름 입력..." maxlength="20" autocomplete="off" />
@@ -543,8 +554,8 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 <div class="formation-bar app-squad-only" role="group" aria-label="포메이션 설정">
   <span class="squad-badge basic" id="squadBadge">🔵 기본</span>
   <label for="formationSelect" class="sr-only">포메이션</label>
-  <select class="formation-select" id="formationSelect" aria-label="포메이션 선택" onchange="onFormationChange()"></select>
-  <button class="btn btn-slate" style="padding:6px 12px;font-size:0.8rem;" aria-label="포메이션 초기화" onclick="resetLayout()">↺ 초기화</button>
+  <select class="formation-select editor-only" id="formationSelect" aria-label="포메이션 선택" onchange="onFormationChange()"></select>
+  <button class="btn btn-slate editor-only" style="padding:6px 12px;font-size:0.8rem;" aria-label="포메이션 초기화" onclick="resetLayout()">↺ 초기화</button>
 </div>
 
 <!-- 필드 -->
@@ -557,14 +568,15 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 <div id="patternUI">
   <div class="pattern-bar">
     <label for="patternName" class="sr-only">패턴 이름</label>
-    <input class="pattern-name-input" id="patternName" placeholder="패턴 이름..." maxlength="20" onchange="renameCurrentPattern()" />
+    <input class="pattern-name-input editor-only" id="patternName" placeholder="패턴 이름..." maxlength="20" onchange="renameCurrentPattern()" />
+    <span id="patternNameView" class="viewer-only" style="font-weight:700;font-size:0.9rem;"></span>
     <div class="pattern-nav">
       <button aria-label="이전 패턴" onclick="prevPattern()">◀</button>
       <span id="patternCounter">1 / 1</span>
       <button aria-label="다음 패턴" onclick="nextPattern()">▶</button>
     </div>
-    <button class="btn btn-blue" onclick="addPattern()"    style="padding:7px 12px;">+ 추가</button>
-    <button class="btn btn-red"  onclick="deletePattern()" style="padding:7px 12px;">🗑 삭제</button>
+    <button class="btn btn-blue editor-only" onclick="addPattern()"    style="padding:7px 12px;">+ 추가</button>
+    <button class="btn btn-red editor-only"  onclick="deletePattern()" style="padding:7px 12px;">🗑 삭제</button>
   </div>
   <div class="pattern-bar">
     <div class="pattern-nav">
@@ -572,19 +584,19 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
       <span id="stepCounter">단계 1 / 1</span>
       <button aria-label="다음 단계" onclick="nextStep()">▶</button>
     </div>
-    <button class="btn btn-blue" onclick="addStep()"    style="padding:7px 12px;">+ 단계</button>
-    <button class="btn btn-red"  onclick="deleteStep()" style="padding:7px 12px;">🗑 단계</button>
+    <button class="btn btn-blue editor-only" onclick="addStep()"    style="padding:7px 12px;">+ 단계</button>
+    <button class="btn btn-red editor-only"  onclick="deleteStep()" style="padding:7px 12px;">🗑 단계</button>
   </div>
   <div class="controls">
     <button class="btn btn-green"  id="playBtn"   onclick="togglePlay()">▶ 미리보기</button>
-    <button class="btn btn-slate"  onclick="clearCurrentStep()">↺ 단계 초기화</button>
+    <button class="btn btn-slate editor-only"  onclick="clearCurrentStep()">↺ 단계 초기화</button>
     <button class="btn btn-amber"  id="gifBtn"    onclick="exportGif(false)">🎞 GIF 저장</button>
     <button class="btn btn-purple" id="gifAllBtn" onclick="exportGif(true)">📋 전체 패턴 GIF</button>
   </div>
 </div>
 
 <!-- 선수 컨트롤 -->
-<div class="controls app-squad-only" role="toolbar" aria-label="선수 조작">
+<div class="controls app-squad-only editor-only" role="toolbar" aria-label="선수 조작">
   <button class="btn btn-blue" id="addPlayerBtn" onclick="addPlayer()">+ 선수 추가</button>
   <button class="btn btn-green" onclick="saveImage()">📸 이미지 저장</button>
 </div>
@@ -605,10 +617,15 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   </div>
 </div>
 
-<p class="hint" id="hintText">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제</p>
+<p class="hint editor-only" id="hintText">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제</p>
+
+<!-- 뷰어 전용: 선수 시점 -->
+<div class="controls app-squad-only viewer-only" role="toolbar" aria-label="열람 도구">
+  <button class="btn btn-blue" onclick="openPlayerView(null)">👤 선수 시점 보기</button>
+</div>
 
 <!-- 공유 버튼 -->
-<div class="controls app-squad-only" role="toolbar" aria-label="공유 및 파일">
+<div class="controls app-squad-only editor-only" role="toolbar" aria-label="공유 및 파일">
   <button class="btn btn-orange" onclick="openShare()">📤 단톡방 공유 텍스트 생성</button>
   <button class="btn btn-blue"   onclick="openPlayerView(null)">👤 선수 시점 보기</button>
   <button class="btn btn-green"  onclick="saveSquadFile()">💾 파일 저장</button>
@@ -804,6 +821,9 @@ function getPlayers() {
 // 앱 모드: 'squad' | 'pattern' | 'strategy'
 let appMode = 'squad';
 
+// 뷰어 모드: 공유 링크(#s=)로 진입 — 편집·저장 차단, 열람 UI만 노출
+let viewerMode = false;
+
 // 전술 패턴 — 다단계(step) 시퀀스. 각 단계는 선수 이동 묶음 + 공 이동(선택).
 // 단계 N의 시작 위치 = 단계 N-1 종료 위치(누적), 1단계 시작은 현재 스쿼드 배치.
 const BALL_START = { x: 240, y: 330 };
@@ -944,12 +964,65 @@ function initAllSquads() {
 // SQUAD SWITCHING
 // ═══════════════════════════════════════════════════════════════
 function saveCurrentNotes() {
-  squads[currentSquad].teamNote = document.getElementById('teamNote').value;
+  if (viewerMode) return; // 뷰어에서는 입력 UI가 없고 state가 원본
+  const tn = document.getElementById('teamNote');
+  if (!tn) return;
+  squads[currentSquad].teamNote = tn.value;
   const players = getPlayers();
   players.forEach(p => {
     const el = document.getElementById('pnote_' + p.id);
     if (el) squads[currentSquad].playerNotes[p.id] = el.value;
   });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VIEWER MODE
+// ═══════════════════════════════════════════════════════════════
+function renderViewerBar() {
+  const team = document.getElementById('teamName').value.trim();
+  document.getElementById('vbTitle').textContent =
+    team ? `${team} — 공유받은 전술` : '공유받은 전술';
+}
+
+function importSharedSquad() {
+  if (!confirm('공유받은 전술을 내 스쿼드로 가져올까요?\n기존 내 스쿼드는 덮어써집니다.')) return;
+  try { localStorage.setItem(LS_KEY, JSON.stringify(buildStateSnap())); } catch {}
+  location.href = location.pathname; // 해시 제거 → 편집 모드로 리로드
+}
+
+function openMySquad() {
+  location.href = location.pathname;
+}
+
+// 뷰어 모드: 지침을 읽기 전용 카드로 렌더 (입력 UI 대체)
+function renderViewerNotes() {
+  const sq = squads[currentSquad];
+  const meta = SQUAD_META[currentSquad];
+  const teamNote = (sq.teamNote || '').trim();
+  const players = getPlayers();
+  const rows = players
+    .map((p, i) => ({ p, num: i + 1, note: (sq.playerNotes[p.id] || '').trim() }))
+    .filter(r => r.note);
+  const wrap = document.getElementById('notesWrap');
+  if (!teamNote && rows.length === 0) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `
+    ${teamNote ? `
+    <div class="notes-card">
+      <div class="notes-card-title">${meta.icon} ${escHtml(meta.label)} — 전체 지침</div>
+      <div class="viewer-note-text">${escHtml(teamNote)}</div>
+    </div>` : ''}
+    ${rows.length ? `
+    <div class="notes-card">
+      <div class="notes-card-title">개별 선수 지침</div>
+      ${rows.map(r => `
+        <div class="viewer-note-row">
+          <div class="player-note-header">
+            <div class="player-note-dot" style="background:${r.p.color};"></div>
+            <span>${r.num}. ${escHtml(r.p.name)}</span>
+          </div>
+          <div class="viewer-note-text">${escHtml(r.note)}</div>
+        </div>`).join('')}
+    </div>` : ''}`;
 }
 
 // 현재 state(currentMode/currentSquad/roster/squads)를 화면 전체에 반영
@@ -968,10 +1041,11 @@ function refreshUI() {
   // Badge + note label
   const meta = SQUAD_META[currentSquad];
   const badge = document.getElementById('squadBadge');
-  badge.textContent = `${meta.icon} ${meta.label.replace(' 스쿼드','')}`;
+  badge.textContent = `${meta.icon} ${meta.label.replace(' 스쿼드','')}`
+    + (viewerMode ? ` · ${squads[currentSquad].formation}` : '');
   badge.className = `squad-badge ${currentSquad}`;
-  document.getElementById('teamNoteLabel').textContent =
-    `${meta.icon} ${meta.label} — 전체 지침`;
+  const noteLabel = document.getElementById('teamNoteLabel');
+  if (noteLabel) noteLabel.textContent = `${meta.icon} ${meta.label} — 전체 지침`; // 뷰어 모드에서는 읽기 카드로 대체되어 없음
 
   renderPlayers();
   renderNotesPanel();
@@ -1112,8 +1186,10 @@ function renderPlayers() {
     el.innerHTML = `
       <div class="player-circle" style="background:${p.color};">${i+1}</div>
       <div class="player-name">${escHtml(p.name)}</div>`;
-    el.addEventListener('dblclick', e => { e.stopPropagation(); startInlineEdit(el, p); });
-    el.addEventListener('contextmenu', e => { e.preventDefault(); e.stopPropagation(); showCtxMenu(e.clientX, e.clientY, p); });
+    if (!viewerMode) {
+      el.addEventListener('dblclick', e => { e.stopPropagation(); startInlineEdit(el, p); });
+      el.addEventListener('contextmenu', e => { e.preventDefault(); e.stopPropagation(); showCtxMenu(e.clientX, e.clientY, p); });
+    }
     f.appendChild(el);
   });
 }
@@ -1165,6 +1241,7 @@ function startInlineEdit(playerEl, player) {
 const fieldEl = document.getElementById('field');
 
 fieldEl.addEventListener('mousedown', e => {
+  if (viewerMode) return;
   if (e.button !== 0) return;
   const pe = e.target.closest('.player');
   if (!pe) return;
@@ -1189,6 +1266,7 @@ document.addEventListener('mouseup', () => {
 });
 
 fieldEl.addEventListener('touchstart', e => {
+  if (viewerMode) return;
   const pe = e.target.closest('.player');
   if (!pe) return;
   const id = Number(pe.dataset.id);
@@ -1305,6 +1383,7 @@ function updatePatternUI() {
   const pat = currentPattern();
   currentStepIdx = Math.min(currentStepIdx, pat.steps.length - 1);
   document.getElementById('patternName').value = pat.name;
+  document.getElementById('patternNameView').textContent = pat.name;
   document.getElementById('patternCounter').textContent = `${currentPatternIdx+1} / ${patterns.length}`;
   document.getElementById('stepCounter').textContent = `단계 ${currentStepIdx+1} / ${pat.steps.length}`;
 }
@@ -1632,6 +1711,7 @@ function canvasCoords(e) {
 }
 
 function beginDraw(x, y) {
+  if (viewerMode) return false;
   const b = hitBall(x, y);
   if (b) {
     stopAnimation();
@@ -1694,6 +1774,7 @@ pCanvas.addEventListener('mouseup', e => {
 
 pCanvas.addEventListener('contextmenu', e => {
   e.preventDefault();
+  if (viewerMode) return;
   const { x, y } = canvasCoords(e);
   const hit = hitArrow(x, y);
   if (hit) {
@@ -2101,6 +2182,7 @@ function saveManualTxt() {
 // NOTES PANEL
 // ═══════════════════════════════════════════════════════════════
 function renderNotesPanel() {
+  if (viewerMode) { renderViewerNotes(); return; }
   const sq = squads[currentSquad];
   document.getElementById('teamNote').value = sq.teamNote || '';
 
@@ -2558,6 +2640,7 @@ const LS_KEY = 'squad-maker-v1';
 let _saveTimer = null;
 
 function autoSave() {
+  if (viewerMode) return; // 열람자의 기존 로컬 데이터 보존
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(() => {
     try {
@@ -2593,8 +2676,10 @@ document.getElementById('teamName').addEventListener('input', autoSave);
 drawHtmlField();
 
 if (loadFromURL()) {
+  viewerMode = true;
+  document.body.classList.add('viewer-mode');
   refreshUI();
-  document.getElementById('readonlyBanner').classList.add('visible');
+  renderViewerBar();
 } else if (!loadFromLocalStorage()) {
   initAllSquads();
 }
