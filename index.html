@@ -680,11 +680,7 @@ function initAllSquads() {
     squads[type].playerNotes = {};
   });
 
-  buildFormationSelect();
-  document.getElementById('formationSelect').value = squads[currentSquad].formation;
-  renderPlayers();
-  renderNotesPanel();
-  updateAddPlayerBtn();
+  refreshUI();
   autoSave();
 }
 
@@ -700,32 +696,37 @@ function saveCurrentNotes() {
   });
 }
 
-function switchSquad(type) {
-  if (type === currentSquad) return;
-  saveCurrentNotes();
-  currentSquad = type;
+// 현재 state(currentMode/currentSquad/roster/squads)를 화면 전체에 반영
+function refreshUI() {
+  buildModePills();
+  buildFormationSelect();
+  document.getElementById('formationSelect').value = squads[currentSquad].formation;
 
-  // Update tab highlight + aria-selected
+  // Squad tab highlight + aria-selected
   document.querySelectorAll('.squad-tab').forEach(t => {
-    const isActive = t.dataset.squad === type;
+    const isActive = t.dataset.squad === currentSquad;
     t.classList.toggle('active', isActive);
     t.setAttribute('aria-selected', isActive ? 'true' : 'false');
   });
 
-  // Update badge
-  const meta = SQUAD_META[type];
+  // Badge + note label
+  const meta = SQUAD_META[currentSquad];
   const badge = document.getElementById('squadBadge');
   badge.textContent = `${meta.icon} ${meta.label.replace(' 스쿼드','')}`;
-  badge.className = `squad-badge ${type}`;
-
-  // Update note label
+  badge.className = `squad-badge ${currentSquad}`;
   document.getElementById('teamNoteLabel').textContent =
     `${meta.icon} ${meta.label} — 전체 지침`;
 
-  buildFormationSelect();
-  document.getElementById('formationSelect').value = squads[type].formation;
   renderPlayers();
   renderNotesPanel();
+  updateAddPlayerBtn();
+}
+
+function switchSquad(type) {
+  if (type === currentSquad) return;
+  saveCurrentNotes();
+  currentSquad = type;
+  refreshUI();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -859,7 +860,17 @@ function renderPlayers() {
 }
 
 function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// 복원된 외부 데이터(공유 URL·.sq 파일)도 UI 입력과 동일한 제약을 따르도록 정규화
+function sanitizeRoster(list) {
+  return (list || []).map(r => ({
+    id: Number(r.id),
+    name: String(r.name ?? '').slice(0, 12),
+    color: String(r.color ?? '#1E88E5'),
+  }));
 }
 
 function startInlineEdit(playerEl, player) {
@@ -1181,20 +1192,7 @@ function loadFromURL() {
   if (!match || !match[1]) return false;
   const state = decodeState(match[1]);
   if (!state || state.v !== 1) return false;
-  // Data-only restore — INIT block handles UI refresh
-  document.getElementById('teamName').value = state.team || '';
-  currentMode = state.mode || '9v9';
-  roster = (state.roster || []).map(r => ({ id: r.id, name: r.name, color: r.color }));
-  nextId = roster.length ? Math.max(...roster.map(r => r.id)) + 1 : 1;
-  ['basic','attack','defense'].forEach(type => {
-    const sq = state.squads?.[type];
-    if (!sq) return;
-    squads[type].formation   = sq.f   || Object.keys(MODES_CONFIG[currentMode].formations)[0];
-    squads[type].positions   = sq.pos || {};
-    squads[type].teamNote    = sq.tn  || '';
-    squads[type].playerNotes = sq.pn  || {};
-  });
-  currentSquad = state.squad || 'basic';
+  restoreState(state); // Data-only — INIT block handles UI refresh
   return true;
 }
 
@@ -1265,37 +1263,28 @@ function loadSquadFile(event) {
   reader.readAsText(file);
 }
 
-function applyState(state) {
+// 외부 데이터(공유 URL·.sq 파일·localStorage)를 state에 복원 (데이터만, UI 미갱신)
+// 잘못된 mode/formation/squad 값은 기본값으로 대체해 초기화 중단을 막는다
+function restoreState(state) {
   document.getElementById('teamName').value = state.team || '';
-  currentMode = state.mode || '9v9';
-  roster = (state.roster || []).map(r => ({ id: r.id, name: r.name, color: r.color }));
+  currentMode = MODES_CONFIG[state.mode] ? state.mode : '9v9';
+  roster = sanitizeRoster(state.roster);
   nextId = roster.length ? Math.max(...roster.map(r => r.id)) + 1 : 1;
+  const formations = MODES_CONFIG[currentMode].formations;
   ['basic','attack','defense'].forEach(type => {
     const sq = state.squads?.[type];
     if (!sq) return;
-    squads[type].formation   = sq.f   || Object.keys(MODES_CONFIG[currentMode].formations)[0];
+    squads[type].formation   = formations[sq.f] ? sq.f : Object.keys(formations)[0];
     squads[type].positions   = sq.pos || {};
     squads[type].teamNote    = sq.tn  || '';
     squads[type].playerNotes = sq.pn  || {};
   });
-  currentSquad = state.squad || 'basic';
-  // UI 업데이트
-  document.querySelectorAll('.mode-pill').forEach(b =>
-    b.classList.toggle('active', b.dataset.mode === currentMode));
-  document.querySelectorAll('.squad-tab').forEach(b =>
-    b.classList.toggle('active', b.dataset.squad === currentSquad));
-  const sqBadge = document.querySelector('.squad-badge');
-  if (sqBadge) { sqBadge.className = 'squad-badge ' + currentSquad; }
-  const SQUAD_LABELS = { basic:'기본', attack:'공격', defense:'수비' };
-  if (sqBadge) sqBadge.textContent = SQUAD_LABELS[currentSquad] + ' 스쿼드';
-  const fSelect = document.getElementById('formationSelect');
-  if (fSelect) {
-    fSelect.innerHTML = Object.keys(MODES_CONFIG[currentMode].formations)
-      .map(f => `<option value="${f}"${f === squads[currentSquad].formation ? ' selected' : ''}>${f}</option>`).join('');
-  }
-  drawHtmlField();
-  renderPlayers();
-  renderNotesPanel();
+  currentSquad = SQUAD_META[state.squad] ? state.squad : 'basic';
+}
+
+function applyState(state) {
+  restoreState(state);
+  refreshUI();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1487,27 +1476,9 @@ document.getElementById('teamName').addEventListener('input', autoSave);
 // INIT
 // ═══════════════════════════════════════════════════════════════
 drawHtmlField();
-buildModePills();
 
-const loadedFromUrl = loadFromURL();
-if (loadedFromUrl) {
-  // Restore from shared URL
-  buildModePills();
-  buildFormationSelect();
-  document.getElementById('formationSelect').value = squads[currentSquad].formation;
-  // Sync squad tab UI
-  document.querySelectorAll('.squad-tab').forEach(t =>
-    t.classList.toggle('active', t.dataset.squad === currentSquad)
-  );
-  const meta = SQUAD_META[currentSquad];
-  const badge = document.getElementById('squadBadge');
-  badge.textContent = `${meta.icon} ${meta.label.replace(' 스쿼드','')}`;
-  badge.className = `squad-badge ${currentSquad}`;
-  document.getElementById('teamNoteLabel').textContent =
-    `${meta.icon} ${meta.label} — 전체 지침`;
-  renderPlayers();
-  renderNotesPanel();
-  // Show banner
+if (loadFromURL()) {
+  refreshUI();
   document.getElementById('readonlyBanner').classList.add('visible');
 } else if (!loadFromLocalStorage()) {
   initAllSquads();
