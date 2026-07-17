@@ -364,7 +364,7 @@ h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
 
 .app-hidden { display:none !important; }
 
-/* ── 공격 패턴 모드 ── */
+/* ── 전술 패턴 모드 ── */
 #patternCanvas {
   position:absolute; top:0; left:0; width:480px; height:660px;
   border-radius:6px; box-shadow:0 8px 32px rgba(0,0,0,0.6);
@@ -513,7 +513,7 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 <!-- 앱 모드 탭 -->
 <div class="app-tabs" role="tablist" aria-label="앱 모드 선택">
   <button class="app-tab active" role="tab" aria-selected="true"  data-app="squad"    onclick="setAppMode('squad')">⚽ 스쿼드</button>
-  <button class="app-tab"        role="tab" aria-selected="false" data-app="pattern"  onclick="setAppMode('pattern')">🎯 공격 패턴</button>
+  <button class="app-tab"        role="tab" aria-selected="false" data-app="pattern"  onclick="setAppMode('pattern')">🎯 전술 패턴</button>
   <button class="app-tab"        role="tab" aria-selected="false" data-app="strategy" onclick="setAppMode('strategy')">📋 매치 전략</button>
 </div>
 
@@ -549,10 +549,10 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 <!-- 필드 -->
 <div id="fieldWrapper">
   <div id="field" role="region" aria-label="축구 필드 — 선수를 드래그해 위치를 조정하세요"></div>
-  <canvas id="patternCanvas" width="480" height="660" aria-label="공격 패턴 캔버스 — 선수를 드래그해 이동 경로를 그리세요"></canvas>
+  <canvas id="patternCanvas" width="480" height="660" aria-label="전술 패턴 캔버스 — 선수를 드래그해 이동 경로를 그리세요"></canvas>
 </div>
 
-<!-- 공격 패턴 컨트롤 -->
+<!-- 전술 패턴 컨트롤 -->
 <div id="patternUI">
   <div class="pattern-bar">
     <label for="patternName" class="sr-only">패턴 이름</label>
@@ -565,9 +565,18 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
     <button class="btn btn-blue" onclick="addPattern()"    style="padding:7px 12px;">+ 추가</button>
     <button class="btn btn-red"  onclick="deletePattern()" style="padding:7px 12px;">🗑 삭제</button>
   </div>
+  <div class="pattern-bar">
+    <div class="pattern-nav">
+      <button aria-label="이전 단계" onclick="prevStep()">◀</button>
+      <span id="stepCounter">단계 1 / 1</span>
+      <button aria-label="다음 단계" onclick="nextStep()">▶</button>
+    </div>
+    <button class="btn btn-blue" onclick="addStep()"    style="padding:7px 12px;">+ 단계</button>
+    <button class="btn btn-red"  onclick="deleteStep()" style="padding:7px 12px;">🗑 단계</button>
+  </div>
   <div class="controls">
     <button class="btn btn-green"  id="playBtn"   onclick="togglePlay()">▶ 미리보기</button>
-    <button class="btn btn-slate"  onclick="clearCurrentPattern()">↺ 경로 초기화</button>
+    <button class="btn btn-slate"  onclick="clearCurrentStep()">↺ 단계 초기화</button>
     <button class="btn btn-amber"  id="gifBtn"    onclick="exportGif(false)">🎞 GIF 저장</button>
     <button class="btn btn-purple" id="gifAllBtn" onclick="exportGif(true)">📋 전체 패턴 GIF</button>
   </div>
@@ -794,18 +803,26 @@ function getPlayers() {
 // 앱 모드: 'squad' | 'pattern' | 'strategy'
 let appMode = 'squad';
 
-// 공격 패턴 — moves: { rosterId: {toX, toY} }, 시작 위치는 현재 스쿼드 배치에서 실시간 참조
-let patterns = [{ name: '패턴 1', moves: {} }];
+// 전술 패턴 — 다단계(step) 시퀀스. 각 단계는 선수 이동 묶음 + 공 이동(선택).
+// 단계 N의 시작 위치 = 단계 N-1 종료 위치(누적), 1단계 시작은 현재 스쿼드 배치.
+const BALL_START = { x: 240, y: 330 };
+function newStep() { return { moves: {}, ball: null }; }
+function newPattern(name) { return { name, ballStart: { ...BALL_START }, steps: [newStep()] }; }
+
+let patterns = [newPattern('패턴 1')];
 let currentPatternIdx = 0;
+let currentStepIdx = 0;
 
 // 패턴 애니메이션 / 경로 드로잉
 const PLAYER_R = 22;
-const ANIM_MS = 2200;
-let animRaf = null, animStart = null, isPlaying = false;
-let drawState = null; // { playerId, fromX, fromY, curX, curY }
+const BALL_R = 9;
+const STEP_MS = 1800;   // 단계당 재생 시간
+const STEP_GAP = 400;   // 단계 사이 정지 시간
+let animRaf = null, animStart = null, animStep = 0, isPlaying = false;
+let drawState = null; // { kind: 'player'|'ball', playerId?, fromX, fromY, curX, curY }
 
 // ═══════════════════════════════════════════════════════════════
-// APP MODE (스쿼드 / 공격 패턴 / 매치 전략)
+// APP MODE (스쿼드 / 전술 패턴 / 매치 전략)
 // ═══════════════════════════════════════════════════════════════
 function setAppMode(mode) {
   if (mode === appMode) return;
@@ -829,7 +846,7 @@ function setAppMode(mode) {
   const hint = document.getElementById('hintText');
   hint.style.display = mode === 'strategy' ? 'none' : '';
   hint.innerHTML = mode === 'pattern'
-    ? '선수 클릭-드래그: 이동 경로 설정 &nbsp;|&nbsp; 우클릭 화살표: 경로 삭제'
+    ? '선수·공 드래그: 이동 경로 &nbsp;|&nbsp; 공 살짝 끌기: 시작 위치 &nbsp;|&nbsp; 우클릭 화살표: 삭제'
     : '드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제';
 
   if (mode === 'pattern') {
@@ -914,8 +931,9 @@ function initAllSquads() {
   });
 
   // 인원수가 바뀌면 명단이 재구성되므로 패턴도 초기화
-  patterns = [{ name: '패턴 1', moves: {} }];
+  patterns = [newPattern('패턴 1')];
   currentPatternIdx = 0;
+  currentStepIdx = 0;
 
   refreshUI();
   autoSave();
@@ -1238,7 +1256,7 @@ function ctxRemove() {
     delete squads[type].positions[id];
     delete squads[type].playerNotes[id];
   });
-  patterns.forEach(pt => { delete pt.moves[id]; });
+  patterns.forEach(pt => pt.steps.forEach(st => { delete st.moves[id]; }));
   renderPlayers(); renderNotesPanel(); hideCtxMenu();
 }
 
@@ -1267,18 +1285,23 @@ function saveImage() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ATTACK PATTERNS — 관리
+// TACTICAL PATTERNS — 패턴/단계 관리
 // ═══════════════════════════════════════════════════════════════
 function currentPattern() { return patterns[currentPatternIdx]; }
+function currentStep() { return currentPattern().steps[currentStepIdx]; }
 
 function updatePatternUI() {
-  document.getElementById('patternName').value = currentPattern().name;
+  const pat = currentPattern();
+  currentStepIdx = Math.min(currentStepIdx, pat.steps.length - 1);
+  document.getElementById('patternName').value = pat.name;
   document.getElementById('patternCounter').textContent = `${currentPatternIdx+1} / ${patterns.length}`;
+  document.getElementById('stepCounter').textContent = `단계 ${currentStepIdx+1} / ${pat.steps.length}`;
 }
 
 function addPattern() {
-  patterns.push({ name: `패턴 ${patterns.length+1}`, moves: {} });
+  patterns.push(newPattern(`패턴 ${patterns.length+1}`));
   currentPatternIdx = patterns.length - 1;
+  currentStepIdx = 0;
   stopAnimation(); updatePatternUI(); renderPatternFrame(0); autoSave();
 }
 
@@ -1286,16 +1309,19 @@ function deletePattern() {
   if (patterns.length === 1) { showToast('패턴이 1개이면 삭제할 수 없습니다.'); return; }
   patterns.splice(currentPatternIdx, 1);
   currentPatternIdx = Math.min(currentPatternIdx, patterns.length-1);
+  currentStepIdx = 0;
   stopAnimation(); updatePatternUI(); renderPatternFrame(0); autoSave();
 }
 
 function prevPattern() {
   currentPatternIdx = (currentPatternIdx - 1 + patterns.length) % patterns.length;
+  currentStepIdx = 0;
   stopAnimation(); updatePatternUI(); renderPatternFrame(0);
 }
 
 function nextPattern() {
   currentPatternIdx = (currentPatternIdx + 1) % patterns.length;
+  currentStepIdx = 0;
   stopAnimation(); updatePatternUI(); renderPatternFrame(0);
 }
 
@@ -1305,9 +1331,59 @@ function renameCurrentPattern() {
   updatePatternUI(); autoSave();
 }
 
-function clearCurrentPattern() {
-  currentPattern().moves = {};
+function addStep() {
+  const pat = currentPattern();
+  pat.steps.push(newStep());
+  currentStepIdx = pat.steps.length - 1;
+  stopAnimation(); updatePatternUI(); renderPatternFrame(0); autoSave();
+}
+
+function deleteStep() {
+  const pat = currentPattern();
+  if (pat.steps.length === 1) { showToast('단계가 1개이면 삭제할 수 없습니다.'); return; }
+  pat.steps.splice(currentStepIdx, 1);
+  currentStepIdx = Math.min(currentStepIdx, pat.steps.length - 1);
+  stopAnimation(); updatePatternUI(); renderPatternFrame(0); autoSave();
+}
+
+function prevStep() {
+  const n = currentPattern().steps.length;
+  currentStepIdx = (currentStepIdx - 1 + n) % n;
+  stopAnimation(); updatePatternUI(); renderPatternFrame(0);
+}
+
+function nextStep() {
+  const n = currentPattern().steps.length;
+  currentStepIdx = (currentStepIdx + 1) % n;
+  stopAnimation(); updatePatternUI(); renderPatternFrame(0);
+}
+
+function clearCurrentStep() {
+  currentStep().moves = {};
+  currentStep().ball = null;
   stopAnimation(); renderPatternFrame(0); autoSave();
+}
+
+// 단계 [0, uptoStep) 적용 후의 선수 위치 (1단계 시작 = 현재 스쿼드 배치)
+function positionsAfter(pat, uptoStep) {
+  const pos = {};
+  getPlayers().forEach(p => { pos[p.id] = { x: p.x, y: p.y }; });
+  for (let s = 0; s < uptoStep && s < pat.steps.length; s++) {
+    Object.entries(pat.steps[s].moves).forEach(([id, mv]) => {
+      if (pos[id]) pos[id] = { x: mv.toX, y: mv.toY };
+    });
+  }
+  return pos;
+}
+
+// 단계 [0, uptoStep) 적용 후의 공 위치
+function ballPosAfter(pat, uptoStep) {
+  let b = { x: pat.ballStart.x, y: pat.ballStart.y };
+  for (let s = 0; s < uptoStep && s < pat.steps.length; s++) {
+    const mv = pat.steps[s].ball;
+    if (mv) b = { x: mv.toX, y: mv.toY };
+  }
+  return b;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1377,55 +1453,141 @@ function canvasArrow(ctx, fx, fy, tx, ty, color, alpha) {
   ctx.restore();
 }
 
+function canvasBall(ctx, x, y) {
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.55)';
+  ctx.shadowBlur = 6;
+  ctx.beginPath(); ctx.arc(x, y, BALL_R, 0, Math.PI*2);
+  ctx.fillStyle = 'white'; ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = '#111'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2);
+  ctx.fillStyle = '#111'; ctx.fill();
+  ctx.restore();
+}
+
+function canvasLabel(ctx, text) {
+  ctx.save();
+  ctx.font = 'bold 13px Segoe UI, sans-serif';
+  const w = ctx.measureText(text).width + 18;
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.beginPath();
+  ctx.roundRect(10, 10, w, 28, 6);
+  ctx.fill();
+  ctx.fillStyle = 'white';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, 19, 24);
+  ctx.restore();
+}
+
 function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
 
-function renderPatternFrame(t, patIdx) {
-  const pIdx = (patIdx !== undefined) ? patIdx : currentPatternIdx;
-  const pat = patterns[pIdx];
+// 한 단계를 진행도 t(0~1)로 렌더링. 시작 위치는 이전 단계들의 누적 종료 위치.
+function renderStepFrame(ctx, pat, stepIdx, t, label) {
+  canvasField(ctx);
+  if (!pat) return;
+
+  const base = positionsAfter(pat, stepIdx);
+  const ballBase = ballPosAfter(pat, stepIdx);
+  const step = pat.steps[stepIdx] || newStep();
   const players = getPlayers();
-  canvasField(pCtx);
 
   const arrowAlpha = Math.max(0, 1 - t * 2);
   const et = easeInOut(Math.min(t, 1));
 
-  if (pat) {
-    Object.entries(pat.moves).forEach(([id, move]) => {
-      const p = players.find(p => p.id == id);
-      if (!p) return;
-      canvasArrow(pCtx, p.x, p.y, move.toX, move.toY, '#facc15', arrowAlpha);
-    });
-    if (drawState) {
-      canvasArrow(pCtx, drawState.fromX, drawState.fromY, drawState.curX, drawState.curY, '#facc15', 0.7);
-    }
+  Object.entries(step.moves).forEach(([id, move]) => {
+    const from = base[id];
+    if (!from) return;
+    canvasArrow(ctx, from.x, from.y, move.toX, move.toY, '#facc15', arrowAlpha);
+  });
+  if (step.ball) {
+    canvasArrow(ctx, ballBase.x, ballBase.y, step.ball.toX, step.ball.toY, '#fb923c', arrowAlpha);
   }
 
   players.forEach((p, i) => {
-    const move = pat?.moves[p.id];
-    const x = move ? p.x + (move.toX - p.x) * et : p.x;
-    const y = move ? p.y + (move.toY - p.y) * et : p.y;
-    canvasPlayer(pCtx, p.color, p.name, i+1, x, y);
+    const from = base[p.id] || { x: p.x, y: p.y };
+    const move = step.moves[p.id];
+    const x = move ? from.x + (move.toX - from.x) * et : from.x;
+    const y = move ? from.y + (move.toY - from.y) * et : from.y;
+    canvasPlayer(ctx, p.color, p.name, i+1, x, y);
   });
+
+  const bx = step.ball ? ballBase.x + (step.ball.toX - ballBase.x) * et : ballBase.x;
+  const by = step.ball ? ballBase.y + (step.ball.toY - ballBase.y) * et : ballBase.y;
+  canvasBall(ctx, bx, by);
+
+  if (label) canvasLabel(ctx, label);
+}
+
+// 에디터/기존 호출부용 래퍼 — 현재 패턴·단계를 그린다
+function renderPatternFrame(t) {
+  const pat = currentPattern();
+  const label = pat.steps.length > 1 ? `단계 ${currentStepIdx+1}/${pat.steps.length}` : null;
+  renderStepFrame(pCtx, pat, currentStepIdx, t || 0, label);
+  if (drawState) {
+    canvasArrow(pCtx, drawState.fromX, drawState.fromY, drawState.curX, drawState.curY,
+      drawState.kind === 'ball' ? '#fb923c' : '#facc15', 0.7);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
 // ATTACK PATTERNS — 경로 드로잉 인터랙션
 // ═══════════════════════════════════════════════════════════════
+// 현재 단계 기준(누적 위치) 히트 테스트
 function hitPlayer(x, y) {
-  return getPlayers().find(p => Math.hypot(x - p.x, y - p.y) <= PLAYER_R + 4);
+  const base = positionsAfter(currentPattern(), currentStepIdx);
+  const p = getPlayers().find(p => {
+    const pos = base[p.id];
+    return pos && Math.hypot(x - pos.x, y - pos.y) <= PLAYER_R + 4;
+  });
+  if (!p) return null;
+  const pos = base[p.id];
+  return { id: p.id, x: pos.x, y: pos.y };
 }
 
+function hitBall(x, y) {
+  const b = ballPosAfter(currentPattern(), currentStepIdx);
+  return Math.hypot(x - b.x, y - b.y) <= BALL_R + 6 ? b : null;
+}
+
+// 반환: { type:'player', id } | { type:'ball' } | null
 function hitArrow(x, y) {
   const pat = currentPattern();
-  const players = getPlayers();
-  for (const [id, move] of Object.entries(pat.moves)) {
-    const p = players.find(p => p.id == id);
-    if (!p) continue;
-    const mx = (p.x + move.toX) / 2;
-    const my = (p.y + move.toY) / 2;
-    if (Math.hypot(x - mx, y - my) < 16) return Number(id);
-    if (Math.hypot(x - move.toX, y - move.toY) < 16) return Number(id);
+  const step = currentStep();
+  const base = positionsAfter(pat, currentStepIdx);
+  for (const [id, move] of Object.entries(step.moves)) {
+    const from = base[id];
+    if (!from) continue;
+    const mx = (from.x + move.toX) / 2;
+    const my = (from.y + move.toY) / 2;
+    if (Math.hypot(x - mx, y - my) < 16 || Math.hypot(x - move.toX, y - move.toY) < 16)
+      return { type: 'player', id: Number(id) };
+  }
+  if (step.ball) {
+    const b = ballPosAfter(pat, currentStepIdx);
+    const mx = (b.x + step.ball.toX) / 2;
+    const my = (b.y + step.ball.toY) / 2;
+    if (Math.hypot(x - mx, y - my) < 16 || Math.hypot(x - step.ball.toX, y - step.ball.toY) < 16)
+      return { type: 'ball' };
   }
   return null;
+}
+
+// 공 화살표 끝점이 선수 위면 그 선수의 단계 종료 위치로 스냅 (침투 선수에게 패스)
+function snapBallTarget(x, y) {
+  const pat = currentPattern();
+  const step = currentStep();
+  const base = positionsAfter(pat, currentStepIdx);
+  for (const p of getPlayers()) {
+    const from = base[p.id];
+    if (!from) continue;
+    const end = step.moves[p.id] ? { x: step.moves[p.id].toX, y: step.moves[p.id].toY } : from;
+    if (Math.hypot(x - end.x, y - end.y) <= PLAYER_R) return { toX: end.x, toY: end.y };
+  }
+  return {
+    toX: Math.max(5, Math.min(FIELD_W-5, x)),
+    toY: Math.max(5, Math.min(FIELD_H-5, y)),
+  };
 }
 
 function canvasCoords(e) {
@@ -1436,15 +1598,51 @@ function canvasCoords(e) {
   return { x: (src.clientX - rect.left) * scaleX, y: (src.clientY - rect.top) * scaleY };
 }
 
-pCanvas.addEventListener('mousedown', e => {
-  if (e.button === 2) return; // 우클릭은 contextmenu에서 처리
-  const { x, y } = canvasCoords(e);
+function beginDraw(x, y) {
+  const b = hitBall(x, y);
+  if (b) {
+    stopAnimation();
+    drawState = { kind: 'ball', fromX: b.x, fromY: b.y, curX: x, curY: y };
+    return true;
+  }
   const p = hitPlayer(x, y);
   if (p) {
     stopAnimation();
-    drawState = { playerId: p.id, fromX: p.x, fromY: p.y, curX: x, curY: y };
-    e.preventDefault();
+    drawState = { kind: 'player', playerId: p.id, fromX: p.x, fromY: p.y, curX: x, curY: y };
+    return true;
   }
+  return false;
+}
+
+function endDraw(x, y) {
+  if (!drawState) return;
+  const dist = Math.hypot(x - drawState.fromX, y - drawState.fromY);
+  if (drawState.kind === 'ball') {
+    if (dist > 15) {
+      currentStep().ball = snapBallTarget(x, y);
+    } else {
+      // 살짝 끌면 공 시작 위치만 재배치
+      currentPattern().ballStart = {
+        x: Math.max(5, Math.min(FIELD_W-5, x)),
+        y: Math.max(5, Math.min(FIELD_H-5, y)),
+      };
+    }
+    autoSave();
+  } else if (dist > 15) {
+    currentStep().moves[drawState.playerId] = {
+      toX: Math.max(5, Math.min(FIELD_W-5, x)),
+      toY: Math.max(5, Math.min(FIELD_H-5, y)),
+    };
+    autoSave();
+  }
+  drawState = null;
+  renderPatternFrame(0);
+}
+
+pCanvas.addEventListener('mousedown', e => {
+  if (e.button === 2) return; // 우클릭은 contextmenu에서 처리
+  const { x, y } = canvasCoords(e);
+  if (beginDraw(x, y)) e.preventDefault();
 });
 
 pCanvas.addEventListener('mousemove', e => {
@@ -1458,24 +1656,16 @@ pCanvas.addEventListener('mousemove', e => {
 pCanvas.addEventListener('mouseup', e => {
   if (!drawState) return;
   const { x, y } = canvasCoords(e);
-  const dist = Math.hypot(x - drawState.fromX, y - drawState.fromY);
-  if (dist > 15) {
-    currentPattern().moves[drawState.playerId] = {
-      toX: Math.max(5, Math.min(FIELD_W-5, x)),
-      toY: Math.max(5, Math.min(FIELD_H-5, y)),
-    };
-    autoSave();
-  }
-  drawState = null;
-  renderPatternFrame(0);
+  endDraw(x, y);
 });
 
 pCanvas.addEventListener('contextmenu', e => {
   e.preventDefault();
   const { x, y } = canvasCoords(e);
-  const id = hitArrow(x, y);
-  if (id !== null) {
-    delete currentPattern().moves[id];
+  const hit = hitArrow(x, y);
+  if (hit) {
+    if (hit.type === 'ball') currentStep().ball = null;
+    else delete currentStep().moves[hit.id];
     renderPatternFrame(0);
     autoSave();
   }
@@ -1483,12 +1673,7 @@ pCanvas.addEventListener('contextmenu', e => {
 
 pCanvas.addEventListener('touchstart', e => {
   const { x, y } = canvasCoords(e);
-  const p = hitPlayer(x, y);
-  if (p) {
-    stopAnimation();
-    drawState = { playerId: p.id, fromX: p.x, fromY: p.y, curX: x, curY: y };
-    e.preventDefault();
-  }
+  if (beginDraw(x, y)) e.preventDefault();
 }, { passive: false });
 
 pCanvas.addEventListener('touchmove', e => {
@@ -1503,16 +1688,7 @@ pCanvas.addEventListener('touchmove', e => {
 pCanvas.addEventListener('touchend', e => {
   if (!drawState) return;
   const { x, y } = canvasCoords({ touches: e.changedTouches });
-  const dist = Math.hypot(x - drawState.fromX, y - drawState.fromY);
-  if (dist > 15) {
-    currentPattern().moves[drawState.playerId] = {
-      toX: Math.max(5, Math.min(FIELD_W-5, x)),
-      toY: Math.max(5, Math.min(FIELD_H-5, y)),
-    };
-    autoSave();
-  }
-  drawState = null;
-  renderPatternFrame(0);
+  endDraw(x, y);
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -1525,6 +1701,7 @@ function togglePlay() {
 function startAnimation() {
   isPlaying = true;
   animStart = null;
+  animStep = 0;
   document.getElementById('playBtn').textContent = '⏸ 일시정지';
   animRaf = requestAnimationFrame(animTick);
 }
@@ -1536,16 +1713,27 @@ function stopAnimation() {
   if (appMode === 'pattern') renderPatternFrame(0);
 }
 
+// 단계를 순서대로 재생: 단계당 STEP_MS, 사이 STEP_GAP 정지, 전체 후 1초 유지 → 루프
 function animTick(ts) {
   if (!animStart) animStart = ts;
-  const t = (ts - animStart) / ANIM_MS;
-  renderPatternFrame(Math.min(t, 1));
+  const pat = currentPattern();
+  const t = (ts - animStart) / STEP_MS;
+  const label = pat.steps.length > 1 ? `단계 ${animStep+1}/${pat.steps.length}` : null;
+  renderStepFrame(pCtx, pat, animStep, Math.min(t, 1), label);
   if (t < 1) {
     animRaf = requestAnimationFrame(animTick);
-  } else {
-    // 끝 상태 1초 유지 후 루프
+  } else if (animStep < pat.steps.length - 1) {
     setTimeout(() => {
       if (isPlaying) {
+        animStep++;
+        animStart = null;
+        animRaf = requestAnimationFrame(animTick);
+      }
+    }, STEP_GAP);
+  } else {
+    setTimeout(() => {
+      if (isPlaying) {
+        animStep = 0;
         animStart = null;
         animRaf = requestAnimationFrame(animTick);
       }
@@ -1558,9 +1746,8 @@ function animTick(ts) {
 // ═══════════════════════════════════════════════════════════════
 async function exportGif(allPatterns) {
   stopAnimation();
-  const players = getPlayers();
   const patsToExport = allPatterns ? patterns : [currentPattern()];
-  const filename = allPatterns ? '전체패턴' : (currentPattern().name || '공격패턴');
+  const filename = allPatterns ? '전체패턴' : (currentPattern().name || '전술패턴');
 
   const prog = document.getElementById('gifProgress');
   prog.classList.add('visible');
@@ -1588,61 +1775,37 @@ async function exportGif(allPatterns) {
   off.width = FIELD_W; off.height = FIELD_H;
   const offCtx = off.getContext('2d');
 
-  const FRAMES = 36;
-  const HOLD_FRAMES = 10;
-  const FRAME_DELAY = 55;   // ms/frame ≈ 18fps
+  const FRAMES = 30;        // 단계당 프레임 수
+  const HOLD_FRAMES = 8;
+  const FRAME_DELAY = 60;   // ms/frame ≈ 17fps
   const HOLD_DELAY = 120;
 
-  const totalFrames = patsToExport.length * (FRAMES + HOLD_FRAMES);
+  const totalSteps = patsToExport.reduce((n, p) => n + p.steps.length, 0);
+  const totalFrames = totalSteps * (FRAMES + HOLD_FRAMES);
   let doneFrames = 0;
 
-  function renderOffscreen(t, patIdx) {
-    canvasField(offCtx);
-    const pat = patsToExport[patIdx];
-    const et = easeInOut(Math.min(t, 1));
-    const arrowAlpha = Math.max(0, 1 - t * 2);
-
-    if (pat) {
-      Object.entries(pat.moves).forEach(([id, move]) => {
-        const p = players.find(p => p.id == id);
-        if (!p) return;
-        canvasArrow(offCtx, p.x, p.y, move.toX, move.toY, '#facc15', arrowAlpha);
-      });
-    }
-    players.forEach((p, i) => {
-      const move = pat?.moves[p.id];
-      const x = move ? p.x + (move.toX - p.x) * et : p.x;
-      const y = move ? p.y + (move.toY - p.y) * et : p.y;
-      canvasPlayer(offCtx, p.color, p.name, i+1, x, y);
-    });
-
-    if (allPatterns && pat) {
-      offCtx.save();
-      offCtx.fillStyle = 'rgba(0,0,0,0.5)';
-      offCtx.beginPath();
-      offCtx.roundRect(10, 10, 140, 28, 6);
-      offCtx.fill();
-      offCtx.fillStyle = 'white';
-      offCtx.font = 'bold 13px Segoe UI, sans-serif';
-      offCtx.textAlign = 'left';
-      offCtx.textBaseline = 'middle';
-      offCtx.fillText(pat.name, 18, 24);
-      offCtx.restore();
-    }
+  function stepLabel(pat, si) {
+    if (allPatterns) return `${pat.name} — ${si+1}/${pat.steps.length}`;
+    return pat.steps.length > 1 ? `단계 ${si+1}/${pat.steps.length}` : null;
   }
 
   for (let pi = 0; pi < patsToExport.length; pi++) {
-    for (let f = 0; f <= FRAMES; f++) {
-      renderOffscreen(f / FRAMES, pi);
-      gif.addFrame(offCtx, { delay: FRAME_DELAY, copy: true });
-      doneFrames++;
-      setProgress(doneFrames / totalFrames * 0.7, `패턴 ${pi+1}/${patsToExport.length} 렌더링 중...`);
-      await new Promise(r => setTimeout(r, 0)); // 브라우저에 양보
-    }
-    for (let f = 0; f < HOLD_FRAMES; f++) {
-      renderOffscreen(1, pi);
-      gif.addFrame(offCtx, { delay: HOLD_DELAY, copy: true });
-      doneFrames++;
+    const pat = patsToExport[pi];
+    for (let si = 0; si < pat.steps.length; si++) {
+      const label = stepLabel(pat, si);
+      for (let f = 0; f <= FRAMES; f++) {
+        renderStepFrame(offCtx, pat, si, f / FRAMES, label);
+        gif.addFrame(offCtx, { delay: FRAME_DELAY, copy: true });
+        doneFrames++;
+        setProgress(doneFrames / totalFrames * 0.7,
+          `패턴 ${pi+1}/${patsToExport.length} · 단계 ${si+1}/${pat.steps.length} 렌더링 중...`);
+        await new Promise(r => setTimeout(r, 0)); // 브라우저에 양보
+      }
+      for (let f = 0; f < HOLD_FRAMES; f++) {
+        renderStepFrame(offCtx, pat, si, 1, label);
+        gif.addFrame(offCtx, { delay: HOLD_DELAY, copy: true });
+        doneFrames++;
+      }
     }
   }
 
@@ -1675,6 +1838,10 @@ function classifyPlayer(p) {
   return '공격';
 }
 
+function hasAnyMove(pat) {
+  return pat.steps.some(st => Object.keys(st.moves).length > 0 || st.ball);
+}
+
 function refreshSquadSummary() {
   const players = getPlayers();
   const formation = squads[currentSquad].formation;
@@ -1685,7 +1852,7 @@ function refreshSquadSummary() {
   const roleCounts = { GK: 0, 수비: 0, 미드필더: 0, 공격: 0 };
   players.forEach(p => roleCounts[classifyPlayer(p)]++);
 
-  const activePats = patterns.filter(pt => Object.keys(pt.moves).length > 0);
+  const activePats = patterns.filter(hasAnyMove);
 
   el.innerHTML = `
     <div style="margin-bottom:8px;">
@@ -1693,7 +1860,7 @@ function refreshSquadSummary() {
     </div>
     <div style="font-size:0.75rem;color:#64748b;margin-bottom:6px;">
       GK ${roleCounts.GK} &nbsp;|&nbsp; 수비 ${roleCounts.수비} &nbsp;|&nbsp; 미드 ${roleCounts.미드필더} &nbsp;|&nbsp; 공격 ${roleCounts.공격}
-      &nbsp;&nbsp;·&nbsp;&nbsp; 공격패턴 ${activePats.length}개
+      &nbsp;&nbsp;·&nbsp;&nbsp; 전술패턴 ${activePats.length}개
     </div>
     <div class="player-list">
       ${players.map((p,i) => `
@@ -1745,15 +1912,19 @@ function generateManual() {
   }
 
   // ── 패턴 분석 ────────────────────────────────────────────────
-  const activePats = patterns.filter(pt => Object.keys(pt.moves).length > 0);
+  const activePats = patterns.filter(hasAnyMove);
 
-  const playerMoves = {}; // id → [{patName, dx, dy}]
+  const playerMoves = {}; // id → [{label, dx, dy}]
   activePats.forEach(pt => {
-    Object.entries(pt.moves).forEach(([id, move]) => {
-      const p = players.find(p => p.id == id);
-      if (!p) return;
-      if (!playerMoves[id]) playerMoves[id] = [];
-      playerMoves[id].push({ patName: pt.name, dx: move.toX - p.x, dy: move.toY - p.y });
+    pt.steps.forEach((st, si) => {
+      const base = positionsAfter(pt, si);
+      const label = pt.steps.length > 1 ? `${pt.name} ${si+1}단계` : pt.name;
+      Object.entries(st.moves).forEach(([id, move]) => {
+        const from = base[id];
+        if (!from) return;
+        if (!playerMoves[id]) playerMoves[id] = [];
+        playerMoves[id].push({ label, dx: move.toX - from.x, dy: move.toY - from.y });
+      });
     });
   });
 
@@ -1771,7 +1942,7 @@ function generateManual() {
   function describeMoves(id) {
     const mvs = playerMoves[id];
     if (!mvs || mvs.length === 0) return [];
-    return mvs.map(m => `[${m.patName}] ${moveDir(m.dx, m.dy)} 이동`);
+    return mvs.map(m => `[${m.label}] ${moveDir(m.dx, m.dy)} 이동`);
   }
 
   // ── 팀 전체 섹션 ─────────────────────────────────────────────
@@ -1788,7 +1959,7 @@ function generateManual() {
   ];
 
   if (activePats.length > 0) {
-    teamLines.push(`공격 패턴 ${activePats.length}가지(${activePats.map(p=>p.name).join(', ')})를 숙지한다.`);
+    teamLines.push(`전술 패턴 ${activePats.length}가지(${activePats.map(p=>p.name).join(', ')})를 숙지한다.`);
     teamLines.push('세트피스 및 빠른 전환 상황에서 해당 패턴을 우선 시도한다.');
   }
   if (notes) {
@@ -2097,13 +2268,17 @@ function buildStateSnap() {
     });
     snap.squads[type] = { f: sq.formation, pos, tn: sq.teamNote, pn: sq.playerNotes };
   });
-  snap.pat = patterns.map(pt => {
-    const m = {};
-    Object.entries(pt.moves).forEach(([id, mv]) => {
-      m[id] = { x: Math.round(mv.toX), y: Math.round(mv.toY) };
-    });
-    return { n: pt.name, m };
-  });
+  snap.pat = patterns.map(pt => ({
+    n: pt.name,
+    bs: { x: Math.round(pt.ballStart.x), y: Math.round(pt.ballStart.y) },
+    s: pt.steps.map(st => {
+      const m = {};
+      Object.entries(st.moves).forEach(([id, mv]) => {
+        m[id] = { x: Math.round(mv.toX), y: Math.round(mv.toY) };
+      });
+      return { m, b: st.ball ? { x: Math.round(st.ball.toX), y: Math.round(st.ball.toY) } : null };
+    }),
+  }));
   return snap;
 }
 
@@ -2157,24 +2332,36 @@ function restoreState(state) {
   currentSquad = SQUAD_META[state.squad] ? state.squad : 'basic';
   patterns = sanitizePatterns(state.pat);
   currentPatternIdx = 0;
+  currentStepIdx = 0;
 }
 
-// 복원된 패턴 데이터 정규화 — 이름 길이 제한, 좌표는 숫자·필드 범위로 강제
+// 복원된 패턴 데이터 정규화 — 이름 길이 제한, 좌표는 숫자·필드 범위로 강제.
+// 구형 단일 단계 형식({n, m})은 1단계 패턴으로 마이그레이션.
 function sanitizePatterns(list) {
-  const pats = (Array.isArray(list) ? list : []).map(pt => {
+  const point = o => {
+    const x = Number(o?.x), y = Number(o?.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+    return { x: Math.max(5, Math.min(FIELD_W-5, x)), y: Math.max(5, Math.min(FIELD_H-5, y)) };
+  };
+  const readStep = st => {
     const moves = {};
-    Object.entries(pt?.m || {}).forEach(([id, mv]) => {
-      const toX = Number(mv?.x), toY = Number(mv?.y);
-      if (Number.isFinite(toX) && Number.isFinite(toY)) {
-        moves[id] = {
-          toX: Math.max(5, Math.min(FIELD_W-5, toX)),
-          toY: Math.max(5, Math.min(FIELD_H-5, toY)),
-        };
-      }
+    Object.entries(st?.m || {}).forEach(([id, mv]) => {
+      const p = point(mv);
+      if (p) moves[id] = { toX: p.x, toY: p.y };
     });
-    return { name: String(pt?.n ?? '패턴').slice(0, 20), moves };
+    const b = point(st?.b);
+    return { moves, ball: b ? { toX: b.x, toY: b.y } : null };
+  };
+  const pats = (Array.isArray(list) ? list : []).map(pt => {
+    const rawSteps = Array.isArray(pt?.s) ? pt.s : (pt?.m ? [{ m: pt.m, b: null }] : []);
+    const steps = rawSteps.map(readStep);
+    return {
+      name: String(pt?.n ?? '패턴').slice(0, 20),
+      ballStart: point(pt?.bs) || { ...BALL_START },
+      steps: steps.length ? steps : [newStep()],
+    };
   });
-  return pats.length ? pats : [{ name: '패턴 1', moves: {} }];
+  return pats.length ? pats : [newPattern('패턴 1')];
 }
 
 function applyState(state) {
