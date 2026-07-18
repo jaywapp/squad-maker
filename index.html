@@ -520,6 +520,19 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 .tactic-tag.amber { background:#332a1a; color:var(--warn); }
 .tactic-tag.red   { background:#33201f; color:var(--danger); }
 
+/* ── 화살표 삭제 팝오버 ── */
+.arrow-pop {
+  position:fixed; z-index:1000;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:8px; padding:4px; box-shadow:0 8px 24px rgba(0,0,0,0.6);
+}
+.arrow-pop button {
+  background:none; border:none; color:var(--danger);
+  font-size:0.85rem; font-weight:600; cursor:pointer;
+  padding:8px 14px; border-radius:6px;
+}
+.arrow-pop button:hover { background:var(--surface2); }
+
 /* ── 커스텀 다이얼로그 ── */
 .dlg-backdrop {
   position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:2500;
@@ -566,6 +579,10 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   .mode-pills { flex-wrap: wrap; }
   /* 포메이션 바 줄바꿈 허용 */
   .formation-bar { flex-wrap: wrap; }
+  /* 터치 타깃 확보 */
+  .formation-select { min-height: 40px; }
+  .pattern-nav button { min-width: 40px; min-height: 40px; font-size: 1.05rem; }
+  .btn { min-height: 40px; }
 }
 
 </style>
@@ -911,6 +928,22 @@ let drawState = null; // { kind: 'player'|'ball', playerId?, fromX, fromY, curX,
 // ═══════════════════════════════════════════════════════════════
 // APP MODE (스쿼드 / 전술 패턴 / 매치 전략)
 // ═══════════════════════════════════════════════════════════════
+// 입력 방식(터치/마우스)에 맞춘 조작 힌트
+const isCoarsePointer = matchMedia('(pointer: coarse)').matches;
+function updateHint(mode) {
+  const hint = document.getElementById('hintText');
+  hint.style.display = mode === 'strategy' ? 'none' : '';
+  if (mode === 'pattern') {
+    hint.innerHTML = isCoarsePointer
+      ? '선수·공 드래그: 이동 경로 &nbsp;|&nbsp; 공 살짝 끌기: 시작 위치 &nbsp;|&nbsp; 화살표 탭: 삭제'
+      : '선수·공 드래그: 이동 경로 &nbsp;|&nbsp; 공 살짝 끌기: 시작 위치 &nbsp;|&nbsp; 화살표 클릭/우클릭: 삭제';
+  } else {
+    hint.innerHTML = isCoarsePointer
+      ? '드래그: 위치 이동 &nbsp;|&nbsp; 길게 누르기: 이름·색상·삭제 메뉴'
+      : '드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭: 색상·삭제';
+  }
+}
+
 function setAppMode(mode) {
   if (mode === appMode) return;
   if (appMode === 'squad') saveCurrentNotes();
@@ -933,11 +966,7 @@ function setAppMode(mode) {
   document.getElementById('patternUI').style.display     = mode === 'pattern'  ? 'flex' : 'none';
   document.getElementById('strategyUI').style.display    = mode === 'strategy' ? 'flex' : 'none';
 
-  const hint = document.getElementById('hintText');
-  hint.style.display = mode === 'strategy' ? 'none' : '';
-  hint.innerHTML = mode === 'pattern'
-    ? '선수·공 드래그: 이동 경로 &nbsp;|&nbsp; 공 살짝 끌기: 시작 위치 &nbsp;|&nbsp; 우클릭 화살표: 삭제'
-    : '드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제';
+  updateHint(mode);
 
   applyFieldScale();
 
@@ -1375,6 +1404,8 @@ document.addEventListener('mouseup', () => {
   if (dragState) { dragState.el.classList.remove('dragging'); dragState = null; autoSave(); }
 });
 
+// 롱프레스(500ms) → 컨텍스트 메뉴. iOS Safari는 터치에서 contextmenu를 발생시키지 않음.
+let lpTimer = null;
 fieldEl.addEventListener('touchstart', e => {
   if (viewerMode) return;
   const pe = e.target.closest('.player');
@@ -1384,11 +1415,22 @@ fieldEl.addEventListener('touchstart', e => {
   if (!p) return;
   const t = e.touches[0];
   dragState = { id, el: pe, sx: t.clientX, sy: t.clientY, px: p.x, py: p.y, sc: getFieldScale() };
-  pe.classList.add('dragging'); e.preventDefault();
+  pe.classList.add('dragging');
+  clearTimeout(lpTimer);
+  lpTimer = setTimeout(() => {
+    if (!dragState) return;
+    dragState.el.classList.remove('dragging');
+    const r = roster.find(r => r.id === dragState.id);
+    dragState = null;
+    if (r) showCtxMenu(t.clientX, t.clientY, r);
+  }, 500);
+  e.preventDefault();
 }, { passive: false });
 document.addEventListener('touchmove', e => {
   if (!dragState) return;
   const t = e.touches[0];
+  // 8px 이상 움직이면 드래그로 간주 → 롱프레스 취소
+  if (Math.hypot(t.clientX - dragState.sx, t.clientY - dragState.sy) > 8) clearTimeout(lpTimer);
   const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + (t.clientX - dragState.sx) / dragState.sc));
   const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + (t.clientY - dragState.sy) / dragState.sc));
   squads[currentSquad].positions[dragState.id] = { x, y };
@@ -1397,6 +1439,7 @@ document.addEventListener('touchmove', e => {
   e.preventDefault();
 }, { passive: false });
 document.addEventListener('touchend', () => {
+  clearTimeout(lpTimer);
   if (dragState) { dragState.el.classList.remove('dragging'); dragState = null; autoSave(); }
 });
 
@@ -1836,6 +1879,7 @@ function beginDraw(x, y) {
 
 function endDraw(x, y) {
   if (!drawState) return;
+  lastDrawEndAt = performance.now(); // 드로잉 직후의 click을 화살표 탭으로 오인하지 않기 위함
   const dist = Math.hypot(x - drawState.fromX, y - drawState.fromY);
   if (drawState.kind === 'ball') {
     if (dist > 15) {
@@ -1885,11 +1929,54 @@ pCanvas.addEventListener('contextmenu', e => {
   const { x, y } = canvasCoords(e);
   const hit = hitArrow(x, y);
   if (hit) {
-    if (hit.type === 'ball') currentStep().ball = null;
-    else delete currentStep().moves[hit.id];
-    renderPatternFrame(0);
-    autoSave();
+    deleteArrow(hit);
   }
+});
+
+// 화살표 탭/클릭 → 삭제 팝오버 (터치에서는 우클릭이 없으므로)
+let _arrowPop = null, lastDrawEndAt = 0;
+
+function deleteArrow(hit) {
+  if (hit.type === 'ball') currentStep().ball = null;
+  else delete currentStep().moves[hit.id];
+  renderPatternFrame(0);
+  autoSave();
+}
+
+function hideArrowPopover() {
+  if (_arrowPop) { _arrowPop.remove(); _arrowPop = null; }
+}
+
+function showArrowPopover(x, y, hit) {
+  hideArrowPopover();
+  const pop = document.createElement('div');
+  pop.className = 'arrow-pop';
+  pop.style.left = Math.min(x, innerWidth - 130) + 'px';
+  pop.style.top  = Math.min(y, innerHeight - 60) + 'px';
+  const btn = document.createElement('button');
+  btn.textContent = '경로 삭제';
+  btn.addEventListener('click', () => {
+    deleteArrow(hit);
+    hideArrowPopover();
+    showToast('경로 삭제됨');
+  });
+  pop.appendChild(btn);
+  document.body.appendChild(pop);
+  _arrowPop = pop;
+}
+
+document.addEventListener('click', e => {
+  if (_arrowPop && !_arrowPop.contains(e.target)) hideArrowPopover();
+});
+
+pCanvas.addEventListener('click', e => {
+  if (viewerMode || drawState) return;
+  if (performance.now() - lastDrawEndAt < 350) return;
+  const { x, y } = canvasCoords(e);
+  const hit = hitArrow(x, y);
+  if (!hit) return;
+  e.stopPropagation();
+  showArrowPopover(e.clientX, e.clientY, hit);
 });
 
 pCanvas.addEventListener('touchstart', e => {
@@ -2791,6 +2878,7 @@ if (loadFromURL()) {
   initAllSquads();
 }
 applyFieldScale();
+updateHint(appMode);
 </script>
 </body>
 </html>
