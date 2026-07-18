@@ -32,7 +32,7 @@
   --ink: #e8ede8;         /* 초크 화이트 */
   --ink2: #c4cdc5;
   --muted: #8fa096;
-  --faint: #5c6b61;
+  --faint: #74847a;
   --accent: #b8e986;      /* 라임 초크 */
   --accent-ink: #1a2412;
   --warn: #f0b429;
@@ -147,8 +147,8 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
   transition: background 0.15s, color 0.15s; text-align: center;
 }
 .squad-tab:not(:last-child) { border-right: 1px solid var(--border); }
-.squad-tab[data-squad="basic"].active   { background: #4d7ea8; color: white; }
-.squad-tab[data-squad="attack"].active  { background: #b9704a; color: white; }
+.squad-tab[data-squad="basic"].active   { background: #426f96; color: white; }
+.squad-tab[data-squad="attack"].active  { background: #955638; color: white; }
 .squad-tab[data-squad="defense"].active { background: #5d6fa8; color: white; }
 
 /* ── 포메이션 바 ── */
@@ -160,8 +160,8 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
   font-size: 0.78rem; font-weight: 700; padding: 4px 12px;
   border-radius: 20px; white-space: nowrap;
 }
-.squad-badge.basic   { background: #4d7ea8; color: white; }
-.squad-badge.attack  { background: #b9704a; color: white; }
+.squad-badge.basic   { background: #426f96; color: white; }
+.squad-badge.attack  { background: #955638; color: white; }
 .squad-badge.defense { background: #5d6fa8; color: white; }
 
 /* ── Field ── */
@@ -195,6 +195,8 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
   cursor:grab; user-select:none; z-index:10; touch-action:none;
 }
 .player.dragging { cursor:grabbing; z-index:50; }
+.player:focus-visible .player-circle,
+.player.selected .player-circle { outline:3px solid var(--accent); outline-offset:3px; }
 .player-circle {
   width:44px; height:44px; border-radius:50%; margin:0 auto;
   display:flex; align-items:center; justify-content:center;
@@ -414,6 +416,24 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
 
 .hint { font-size:0.72rem; color:var(--muted); }
 
+/* ── Selected player quick actions ── */
+.player-actions {
+  display:none; width:100%; max-width:480px; align-items:center; gap:8px; flex-wrap:wrap;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px;
+}
+.player-actions.visible { display:flex; }
+.player-actions-name { flex:1 1 100%; font-size:0.8rem; font-weight:700; color:var(--ink2); }
+.player-actions .btn { padding:7px 11px; }
+
+/* ── Collapsible player notes ── */
+.player-notes-card > summary {
+  list-style:none; display:flex; align-items:center; justify-content:space-between;
+  cursor:pointer; margin-bottom:10px;
+}
+.player-notes-card > summary::-webkit-details-marker { display:none; }
+.player-notes-card > summary .notes-card-title { margin-bottom:0; }
+.notes-count { font-size:0.72rem; color:var(--muted); }
+
 /* ── 앱 모드 탭 ── */
 .app-tabs {
   display:flex; width:100%; max-width:480px;
@@ -552,8 +572,14 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   background:var(--surface); border:1px solid var(--border); color:var(--ink);
   padding:8px 18px; border-radius:8px; font-size:0.82rem; font-weight:600;
   z-index:3000; pointer-events:none; opacity:0; transition:opacity 0.3s;
+  display:flex; align-items:center; gap:12px;
 }
 .toast.visible { opacity:1; }
+.toast.actionable { pointer-events:auto; }
+.toast-action {
+  border:none; background:none; color:var(--accent); cursor:pointer;
+  font:inherit; font-weight:800; text-decoration:underline; text-underline-offset:3px;
+}
 
 /* ── 접근성: 포커스 링 ── */
 :focus-visible {
@@ -583,6 +609,13 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   .formation-select { min-height: 44px; }
   .pattern-nav button { min-width: 44px; min-height: 44px; font-size: 1.05rem; }
   .btn { min-height: 44px; }
+  .player-actions { position:sticky; bottom:10px; z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.45); }
+  .player-notes-card:not([open]) { padding-bottom:6px; }
+  .player-notes-card:not([open]) > summary { margin-bottom:0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior:auto !important; transition-duration:0.01ms !important; }
 }
 
 </style>
@@ -600,9 +633,9 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 
 <!-- 앱 모드 탭 -->
 <div class="app-tabs" role="tablist" aria-label="앱 모드 선택">
-  <button class="app-tab active" role="tab" aria-selected="true"  data-app="squad"    onclick="setAppMode('squad')">스쿼드</button>
-  <button class="app-tab"        role="tab" aria-selected="false" data-app="pattern"  onclick="setAppMode('pattern')">전술 패턴</button>
-  <button class="app-tab editor-only" role="tab" aria-selected="false" data-app="strategy" onclick="setAppMode('strategy')">매치 전략</button>
+  <button class="app-tab active" role="tab" aria-selected="true"  tabindex="0"  data-app="squad"    onclick="setAppMode('squad')">스쿼드</button>
+  <button class="app-tab"        role="tab" aria-selected="false" tabindex="-1" data-app="pattern"  onclick="setAppMode('pattern')">전술 패턴</button>
+  <button class="app-tab editor-only" role="tab" aria-selected="false" tabindex="-1" data-app="strategy" onclick="setAppMode('strategy')">매치 전략</button>
 </div>
 
 <main aria-label="스쿼드 메이커">
@@ -611,9 +644,9 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 
 <!-- 스쿼드 탭 -->
 <div class="squad-tabs app-squad-only" role="tablist" aria-label="스쿼드 선택">
-  <button class="squad-tab active" role="tab" aria-selected="true"  data-squad="basic"   onclick="switchSquad('basic')">기본 스쿼드</button>
-  <button class="squad-tab"        role="tab" aria-selected="false" data-squad="attack"  onclick="switchSquad('attack')">공격 스쿼드</button>
-  <button class="squad-tab"        role="tab" aria-selected="false" data-squad="defense" onclick="switchSquad('defense')">수비 스쿼드</button>
+  <button class="squad-tab active" role="tab" aria-selected="true"  tabindex="0"  data-squad="basic"   onclick="switchSquad('basic')">기본 스쿼드</button>
+  <button class="squad-tab"        role="tab" aria-selected="false" tabindex="-1" data-squad="attack"  onclick="switchSquad('attack')">공격 스쿼드</button>
+  <button class="squad-tab"        role="tab" aria-selected="false" tabindex="-1" data-squad="defense" onclick="switchSquad('defense')">수비 스쿼드</button>
 </div>
 
 <!-- 포메이션 바 -->
@@ -631,6 +664,15 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 </div>
 
 <p class="hint editor-only" id="hintText">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제</p>
+
+<div class="player-actions editor-only" id="playerActions" role="toolbar" aria-label="선택한 선수 작업">
+  <span class="player-actions-name" id="playerActionsName"></span>
+  <button class="btn btn-slate" onclick="renameSelectedPlayer()">이름</button>
+  <button class="btn btn-slate" onclick="openSelectedPlayerMenu()">색상·더보기</button>
+  <button class="btn btn-slate" onclick="focusSelectedPlayerNote()">지침</button>
+  <button class="btn btn-red" onclick="removeSelectedPlayer()">삭제</button>
+  <button class="btn btn-slate" aria-label="선수 선택 해제" onclick="clearSelectedPlayer()">닫기</button>
+</div>
 
 </div><!-- /pane-field -->
 <div class="pane-side">
@@ -694,10 +736,13 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
       aria-labelledby="teamNoteLabel"
       oninput="saveTeamNote()"></textarea>
   </div>
-  <div class="notes-card">
-    <div class="notes-card-title">개별 선수 지침</div>
+  <details class="notes-card player-notes-card" id="playerNotesCard" open>
+    <summary>
+      <span class="notes-card-title">개별 선수 지침</span>
+      <span class="notes-count" id="playerNotesCount"></span>
+    </summary>
     <div class="player-note-list" id="playerNotes"></div>
-  </div>
+  </details>
 </div>
 
 <!-- 뷰어 전용: 선수 시점 -->
@@ -757,9 +802,10 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 </main>
 
 <!-- 선수 시점 모달 -->
-<div id="playerViewModal" role="dialog" aria-modal="true" aria-label="선수 시점 보기">
+<div id="playerViewModal" role="dialog" aria-modal="true" aria-labelledby="playerViewTitle">
   <div class="pv-box">
     <div class="pv-header">
+      <h2 class="sr-only" id="playerViewTitle">선수 시점 보기</h2>
       <div class="pv-avatar" id="pvAvatar" aria-hidden="true"></div>
       <div class="pv-header-info">
         <div class="pv-selector-wrap">
@@ -785,9 +831,9 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 </div>
 
 <!-- 공유 모달 -->
-<div id="shareModal" role="dialog" aria-modal="true" aria-label="단톡방 공유 텍스트">
+<div id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
   <div class="share-box">
-    <h3>단톡방 공유 텍스트</h3>
+    <h3 id="shareModalTitle">단톡방 공유 텍스트</h3>
     <div class="share-text" id="shareText"></div>
     <div class="share-actions">
       <button class="btn btn-green" onclick="copyShareText()">텍스트 복사</button>
@@ -944,6 +990,27 @@ function updateHint(mode) {
   }
 }
 
+function initTablistKeyboard(tablist) {
+  tablist.addEventListener('keydown', e => {
+    if (!['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) return;
+    const tabs = [...tablist.querySelectorAll('[role="tab"]')]
+      .filter(tab => getComputedStyle(tab).display !== 'none');
+    if (!tabs.length) return;
+    const current = tabs.indexOf(document.activeElement);
+    if (current < 0) return;
+    e.preventDefault();
+    let next = current;
+    if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = tabs.length - 1;
+    else if (e.key === 'ArrowRight') next = (current + 1) % tabs.length;
+    else next = (current - 1 + tabs.length) % tabs.length;
+    tabs[next].focus();
+    tabs[next].click();
+  });
+}
+
+document.querySelectorAll('[role="tablist"]').forEach(initTablistKeyboard);
+
 function setAppMode(mode) {
   if (mode === appMode) return;
   if (appMode === 'squad') saveCurrentNotes();
@@ -956,6 +1023,7 @@ function setAppMode(mode) {
     const isActive = t.dataset.app === mode;
     t.classList.toggle('active', isActive);
     t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    t.tabIndex = isActive ? 0 : -1;
   });
   document.querySelectorAll('.app-squad-only').forEach(el =>
     el.classList.toggle('app-hidden', mode !== 'squad'));
@@ -1145,6 +1213,7 @@ function refreshUI() {
     const isActive = t.dataset.squad === currentSquad;
     t.classList.toggle('active', isActive);
     t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    t.tabIndex = isActive ? 0 : -1;
   });
 
   // Badge + note label
@@ -1305,19 +1374,106 @@ function uiConfirm(msg, okLabel) {
   });
 }
 
-function showToast(msg) {
+let lastUndo = null;
+
+function captureUndo() {
+  lastUndo = {
+    state: JSON.parse(JSON.stringify(buildStateSnap())),
+    appMode,
+    patternIdx: currentPatternIdx,
+    stepIdx: currentStepIdx,
+  };
+}
+
+function restoreUndo() {
+  if (!lastUndo) return;
+  const entry = lastUndo;
+  lastUndo = null;
+  restoreState(entry.state);
+  currentPatternIdx = Math.min(entry.patternIdx, patterns.length - 1);
+  currentStepIdx = Math.min(entry.stepIdx, currentPattern().steps.length - 1);
+  refreshUI();
+  if (appMode !== entry.appMode) setAppMode(entry.appMode);
+  clearSelectedPlayer();
+  autoSave();
+  showToast('이전 상태로 복구했습니다.');
+}
+
+function showUndoToast(msg) {
+  showToast(msg, '되돌리기', restoreUndo, 5000);
+}
+
+function showToast(msg, actionLabel, action, duration = 1800) {
   let t = document.getElementById('_toast');
   if (!t) {
     t = document.createElement('div');
     t.id = '_toast';
     t.className = 'toast';
+    t.setAttribute('role', 'status');
+    t.setAttribute('aria-live', 'polite');
     document.body.appendChild(t);
   }
-  t.textContent = msg;
+  t.replaceChildren();
+  const text = document.createElement('span');
+  text.textContent = msg;
+  t.appendChild(text);
+  t.classList.toggle('actionable', Boolean(actionLabel && action));
+  if (actionLabel && action) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'toast-action';
+    btn.textContent = actionLabel;
+    btn.addEventListener('click', () => {
+      clearTimeout(t._tid);
+      t.classList.remove('visible', 'actionable');
+      action();
+    }, { once:true });
+    t.appendChild(btn);
+  }
   t.classList.add('visible');
   clearTimeout(t._tid);
-  t._tid = setTimeout(() => { t.classList.remove('visible'); }, 1800);
+  t._tid = setTimeout(() => { t.classList.remove('visible', 'actionable'); }, duration);
 }
+
+let activeModal = null;
+let inertedElements = [];
+
+function getModalFocusables(modal) {
+  return [...modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+    .filter(el => !el.disabled && getComputedStyle(el).display !== 'none');
+}
+
+function activateModal(modal, initialSelector) {
+  modal._prevFocus = document.activeElement;
+  activeModal = modal;
+  inertedElements = [...document.body.children].filter(el =>
+    el !== modal && el.id !== '_toast' && !['SCRIPT','STYLE'].includes(el.tagName));
+  inertedElements.forEach(el => { el.setAttribute('inert', ''); });
+  requestAnimationFrame(() => {
+    const initial = initialSelector ? modal.querySelector(initialSelector) : null;
+    (initial || getModalFocusables(modal)[0])?.focus();
+  });
+}
+
+function deactivateModal(modal) {
+  inertedElements.forEach(el => { el.removeAttribute('inert'); });
+  inertedElements = [];
+  activeModal = null;
+  if (modal._prevFocus && typeof modal._prevFocus.focus === 'function') modal._prevFocus.focus();
+  modal._prevFocus = null;
+}
+
+document.addEventListener('keydown', e => {
+  if (!activeModal || e.key !== 'Tab') return;
+  const focusables = getModalFocusables(activeModal);
+  if (!focusables.length) return;
+  const current = focusables.indexOf(document.activeElement);
+  const next = e.shiftKey
+    ? (current <= 0 ? focusables.length - 1 : current - 1)
+    : (current >= focusables.length - 1 ? 0 : current + 1);
+  e.preventDefault();
+  focusables[next].focus();
+}, true);
 
 // ═══════════════════════════════════════════════════════════════
 // HTML FIELD LINES
@@ -1346,19 +1502,79 @@ function renderPlayers() {
   f.querySelectorAll('.player').forEach(e => e.remove());
   getPlayers().forEach((p, i) => {
     const el = document.createElement('div');
-    el.className = 'player';
+    el.className = 'player' + (selectedPlayer?.id === p.id ? ' selected' : '');
     el.dataset.id = p.id;
+    el.tabIndex = viewerMode ? -1 : 0;
+    el.setAttribute('role', viewerMode ? 'img' : 'button');
+    el.setAttribute('aria-label', viewerMode
+      ? `${i + 1}번 ${p.name}`
+      : `${i + 1}번 ${p.name} 선수 편집`);
     el.style.left = p.x + 'px';
     el.style.top  = p.y + 'px';
     el.innerHTML = `
       <div class="player-circle" style="background:${p.color};">${i+1}</div>
       <div class="player-name">${escHtml(p.name)}</div>`;
     if (!viewerMode) {
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        selectPlayerForEdit(p.id);
+      });
+      el.addEventListener('keydown', e => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault(); e.stopPropagation();
+        selectPlayerForEdit(p.id);
+      });
       el.addEventListener('dblclick', e => { e.stopPropagation(); startInlineEdit(el, p); });
       el.addEventListener('contextmenu', e => { e.preventDefault(); e.stopPropagation(); showCtxMenu(e.clientX, e.clientY, p); });
     }
     f.appendChild(el);
   });
+}
+
+function selectPlayerForEdit(id) {
+  selectedPlayer = roster.find(r => r.id === id) || null;
+  document.querySelectorAll('.player').forEach(el =>
+    el.classList.toggle('selected', Number(el.dataset.id) === id));
+  const bar = document.getElementById('playerActions');
+  if (!selectedPlayer || !bar) return;
+  const num = roster.findIndex(r => r.id === id) + 1;
+  document.getElementById('playerActionsName').textContent = `${num}. ${selectedPlayer.name}`;
+  bar.classList.add('visible');
+}
+
+function clearSelectedPlayer() {
+  selectedPlayer = null;
+  document.querySelectorAll('.player').forEach(el => el.classList.remove('selected'));
+  document.getElementById('playerActions')?.classList.remove('visible');
+  hideCtxMenu();
+}
+
+function renameSelectedPlayer() {
+  if (!selectedPlayer) return;
+  const el = document.querySelector(`.player[data-id="${selectedPlayer.id}"]`);
+  const player = roster.find(r => r.id === selectedPlayer.id);
+  if (el && player) startInlineEdit(el, player);
+}
+
+function openSelectedPlayerMenu() {
+  if (!selectedPlayer) return;
+  const bar = document.getElementById('playerActions');
+  const rect = bar.getBoundingClientRect();
+  showCtxMenu(rect.left, rect.bottom + 4, selectedPlayer);
+}
+
+function focusSelectedPlayerNote() {
+  if (!selectedPlayer) return;
+  const card = document.getElementById('playerNotesCard');
+  if (card) card.open = true;
+  const note = document.getElementById('pnote_' + selectedPlayer.id);
+  if (!note) return;
+  note.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+  note.focus({ preventScroll:true });
+}
+
+function removeSelectedPlayer() {
+  ctxRemove();
 }
 
 function escHtml(s) {
@@ -1482,9 +1698,10 @@ document.addEventListener('touchend', () => {
 function showCtxMenu(x, y, player) {
   selectedPlayer = player;
   document.getElementById('colorPalette').innerHTML = COLORS.map(c =>
-    `<div class="swatch${c===player.color?' active':''}"
+    `<button type="button" class="swatch${c===player.color?' active':''}"
+         aria-label="선수 색상 ${c}"
          style="background:${c};${c==='#ffffff'?'border-color:var(--faint);':''}"
-         onclick="ctxColor('${c}')"></div>`
+         onclick="ctxColor('${c}')"></button>`
   ).join('');
   const m = document.getElementById('ctxMenu');
   m.style.left = Math.min(x, innerWidth-180)+'px';
@@ -1512,14 +1729,17 @@ function ctxRename() {
 function ctxRemove() {
   if (!selectedPlayer) return;
   if (roster.length <= 1) { showToast('선수가 1명 이하면 삭제할 수 없습니다.'); return; }
+  captureUndo();
   const id = selectedPlayer.id;
+  const name = selectedPlayer.name;
   roster = roster.filter(r => r.id !== id);
   ['basic','attack','defense'].forEach(type => {
     delete squads[type].positions[id];
     delete squads[type].playerNotes[id];
   });
   patterns.forEach(pt => pt.steps.forEach(st => { delete st.moves[id]; }));
-  renderPlayers(); renderNotesPanel(); hideCtxMenu();
+  clearSelectedPlayer(); renderPlayers(); renderNotesPanel(); updateAddPlayerBtn(); hideCtxMenu();
+  showUndoToast(`${name} 선수를 삭제했습니다.`);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1584,10 +1804,13 @@ function addPattern() {
 
 function deletePattern() {
   if (patterns.length === 1) { showToast('패턴이 1개이면 삭제할 수 없습니다.'); return; }
+  captureUndo();
+  const name = currentPattern().name;
   patterns.splice(currentPatternIdx, 1);
   currentPatternIdx = Math.min(currentPatternIdx, patterns.length-1);
   currentStepIdx = 0;
   stopAnimation(); updatePatternUI(); renderPatternFrame(0); autoSave();
+  showUndoToast(`${name} 패턴을 삭제했습니다.`);
 }
 
 function prevPattern() {
@@ -1618,9 +1841,12 @@ function addStep() {
 function deleteStep() {
   const pat = currentPattern();
   if (pat.steps.length === 1) { showToast('단계가 1개이면 삭제할 수 없습니다.'); return; }
+  captureUndo();
+  const deletedStep = currentStepIdx + 1;
   pat.steps.splice(currentStepIdx, 1);
   currentStepIdx = Math.min(currentStepIdx, pat.steps.length - 1);
   stopAnimation(); updatePatternUI(); renderPatternFrame(0); autoSave();
+  showUndoToast(`${deletedStep}단계를 삭제했습니다.`);
 }
 
 function prevStep() {
@@ -1636,9 +1862,16 @@ function nextStep() {
 }
 
 function clearCurrentStep() {
+  const step = currentStep();
+  if (!Object.keys(step.moves).length && !step.ball) {
+    showToast('현재 단계에 초기화할 경로가 없습니다.');
+    return;
+  }
+  captureUndo();
   currentStep().moves = {};
   currentStep().ball = null;
   stopAnimation(); renderPatternFrame(0); autoSave();
+  showUndoToast('현재 단계의 경로를 초기화했습니다.');
 }
 
 // 단계 [0, uptoStep) 적용 후의 선수 위치 (1단계 시작 = 현재 스쿼드 배치)
@@ -1974,10 +2207,12 @@ pCanvas.addEventListener('contextmenu', e => {
 let _arrowPop = null, lastDrawEndAt = 0;
 
 function deleteArrow(hit) {
+  captureUndo();
   if (hit.type === 'ball') currentStep().ball = null;
   else delete currentStep().moves[hit.id];
   renderPatternFrame(0);
   autoSave();
+  showUndoToast('경로를 삭제했습니다.');
 }
 
 function hideArrowPopover() {
@@ -1995,7 +2230,6 @@ function showArrowPopover(x, y, hit) {
   btn.addEventListener('click', () => {
     deleteArrow(hit);
     hideArrowPopover();
-    showToast('경로 삭제됨');
   });
   pop.appendChild(btn);
   document.body.appendChild(pop);
@@ -2418,6 +2652,8 @@ function renderNotesPanel() {
   document.getElementById('teamNote').value = sq.teamNote || '';
 
   const players = getPlayers();
+  const completed = players.filter(p => (sq.playerNotes[p.id] || '').trim()).length;
+  document.getElementById('playerNotesCount').textContent = `${completed}/${players.length} 작성`;
   document.getElementById('playerNotes').innerHTML = players.map((p, i) => `
     <div class="player-note-row">
       <div class="player-note-header">
@@ -2514,10 +2750,14 @@ function openShare() {
   // Generate share URL
   const url = generateShareURL();
   document.getElementById('shareUrlBox').textContent = url;
-  document.getElementById('shareModal').classList.add('visible');
+  const modal = document.getElementById('shareModal');
+  modal.classList.add('visible');
+  activateModal(modal, '.share-actions button');
 }
 function closeShare() {
-  document.getElementById('shareModal').classList.remove('visible');
+  const modal = document.getElementById('shareModal');
+  modal.classList.remove('visible');
+  deactivateModal(modal);
 }
 document.getElementById('shareModal').addEventListener('click', e => {
   if (e.target === document.getElementById('shareModal')) closeShare();
@@ -2743,10 +2983,13 @@ function openPlayerView(playerId) {
   if (!playerId && roster.length > 0) playerId = roster[0].id;
   modal.style.display = 'flex';
   renderPlayerView(playerId);
+  activateModal(modal, '#pvSelector');
 }
 
 function closePlayerView() {
-  document.getElementById('playerViewModal').style.display = 'none';
+  const modal = document.getElementById('playerViewModal');
+  modal.style.display = 'none';
+  deactivateModal(modal);
 }
 
 function onPvSelect() {
@@ -2914,6 +3157,8 @@ if (loadFromURL()) {
 } else if (!loadFromLocalStorage()) {
   initAllSquads();
 }
+const playerNotesCard = document.getElementById('playerNotesCard');
+if (playerNotesCard && matchMedia('(max-width: 500px)').matches) playerNotesCard.open = false;
 applyFieldScale();
 updateHint(appMode);
 </script>
