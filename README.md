@@ -2,6 +2,9 @@
 
 축구 포메이션을 짜고 전술 지침을 작성하며, 공격 패턴을 GIF로 만들어 팀원과 공유하는 싱글-파일 웹앱입니다.
 
+- **작성**: PC·태블릿 큰 화면에 최적화된 2패널 편집 화면 (모바일 작성도 지원)
+- **열람**: 공유 링크로 열면 모바일 친화적인 **읽기 전용 뷰어 모드**
+
 **🔗 [라이브 데모](https://jaywapp.github.io/squad-maker/)**
 
 ---
@@ -41,6 +44,7 @@
 ### 📤 공유
 - **단톡방 공유 텍스트** — 카카오톡 등에 붙여넣기 가능한 텍스트 자동 생성
 - **URL 공유** — 스쿼드 전체 상태를 URL에 인코딩해 링크로 공유
+- **뷰어 모드** — 공유 링크로 진입하면 편집 UI 없는 열람 전용 화면(스쿼드·패턴 재생·지침 확인, 열람자의 기존 로컬 데이터 보존). "내 스쿼드로 가져오기"로 명시적 저장 가능
 - **파일 저장/불러오기** — `.sq` 형식(JSON)으로 스쿼드 저장 및 복원
 
 ### 💾 자동 저장
@@ -55,15 +59,15 @@
 | 동작 | 기능 |
 |------|------|
 | 드래그 | 선수 위치 이동 |
-| 더블클릭 | 이름 수정 |
-| 우클릭 / 롱프레스 | 색상 변경 / 삭제 / 선수 시점 보기 |
+| 더블클릭 (PC) | 이름 수정 |
+| 우클릭 (PC) / 길게 누르기 (터치) | 색상 변경 / 이름 변경 / 삭제 / 선수 시점 보기 |
 | `+ 선수 추가` | 선수 추가 (모드별 최대 인원) |
 | `↺ 초기화` | 포메이션 기본 배치로 리셋 |
-| `📸 이미지 저장` | PNG 다운로드 |
-| `📤 단톡방 공유 텍스트 생성` | 전술 텍스트 + URL 공유 |
-| `👤 선수 시점 보기` | 선수별 포지션·지침 모달 |
-| `💾 파일 저장` | `.sq` 파일 다운로드 |
-| `📂 파일 불러오기` | `.sq` 파일 복원 |
+| `이미지 저장` | PNG 다운로드 |
+| `단톡방 공유 텍스트 생성` | 전술 텍스트 + URL 공유 |
+| `선수 시점 보기` | 선수별 포지션·지침 모달 |
+| `파일 저장` | `.sq` 파일 다운로드 |
+| `파일 불러오기` | `.sq` 파일 복원 |
 
 ### 전술 패턴 모드
 
@@ -72,12 +76,12 @@
 | 선수 클릭-드래그 | 현재 단계의 이동 경로 설정 |
 | 공 클릭-드래그 | 현재 단계의 공 이동(패스) 설정 |
 | 공 살짝 끌기 | 공 시작 위치 재배치 |
-| 우클릭 화살표 | 해당 경로 삭제 |
-| `◀ 단계 ▶` / `+ 단계` / `🗑 단계` | 단계 탐색·추가·삭제 |
-| `▶ 미리보기` | 전체 단계 연속 재생/일시정지 |
+| 화살표 클릭/탭 또는 우클릭 | 해당 경로 삭제 |
+| `◀ 단계 ▶` / `+ 단계` / `단계 삭제` | 단계 탐색·추가·삭제 |
+| `미리보기` | 전체 단계 연속 재생/일시정지 |
 | `↺ 단계 초기화` | 현재 단계 경로 전체 삭제 |
-| `🎞 GIF 저장` | 현재 패턴 GIF 다운로드 |
-| `📋 전체 패턴 GIF` | 모든 패턴 연속 GIF 다운로드 |
+| `GIF 저장` | 현재 패턴 GIF 다운로드 |
+| `전체 패턴 GIF` | 모든 패턴 연속 GIF 다운로드 |
 
 ---
 
@@ -127,16 +131,20 @@ xdg-open index.html    # Linux
 
 ### 아키텍처
 
-- **단일 파일 `index.html`** (~1,800줄): CSS + HTML + vanilla JS, 빌드 도구 없음
+- **단일 파일 `index.html`** (~2,700줄): CSS + HTML + vanilla JS, 빌드 도구 없음
 - **상태 모델**
   - `roster` — 전 스쿼드 공유 명단 `[{id, name(≤12자), color}]`
   - `squads[basic|attack|defense]` — `{formation, positions:{id:{x,y}}, teamNote, playerNotes:{id:text}}`
   - `patterns` — 전술 패턴 `[{name(≤20자), ballStart:{x,y}, steps:[{moves:{id:{toX,toY}}, ball:{toX,toY}|null}]}]`
     (단계 N 시작 위치 = 단계 N-1 종료 위치 누적, 1단계 시작 = 현재 스쿼드 배치)
-- **앱 모드 3개**: `squad` / `pattern` / `strategy` — `setAppMode()`가 `.app-squad-only` 클래스와 개별 요소 표시를 토글
+- **좌표계 480×660 고정** — 렌더링만 반응형: `#field`는 `transform: scale(s)`, `#patternCanvas`는 백킹 스토어를 `s×dpr`로 재설정(`applyFieldScale()`). HTML 드래그는 델타를 `dragState.sc`로 나눠 보정. PNG 캡처 시 스케일 임시 해제
+- **앱 모드 3개**: `squad` / `pattern` / `strategy` — `setAppMode()`가 `.app-squad-only`·`body.mode-*` 클래스와 개별 요소 표시를 토글
+- **뷰어 모드**: `#s=` 진입 시 `viewerMode=true` + `body.viewer-mode` — `.editor-only` 숨김/`.viewer-only` 표시, autoSave·드래그·편집 차단(열람자 localStorage 보존), `importSharedSquad()`로 명시적 가져오기
+- **레이아웃**: ≥1024px에서 `.layout` 2패널(`.pane-field` sticky 필드 최대 640px / `.pane-side` 컨트롤·지침), 미만은 세로 스택
+- **테마**: `:root` CSS 변수(전술 보드 팔레트 — `--bg/--surface/--accent(라임)/--pitch` 등), UI 라벨 이모지 없음(공유 텍스트·내보내기 이미지에는 유지), 네이티브 `alert/confirm/prompt` 금지 — `uiConfirm()`/`showToast()` 사용
 - **영속화**: localStorage(`squad-maker-v1`) · 공유 URL `#s=`(URL-safe base64) · `.sq` JSON — 모두 `buildStateSnap()`/`restoreState()` 경유, 스냅샷 버전 `v:1`
   - 복원 데이터는 반드시 `sanitizeRoster()`/`sanitizePatterns()`로 정규화 (XSS·크래시 방어). 구형 단일 화살표 패턴 `{n,m}`은 1단계 패턴으로 자동 마이그레이션
-- **외부 의존(CDN)**: html2canvas(PNG 저장, 제작자 도메인), gif.js 0.2.0 + worker(cdnjs, GIF 인코딩)
+- **외부 의존(CDN)**: html2canvas(PNG 저장, 제작자 도메인), gif.js 0.2.0 + worker(cdnjs, GIF 인코딩), Google Fonts Oswald(워드마크, swap 폴백)
 
 ### 배포
 
@@ -159,12 +167,12 @@ xdg-open index.html    # Linux
 | [#25](https://github.com/jaywapp/squad-maker/pull/25) | XSS 수정(escHtml 따옴표 이스케이프 + sanitize), 복원 로직 단일화(`restoreState`+`refreshUI`), og-image 추가 |
 | [#26](https://github.com/jaywapp/squad-maker/pull/26) | 공격 패턴 에디터·GIF·매치 전략 탭을 현 구조로 재이식 (구 feature 브랜치 3개는 이식 후 삭제) |
 | [#27](https://github.com/jaywapp/squad-maker/pull/27) | 다단계 전술 패턴 + 공 이동/패스 스냅 (설계: `docs/superpowers/specs/2026-07-18-multi-step-tactical-patterns-design.md`) |
+| (진행 중) | 반응형 UX 개편: 필드 스케일링·뷰어 모드·2패널·전술 보드 테마·터치 패리티 (설계: `docs/superpowers/specs/2026-07-18-responsive-ux-overhaul-design.md`, 계획: `docs/superpowers/plans/2026-07-18-responsive-ux-overhaul.md`) |
 
 - 브랜치 상태: **main만 유지** — feature 브랜치는 PR 스쿼시 머지 후 삭제하는 흐름
 
 ### 남은 후보 과제
 
-- [ ] 공유 URL(`#s=`)로 진입한 방문자가 조작하면 autoSave가 방문자의 기존 localStorage 스쿼드를 덮어씀 → 읽기전용 진입 시 저장 분리 필요
 - [ ] html2canvas를 제작자 개인 도메인 CDN에서 로드 중 → cdnjs + SRI로 하드닝 권장
 - [ ] 광고 삽입 계획 실행: `docs/ad-placement.md` (일부 라인 참조는 구식 — 적용 전 재확인)
 
