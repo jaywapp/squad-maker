@@ -112,7 +112,7 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
   background: var(--bg); color: white; font-size: 0.9rem; outline: none;
 }
 .team-name-input:focus { border-color: var(--accent); }
-.team-name-input::placeholder { color: var(--border); }
+.team-name-input::placeholder { color: var(--faint); }
 
 /* ── 인원수 pills ── */
 .mode-pills {
@@ -376,7 +376,7 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
 .pv-mini-dot.other { width:8px;  height:8px;  background:rgba(255,255,255,0.3); }
 .pv-mini-dot.self  { width:13px; height:13px; border:2px solid white; box-shadow:0 0 0 4px rgba(250,204,21,0.35); }
 .pv-info { flex:1; display:flex; flex-direction:column; gap:8px; }
-.pv-zone-badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.72rem; font-weight:700; background:#4d7ea8; color:var(--accent); }
+.pv-zone-badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.72rem; font-weight:700; background:#4d7ea8; color:white; }
 .pv-note-block { display:flex; flex-direction:column; gap:4px; }
 .pv-note-label { font-size:0.7rem; color:var(--faint); font-weight:600; }
 .pv-note-text  { font-size:0.8rem; color:var(--ink2); line-height:1.6; white-space:pre-wrap; }
@@ -412,7 +412,7 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
 .viewer-note-row { margin-bottom:10px; }
 .viewer-note-row:last-child { margin-bottom:0; }
 
-.hint { font-size:0.72rem; color:var(--border); }
+.hint { font-size:0.72rem; color:var(--muted); }
 
 /* ── 앱 모드 탭 ── */
 .app-tabs {
@@ -486,7 +486,7 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 
 .squad-summary { font-size:0.8rem; color:var(--muted); line-height:1.8; }
 .squad-summary .formation-badge {
-  display:inline-block; background:var(--accent); color:white;
+  display:inline-block; background:var(--accent); color:var(--accent-ink);
   padding:2px 10px; border-radius:12px; font-weight:700; font-size:0.78rem; margin-bottom:8px;
 }
 .player-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
@@ -580,9 +580,9 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   /* 포메이션 바 줄바꿈 허용 */
   .formation-bar { flex-wrap: wrap; }
   /* 터치 타깃 확보 */
-  .formation-select { min-height: 40px; }
-  .pattern-nav button { min-width: 40px; min-height: 40px; font-size: 1.05rem; }
-  .btn { min-height: 40px; }
+  .formation-select { min-height: 44px; }
+  .pattern-nav button { min-width: 44px; min-height: 44px; font-size: 1.05rem; }
+  .btn { min-height: 44px; }
 }
 
 </style>
@@ -1089,7 +1089,12 @@ function renderViewerBar() {
 function importSharedSquad() {
   uiConfirm('공유받은 전술을 내 스쿼드로 가져올까요?\n기존 내 스쿼드는 덮어써집니다.', '가져오기').then(ok => {
     if (!ok) return;
-    try { localStorage.setItem(LS_KEY, JSON.stringify(buildStateSnap())); } catch {}
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(buildStateSnap()));
+    } catch {
+      showToast('저장 실패 — 브라우저 저장소 설정을 확인해주세요');
+      return; // 저장 성공 시에만 편집 모드로 이동
+    }
     location.href = location.pathname; // 해시 제거 → 편집 모드로 리로드
   });
 }
@@ -1257,8 +1262,10 @@ function addPlayer() {
 }
 
 // 네이티브 confirm 대체 — Promise<boolean>
+// 키보드: Escape 취소, Tab 포커스 트랩, 닫힌 뒤 트리거 요소로 포커스 복귀
 function uiConfirm(msg, okLabel) {
   return new Promise(resolve => {
+    const prevFocus = document.activeElement;
     const wrap = document.createElement('div');
     wrap.className = 'dlg-backdrop';
     wrap.innerHTML = `<div class="dlg" role="alertdialog" aria-modal="true">
@@ -1267,10 +1274,31 @@ function uiConfirm(msg, okLabel) {
         <button class="btn btn-slate" data-r="0">취소</button>
         <button class="btn btn-green" data-r="1">${escHtml(okLabel || '확인')}</button>
       </div></div>`;
+    const done = result => {
+      document.removeEventListener('keydown', onKey, true);
+      wrap.remove();
+      if (prevFocus && typeof prevFocus.focus === 'function') prevFocus.focus();
+      resolve(result);
+    };
+    const onKey = e => {
+      if (e.key === 'Escape') {
+        e.preventDefault(); e.stopPropagation();
+        done(false);
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        const btns = [...wrap.querySelectorAll('button')];
+        const idx = btns.indexOf(document.activeElement);
+        const next = e.shiftKey
+          ? (idx <= 0 ? btns.length - 1 : idx - 1)
+          : (idx >= btns.length - 1 ? 0 : idx + 1);
+        btns[next].focus();
+      }
+    };
+    document.addEventListener('keydown', onKey, true);
     wrap.addEventListener('click', e => {
       const r = e.target.dataset ? e.target.dataset.r : undefined;
-      if (r !== undefined) { wrap.remove(); resolve(r === '1'); }
-      else if (e.target === wrap) { wrap.remove(); resolve(false); }
+      if (r !== undefined) done(r === '1');
+      else if (e.target === wrap) done(false);
     });
     document.body.appendChild(wrap);
     wrap.querySelector('[data-r="1"]').focus();
@@ -1339,12 +1367,17 @@ function escHtml(s) {
 }
 
 // 복원된 외부 데이터(공유 URL·.sq 파일)도 UI 입력과 동일한 제약을 따르도록 정규화
+// color는 innerHTML 인라인 style에 삽입되므로 hex 형식만 허용 (속성 탈출 XSS 방어)
+const SAFE_COLOR_RE = /^#[0-9a-fA-F]{3,8}$/;
 function sanitizeRoster(list) {
-  return (list || []).map(r => ({
-    id: Number(r.id),
-    name: String(r.name ?? '').slice(0, 12),
-    color: String(r.color ?? '#1E88E5'),
-  }));
+  return (list || []).map(r => {
+    const color = String(r.color ?? '');
+    return {
+      id: Number(r.id),
+      name: String(r.name ?? '').slice(0, 12),
+      color: SAFE_COLOR_RE.test(color) ? color : '#1E88E5',
+    };
+  });
 }
 
 function startInlineEdit(playerEl, player) {
@@ -1492,7 +1525,10 @@ function ctxRemove() {
 // ═══════════════════════════════════════════════════════════════
 // SAVE IMAGE
 // ═══════════════════════════════════════════════════════════════
+let _capturing = false; // 연속 실행 시 임시 480px 고정값이 원래 값으로 저장되는 것 방지
 function saveImage() {
+  if (_capturing) return;
+  _capturing = true;
   const teamName = document.getElementById('teamName').value.trim();
   const form     = squads[currentSquad].formation;
   const meta     = SQUAD_META[currentSquad];
@@ -1520,6 +1556,7 @@ function saveImage() {
       if (banner.parentNode) f.removeChild(banner);
       wrapper.style.maxWidth = prevMax; wrapper.style.width = prevWidth;
       applyFieldScale();
+      _capturing = false;
     });
 }
 
