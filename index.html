@@ -316,6 +316,42 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
 }
 .share-actions { display:flex; gap:8px; flex-wrap:wrap; }
 
+/* ── 출시 전 기능 미리보기 (수요 측정 — Task 0.3) ── */
+.interest-section {
+  width:100%; max-width:480px;
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  padding:10px 12px;
+  background:var(--surface); border:1px dashed var(--border); border-radius:10px;
+}
+.interest-label {
+  font-size:0.68rem; font-weight:700; color:var(--faint);
+  text-transform:uppercase; letter-spacing:0.08em;
+}
+.interest-chip {
+  border:1px solid var(--border); background:var(--surface2); color:var(--ink2);
+  border-radius:999px; padding:6px 12px; font-size:0.75rem; cursor:pointer;
+  font-family:inherit; transition:border-color 0.15s, color 0.15s;
+}
+.interest-chip:hover, .interest-chip:focus-visible { border-color:var(--accent); color:var(--accent); }
+#interestModal {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.75); z-index:2000;
+  align-items:flex-start; justify-content:center;
+  padding:20px 12px; overflow-y:auto;
+}
+#interestModal.visible { display:flex; }
+.interest-status {
+  background:var(--bg); border-left:3px solid var(--warn);
+  padding:10px 12px; border-radius:0 8px 8px 0;
+  font-size:0.78rem; color:var(--ink2); line-height:1.6;
+}
+.interest-desc { font-size:0.82rem; color:var(--ink2); line-height:1.7; }
+.interest-desc li { margin-left:18px; }
+.interest-price { font-size:0.8rem; color:var(--accent); font-weight:700; }
+.interest-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.interest-note { font-size:0.7rem; color:var(--faint); line-height:1.6; }
+.interest-note a { color:var(--accent); }
+
 /* ── 선수 시점 모달 ── */
 #playerViewModal {
   display:none; position:fixed; inset:0;
@@ -609,6 +645,7 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   .formation-select { min-height: 44px; }
   .pattern-nav button { min-width: 44px; min-height: 44px; font-size: 1.05rem; }
   .btn { min-height: 44px; }
+  .interest-chip { min-height: 44px; }
   .player-actions { position:sticky; bottom:10px; z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.45); }
   .player-notes-card:not([open]) { padding-bottom:6px; }
   .player-notes-card:not([open]) > summary { margin-bottom:0; }
@@ -717,6 +754,7 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
     <button class="btn btn-slate editor-only"  onclick="clearCurrentStep()">↺ 단계 초기화</button>
     <button class="btn btn-amber"  id="gifBtn"    onclick="exportGif(false)">GIF 저장</button>
     <button class="btn btn-purple" id="gifAllBtn" onclick="exportGif(true)">전체 패턴 GIF</button>
+    <button class="interest-chip editor-only" onclick="openInterestPreview('export', 'pattern_controls')">고급 영상 (준비 중)</button>
   </div>
 </div>
 
@@ -758,6 +796,14 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   <button class="btn btn-slate"  onclick="document.getElementById('sqFileInput').click()">파일 불러오기</button>
 </div>
 <input type="file" id="sqFileInput" accept=".sq" style="display:none" aria-hidden="true" onchange="loadSquadFile(event)">
+
+<!-- 출시 전 기능 미리보기 — 수요 측정 전용, 기존 무료 기능에 제한 없음 (Task 0.3) -->
+<div class="interest-section app-squad-only editor-only" role="group" aria-label="출시 준비 중 기능">
+  <span class="interest-label">출시 준비 중</span>
+  <button class="interest-chip" onclick="openInterestPreview('cloud', 'share_toolbar')">클라우드에 팀 저장</button>
+  <button class="interest-chip" onclick="openInterestPreview('export', 'share_toolbar')">고급 영상 내보내기</button>
+  <button class="interest-chip" onclick="openInterestPreview('briefing', 'share_toolbar')">선수별 브리핑</button>
+</div>
 
 <!-- 매치 전략 -->
 <div id="strategyUI">
@@ -847,6 +893,28 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
         <div class="share-url-box" id="shareUrlBox" onclick="this.select()"></div>
         <button class="btn btn-blue" style="white-space:nowrap;" onclick="copyShareUrl()">링크 복사</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- 출시 전 기능 미리보기 모달 -->
+<div id="interestModal" role="dialog" aria-modal="true" aria-labelledby="interestTitle">
+  <div class="share-box">
+    <h3 id="interestTitle"></h3>
+    <div class="interest-status">
+      아직 출시 전인 기능입니다. 어떤 기능부터 만들지 결정하기 위해 관심을 측정하고 있으며,
+      지금 쓰고 계신 무료 기능은 그대로 무료로 유지됩니다.
+    </div>
+    <ul class="interest-desc" id="interestDesc"></ul>
+    <div class="interest-price" id="interestPrice"></div>
+    <div class="share-divider"></div>
+    <div class="interest-note">
+      이 창을 연 클릭만 관심 신호로 집계하며, 개인정보는 수집하지 않습니다.<br>
+      더 자세한 의견을 주고 싶다면 <a id="interestMail" href="#">코치 인터뷰에 이메일로 참여</a>할 수 있습니다.
+      이메일 주소는 인터뷰 연락에만 사용하고 분석 데이터에는 포함하지 않습니다.
+    </div>
+    <div class="interest-actions">
+      <button class="btn btn-slate" onclick="closeInterestPreview()">닫기</button>
     </div>
   </div>
 </div>
@@ -2899,6 +2967,73 @@ function copyShareUrl() {
       showToast('자동 복사 실패 — 링크를 직접 선택해 복사해주세요');
     });
 }
+
+// ═══════════════════════════════════════════════════════════════
+// 출시 전 기능 미리보기 — 수요 측정 (Task 0.3)
+// 기능을 약속하지 않는다: 가치 설명 + 예상 가격 + 출시 전 상태를 정직하게 안내
+// ═══════════════════════════════════════════════════════════════
+const INTEREST_FEATURES = {
+  cloud: {
+    event: 'cloud_save_interest_clicked',
+    title: '클라우드에 팀 저장',
+    desc: [
+      '팀·전술 문서를 계정에 저장하고 PC·폰 어디서든 이어서 편집',
+      '브라우저 데이터를 지워도 전술이 보존됨',
+      '취소·만료를 관리할 수 있는 공유 링크',
+    ],
+    price: '무료 계정: 팀 1개 · 전술 문서 5개 / Pro(예상 월 6,900원): 여러 팀 · 무제한 문서',
+  },
+  export: {
+    event: 'advanced_export_previewed',
+    title: '고급 영상 내보내기',
+    desc: [
+      '고해상도 PNG · PDF 전술지',
+      '패턴 애니메이션을 고화질 영상(MP4 등)으로 저장',
+      '해상도 · 재생 속도 · 팀명/로고 브랜딩 옵션',
+    ],
+    price: 'Pro 요금제(예상 월 6,900원) 포함 기능',
+  },
+  briefing: {
+    event: 'player_briefing_previewed',
+    title: '선수별 전술 브리핑',
+    desc: [
+      '선수마다 자기 위치·지침·관련 패턴만 담긴 개인 링크 생성',
+      '선수는 가입 없이 폰에서 바로 열람',
+      '누가 확인했는지 열람 여부 표시',
+    ],
+    price: 'Pro 요금제(예상 월 6,900원) 포함 기능',
+  },
+};
+
+function openInterestPreview(key, source) {
+  const f = INTEREST_FEATURES[key];
+  if (!f) return;
+  track(f.event, { source });
+  document.getElementById('interestTitle').textContent = f.title;
+  const ul = document.getElementById('interestDesc');
+  ul.innerHTML = '';
+  f.desc.forEach(text => {
+    const li = document.createElement('li');
+    li.textContent = text;
+    ul.appendChild(li);
+  });
+  document.getElementById('interestPrice').textContent = f.price;
+  document.getElementById('interestMail').href =
+    'mailto:jaywapp16@gmail.com?subject=' + encodeURIComponent(`[스쿼드 메이커] 코치 인터뷰 참여 — ${f.title}`);
+  const modal = document.getElementById('interestModal');
+  modal.classList.add('visible');
+  activateModal(modal, '.interest-actions button');
+}
+
+function closeInterestPreview() {
+  const modal = document.getElementById('interestModal');
+  modal.classList.remove('visible');
+  deactivateModal(modal);
+}
+
+document.getElementById('interestModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('interestModal')) closeInterestPreview();
+});
 
 // ═══════════════════════════════════════════════════════════════
 // FILE SAVE / LOAD (.sq)
