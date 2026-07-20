@@ -12,6 +12,26 @@
    스냅샷 JSON, 자유 입력 텍스트 원문.
 3. **값 제한** — 속성 값은 문자열로 강제 변환 후 40자로 자른다(실수로 긴 콘텐츠가 섞이는 것 방지).
 4. `once: true` 이벤트는 페이지 로드(세션)당 1회만 전송한다.
+5. **자동 부가 필드까지 통제** — 화이트리스트는 우리가 넘기는 속성만 통제하고,
+   분석 스크립트가 스스로 붙이는 `url`·`referrer`는 통제하지 못한다.
+   `#s=` 공유 스냅샷이 URL에 들어 있으므로 전송 직전 가드로 경로만 남긴다.
+   상세는 [ADR 0001 구현 규칙](./adr/0001-analytics-provider.md) 참고.
+6. **준비 전 이벤트 보존** — 스크립트 로드 전 발생한 이벤트는 큐에 보관했다가
+   순서대로 전달한다. 조용히 폐기하지 않는다.
+
+### 전송되는 payload의 전체 모습
+
+어댑터가 넘기는 `name` + 허용 속성 외에, Umami가 다음을 자동으로 덧붙인다.
+`url`·`referrer`는 가드로 축약된 값이다.
+
+| 필드 | 값 | 비고 |
+|---|---|---|
+| `url` | `/index.html` | pathname만 — 해시·쿼리 제거 |
+| `referrer` | 출처 origin + pathname | 유입 경로 분석용 |
+| `hostname` | 배포 호스트 | |
+| `screen` / `language` | 화면 크기 / 브라우저 언어 | |
+| `title` | 고정된 문서 제목 | 콘텐츠 아님 |
+| `website` | Umami 웹사이트 ID | |
 
 ## 0단계 이벤트
 
@@ -44,6 +64,9 @@
 
 ## 검증 방법
 
-- localhost에서 앱을 열면 전송 대신 `console.debug('[analytics]', name, props)`가 출력된다.
-- 자동 검증: `tests/e2e/analytics-events.spec.js` — once 이벤트의 중복 발생 금지,
-  화이트리스트 밖 속성 폐기, 분석 비활성 상태에서 앱 정상 동작을 확인한다.
+- localhost에서 앱을 열면 `console.debug('[analytics]', name, props)`로도 출력된다.
+- **어댑터 계약**: `tests/e2e/analytics-events.spec.js` — once 이벤트 중복 금지,
+  화이트리스트 밖 속성·미등록 이벤트 폐기, 분석 비활성 시 네트워크 요청 0건.
+- **최종 전송 계약**: `tests/e2e/analytics-payload.spec.js` — 실제 Umami 스크립트를 주입해
+  `/api/send`로 나가는 본문을 검사한다. `#s=` 해시·팀명·선수명·지침이 0건이어야 하고,
+  로드 지연·실패 상황에서 큐 동작과 앱 무영향을 확인한다.

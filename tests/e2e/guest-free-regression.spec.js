@@ -1,8 +1,12 @@
 // Guest 무료 기능 회귀 계약 — 수익화 작업이 기존 무료 경험을 깨지 않는지 고정한다.
 // 계약 문서: docs/2026-07-20-monetization-implementation-plan.md §2.1, §7.1 Task 0.1
-// 주의: PNG/GIF 내보내기는 CDN(html2canvas, gif.js)을 사용하므로 네트워크가 필요하다.
+//
+// 배포 차단 테스트이므로 외부 네트워크에 의존하지 않는다. PNG/GIF가 쓰는
+// html2canvas·gif.js는 tests/vendor의 고정 버전을 route로 주입한다(실제 라이브러리가 실행됨).
+// 실제 CDN 연결 가능 여부는 tests/e2e/cdn-smoke.spec.js에서 따로 확인한다.
 const fs = require('fs');
 const { test, expect } = require('@playwright/test');
+const { stubExportCdn } = require('../helpers/stub-cdn');
 const fixture = require('../fixtures/snapshot-v1.json');
 
 const LS_KEY = 'squad-maker-v1';
@@ -24,6 +28,10 @@ function seedLocalStorage(page, snap) {
 }
 
 test.describe('Guest 무료 회귀 계약', () => {
+
+  test.beforeEach(async ({ page }) => {
+    await stubExportCdn(page);
+  });
 
   test('앱이 편집 모드로 로드되고 페이지 오류가 없다', async ({ page }) => {
     const errors = [];
