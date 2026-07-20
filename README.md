@@ -153,11 +153,16 @@ xdg-open index.html    # Linux
 
 ### 검증 방법
 
-1. 인라인 스크립트 추출 후 `node --check` 구문 검증
-2. **헤드리스 Chrome 하니스**: 테스트 페이지가 iframe으로 앱을 로드하고 단언 실행 →
-   `chrome --headless=new --virtual-time-budget=15000 --dump-dom http://localhost:<port>/test-harness.html`
-   - 주의: 앱의 최상위 `let/const`는 window 프로퍼티가 아니므로 `iframe.contentWindow.eval('...')`로 접근
-   - 하니스는 저장소에 커밋하지 않음 (실행 후 삭제)
+1. **Guest 회귀 계약 (필수)** — 수익화 작업 중 무료 기능이 깨지지 않았는지 확인하는 배포 차단 테스트:
+   ```bash
+   npm install          # 최초 1회
+   npx playwright install chromium   # 최초 1회
+   npm test             # tests/e2e/guest-free-regression.spec.js — 390px·1280px 모두 실행
+   ```
+   - 검증 범위: 편집·자동 저장, PNG/GIF 내보내기, 패턴 추가, `#s=` 공유 URL 뷰어, `.sq` 왕복, 공유 링크 열람 시 LocalStorage 보존
+   - `v:1` 스냅샷 계약 픽스처: `tests/fixtures/snapshot-v1.json`
+   - PNG/GIF 테스트는 CDN(html2canvas, gif.js)을 사용하므로 인터넷 연결 필요
+2. 인라인 스크립트 추출 후 `node --check` 구문 검증
 3. claude-in-chrome 확장이 연결되어 있으면 실브라우저 검증 우선
 
 ### 최근 작업 (모두 머지·배포됨)
