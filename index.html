@@ -921,6 +921,65 @@ const SQUAD_META = {
 };
 
 // ═══════════════════════════════════════════════════════════════
+// ANALYTICS — 개인정보 미전송 어댑터 (계약: docs/analytics-event-dictionary.md)
+// ═══════════════════════════════════════════════════════════════
+// websiteId가 비어 있으면 스크립트 로드·전송을 모두 생략한다 (기능 플래그 'analytics').
+const ANALYTICS_CFG = {
+  websiteId: '',
+  src: 'https://cloud.umami.is/script.js',
+};
+const ANALYTICS_DEV = ['localhost', '127.0.0.1'].includes(location.hostname);
+
+// 이벤트·속성 화이트리스트 — 사전에 없는 이름·키는 폐기된다
+const ANALYTICS_EVENTS = {
+  squad_started: ['mode'],
+  squad_completed: ['mode', 'patterns_used'],
+  image_exported: ['kind', 'ok'],
+  gif_exported: ['kind', 'ok'],
+  share_link_created: ['kind'],
+  share_link_opened: ['kind'],
+  cloud_save_interest_clicked: ['source'],
+  advanced_export_previewed: ['source'],
+  player_briefing_previewed: ['source'],
+};
+
+const _trackedOnce = new Set();
+let _appReady = false; // INIT 완료 후 true — 초기화 중 자동 저장을 사용자 편집으로 오인 방지
+
+function track(name, props = {}, opts = {}) {
+  const allowedKeys = ANALYTICS_EVENTS[name];
+  if (!allowedKeys) return;
+  if (opts.once) {
+    if (_trackedOnce.has(name)) return;
+    _trackedOnce.add(name);
+  }
+  const safe = {};
+  allowedKeys.forEach(k => {
+    if (props[k] !== undefined) safe[k] = String(props[k]).slice(0, 40);
+  });
+  if (ANALYTICS_DEV) console.debug('[analytics]', name, safe);
+  if (!ANALYTICS_CFG.websiteId) return;
+  try { window.umami?.track(name, safe); } catch {}
+}
+
+// 결과물 산출(이미지·GIF·공유 생성)을 squad_completed의 대리 지표로 사용
+function trackOutput() {
+  track('squad_completed', {
+    mode: currentMode,
+    patterns_used: patterns.some(hasAnyMove),
+  }, { once: true });
+}
+
+(function initAnalytics() {
+  if (!ANALYTICS_CFG.websiteId) return;
+  const s = document.createElement('script');
+  s.defer = true;
+  s.src = ANALYTICS_CFG.src;
+  s.setAttribute('data-website-id', ANALYTICS_CFG.websiteId);
+  document.head.appendChild(s);
+})();
+
+// ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
 let currentMode   = '9v9';
@@ -1770,8 +1829,10 @@ function saveImage() {
       const a = document.createElement('a');
       a.download = `${teamName||'스쿼드'}_${meta.label}_${form}.png`;
       a.href = canvas.toDataURL('image/png'); a.click();
+      track('image_exported', { kind: 'png', ok: true });
+      trackOutput();
     })
-    .catch(() => {})
+    .catch(() => { track('image_exported', { kind: 'png', ok: false }); })
     .finally(() => {
       if (banner.parentNode) f.removeChild(banner);
       wrapper.style.maxWidth = prevMax; wrapper.style.width = prevWidth;
@@ -2397,6 +2458,8 @@ async function exportGif(allPatterns) {
     prog.classList.remove('visible');
     renderPatternFrame(0);
     if (workerUrl.startsWith('blob:')) URL.revokeObjectURL(workerUrl);
+    track('gif_exported', { kind: allPatterns ? 'all' : 'single', ok: true });
+    trackOutput();
   });
 
   gif.render();
@@ -2753,6 +2816,8 @@ function openShare() {
   const modal = document.getElementById('shareModal');
   modal.classList.add('visible');
   activateModal(modal, '.share-actions button');
+  track('share_link_created', { kind: 'text' });
+  trackOutput();
 }
 function closeShare() {
   const modal = document.getElementById('shareModal');
@@ -2823,6 +2888,8 @@ function loadFromURL() {
 
 function copyShareUrl() {
   const url = generateShareURL();
+  track('share_link_created', { kind: 'public_url' });
+  trackOutput();
   navigator.clipboard.writeText(url)
     .then(() => showToast('링크 복사됨 — 공유받은 사람은 열람 화면을 보게 됩니다'))
     .catch(() => {
@@ -3115,6 +3182,7 @@ let _saveTimer = null;
 
 function autoSave() {
   if (viewerMode) return; // 열람자의 기존 로컬 데이터 보존
+  if (_appReady) track('squad_started', { mode: currentMode }, { once: true });
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(() => {
     try {
@@ -3154,6 +3222,7 @@ if (loadFromURL()) {
   document.body.classList.add('viewer-mode');
   refreshUI();
   renderViewerBar();
+  track('share_link_opened', { kind: 'public' }, { once: true });
 } else if (!loadFromLocalStorage()) {
   initAllSquads();
 }
@@ -3161,6 +3230,8 @@ const playerNotesCard = document.getElementById('playerNotesCard');
 if (playerNotesCard && matchMedia('(max-width: 500px)').matches) playerNotesCard.open = false;
 applyFieldScale();
 updateHint(appMode);
+_appReady = true; // 이후의 autoSave는 사용자 편집으로 간주
+
 </script>
 </body>
 </html>
