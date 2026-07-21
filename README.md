@@ -165,6 +165,7 @@ xdg-open index.html    # Linux
    | `analytics-events` | 이벤트 화이트리스트, once 중복 금지, 분석 비활성 시 무전송 |
    | `analytics-payload` | 실제 Umami로 나가는 최종 본문에 `#s=`·이름·지침 0건, 로드 지연·실패 시 큐 동작 |
    | `interest-previews` | 수요 측정 진입점 노출·이벤트 구분, 뷰어 모드 비노출 |
+   | `beta-ui` | 도움말·의견 창구·버전 표시, 의견 폼 폴백, 진단 정보에 개인정보 미포함 |
 
    - `v:1` 스냅샷 계약 픽스처: `tests/fixtures/snapshot-v1.json`
    - html2canvas·gif.js·Umami는 `tests/vendor`의 고정 버전을 route로 주입하고 그 외 외부

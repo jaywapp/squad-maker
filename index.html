@@ -655,11 +655,66 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   *, *::before, *::after { scroll-behavior:auto !important; transition-duration:0.01ms !important; }
 }
 
+/* ── 상단 유틸리티 바 (도움말·의견·버전) ── */
+.topbar {
+  width:100%; max-width:960px; margin:0 auto 10px;
+  display:flex; align-items:center; justify-content:flex-end; gap:8px;
+  padding:0 4px;
+}
+.topbar-btn {
+  border:1px solid var(--border); background:var(--surface); color:var(--ink2);
+  border-radius:999px; padding:6px 14px; font-size:0.78rem; cursor:pointer;
+  font-family:inherit; min-height:36px; transition:border-color 0.15s, color 0.15s;
+}
+.topbar-btn:hover, .topbar-btn:focus-visible { border-color:var(--accent); color:var(--accent); }
+.topbar-version {
+  margin-right:auto; font-size:0.7rem; color:var(--faint);
+  letter-spacing:0.04em; user-select:none;
+}
+@media (max-width:500px) {
+  .topbar-btn { min-height:40px; }
+}
+
+/* ── 도움말 모달 ── */
+#helpModal {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.75); z-index:2000;
+  align-items:flex-start; justify-content:center;
+  padding:20px 12px; overflow-y:auto;
+}
+#helpModal.visible { display:flex; }
+.help-box {
+  background:var(--surface); border:1px solid var(--border); border-radius:14px;
+  width:100%; max-width:560px; padding:22px;
+  display:flex; flex-direction:column; gap:16px;
+}
+.help-box h3 { font-size:1.05rem; font-weight:700; }
+.help-box h4 {
+  font-size:0.85rem; font-weight:700; color:var(--accent);
+  margin-bottom:4px;
+}
+.help-section { font-size:0.83rem; color:var(--ink2); line-height:1.7; }
+.help-section ol, .help-section ul { margin:4px 0 0 18px; }
+.help-section li { margin-bottom:3px; }
+.help-report {
+  background:var(--bg); border:1px solid var(--border); border-radius:10px;
+  padding:14px; display:flex; flex-direction:column; gap:8px;
+}
+.help-report p { font-size:0.8rem; color:var(--ink2); line-height:1.6; }
+.help-actions { display:flex; gap:8px; flex-wrap:wrap; }
+
 </style>
 </head>
 <body class="mode-squad">
 
 <h1 class="wordmark">SQUAD MAKER<span class="wm-sub">전술 보드</span></h1>
+
+<!-- 상단 유틸리티 바: 도움말·의견 보내기·버전 (편집·뷰어 공통) -->
+<div class="topbar" role="toolbar" aria-label="도움말 및 의견">
+  <span class="topbar-version" id="appVersion" aria-label="앱 버전"></span>
+  <button class="topbar-btn" onclick="openHelp()">도움말</button>
+  <button class="topbar-btn" onclick="openFeedback()">의견 보내기</button>
+</div>
 
 <!-- 공유 링크로 열린 경우 뷰어 바 -->
 <div id="viewerBar" role="status">
@@ -919,11 +974,71 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   </div>
 </div>
 
+<!-- 도움말 모달 -->
+<div id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="help-box">
+    <h3 id="helpTitle">스쿼드 메이커 사용 안내</h3>
+
+    <div class="help-section">
+      <h4>1. 스쿼드 짜기</h4>
+      <ol>
+        <li>위쪽 <b>스쿼드 / 전술 패턴 / 매치 전략</b> 탭에서 <b>스쿼드</b>를 고릅니다.</li>
+        <li><b>포메이션</b>을 선택하면 선수들이 기본 위치로 배치됩니다.</li>
+        <li>선수를 <b>손가락으로 끌어(드래그)</b> 원하는 자리로 옮깁니다.</li>
+        <li>이름을 바꾸려면 선수를 <b>더블클릭</b>(모바일은 <b>길게 누르기</b>) 하세요.</li>
+      </ol>
+    </div>
+
+    <div class="help-section">
+      <h4>2. 지침 적기</h4>
+      <ul>
+        <li>필드 아래 <b>전술 지침</b>에 팀 전체·선수별 메모를 적을 수 있습니다.</li>
+        <li>선수를 길게 눌러 <b>선수 시점 보기</b>를 열면 그 선수 기준으로 위치와 지침을 봅니다.</li>
+      </ul>
+    </div>
+
+    <div class="help-section">
+      <h4>3. 공유하기</h4>
+      <ul>
+        <li><b>단톡방 공유 텍스트 생성</b> — 카카오톡에 붙여넣을 수 있는 요약 + 링크를 만듭니다.</li>
+        <li>받은 사람이 링크를 열면 <b>읽기 전용 화면</b>으로 보이며, 그 사람의 데이터는 건드리지 않습니다.</li>
+      </ul>
+    </div>
+
+    <div class="help-section">
+      <h4>4. 저장</h4>
+      <ul>
+        <li>작업 내용은 <b>자동 저장</b>되어 새로고침해도 유지됩니다.</li>
+        <li><b>파일 저장</b>으로 백업(.sq 파일)을 내려받고, <b>파일 불러오기</b>로 되돌릴 수 있습니다.</li>
+      </ul>
+    </div>
+
+    <div class="help-report">
+      <p><b>잘 안 되거나 이상한가요?</b> 아래 버튼으로 알려 주세요. 어떤 화면에서 무엇을 하려다 문제가 생겼는지 적어 주시면 큰 도움이 됩니다.</p>
+      <div class="help-actions">
+        <button class="btn btn-orange" onclick="openFeedback()">의견 보내기</button>
+        <button class="btn btn-slate" onclick="copyDiagnostics()">진단 정보 복사</button>
+      </div>
+    </div>
+
+    <div class="help-actions">
+      <button class="btn btn-slate" onclick="closeHelp()">닫기</button>
+    </div>
+  </div>
+</div>
+
 <!-- GIF 진행 오버레이 -->
 <div id="gifProgress" role="status">
   <p id="gifProgressText">GIF 생성 중...</p>
   <div id="gifProgressBar"><div id="gifProgressFill" style="width:0%"></div></div>
 </div>
+
+<!-- ── 베타 운영 설정 ─────────────────────────────────────────────
+     의견 폼 URL을 아래 줄의 주석을 풀고 붙여넣으세요. (docs/2026-07-21-beta-readiness.md 참고)
+     개인정보·시크릿이 아니므로 저장소에 커밋해도 됩니다. -->
+<script>
+  // window.SQUAD_MAKER_FEEDBACK_URL = 'https://forms.gle/여기에_폼_링크';
+</script>
 
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
@@ -934,6 +1049,10 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 // #43A047(녹색)은 필드 배경(#2b5e3f)과 동계열이라 대비가 낮음 → #00C853(라임)으로 교체
 const COLORS = ['#E53935','#1E88E5','#00C853','#FB8C00','#8E24AA','#00ACC1','#F06292','#FFD600','#546E7A','#ffffff'];
 const FIELD_W = 480, FIELD_H = 660;
+
+// 베타 운영: 버전 표기와 의견 창구(구글 폼). URL은 배포 환경에서 주입한다.
+const APP_VERSION = 'beta 1 (2026-07-21)';
+const FEEDBACK_URL = window.SQUAD_MAKER_FEEDBACK_URL || '';
 
 const MODES_CONFIG = {
   '5v5':  { label:'5vs5',  max:5,  formations:{
@@ -2941,6 +3060,8 @@ document.getElementById('shareModal').addEventListener('click', e => {
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  if (document.getElementById('helpModal').classList.contains('visible')) { closeHelp(); return; }
+  if (document.getElementById('interestModal').classList.contains('visible')) { closeInterestPreview(); return; }
   if (document.getElementById('shareModal').classList.contains('visible')) { closeShare(); return; }
   if (document.getElementById('playerViewModal').style.display === 'flex') { closePlayerView(); return; }
   if (document.getElementById('ctxMenu').classList.contains('visible')) { hideCtxMenu(); }
@@ -3077,6 +3198,68 @@ function closeInterestPreview() {
 document.getElementById('interestModal').addEventListener('click', e => {
   if (e.target === document.getElementById('interestModal')) closeInterestPreview();
 });
+
+// ═══════════════════════════════════════════════════════════════
+// 도움말 · 의견 보내기 (베타 운영)
+// ═══════════════════════════════════════════════════════════════
+function openHelp() {
+  const modal = document.getElementById('helpModal');
+  modal.classList.add('visible');
+  activateModal(modal, '.help-box .help-actions:last-child button');
+}
+
+function closeHelp() {
+  const modal = document.getElementById('helpModal');
+  modal.classList.remove('visible');
+  deactivateModal(modal);
+}
+
+document.getElementById('helpModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('helpModal')) closeHelp();
+});
+
+// 개인정보(선수·팀 이름, 지침, 스쿼드 내용)는 절대 포함하지 않는다 — 환경 정보만.
+function buildDiagnostics() {
+  let hasSave = false;
+  try { hasSave = !!localStorage.getItem(LS_KEY); } catch {}
+  const modeLabel = { squad: '스쿼드', pattern: '전술 패턴', strategy: '매치 전략' }[appMode] || appMode;
+  return [
+    '[스쿼드 메이커 진단 정보]',
+    '버전: ' + APP_VERSION,
+    '화면: ' + window.screen.width + '×' + window.screen.height +
+      ' / 창 ' + window.innerWidth + '×' + window.innerHeight,
+    '보기: ' + (viewerMode ? '공유 열람(뷰어)' : '편집'),
+    '현재 화면: ' + modeLabel,
+    '저장된 데이터: ' + (hasSave ? '있음' : '없음'),
+    '브라우저: ' + navigator.userAgent,
+    '시각: ' + new Date().toLocaleString('ko-KR'),
+  ].join('\n');
+}
+
+function copyDiagnostics() {
+  const text = buildDiagnostics();
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(
+      () => showToast('진단 정보를 복사했습니다. 의견에 붙여넣어 주세요.'),
+      () => showToast('복사에 실패했습니다. 직접 상황을 적어 주세요.', null, null, 2600)
+    );
+  } else {
+    showToast('이 브라우저는 자동 복사를 지원하지 않습니다.', null, null, 2600);
+  }
+}
+
+function openFeedback() {
+  if (!FEEDBACK_URL) {
+    showToast('의견 창구가 아직 준비 중입니다. 잠시 후 다시 시도해 주세요.', null, null, 2800);
+    return;
+  }
+  // 진단 정보는 조용히 복사만 해두고(개인정보 없음), 폼은 새 탭으로 연다.
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(buildDiagnostics()).catch(() => {});
+  }
+  window.open(FEEDBACK_URL, '_blank', 'noopener');
+  showToast('의견 폼을 새 탭에서 열었습니다. 감사합니다!');
+}
 
 // ═══════════════════════════════════════════════════════════════
 // FILE SAVE / LOAD (.sq)
@@ -3393,6 +3576,7 @@ document.getElementById('teamName').addEventListener('input', autoSave);
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
+document.getElementById('appVersion').textContent = APP_VERSION;
 drawHtmlField();
 
 if (loadFromURL()) {
