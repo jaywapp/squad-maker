@@ -8,3 +8,8 @@
 Thumbs.db
 .vscode/
 .idea/
+
+# Node / test artifacts
+node_modules/
+test-results/
+playwright-report/

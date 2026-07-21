@@ -153,12 +153,29 @@ xdg-open index.html    # Linux
 
 ### 검증 방법
 
-1. 인라인 스크립트 추출 후 `node --check` 구문 검증
-2. **헤드리스 Chrome 하니스**: 테스트 페이지가 iframe으로 앱을 로드하고 단언 실행 →
-   `chrome --headless=new --virtual-time-budget=15000 --dump-dom http://localhost:<port>/test-harness.html`
-   - 주의: 앱의 최상위 `let/const`는 window 프로퍼티가 아니므로 `iframe.contentWindow.eval('...')`로 접근
-   - 하니스는 저장소에 커밋하지 않음 (실행 후 삭제)
-3. claude-in-chrome 확장이 연결되어 있으면 실브라우저 검증 우선
+1. **회귀 계약 (필수, 배포 차단)** — 외부 네트워크 없이 결정적으로 통과해야 한다:
+   ```bash
+   npm install          # 최초 1회
+   npx playwright install chromium   # 최초 1회
+   npm test             # 390px·1280px 두 뷰포트로 실행
+   ```
+   | 스펙 | 고정하는 계약 |
+   |---|---|
+   | `guest-free-regression` | 편집·자동 저장, PNG/GIF 내보내기, 패턴 추가, `#s=` 뷰어, `.sq` 왕복, 공유 링크 열람 시 LocalStorage 보존 |
+   | `analytics-events` | 이벤트 화이트리스트, once 중복 금지, 분석 비활성 시 무전송 |
+   | `analytics-payload` | 실제 Umami로 나가는 최종 본문에 `#s=`·이름·지침 0건, 로드 지연·실패 시 큐 동작 |
+   | `interest-previews` | 수요 측정 진입점 노출·이벤트 구분, 뷰어 모드 비노출 |
+   | `beta-ui` | 도움말·의견 창구·버전 표시, 의견 폼 폴백, 진단 정보에 개인정보 미포함 |
+
+   - `v:1` 스냅샷 계약 픽스처: `tests/fixtures/snapshot-v1.json`
+   - html2canvas·gif.js·Umami는 `tests/vendor`의 고정 버전을 route로 주입하고 그 외 외부
+     요청은 전부 차단한다 — 실제 라이브러리가 실행되므로 스텁이 아니다
+2. **CDN 가용성 smoke (선택)** — 실패는 앱 회귀가 아니라 공급자·네트워크 문제:
+   ```bash
+   npm run test:cdn
+   ```
+3. 인라인 스크립트 추출 후 `node --check` 구문 검증
+4. claude-in-chrome 확장이 연결되어 있으면 실브라우저 검증 우선
 
 ### 최근 작업 (모두 머지·배포됨)
 
