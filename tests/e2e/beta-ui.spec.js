@@ -54,28 +54,65 @@ test.describe('베타 운영 UI', () => {
     await popup.close();
   });
 
-  test('진단 정보에는 팀명·선수명·지침이 포함되지 않는다', async ({ page, context }) => {
-    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    // 민감한 값이 들어 있는 스냅샷을 URL로 복원한 뒤 진단 정보를 생성한다
-    const snap = JSON.parse(JSON.stringify(fixture));
-    await page.goto('/index.html#s=' + encodeSnap(snap));
-    const diag = await page.evaluate(() => window.buildDiagnostics());
-
-    // 스냅샷에 실제로 존재하는 민감 값들을 수집해 진단 문자열에 없는지 확인
-    const forbidden = [];
-    if (snap.team) forbidden.push(snap.team);
-    (snap.roster || []).forEach(r => r.name && forbidden.push(r.name));
-    Object.values(snap.squads || {}).forEach(sq => {
-      if (sq.tn) forbidden.push(sq.tn);           // teamNote (직렬화 축약 키)
-      Object.values(sq.pn || {}).forEach(n => n && forbidden.push(n)); // playerNotes
+  // 반환값이 아니라 실제로 클립보드에 쓰이는 값을 검사한다.
+  // 각 민감 필드에 12자 이하(정규화 시 잘리지 않는) 고유 canary를 심어,
+  // 어느 경로로든 그 값이 새어 나가면 실패하게 한다.
+  test('진단 복사·의견 전송이 클립보드에 개인정보를 쓰지 않는다', async ({ page }) => {
+    const CANARY = {
+      team: 'ZZTEAMQ',
+      name: 'ZZPLYRQ',
+      teamNote: 'ZZTNOTEQ',
+      playerNote: 'ZZPNOTEQ',
+      pattern: 'ZZPATQ',
+    };
+    await page.addInitScript(() => {
+      // 클립보드 스파이 + 폼 URL 주입 (openFeedback이 실제 쓰기 경로를 타게 함)
+      window.__clip = [];
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: { writeText: t => { window.__clip.push(String(t)); return Promise.resolve(); } },
+      });
+      window.SQUAD_MAKER_FEEDBACK_URL = 'https://example.com/beta-form';
     });
-    expect(forbidden.length).toBeGreaterThan(0); // 픽스처에 민감 값이 실제로 있어야 의미 있음
-    for (const value of forbidden) {
-      expect(diag).not.toContain(value);
+
+    const snap = JSON.parse(JSON.stringify(fixture));
+    snap.team = CANARY.team;
+    snap.roster[0].name = CANARY.name;
+    snap.squads.basic.tn = CANARY.teamNote;
+    snap.squads.basic.pn = { '1': CANARY.playerNote };
+    snap.pat[0].n = CANARY.pattern;
+    await page.goto('/index.html#s=' + encodeSnap(snap));
+
+    // 두 복사 경로를 실제로 실행
+    await page.evaluate(() => window.copyDiagnostics());
+    await page.evaluate(() => window.openFeedback());
+
+    const writes = await page.evaluate(() => window.__clip);
+    expect(writes.length).toBeGreaterThanOrEqual(2); // copyDiagnostics + openFeedback
+    const all = writes.join('\n');
+    for (const value of Object.values(CANARY)) {
+      expect(all).not.toContain(value);
     }
-    // 대신 환경 정보는 담고 있어야 한다
-    expect(diag).toContain('버전:');
-    expect(diag).toContain('스쿼드 메이커 진단 정보');
+    // 쓰인 값은 허용된 진단 정보여야 한다
+    expect(writes[0]).toContain('스쿼드 메이커 진단 정보');
+    expect(writes[0]).toContain('버전:');
+  });
+
+  test('도움말 모달은 Escape와 배경 클릭으로 닫힌다', async ({ page }) => {
+    await page.goto('/index.html');
+    const modal = page.locator('#helpModal');
+
+    await page.click('.topbar button:has-text("도움말")');
+    await expect(modal).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(modal).toBeHidden();
+    // 닫은 뒤 트리거 버튼으로 포커스가 복원된다
+    await expect(page.locator('.topbar button:has-text("도움말")')).toBeFocused();
+
+    await page.click('.topbar button:has-text("도움말")');
+    await expect(modal).toBeVisible();
+    await modal.click({ position: { x: 5, y: 5 } }); // 배경(백드롭) 클릭
+    await expect(modal).toBeHidden();
   });
 
   test('뷰어 모드에서도 도움말·의견 버튼을 쓸 수 있다', async ({ page }) => {
