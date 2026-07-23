@@ -5,7 +5,8 @@
   "description": "SQUAD MAKER — 아마추어 축구 전술 보드",
   "scripts": {
     "serve": "http-server -p 4317 -c-1 .",
-    "test": "playwright test",
+    "test": "npm run test:api && playwright test",
+    "test:api": "node --test tests/unit/feedback-api.test.js",
     "test:e2e": "playwright test",
     "test:cdn": "playwright test --config=playwright.cdn.config.js"
   },

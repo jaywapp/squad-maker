@@ -5,7 +5,7 @@
 - **작성**: PC·태블릿 큰 화면에 최적화된 2패널 편집 화면 (모바일 작성도 지원)
 - **열람**: 공유 링크로 열면 모바일 친화적인 **읽기 전용 뷰어 모드**
 
-**🔗 [라이브 데모](https://jaywapp.github.io/squad-maker/)**
+**🔗 [라이브 데모](https://squad-maker.vercel.app/)**
 
 ---
 
@@ -104,7 +104,7 @@
 - **순수 HTML / CSS / JavaScript** — 빌드 도구 없음, 단일 파일(`index.html`)로 실행
 - **[html2canvas](https://html2canvas.hertzen.com/)** — PNG 이미지 내보내기 (CDN)
 - **[gif.js](https://jnordberg.github.io/gif.js/)** — 브라우저 기반 GIF 인코딩 (CDN)
-- **GitHub Pages** — 정적 호스팅
+- **Vercel** — 정적 호스팅 및 GitHub Issues `제보` 중계 함수
 
 ---
 
@@ -148,8 +148,10 @@ xdg-open index.html    # Linux
 
 ### 배포
 
-- GitHub Pages — `main` 브랜치 자동 배포 → https://jaywapp.github.io/squad-maker/
-- 머지 후 확인: `gh api repos/jaywapp/squad-maker/pages/builds/latest` 로 빌드 상태·커밋 확인 후 라이브 콘텐츠 마커 curl 검증
+- Vercel — `main` 브랜치 push 시 GitHub Actions가 테스트 후 prebuilt production 배포
+- 배포에는 GitHub Secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`가 필요합니다.
+- 제보 중계에는 Vercel 환경 변수 `GITHUB_ISSUES_TOKEN`, `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`가 필요합니다. 허용할 추가 출처는 `FEEDBACK_ALLOWED_ORIGINS`에 쉼표로 구분합니다.
+- Vercel Git Integration과 Actions가 같은 커밋을 중복 배포하지 않도록 Git Integration의 production 자동 배포를 비활성화합니다.
 
 ### 검증 방법
 

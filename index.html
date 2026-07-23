@@ -9,14 +9,14 @@
 <meta property="og:type"        content="website">
 <meta property="og:title"       content="스쿼드 메이커 — 축구 포메이션 & 전술 공유">
 <meta property="og:description" content="축구 스쿼드를 직접 만들고 팀원과 공유하세요. 포메이션 설정, 선수 배치, 전술 지침을 손쉽게 작성하고 링크로 공유할 수 있습니다.">
-<meta property="og:url"         content="https://jaywapp.github.io/squad-maker/">
-<meta property="og:image"       content="https://jaywapp.github.io/squad-maker/og-image.png">
+  <meta property="og:url"         content="https://squad-maker.vercel.app/">
+  <meta property="og:image"       content="https://squad-maker.vercel.app/og-image.png">
 <meta property="og:locale"      content="ko_KR">
 <!-- Twitter Card -->
 <meta name="twitter:card"        content="summary_large_image">
 <meta name="twitter:title"       content="스쿼드 메이커 — 축구 포메이션 & 전술 공유">
 <meta name="twitter:description" content="포메이션 설정, 선수 배치, 전술 지침을 만들고 링크로 공유하세요.">
-<meta name="twitter:image"       content="https://jaywapp.github.io/squad-maker/og-image.png">
+  <meta name="twitter:image"       content="https://squad-maker.vercel.app/og-image.png">
 <!-- Favicon (SVG 인라인) -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%232b5e3f'/><text y='24' x='4' font-size='22'>⚽</text></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%232b5e3f'/><text y='24' x='4' font-size='22'>⚽</text></svg>">
@@ -675,14 +675,14 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   .topbar-btn { min-height:40px; }
 }
 
-/* ── 도움말 모달 ── */
-#helpModal {
+/* ── 도움말·제보 모달 ── */
+#helpModal, #feedbackModal {
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,0.75); z-index:2000;
   align-items:flex-start; justify-content:center;
   padding:20px 12px; overflow-y:auto;
 }
-#helpModal.visible { display:flex; }
+#helpModal.visible, #feedbackModal.visible { display:flex; }
 .help-box {
   background:var(--surface); border:1px solid var(--border); border-radius:14px;
   width:100%; max-width:560px; padding:22px;
@@ -702,6 +702,26 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 }
 .help-report p { font-size:0.8rem; color:var(--ink2); line-height:1.6; }
 .help-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.feedback-form { display:flex; flex-direction:column; gap:12px; }
+.feedback-field { display:flex; flex-direction:column; gap:5px; }
+.feedback-field label { font-size:0.78rem; font-weight:700; color:var(--ink2); }
+.feedback-field input, .feedback-field textarea {
+  width:100%; border:1px solid var(--border); border-radius:8px;
+  background:var(--bg); color:var(--ink); padding:9px 11px;
+  font:inherit; font-size:0.85rem; outline:none;
+}
+.feedback-field input:focus, .feedback-field textarea:focus { border-color:var(--accent); }
+.feedback-field textarea { min-height:130px; resize:vertical; line-height:1.5; }
+.feedback-meta {
+  background:var(--bg); border:1px solid var(--border); border-radius:8px;
+  padding:10px; color:var(--muted); font-size:0.75rem; line-height:1.6;
+}
+.feedback-check { display:flex; align-items:flex-start; gap:8px; color:var(--ink2); font-size:0.78rem; line-height:1.5; }
+.feedback-check input { margin-top:3px; }
+.feedback-status { min-height:1.3em; color:var(--ink2); font-size:0.8rem; line-height:1.5; }
+.feedback-status.error { color:#ff9b9b; }
+.feedback-status.success { color:var(--accent); }
+.feedback-honeypot { position:absolute !important; left:-10000px !important; width:1px !important; height:1px !important; overflow:hidden !important; }
 
 </style>
 </head>
@@ -709,11 +729,11 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 
 <h1 class="wordmark">SQUAD MAKER<span class="wm-sub">전술 보드</span></h1>
 
-<!-- 상단 유틸리티 바: 도움말·의견 보내기·버전 (편집·뷰어 공통) -->
-<div class="topbar" role="toolbar" aria-label="도움말 및 의견">
+<!-- 상단 유틸리티 바: 도움말·제보·버전 (편집·뷰어 공통) -->
+<div class="topbar" role="toolbar" aria-label="도움말 및 제보">
   <span class="topbar-version" id="appVersion" aria-label="앱 버전"></span>
   <button class="topbar-btn" onclick="openHelp()">도움말</button>
-  <button class="topbar-btn" onclick="openFeedback()">의견 보내기</button>
+  <button class="topbar-btn" onclick="openFeedback()">제보</button>
 </div>
 
 <!-- 공유 링크로 열린 경우 뷰어 바 -->
@@ -1016,7 +1036,7 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
     <div class="help-report">
       <p><b>잘 안 되거나 이상한가요?</b> 아래 버튼으로 알려 주세요. 어떤 화면에서 무엇을 하려다 문제가 생겼는지 적어 주시면 큰 도움이 됩니다.</p>
       <div class="help-actions">
-        <button class="btn btn-orange" onclick="openFeedback()">의견 보내기</button>
+        <button class="btn btn-orange" onclick="openFeedback()">제보</button>
         <button class="btn btn-slate" onclick="copyDiagnostics()">진단 정보 복사</button>
       </div>
     </div>
@@ -1027,18 +1047,48 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   </div>
 </div>
 
+<!-- 제보 모달 -->
+<div id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+  <div class="help-box">
+    <h3 id="feedbackTitle">제보</h3>
+    <p class="help-section">오류나 개선 의견을 보내면 이 프로젝트의 GitHub Issue로 등록됩니다. 연락처와 진단 정보는 선택 사항입니다.</p>
+    <form id="feedbackForm" class="feedback-form" onsubmit="submitFeedback(event)">
+      <div class="feedback-field">
+        <label for="feedbackSubject">제목 <span aria-hidden="true">*</span></label>
+        <input id="feedbackSubject" name="title" maxlength="100" required autocomplete="off" aria-required="true">
+      </div>
+      <div class="feedback-field">
+        <label for="feedbackDescription">내용 <span aria-hidden="true">*</span></label>
+        <textarea id="feedbackDescription" name="description" maxlength="4000" required aria-required="true" placeholder="어떤 화면에서 무엇을 하다가 문제가 생겼는지 적어 주세요."></textarea>
+      </div>
+      <div class="feedback-field">
+        <label for="feedbackContact">연락처 (선택)</label>
+        <input id="feedbackContact" name="contact" maxlength="200" autocomplete="email" placeholder="답변을 받고 싶을 때만 입력해 주세요.">
+      </div>
+      <label class="feedback-check">
+        <input id="feedbackDiagnostics" type="checkbox">
+        화면 크기, 브라우저, 앱 버전 등 진단 정보를 함께 보냅니다. 팀명·선수명·전술 내용은 포함하지 않습니다.
+      </label>
+      <div class="feedback-meta" id="feedbackMeta"></div>
+      <div id="feedbackCaptcha" aria-label="스팸 방지 확인"></div>
+      <div class="feedback-honeypot" aria-hidden="true">
+        <label for="feedbackWebsite">웹사이트</label>
+        <input id="feedbackWebsite" name="website" tabindex="-1" autocomplete="off">
+      </div>
+      <p id="feedbackStatus" class="feedback-status" role="status" aria-live="polite"></p>
+      <div class="help-actions">
+        <button class="btn btn-green" id="feedbackSubmit" type="submit">제보 보내기</button>
+        <button class="btn btn-slate" type="button" onclick="closeFeedback()">닫기</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- GIF 진행 오버레이 -->
 <div id="gifProgress" role="status">
   <p id="gifProgressText">GIF 생성 중...</p>
   <div id="gifProgressBar"><div id="gifProgressFill" style="width:0%"></div></div>
 </div>
-
-<!-- ── 베타 운영 설정 ─────────────────────────────────────────────
-     의견 폼 URL을 아래 줄의 주석을 풀고 붙여넣으세요. (docs/2026-07-21-beta-readiness.md 참고)
-     개인정보·시크릿이 아니므로 저장소에 커밋해도 됩니다. -->
-<script>
-  // window.SQUAD_MAKER_FEEDBACK_URL = 'https://forms.gle/여기에_폼_링크';
-</script>
 
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
@@ -1050,9 +1100,9 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 const COLORS = ['#E53935','#1E88E5','#00C853','#FB8C00','#8E24AA','#00ACC1','#F06292','#FFD600','#546E7A','#ffffff'];
 const FIELD_W = 480, FIELD_H = 660;
 
-// 베타 운영: 버전 표기와 의견 창구(구글 폼). URL은 배포 환경에서 주입한다.
+// 베타 운영: 버전 표기와 같은 출처의 Vercel 제보 API.
 const APP_VERSION = 'beta 1 (2026-07-21)';
-const FEEDBACK_URL = window.SQUAD_MAKER_FEEDBACK_URL || '';
+const FEEDBACK_ENDPOINT = '/api/feedback';
 
 const MODES_CONFIG = {
   '5v5':  { label:'5vs5',  max:5,  formations:{
@@ -3248,18 +3298,127 @@ function copyDiagnostics() {
   }
 }
 
+let feedbackStartedAt = 0;
+let feedbackCaptchaToken = '';
+let feedbackWidgetId = null;
+
+function setFeedbackStatus(message, kind) {
+  const status = document.getElementById('feedbackStatus');
+  status.textContent = message;
+  status.className = 'feedback-status' + (kind ? ' ' + kind : '');
+}
+
+async function prepareFeedbackCaptcha() {
+  const container = document.getElementById('feedbackCaptcha');
+  container.textContent = '스팸 방지 확인을 불러오는 중입니다.';
+  try {
+    const response = await fetch(FEEDBACK_ENDPOINT, { headers: { Accept: 'application/json' } });
+    const config = await response.json();
+    if (!response.ok || !config.turnstileSiteKey) throw new Error('captcha_unavailable');
+
+    if (!window.turnstile) {
+      await new Promise((resolve, reject) => {
+        const existing = document.querySelector('script[data-feedback-turnstile]');
+        if (existing) {
+          existing.addEventListener('load', resolve, { once:true });
+          existing.addEventListener('error', reject, { once:true });
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+        script.async = true;
+        script.defer = true;
+        script.dataset.feedbackTurnstile = 'true';
+        script.addEventListener('load', resolve, { once:true });
+        script.addEventListener('error', reject, { once:true });
+        document.head.appendChild(script);
+      });
+    }
+
+    container.textContent = '';
+    feedbackWidgetId = window.turnstile.render(container, {
+      sitekey: config.turnstileSiteKey,
+      theme: 'dark',
+      callback: token => { feedbackCaptchaToken = token; setFeedbackStatus(''); },
+      'expired-callback': () => { feedbackCaptchaToken = ''; setFeedbackStatus('스팸 방지 확인이 만료되었습니다. 다시 확인해 주세요.', 'error'); },
+      'error-callback': () => { feedbackCaptchaToken = ''; setFeedbackStatus('스팸 방지 확인을 완료하지 못했습니다.', 'error'); },
+    });
+  } catch {
+    container.textContent = '';
+    setFeedbackStatus('제보 창구를 준비하지 못했습니다. 잠시 후 다시 시도해 주세요.', 'error');
+  }
+}
+
 function openFeedback() {
-  if (!FEEDBACK_URL) {
-    showToast('의견 창구가 아직 준비 중입니다. 잠시 후 다시 시도해 주세요.', null, null, 2800);
+  if (document.getElementById('helpModal').classList.contains('visible')) closeHelp();
+  feedbackStartedAt = Date.now();
+  feedbackCaptchaToken = '';
+  document.getElementById('feedbackMeta').textContent =
+    `대상: jaywapp/squad-maker · 분류: 제보 · 버전: ${APP_VERSION} · 플랫폼: web`;
+  setFeedbackStatus('');
+  const modal = document.getElementById('feedbackModal');
+  modal.classList.add('visible');
+  activateModal(modal, '#feedbackSubject');
+  prepareFeedbackCaptcha();
+}
+
+function closeFeedback() {
+  const modal = document.getElementById('feedbackModal');
+  modal.classList.remove('visible');
+  deactivateModal(modal);
+}
+
+async function submitFeedback(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const submit = document.getElementById('feedbackSubmit');
+  const title = document.getElementById('feedbackSubject').value.trim();
+  const description = document.getElementById('feedbackDescription').value.trim();
+  if (!title || !description) {
+    setFeedbackStatus('제목과 내용을 모두 입력해 주세요.', 'error');
     return;
   }
-  // 진단 정보는 조용히 복사만 해두고(개인정보 없음), 폼은 새 탭으로 연다.
-  if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(buildDiagnostics()).catch(() => {});
+  if (!feedbackCaptchaToken) {
+    setFeedbackStatus('스팸 방지 확인을 완료해 주세요.', 'error');
+    return;
   }
-  window.open(FEEDBACK_URL, '_blank', 'noopener');
-  showToast('의견 폼을 새 탭에서 열었습니다. 감사합니다!');
+
+  submit.disabled = true;
+  setFeedbackStatus('제보를 보내는 중입니다.');
+  try {
+    const includeDiagnostics = document.getElementById('feedbackDiagnostics').checked;
+    const response = await fetch(FEEDBACK_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', Accept:'application/json' },
+      body: JSON.stringify({
+        repository: 'jaywapp/squad-maker',
+        title,
+        description,
+        contact: document.getElementById('feedbackContact').value.trim(),
+        appVersion: APP_VERSION,
+        platform: 'web',
+        diagnostics: includeDiagnostics ? { summary: buildDiagnostics() } : {},
+        turnstileToken: feedbackCaptchaToken,
+        startedAt: feedbackStartedAt,
+        website: document.getElementById('feedbackWebsite').value,
+      }),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || '제보를 보내지 못했습니다.');
+    setFeedbackStatus(`제보가 등록되었습니다. Issue #${result.issueNumber}`, 'success');
+    form.reset();
+    if (window.turnstile && feedbackWidgetId !== null) window.turnstile.reset(feedbackWidgetId);
+    feedbackCaptchaToken = '';
+  } catch (error) {
+    setFeedbackStatus(error.message || '제보를 보내지 못했습니다. 입력 내용은 유지되니 다시 시도해 주세요.', 'error');
+  } finally {
+    submit.disabled = false;
+  }
 }
+
+document.getElementById('feedbackModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('feedbackModal')) closeFeedback();
+});
 
 // ═══════════════════════════════════════════════════════════════
 // FILE SAVE / LOAD (.sq)
