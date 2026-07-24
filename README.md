@@ -125,13 +125,13 @@ xdg-open index.html    # Linux
 
 ---
 
-## 🛠 개발 현황 (AI/개발 세션용, 2026-07-18 기준)
+## 🛠 개발 현황 (AI/개발 세션용, 2026-07-24 기준)
 
 > 다음 작업 세션이 프로젝트 컨텍스트를 빠르게 파악하기 위한 섹션입니다.
 
 ### 아키텍처
 
-- **단일 파일 `index.html`** (~2,700줄): CSS + HTML + vanilla JS, 빌드 도구 없음
+- **단일 파일 `index.html`** (~3,800줄): CSS + HTML + vanilla JS, 빌드 도구 없음
 - **상태 모델**
   - `roster` — 전 스쿼드 공유 명단 `[{id, name(≤12자), color}]`
   - `squads[basic|attack|defense]` — `{formation, positions:{id:{x,y}}, teamNote, playerNotes:{id:text}}`
@@ -179,19 +179,24 @@ xdg-open index.html    # Linux
 3. 인라인 스크립트 추출 후 `node --check` 구문 검증
 4. claude-in-chrome 확장이 연결되어 있으면 실브라우저 검증 우선
 
-### 최근 작업 (모두 머지·배포됨)
+### 최근 작업
 
-| PR | 내용 |
-|----|------|
+| 상태 | 내용 |
+|---|---|
 | [#25](https://github.com/jaywapp/squad-maker/pull/25) | XSS 수정(escHtml 따옴표 이스케이프 + sanitize), 복원 로직 단일화(`restoreState`+`refreshUI`), og-image 추가 |
 | [#26](https://github.com/jaywapp/squad-maker/pull/26) | 공격 패턴 에디터·GIF·매치 전략 탭을 현 구조로 재이식 (구 feature 브랜치 3개는 이식 후 삭제) |
 | [#27](https://github.com/jaywapp/squad-maker/pull/27) | 다단계 전술 패턴 + 공 이동/패스 스냅 (설계: `docs/superpowers/specs/2026-07-18-multi-step-tactical-patterns-design.md`) |
-| (진행 중) | 반응형 UX 개편: 필드 스케일링·뷰어 모드·2패널·전술 보드 테마·터치 패리티 (설계: `docs/superpowers/specs/2026-07-18-responsive-ux-overhaul-design.md`, 계획: `docs/superpowers/plans/2026-07-18-responsive-ux-overhaul.md`) |
+| [#29](https://github.com/jaywapp/squad-maker/pull/29) | 반응형 UX 개편: 필드 스케일링·뷰어 모드·2패널·전술 보드 테마·터치 패리티 |
+| [#30](https://github.com/jaywapp/squad-maker/pull/30) | 편집 안전성과 접근성 개선 |
+| [#31](https://github.com/jaywapp/squad-maker/pull/31) | 수익화 0단계 측정 기반과 클로즈드 베타 운영 도구. 분석 P1 수정과 결정적 회귀 테스트까지 `main` 반영 |
+| 배포 표준화 브랜치 | GitHub Actions 기반 Vercel 배포와 GitHub Issues `제보` 중계 구현. 현재 `agent/project-delivery-standard-20260724`에서 검증·PR 대기 |
 
-- 브랜치 상태: **main만 유지** — feature 브랜치는 PR 스쿼시 머지 후 삭제하는 흐름
+- 병합된 기능 브랜치는 PR 스쿼시 머지 후 삭제하고 `main`만 유지한다.
 
 ### 남은 후보 과제
 
+- [ ] 배포 표준화 브랜치 검증 후 PR
+- [ ] Umami 웹사이트 ID 설정 후 4주 측정·코치 인터뷰·Gate A 판정
 - [ ] html2canvas를 제작자 개인 도메인 CDN에서 로드 중 → cdnjs + SRI로 하드닝 권장
 - [ ] 광고 삽입 계획 실행: `docs/ad-placement.md` (일부 라인 참조는 구식 — 적용 전 재확인)
 
