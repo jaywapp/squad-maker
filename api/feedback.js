@@ -6,6 +6,7 @@ const RATE_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT = 3;
 const attempts = globalThis.__squadMakerFeedbackAttempts || new Map();
 globalThis.__squadMakerFeedbackAttempts = attempts;
+let nextCleanupAt = 0;
 
 function send(response, status, payload, origin) {
   if (origin) response.setHeader('Access-Control-Allow-Origin', origin);
@@ -44,7 +45,13 @@ function clientIp(request) {
 }
 
 function withinRateLimit(ip, now = Date.now()) {
-  const recent = (attempts.get(ip) || []).filter(timestamp => now - timestamp < RATE_WINDOW_MS);
+  if (now >= nextCleanupAt) {
+    for (const [key, timestamps] of attempts) {
+      if (!timestamps.length || now - timestamps[timestamps.length - 1] >= RATE_WINDOW_MS) attempts.delete(key);
+    }
+    nextCleanupAt = now + RATE_WINDOW_MS;
+  }
+  const recent = (attempts.get(ip) || []).filter(timestamp => now - timestamp < RATE_WINDOW_MS).slice(-RATE_LIMIT);
   recent.push(now);
   attempts.set(ip, recent);
   return recent.length <= RATE_LIMIT;
@@ -159,7 +166,9 @@ module.exports = async function handler(request, response) {
   let captchaValid = false;
   try {
     captchaValid = await verifyTurnstile(cleanText(raw.turnstileToken, 2048), ip);
-  } catch {}
+  } catch {
+    console.warn('[feedback] Turnstile verification request failed');
+  }
   if (!captchaValid) {
     return send(response, 400, { error: '스팸 방지 확인에 실패했습니다. 다시 확인해 주세요.' }, origin);
   }
@@ -168,6 +177,7 @@ module.exports = async function handler(request, response) {
   try {
     result = await createIssue(payload);
   } catch {
+    console.warn('[feedback] GitHub issue request failed');
     return send(response, 502, { error: 'GitHub에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.' }, origin);
   }
   if (result.configurationError) {
