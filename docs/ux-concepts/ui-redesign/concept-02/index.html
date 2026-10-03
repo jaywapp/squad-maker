@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>매치데이 중계</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Barlow+Condensed:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: TV match-day graphics. Scorebug header, landscape pitch as the stage, lineup card left, lower-third + ticker below.
+   Deliberately single dark theme (broadcast look on any host background). */
+:root {
+  --navy: #0a1a3a;        /* 스튜디오 배경 */
+  --navy-2: #12285a;      /* 패널 */
+  --navy-3: #1d3a7a;
+  --gold: #f4c542;        /* 팀 컬러 */
+  --white: #f5f7fb;
+  --dim: #9fb0d4;
+  --grass-a: #1f6b3d; --grass-b: #237545;
+  --red: #ff5a4e; --cyan: #52d6ff;
+  --font-display: 'Black Han Sans', 'Noto Sans KR', sans-serif;
+  --font-cond: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-body: 'Noto Sans KR', 'Apple SD Gothic Neo', system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: radial-gradient(120% 80% at 70% 0%, var(--navy-3), var(--navy) 60%) fixed, var(--navy); color: var(--white); font-family: var(--font-body); font-size: 15px; line-height: 1.45; padding-inline: 16px; padding-block: 14px 24px; min-height: 100vh; }
+button, input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.shell { max-width: 1320px; margin: 0 auto; display: grid; gap: 14px; }
+
+/* Scorebug header */
+.bug { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0; }
+.bug > * { display: flex; align-items: center; }
+.logo { background: var(--gold); color: var(--navy); font-family: var(--font-display); font-size: 1.15rem; padding: 6px 16px 6px 14px; clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+.fixture { background: var(--white); color: var(--navy); font-family: var(--font-cond); font-weight: 800; font-size: 1.15rem; text-transform: uppercase; letter-spacing: .02em; padding: 6px 22px 6px 20px; margin-left: -6px; clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); gap: 10px; }
+.fixture .vs { background: var(--navy); color: var(--gold); padding: 0 6px; font-size: .9rem; }
+.kick { background: var(--navy-2); font-family: var(--font-cond); font-weight: 600; font-size: 1.05rem; padding: 6px 20px; margin-left: -6px; clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); color: var(--dim); font-variant-numeric: tabular-nums; }
+.bug .grow { flex: 1; }
+.segs { display: flex; gap: 2px; margin-top: 8px; }
+@media (min-width: 900px) { .segs { margin-top: 0; } }
+.seg { font-family: var(--font-cond); font-weight: 700; font-size: 1.05rem; letter-spacing: .06em; text-transform: uppercase; background: var(--navy-2); border: 0; padding: 8px 16px; cursor: pointer; color: var(--dim); min-height: 40px; }
+.seg[aria-selected="true"] { background: var(--gold); color: var(--navy); }
+.seg span { font-family: var(--font-body); font-weight: 700; font-size: .85rem; letter-spacing: 0; text-transform: none; margin-left: 4px; }
+
+/* Stage */
+.stage { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 960px) { .stage { grid-template-columns: 1fr; } .stage > section { order: -1; } }
+.card { background: linear-gradient(180deg, var(--navy-2), rgba(18,40,90,.75)); border-top: 4px solid var(--gold); }
+.card-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 10px 14px 6px; }
+.card-h h2 { white-space: nowrap; margin: 0; font-family: var(--font-cond); font-weight: 800; font-size: 1.5rem; letter-spacing: .04em; text-transform: uppercase; line-height: 1; }
+.card-h .sub { font-family: var(--font-cond); color: var(--gold); font-weight: 700; font-size: 1.05rem; letter-spacing: .05em; }
+.lineup { list-style: none; margin: 0; padding: 0 0 8px; }
+.lineup li { animation: wipe .45s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i) * 40ms); }
+@keyframes wipe { from { transform: translateX(-24px); clip-path: inset(0 100% 0 0); } to { transform: none; clip-path: inset(0 0 0 0); } }
+.lu { width: 100%; display: grid; grid-template-columns: 44px 1fr auto auto; align-items: center; gap: 10px; border: 0; background: transparent; padding: 6px 14px; text-align: left; cursor: pointer; border-bottom: 1px solid rgba(159,176,212,.14); }
+.lu:hover { background: rgba(255,255,255,.05); }
+.lu[aria-current="true"] { background: var(--white); color: var(--navy); }
+.lu .no { font-family: var(--font-cond); font-weight: 800; font-size: 1.6rem; line-height: 1; text-align: right; color: var(--gold); font-variant-numeric: tabular-nums; }
+.lu[aria-current="true"] .no { color: var(--navy); }
+.lu .nm { font-weight: 700; font-size: 1rem; }
+.lu .rl { font-family: var(--font-cond); font-weight: 600; letter-spacing: .08em; font-size: .95rem; color: var(--dim); }
+.lu[aria-current="true"] .rl { color: var(--navy-3); }
+.lu .nt { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); }
+.lu .nt.off { background: transparent; border: 1px solid var(--dim); }
+.opts { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px 14px; }
+.opt { font-family: var(--font-cond); font-weight: 700; font-size: 1rem; letter-spacing: .04em; background: transparent; border: 1px solid rgba(159,176,212,.4); color: var(--dim); padding: 4px 10px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.opt[aria-pressed="true"] { border-color: var(--gold); color: var(--gold); }
+.opt-label { width: 100%; font-family: var(--font-cond); letter-spacing: .12em; font-size: .85rem; color: var(--dim); text-transform: uppercase; }
+
+.pitch-wrap { position: relative; }
+.pitch { position: relative; width: 100%; aspect-ratio: 105 / 68; touch-action: none; user-select: none; background: repeating-linear-gradient(90deg, var(--grass-a) 0 10%, var(--grass-b) 10% 20%); box-shadow: 0 20px 50px rgba(0,0,0,.45); overflow: hidden; }
+.pitch.vertical { aspect-ratio: 68 / 105; background: repeating-linear-gradient(0deg, var(--grass-a) 0 10%, var(--grass-b) 10% 20%); max-width: 520px; margin: 0 auto; }
+.pitch svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pitch svg.lines * { fill: none; stroke: rgba(255,255,255,.75); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.pitch svg.ov { pointer-events: none; }
+.run { fill: none; stroke: var(--gold); stroke-width: 4; stroke-dasharray: 10 7; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.pass { fill: none; stroke: var(--cyan); stroke-width: 3.5; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.dot { position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border: 3px solid var(--white); border-radius: 50%; background: var(--c); color: var(--navy); font-family: var(--font-cond); font-weight: 800; font-size: 1.25rem; display: grid; place-items: center; cursor: grab; padding: 0; box-shadow: 0 6px 12px rgba(0,0,0,.35); font-variant-numeric: tabular-nums; }
+.dot.gk { color: var(--white); }
+.dot .lbl { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); white-space: nowrap; background: rgba(10,26,58,.85); color: var(--white); font-family: var(--font-body); font-weight: 700; font-size: .78rem; padding: 1px 6px; pointer-events: none; }
+.dot.sel { box-shadow: 0 0 0 4px var(--gold), 0 6px 12px rgba(0,0,0,.35); }
+.dot.sel::before { content: ''; position: absolute; inset: -12px; border-radius: 50%; border: 2px solid var(--gold); animation: ping 1.4s ease-out infinite; }
+@keyframes ping { from { transform: scale(.7); opacity: 1; } to { transform: scale(1.4); opacity: 0; } }
+.dot.dragging { cursor: grabbing; box-shadow: 0 0 0 4px var(--gold), 0 14px 22px rgba(0,0,0,.5); }
+.ballx { position: absolute; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: var(--white); box-shadow: 0 0 0 3px rgba(10,26,58,.6), 0 0 14px var(--cyan); }
+.corner { position: absolute; top: 10px; left: 10px; display: flex; gap: 4px; }
+.corner .tagx { background: rgba(10,26,58,.85); font-family: var(--font-cond); font-weight: 700; letter-spacing: .06em; font-size: 1rem; padding: 3px 10px; }
+.corner .tagx b { color: var(--gold); }
+.corner select { background: var(--gold); color: var(--navy); border: 0; font-family: var(--font-cond); font-weight: 800; font-size: 1rem; padding: 3px 6px; cursor: pointer; }
+
+/* Lower third */
+.lower { display: grid; grid-template-columns: auto 1fr; margin-top: 12px; min-height: 92px; animation: lt .5s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes lt { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.lower .big { background: var(--gold); color: var(--navy); font-family: var(--font-cond); font-weight: 800; font-size: 3.4rem; line-height: 1; padding: 10px 18px; display: grid; place-items: center; min-width: 92px; font-variant-numeric: tabular-nums; }
+.lower .info { background: var(--white); color: var(--navy); padding: 10px 16px; display: grid; gap: 4px; min-width: 0; }
+.lower .who { font-family: var(--font-display); font-size: 1.5rem; line-height: 1.1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.lower .who small { font-family: var(--font-cond); font-weight: 700; letter-spacing: .1em; font-size: 1rem; color: var(--navy-3); }
+.lower textarea { width: 100%; border: 0; border-top: 2px solid var(--navy); background: transparent; color: var(--navy); font-weight: 500; resize: vertical; min-height: 48px; padding: 6px 0 0; }
+.lower textarea::placeholder { color: #66749a; }
+
+/* Ticker */
+.ticker { display: grid; grid-template-columns: auto 1fr auto; align-items: stretch; background: var(--navy-2); border-bottom: 3px solid var(--gold); min-width: 0; }
+.ticker .k { background: var(--red); font-family: var(--font-cond); font-weight: 800; letter-spacing: .1em; padding: 8px 14px; display: flex; align-items: center; font-size: 1rem; text-transform: uppercase; }
+.ticker input { min-width: 0; background: transparent; border: 0; padding: 8px 14px; font-weight: 500; }
+.ticker .acts { display: flex; }
+.ticker .acts button { border: 0; background: var(--navy-3); padding: 0 14px; font-family: var(--font-cond); font-weight: 700; font-size: 1rem; letter-spacing: .06em; cursor: pointer; border-left: 1px solid var(--navy); min-height: 42px; }
+.ticker .acts button.hot { background: var(--gold); color: var(--navy); }
+@media (max-width: 640px) { .segs { width: 100%; } .seg { flex: 1; padding: 6px 4px; font-size: .8rem; white-space: nowrap; display: grid; justify-items: center; } .seg span { margin: 0; font-size: .9rem; } .ticker { grid-template-columns: 1fr; } .ticker .acts button { flex: 1; } .dot { width: 34px; height: 34px; margin: -17px 0 0 -17px; font-size: 1.05rem; border-width: 2px; } .dot .lbl { top: 33px; font-size: .7rem; } .lower .big { font-size: 2.4rem; min-width: 70px; } .lu { padding-block: 4px; } }
+
+/* Pattern + strategy */
+.steps { display: flex; flex-wrap: wrap; align-items: stretch; gap: 2px; margin-top: 12px; }
+.stepb { flex: 1 1 140px; text-align: left; border: 0; background: var(--navy-2); padding: 8px 12px; cursor: pointer; position: relative; overflow: hidden; }
+.stepb b { display: block; font-family: var(--font-cond); font-weight: 800; letter-spacing: .08em; color: var(--gold); font-size: 1rem; }
+.stepb span { font-size: .85rem; color: var(--dim); }
+.stepb[aria-current="true"] { background: var(--white); color: var(--navy); }
+.stepb[aria-current="true"] span { color: var(--navy-3); }
+.stepb .bar { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--gold); width: 0; }
+.play { flex: 0 0 auto; border: 0; background: var(--gold); color: var(--navy); font-family: var(--font-cond); font-weight: 800; font-size: 1.2rem; letter-spacing: .08em; padding: 0 22px; cursor: pointer; min-height: 52px; }
+.brief { white-space: pre-wrap; font-family: var(--font-body); margin: 0; padding: 12px 14px 16px; font-size: .92rem; color: var(--white); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2px; margin-top: 12px; }
+.fact { background: var(--navy-2); padding: 10px 14px; }
+.fact b { display: block; font-family: var(--font-cond); letter-spacing: .12em; color: var(--dim); font-size: .85rem; text-transform: uppercase; }
+.fact span { font-family: var(--font-display); font-size: 1.25rem; }
+.toast { position: fixed; right: 16px; top: 16px; background: var(--gold); color: var(--navy); font-family: var(--font-cond); font-weight: 800; letter-spacing: .06em; font-size: 1.05rem; padding: 8px 16px; z-index: 30; animation: lt .35s both; }
+@media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="shell">
+  <header class="bug">
+    <div class="logo">스쿼드 메이커</div>
+    <div class="fixture"><span id="teamLbl"></span><span class="vs">VS</span><span id="oppLbl"></span></div>
+    <div class="kick" id="kickLbl"></div>
+    <span class="grow"></span>
+    <nav class="segs" role="tablist" aria-label="화면" id="segs">
+      <button class="seg" role="tab" data-app="squad">Lineup<span>스쿼드</span></button>
+      <button class="seg" role="tab" data-app="pattern">Plays<span>전술 패턴</span></button>
+      <button class="seg" role="tab" data-app="strategy">Match<span>매치 전략</span></button>
+    </nav>
+  </header>
+
+  <div class="stage">
+    <aside class="card" id="side"></aside>
+    <section>
+      <div class="pitch-wrap">
+        <div class="pitch" id="pitch">
+          <svg class="lines" id="lines" preserveAspectRatio="none" aria-hidden="true"></svg>
+          <svg class="ov" id="ov" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+          <div class="corner" id="corner"></div>
+        </div>
+      </div>
+      <div id="below"></div>
+    </section>
+  </div>
+
+  <div class="ticker" id="ticker">
+    <div class="k">팀 지침</div>
+    <input id="teamNote" aria-label="팀 전체 지침">
+    <div class="acts"><button type="button" id="shareBtn" class="hot">공유 링크</button><button type="button" id="imgBtn">이미지</button><button type="button">.sq 저장</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* squad-maker UX concept shared core — same data and behavior for all 3 concepts.
+   Coordinates: x 0..100 (left→right), y 0..100 (opponent goal top → own goal bottom). */
+const SM = (() => {
+  const TEAM = { name: 'FC 한강 유나이티드', mode: '9vs9' };
+  const MODES = ['5vs5', '6vs6', '7vs7', '8vs8', '9vs9', '10vs10', '11vs11'];
+  const FORMATIONS = ['3-3-2', '3-2-3', '4-3-1', '2-4-2', '3-4-1'];
+  const PLAYERS = [
+    { id: 1, num: 1,  name: '김도윤', role: 'GK', color: '#e0583c' },
+    { id: 2, num: 2,  name: '박지훈', role: 'DF', color: '#2f6fd6' },
+    { id: 3, num: 4,  name: '이서준', role: 'DF', color: '#2f6fd6' },
+    { id: 4, num: 5,  name: '최민재', role: 'DF', color: '#2f6fd6' },
+    { id: 5, num: 7,  name: '정우진', role: 'MF', color: '#2f6fd6' },
+    { id: 6, num: 6,  name: '강하늘', role: 'MF', color: '#2f6fd6' },
+    { id: 7, num: 8,  name: '윤시우', role: 'MF', color: '#2f6fd6' },
+    { id: 8, num: 11, name: '한결',   role: 'FW', color: '#e8b730' },
+    { id: 9, num: 9,  name: '오태양', role: 'FW', color: '#e8b730' },
+  ];
+  const SQUAD_LABEL = { basic: '기본', attack: '공격', defense: '수비' };
+
+  function layout(formation) {
+    const rows = formation.split('-').map(Number);
+    const pos = { 1: { x: 50, y: 92 } };
+    let id = 2;
+    rows.forEach((n, r) => {
+      const y = rows.length === 1 ? 50 : 74 - (r * (74 - 22)) / (rows.length - 1);
+      for (let i = 0; i < n; i++) {
+        const x = n === 1 ? 50 : 16 + (i * 68) / (n - 1);
+        pos[id++] = { x: Math.round(x), y: Math.round(y) };
+      }
+    });
+    return pos;
+  }
+  function roleFor(formation, id) {
+    if (id === 1) return 'GK';
+    const rows = formation.split('-').map(Number);
+    let c = 2;
+    for (let r = 0; r < rows.length; r++) {
+      if (id < c + rows[r]) return r === 0 ? 'DF' : r === rows.length - 1 ? 'FW' : 'MF';
+      c += rows[r];
+    }
+    return 'MF';
+  }
+
+  const squads = {
+    basic:   { formation: '3-3-2', pos: layout('3-3-2'),
+               teamNote: '라인 간격 15m 유지. 볼을 잃으면 5초 즉시 압박, 실패하면 3-3-2 블록으로 복귀.',
+               notes: { 1: '골킥은 짧게, 2번·5번 쪽으로 시작', 6: '빌드업 때 센터백 사이로 내려와 3-1 형태 만들기', 8: '상대 센터백 뒷공간 침투, 오프사이드 라인 계속 확인' } },
+    attack:  { formation: '3-2-3', pos: layout('3-2-3'),
+               teamNote: '측면 폭을 최대로. 크로스는 니어·파 포스트에 한 명씩.',
+               notes: { 2: '왼쪽 오버래핑 적극 가담', 9: '파 포스트 쇄도' } },
+    defense: { formation: '4-3-1', pos: layout('4-3-1'),
+               teamNote: '하프라인 아래 블록. 중앙 차단 우선, 측면은 허용.',
+               notes: { 6: '상대 10번 전담 마크' } },
+  };
+
+  const pattern = {
+    name: '왼쪽 측면 오버래핑',
+    start: { ...layout('3-3-2') },
+    startBall: 6,
+    steps: [
+      { label: '6 → 7 횡패스, 2번 전진', moves: { 2: { x: 10, y: 50 }, 5: { x: 22, y: 40 } }, ball: 5 },
+      { label: '7 → 2 스루패스, 11번 니어 침투', moves: { 2: { x: 9, y: 26 }, 8: { x: 34, y: 14 }, 5: { x: 30, y: 34 } }, ball: 2 },
+      { label: '2번 컷백 크로스, 9번 파 포스트', moves: { 9: { x: 62, y: 12 }, 8: { x: 40, y: 10 } }, ball: 9 },
+    ],
+  };
+  function patternKeyframes() {
+    const frames = [{ pos: { ...pattern.start }, ball: pattern.startBall }];
+    pattern.steps.forEach((s) => {
+      const prev = frames[frames.length - 1];
+      frames.push({ pos: { ...prev.pos, ...s.moves }, ball: s.ball });
+    });
+    return frames;
+  }
+  const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+  /* frame(step, t): positions while animating from keyframe step → step+1 */
+  function frame(step, t) {
+    const k = patternKeyframes();
+    const a = k[step], b = k[Math.min(step + 1, k.length - 1)];
+    const e = ease(Math.max(0, Math.min(1, t)));
+    const pos = {};
+    for (const id in a.pos) pos[id] = { x: a.pos[id].x + (b.pos[id].x - a.pos[id].x) * e, y: a.pos[id].y + (b.pos[id].y - a.pos[id].y) * e };
+    const ba = a.pos[a.ball], bb = b.pos[b.ball];
+    const ball = { x: ba.x + (bb.x - ba.x) * e + 2.4, y: ba.y + (bb.y - ba.y) * e - 2.4 };
+    return { pos, ball };
+  }
+  /* arrows for step index s (0-based step being edited): run arrows + pass arrow */
+  function arrows(s) {
+    const k = patternKeyframes();
+    const a = k[s], b = k[s + 1];
+    if (!b) return [];
+    const out = [];
+    for (const id in pattern.steps[s].moves) out.push({ kind: 'run', id: +id, from: a.pos[id], to: b.pos[id] });
+    if (a.ball !== b.ball) out.push({ kind: 'pass', from: a.pos[a.ball], to: b.pos[b.ball] });
+    return out;
+  }
+
+  const match = { opponent: '강서 FC', date: '10월 12일 (일) 09:00', venue: '잠실 보조구장', memo: '상대는 4-4 라인 수비가 강함. 측면 오버래핑으로 수적 우위를 만든다.' };
+
+  function shareText(sq) {
+    const s = squads[sq];
+    const lines = [`[${TEAM.name}] ${SQUAD_LABEL[sq]} 스쿼드 · ${TEAM.mode} · ${s.formation}`, `vs ${match.opponent} · ${match.date}`, '', `■ 팀 지침`, s.teamNote, '', '■ 선수별'];
+    PLAYERS.forEach((p) => { if (s.notes[p.id]) lines.push(`${p.num} ${p.name}: ${s.notes[p.id]}`); });
+    return lines.join('\n');
+  }
+
+  /* Pointer drag inside a container. map(clientX, clientY) → {x,y} in 0..100 coords. */
+  function draggable(el, map, { onMove, onEnd, onTap } = {}) {
+    let start = null, moved = false;
+    el.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      start = { x: e.clientX, y: e.clientY }; moved = false;
+      el.setPointerCapture(e.pointerId);
+    });
+    el.addEventListener('pointermove', (e) => {
+      if (!start) return;
+      if (!moved && Math.hypot(e.clientX - start.x, e.clientY - start.y) < 4) return;
+      moved = true; el.classList.add('dragging');
+      const p = map(e.clientX, e.clientY);
+      onMove && onMove({ x: Math.max(3, Math.min(97, p.x)), y: Math.max(3, Math.min(97, p.y)) });
+    });
+    const end = () => {
+      if (!start) return;
+      el.classList.remove('dragging');
+      if (moved) onEnd && onEnd(); else onTap && onTap();
+      start = null;
+    };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTap && onTap(); } });
+  }
+
+  async function copy(text) {
+    try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
+  }
+  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  return { TEAM, MODES, FORMATIONS, PLAYERS, SQUAD_LABEL, squads, layout, roleFor, pattern, patternKeyframes, frame, arrows, match, shareText, draggable, copy, reduced };
+})();
+
+</script>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const st = { app: 'squad', squad: 'basic', sel: 8, step: 0, playing: false };
+const P = (id) => SM.PLAYERS.find((p) => p.id === +id);
+const pitch = $('#pitch');
+const vertical = () => innerWidth < 640;
+/* core coords (x across, y own-goal bottom) → screen %. Landscape attacks to the right. */
+const scr = (p) => (vertical() ? { l: p.x, t: p.y } : { l: 100 - p.y, t: p.x });
+const unscr = (l, t) => (vertical() ? { x: l, y: t } : { x: t, y: 100 - l });
+const toCore = (cx, cy) => { const r = pitch.getBoundingClientRect(); return unscr((cx - r.left) / r.width * 100, (cy - r.top) / r.height * 100); };
+let tT; const toast = (m) => { const t = $('#toast'); t.textContent = m; t.hidden = false; t.style.animation = 'none'; t.offsetWidth; t.style.animation = ''; clearTimeout(tT); tT = setTimeout(() => (t.hidden = true), 1800); };
+
+$('#teamLbl').textContent = SM.TEAM.name;
+$('#oppLbl').textContent = SM.match.opponent;
+$('#kickLbl').textContent = SM.match.date + ' · ' + SM.match.venue;
+
+function lines() {
+  const v = vertical(); const svg = $('#lines');
+  pitch.classList.toggle('vertical', v);
+  svg.setAttribute('viewBox', v ? '0 0 68 105' : '0 0 105 68');
+  const L = '<rect x="0" y="0" width="105" height="68"/><line x1="52.5" y1="0" x2="52.5" y2="68"/><circle cx="52.5" cy="34" r="9.15"/><rect x="0" y="13.84" width="16.5" height="40.32"/><rect x="0" y="24.84" width="5.5" height="18.32"/><rect x="88.5" y="13.84" width="16.5" height="40.32"/><rect x="99.5" y="24.84" width="5.5" height="18.32"/><path d="M16.5 26.7 A9.15 9.15 0 0 1 16.5 41.3"/><path d="M88.5 26.7 A9.15 9.15 0 0 0 88.5 41.3"/>';
+  svg.innerHTML = v ? `<g transform="translate(68 0) rotate(90)">${L}</g>` : L;
+}
+
+function dots(pos, ball) {
+  pitch.querySelectorAll('.dot,.ballx').forEach((n) => n.remove());
+  SM.PLAYERS.forEach((p) => {
+    const b = document.createElement('button'); const s = scr(pos[p.id]);
+    b.className = 'dot' + (p.role === 'GK' ? ' gk' : '') + (st.sel === p.id && st.app === 'squad' ? ' sel' : '');
+    b.style.setProperty('--c', p.role === 'GK' ? 'var(--red)' : p.role === 'FW' ? 'var(--gold)' : 'var(--white)');
+    b.style.left = s.l + '%'; b.style.top = s.t + '%';
+    b.innerHTML = `${p.num}<span class="lbl">${p.name}</span>`; b.setAttribute('aria-label', `${p.num}번 ${p.name}`);
+    pitch.appendChild(b);
+    if (st.app === 'squad') SM.draggable(b, toCore, {
+      onMove: (q) => { SM.squads[st.squad].pos[p.id] = q; const z = scr(q); b.style.left = z.l + '%'; b.style.top = z.t + '%'; },
+      onTap: () => { st.sel = p.id; render(); },
+    }); else b.tabIndex = -1;
+  });
+  if (ball) { const s = scr(ball); const e = document.createElement('div'); e.className = 'ballx'; e.style.left = s.l + '%'; e.style.top = s.t + '%'; pitch.appendChild(e); }
+}
+
+function overlay(step) {
+  const v = $('#ov');
+  v.innerHTML = step == null ? '' : SM.arrows(step).map((a) => { const f = scr(a.from), t = scr(a.to); return `<line class="${a.kind}" x1="${f.l}" y1="${f.t}" x2="${t.l}" y2="${t.t}"/><circle cx="${t.l}" cy="${t.t}" r="1.2" style="fill:${a.kind === 'run' ? 'var(--gold)' : 'var(--cyan)'}"/>`; }).join('');
+}
+
+function side() {
+  const s = SM.squads[st.squad];
+  if (st.app === 'strategy') {
+    $('#side').innerHTML = `<div class="card-h"><h2>Briefing</h2><span class="sub">단톡방용</span></div><pre class="brief" id="brief">${SM.shareText(st.squad)}</pre><div class="opts"><button class="opt" aria-pressed="true" id="copyB">복사</button><button class="opt" aria-pressed="false">.txt 저장</button></div>`;
+    $('#copyB').onclick = async () => toast((await SM.copy(SM.shareText(st.squad))) ? '브리핑 복사됨' : '복사가 막혀 있어요');
+    return;
+  }
+  if (st.app === 'pattern') {
+    $('#side').innerHTML = `<div class="card-h"><h2>Plays</h2><span class="sub">3 패턴</span></div><ul class="lineup">${[SM.pattern.name, '전방 압박 트랩', '코너킥 니어 플릭'].map((n, i) => `<li style="--i:${i}"><button class="lu" aria-current="${i === 0}"><span class="no">${String(i + 1).padStart(2, '0')}</span><span class="nm">${n}</span><span class="rl">${i === 0 ? '3 STEP' : i === 1 ? '2 STEP' : '4 STEP'}</span><span></span></button></li>`).join('')}</ul><div class="opts"><button class="opt" aria-pressed="false">+ 새 패턴</button><button class="opt" aria-pressed="false">GIF</button><button class="opt" aria-pressed="false">전체 GIF</button></div>`;
+    return;
+  }
+  const done = SM.PLAYERS.filter((p) => s.notes[p.id]).length;
+  $('#side').innerHTML = `<div class="card-h"><h2>Starting IX</h2><span class="sub">${s.formation} · 지침 ${done}/${SM.PLAYERS.length}</span></div>
+    <ul class="lineup">${SM.PLAYERS.map((p, i) => `<li style="--i:${i}"><button class="lu" data-pid="${p.id}" aria-current="${st.sel === p.id}"><span class="no">${p.num}</span><span class="nm">${p.name}</span><span class="rl">${SM.roleFor(s.formation, p.id)}</span><span class="nt${s.notes[p.id] ? '' : ' off'}" title="${s.notes[p.id] ? '지침 있음' : '지침 없음'}"></span></button></li>`).join('')}</ul>
+    <div class="opts"><span class="opt-label">스쿼드</span>${Object.keys(SM.SQUAD_LABEL).map((k) => `<button class="opt" data-sq="${k}" aria-pressed="${k === st.squad}">${SM.SQUAD_LABEL[k]}</button>`).join('')}
+    <span class="opt-label">인원</span>${SM.MODES.map((m) => `<button class="opt" aria-pressed="${m === SM.TEAM.mode}">${m.replace('vs', 'v')}</button>`).join('')}</div>`;
+  $('#side').querySelectorAll('[data-pid]').forEach((b) => (b.onclick = () => { st.sel = +b.dataset.pid; render(); }));
+  $('#side').querySelectorAll('[data-sq]').forEach((b) => (b.onclick = () => { st.squad = b.dataset.sq; render(); }));
+}
+
+function corner() {
+  const s = SM.squads[st.squad];
+  if (st.app === 'pattern') { $('#corner').innerHTML = `<span class="tagx"><b>PLAY 01</b> ${SM.pattern.name}</span>`; return; }
+  $('#corner').innerHTML = `<span class="tagx"><b>${SM.SQUAD_LABEL[st.squad]}</b> ${SM.TEAM.mode.toUpperCase()}</span><select id="form" aria-label="포메이션">${SM.FORMATIONS.map((f) => `<option${f === s.formation ? ' selected' : ''}>${f}</option>`).join('')}</select>`;
+  $('#form').onchange = (e) => { s.formation = e.target.value; s.pos = SM.layout(s.formation); render(); toast(`FORMATION ${s.formation}`); };
+}
+
+function below() {
+  const s = SM.squads[st.squad];
+  if (st.app === 'pattern') {
+    $('#below').innerHTML = `<div class="steps">${SM.pattern.steps.map((x, i) => `<button class="stepb" data-step="${i}" aria-current="${i === st.step}"><b>STEP ${i + 1}</b><span>${x.label}</span><i class="bar"></i></button>`).join('')}<button class="play" id="play">${st.playing ? '❚❚ STOP' : '▶ PLAY'}</button></div>`;
+    $('#below').querySelectorAll('[data-step]').forEach((b) => (b.onclick = () => { st.step = +b.dataset.step; st.playing = false; render(); }));
+    $('#play').onclick = togglePlay; return;
+  }
+  if (st.app === 'strategy') {
+    const m = SM.match;
+    $('#below').innerHTML = `<div class="facts"><div class="fact"><b>Opponent</b><span>${m.opponent}</span></div><div class="fact"><b>Kick-off</b><span>${m.date}</span></div><div class="fact"><b>Venue</b><span>${m.venue}</span></div></div><div class="lower" style="grid-template-columns:1fr"><div class="info"><div class="who">감독 메모 <small>MANAGER'S NOTE</small></div><textarea aria-label="감독 메모">${m.memo}</textarea></div></div>`;
+    return;
+  }
+  const p = P(st.sel);
+  if (!p) { $('#below').innerHTML = ''; return; }
+  $('#below').innerHTML = `<div class="lower" key="${p.id}"><div class="big">${p.num}</div><div class="info"><div class="who">${p.name} <small>${SM.roleFor(s.formation, p.id)} · ${SM.SQUAD_LABEL[st.squad]} 스쿼드</small></div><textarea id="pNote" aria-label="${p.name} 개별 지침" placeholder="${p.name}에게만 전할 지침">${s.notes[p.id] || ''}</textarea></div></div>`;
+  $('#pNote').oninput = (e) => { s.notes[p.id] = e.target.value; };
+}
+
+let raf;
+function togglePlay() {
+  st.playing = !st.playing; $('#play').textContent = st.playing ? '❚❚ STOP' : '▶ PLAY';
+  if (!st.playing) { cancelAnimationFrame(raf); render(); return; }
+  overlay(null); const dur = SM.reduced() ? 1 : 1200, n = SM.pattern.steps.length; let t0 = null;
+  const bars = [...document.querySelectorAll('.stepb .bar')];
+  const tick = (ts) => {
+    if (!st.playing) return; t0 ??= ts; const el = (ts - t0) / dur; const s = Math.floor(el) % (n + 1);
+    const f = s < n ? SM.frame(s, el % 1) : SM.frame(n - 1, 1); dots(f.pos, f.ball);
+    bars.forEach((b, i) => (b.style.width = (i < s ? 100 : i === s ? (el % 1) * 100 : 0) + '%'));
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+}
+
+function render() {
+  document.querySelectorAll('.seg').forEach((b) => b.setAttribute('aria-selected', b.dataset.app === st.app));
+  lines(); side(); corner(); below();
+  $('#teamNote').value = SM.squads[st.squad].teamNote;
+  if (st.app === 'pattern') { const f = SM.frame(st.step, 0); dots(f.pos, f.ball); overlay(st.step); }
+  else { dots(SM.squads[st.squad].pos); overlay(null); }
+}
+document.querySelectorAll('.seg').forEach((b) => (b.onclick = () => { st.app = b.dataset.app; st.playing = false; cancelAnimationFrame(raf); render(); }));
+$('#teamNote').oninput = (e) => (SM.squads[st.squad].teamNote = e.target.value);
+$('#shareBtn').onclick = async () => toast((await SM.copy(SM.shareText(st.squad))) ? '공유 텍스트 복사됨' : '복사가 막혀 있어요');
+$('#imgBtn').onclick = () => toast('시안에서는 저장하지 않아요');
+let lastV = vertical(); addEventListener('resize', () => { if (vertical() !== lastV) { lastV = vertical(); render(); } });
+render();
+</script>
+
+</body>
+</html>
