@@ -13,3 +13,12 @@ Thumbs.db
 node_modules/
 test-results/
 playwright-report/
+
+# Local preview build, evidence and signing material
+.work/
+android/.gradle/
+android/local.properties
+android/**/build/
+android/app/src/main/assets/public/
+*.jks
+*.keystore

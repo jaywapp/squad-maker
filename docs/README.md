@@ -1,6 +1,6 @@
 # 스쿼드 메이커 문서 안내
 
-**최신 기준은 [상세 상품 기획서](product-plan.md)입니다.** 사용자 선택은 A — 피치 중심 코치형입니다. 제품 방향과 현재 웹 구현을 구분하며, 미정 수량·가격·기술을 확정하지 않습니다.
+**최신 기준은 [상세 상품 기획서](product-plan.md)입니다.** 사용자 선택은 A — 피치 중심 코치형입니다. 제품 방향과 현재 웹 구현을 구분하며, 상품의 미정 수량·가격을 임의로 확정하지 않습니다.
 
 | 읽을 목적 | 문서 |
 |---|---|
@@ -13,6 +13,8 @@
 | P0-01~03 데이터 보호·C-01 구현과 검증 | [분석](data-safety-ui-contract-20261007-analysis.md), [설계](data-safety-ui-contract-20261007-design.md), [실행 기록](data-safety-ui-contract-20261007-tasks.md) |
 | 선수 ID 충돌 재현·연속 추가·저장 회귀 | [분석](player-id-safety-20261007-analysis.md), [설계](player-id-safety-20261007-design.md), [검증](player-id-safety-20261007-tasks.md) |
 | Claude A UI가 사용할 상태·저장·내보내기 계약 v1 | [UI 계약](ui-state-save-export-contract-v1.md) |
+| 로컬 보관·Android preview 상태 및 검증 | [분석](a-android-preview-20261007-analysis.md), [설계](a-android-preview-20261007-design.md), [실행](a-android-preview-20261007-tasks.md) |
+| 현재 C-03·native 저장/내보내기 계약 v2 | [UI 계약 v2](ui-state-save-export-contract-v2.md), [Claude 요청문](a-android-preview-20261007-claude-request.md), [Android 결정](android-preview-architecture.md) |
 | 문서 전수 분류·이동·참조 검증 결과 | [정리 기록](documentation-audit.md) |
 
 ## 유지하는 근거와 운영 참고

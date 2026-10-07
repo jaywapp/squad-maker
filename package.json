@@ -5,13 +5,24 @@
   "description": "SQUAD MAKER — 아마추어 축구 전술 보드",
   "scripts": {
     "serve": "http-server -p 4317 -c-1 .",
-    "test": "npm run test:api && playwright test",
+    "test": "npm run test:unit && npm run android:bundle && playwright test",
     "test:api": "node --test tests/unit/feedback-api.test.js",
     "test:e2e": "playwright test",
-    "test:cdn": "playwright test --config=playwright.cdn.config.js"
+    "test:cdn": "playwright test --config=playwright.cdn.config.js",
+    "test:unit": "node --test tests/unit/*.test.js",
+    "android:bundle": "node scripts/build-android-web.mjs",
+    "android:sync": "npm run android:bundle && cap sync android"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.5.2",
     "@playwright/test": "^1.54.1",
+    "esbuild": "0.28.2",
     "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.2",
+    "@capacitor/share": "8.0.3"
   }
 }

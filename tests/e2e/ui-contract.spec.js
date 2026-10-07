@@ -18,11 +18,11 @@ async function seed(page) {
   await page.evaluate(([key, value]) => localStorage.setItem(key, value),
     [LS_KEY, JSON.stringify(fixture)]);
   await page.reload();
-  await expect.poll(() => page.evaluate(() => window.SquadMakerContract?.version)).toBe(1);
+  await expect.poll(() => page.evaluate(() => window.SquadMakerContract?.version)).toBe(2);
 }
 
 function expectResult(result, operation, status, completion = null) {
-  expect(result).toMatchObject({ contractVersion: 1, operation, status, completion });
+  expect(result).toMatchObject({ contractVersion: 2, operation, status, completion });
   expect(result).toHaveProperty('code');
   expect(Number.isInteger(result.revision)).toBe(true);
   expect(result.revision).toBeGreaterThanOrEqual(0);
@@ -45,7 +45,7 @@ test.beforeEach(async ({ page }) => {
 
 test('getState returns independent copies of the complete runtime state', async ({ page }) => {
   const before = await state(page);
-  expect(before.contractVersion).toBe(1);
+  expect(before.contractVersion).toBe(2);
   expect(before.snapshot.v).toBe(1);
   expect(before.snapshot).toMatchObject(fixture);
   await page.evaluate(() => {
@@ -191,25 +191,24 @@ test('quota errors retain saved bytes and retry saves the current edit', async (
   expect((await state(page)).snapshot.team).toBe('Unsaved contract team');
 });
 
-test('future library and native operations stay unsupported without a slot policy', async ({ page }) => {
+test('preview library is unlimited while purchases and generic native commands stay unsupported', async ({ page }) => {
   const before = await state(page);
   const raw = await storedRaw(page);
-  expect(before.localLibrary).toEqual({
-    supported: false, teamId: null, fileId: null, items: [],
-    slots: { status: 'unavailable', limit: null, used: null },
+  expect(before.localLibrary).toMatchObject({
+    supported: true, slots: { status: 'available', limit: null, used: 1, policy: 'preview-unlimited' },
   });
-  for (const operation of ['create-file', 'delete-file', 'restore-purchase', 'share-native']) {
-    const result = await run(page, operation, { id: 'future-file' });
+  expect(before.localLibrary.teams).toHaveLength(1);
+  expect(before.localLibrary.items).toHaveLength(1);
+  expect(before.localLibrary.fileId).toBe(before.localLibrary.items[0].id);
+  for (const operation of ['restore-purchase', 'share-native']) {
+    const result = await run(page, operation);
     expectResult(result, operation, 'unsupported');
     expect(result.code).toBe('unsupported-operation');
   }
   expect(await state(page)).toEqual(before);
   expect(await storedRaw(page)).toBe(raw);
   const full = contractFixture.cases.find(value => value.name === 'slots-full');
-  const cancelled = contractFixture.cases.find(value => value.name === 'share-cancelled');
   expect(full).toMatchObject({ illustrative: true, supported: false });
-  expect(cancelled).toMatchObject({ illustrative: true, supported: false });
-  // The illustrative capacity and OS cancellation are not a live product policy.
   expect(full.policy).toContain('Test example only');
 });
 

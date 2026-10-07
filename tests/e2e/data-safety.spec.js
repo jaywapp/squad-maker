@@ -32,7 +32,7 @@ test.beforeEach(async ({ page }) => {
 
 for (const only of ['names', 'colors', 'positions', 'patterns']) {
   test(`mode change protects ${only} without notes`, async ({ page }) => {
-    await page.evaluate(key => { flushSave(); localStorage.removeItem(key); }, LS_KEY);
+    await page.evaluate(async key => { await flushSave(); localStorage.removeItem(key); localStorage.removeItem('squad-maker-library-v1'); }, LS_KEY);
     await page.reload();
     const state = await snap(page);
     if (only === 'names') state.roster[0].name = '이름만 변경';

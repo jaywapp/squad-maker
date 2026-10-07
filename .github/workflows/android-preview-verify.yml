@@ -1,0 +1,67 @@
+name: Android preview verification
+
+on:
+  push:
+    branches: [feat/a-android-preview-20261007]
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'app/**'
+      - 'android/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'package*.json'
+      - 'capacitor.config.json'
+      - '.github/workflows/android-preview-verify.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+
+  unsigned-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run android:sync
+      - name: Build unsigned release and run lint
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease :app:lintRelease --console=plain --no-daemon
+      - name: Upload unsigned build evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-preview-build-evidence
+          path: |
+            android/app/build/outputs/apk/release/*unsigned.apk
+            android/app/build/reports/lint-results-release.*
+            .work/android-web/bundle-manifest.json
+          retention-days: 7
+
