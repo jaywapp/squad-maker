@@ -37,3 +37,11 @@ Windows 로컬 npm.cmd 래퍼가 진행 없이 대기하여, 서명 스크립트
 ## 실제 Android 백업 확장자 보완
 
 API 36의 파일 저장 완료 뒤 NativeSparseQA-final.sq.json이 만들어짐을 확인했다. JSON MIME 타입에 따른 Android 파일 제공자의 확장자 추가이며, .sq 복원 선택성과 백업 명명 계약을 지키기 위해 native Documents.save의 JSON .sq 파일 선택기에서만 application/octet-stream을 지정한다. 브리지의 허용 MIME, JSON bytes, 계약 v2, 웹 .sq, PNG/GIF와 공유 동작은 보존한다. 승인된 최소 native 보완이다. 기존 AOSP FileUtils splitFileName 근거: https://android.googlesource.com/platform/frameworks/base/+/cf628c4/core/java/android/os/FileUtils.java . 최종 APK로 실제 .sq 파일명·원본 bytes·재복원을 확인한다.
+
+## 최종 UI 인계 계약
+
+앱 소스 완료 SHA: c081101f300a1d1132f60947267edbf7b0d298b1. Claude UI 입력 d6c16cefb32500b02c8e975b701b67e216ef9233, native 입력 21c2b5474e77d97aef827b0d45e311eb585d1164. 후속 문서 커밋은 별도다. [계약 v2](ui-state-save-export-contract-v2.md)를 기준으로 ready() 이후 getState()/subscribe()/run()을 사용한다. 반환 객체는 복사본이고 UI 선택은 저장 슬롯을 소비하지 않는다. 저장 완료는 최신 revision의 지속 기록, file-saved는 SAF 쓰기와 stream close, share-sheet-finished는 OS 공유 창 종료다. 웹 download-requested는 요청 단계이며 수신자 전달 완료와 구분한다. 취소·실패·blocked 상태는 원문 보호 및 재시도 안내를 유지한다. .sq/공유 스냅샷 v:1, library version 1 호환을 보존했다.
+
+## Android 검증 환경
+
+전용 API 36 Google APIs Play Store x86_64 AVD, 360dp 폭·약 682px WebView 높이, Emulator 37.2.12. 기존 SDK 35.6 및 원본 AVD 데이터는 보존했고 프로젝트 로컬 공식 runtime을 사용했다. 낮은 가용 RAM 때문에 초기 설치/첫 실행 대기가 있었고, 구 runtime의 HWUI 대기 진단과 UIAutomation 지연·텍스트 선택·잘못 선택된 확인 제목 등 자동화 실패는 통과로 합산하지 않았다. 실제 화면·foreground Activity·백업 JSON·이미지 디코딩·설치 APK 해시로 검증했다.

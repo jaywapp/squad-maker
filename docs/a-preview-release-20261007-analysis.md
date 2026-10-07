@@ -37,3 +37,7 @@
 ## 실제 Android 백업 확장자 보완
 
 API 36의 파일 저장 완료 뒤 NativeSparseQA-final.sq.json이 만들어짐을 확인했다. JSON MIME 타입에 따른 Android 파일 제공자의 확장자 추가이며, .sq 복원 선택성과 백업 명명 계약을 지키기 위해 native Documents.save의 JSON .sq 파일 선택기에서만 application/octet-stream을 지정한다. 브리지의 허용 MIME, JSON bytes, 계약 v2, 웹 .sq, PNG/GIF와 공유 동작은 보존한다. 승인된 최소 native 보완이다. 기존 AOSP FileUtils splitFileName 근거: https://android.googlesource.com/platform/frameworks/base/+/cf628c4/core/java/android/os/FileUtils.java . 최종 APK로 실제 .sq 파일명·원본 bytes·재복원을 확인한다.
+
+## 최종 결과 (2026-10-08 KST)
+
+[설치용 preview Release](https://github.com/jaywapp/squad-maker/releases/tag/v0.1.0-preview.1) 게시 및 재다운로드·재설치 완료. APK 소스는 c081101f300a1d1132f60947267edbf7b0d298b1이며 후속 문서 커밋은 앱 코드를 바꾸지 않는다. 기존 preview 키·인증서만 재사용했다. 새 계정·키·비밀값·권한 등록, main 병합, 상용 광고·결제·Play Store 배포는 하지 않았다. 실제 Android 휴대폰과 TalkBack·큰 글자·가로 화면·수신자 전달은 미검증이며, 무료 수량·가격은 미정이다.
