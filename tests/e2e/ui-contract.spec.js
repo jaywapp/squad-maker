@@ -360,6 +360,8 @@ test('startup storage read failure exposes a safe string reason and retains byte
   }, LS_KEY);
   await page.reload();
   expect((await state(page)).storage).toEqual({ status: 'blocked', error: 'storage-unavailable', retryable: false });
+  await expect(page.locator('#saveStatus')).toContainText('백업 파일 복원도 실패할 수 있습니다.');
+  await expect(page.locator('#saveStatus')).not.toContainText('유효한 .sq 파일을 가져와 복원해 주세요.');
   await page.evaluate(() => window.restoreBlockedRead());
   expect(await storedRaw(page)).toBe(raw);
   expect((await run(page, 'retry-save')).code).toBe('storage-read-blocked');

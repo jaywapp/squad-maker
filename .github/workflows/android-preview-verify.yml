@@ -2,7 +2,7 @@ name: Android preview verification
 
 on:
   push:
-    branches: [feat/a-android-preview-20261007]
+    branches: [feat/a-android-preview-20261007, feat/a-preview-release-20261007]
   pull_request:
     paths:
       - 'index.html'

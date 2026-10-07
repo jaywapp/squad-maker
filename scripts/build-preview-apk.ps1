@@ -20,7 +20,9 @@ $aligned = Join-Path $artifacts 'squad-maker-aligned-unsigned.apk'
 $apk = Join-Path $artifacts 'squad-maker-0.1.0-preview.1.apk'
 Push-Location $repo
 try {
-    & npm.cmd run android:sync
+    & node (Join-Path $repo 'scripts\build-android-web.mjs')
+    if ($LASTEXITCODE -ne 0) { throw 'Android web bundle failed.' }
+    & node (Join-Path $repo 'node_modules\@capacitor\cli\bin\capacitor') sync android
     if ($LASTEXITCODE -ne 0) { throw 'Android sync failed.' }
     Push-Location (Join-Path $repo 'android')
     try {

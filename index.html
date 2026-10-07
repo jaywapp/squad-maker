@@ -2607,15 +2607,25 @@ document.addEventListener('mouseup', () => {
 
 // 롱프레스(500ms) → 컨텍스트 메뉴. iOS Safari는 터치에서 contextmenu를 발생시키지 않음.
 let lpTimer = null;
+function cancelPlayerTouch() {
+  clearTimeout(lpTimer); lpTimer = null;
+  if (!dragState) return;
+  const previous = dragState;
+  dragState = null;
+  previous.el.classList.remove('dragging');
+  const position = squads[currentSquad].positions[previous.id];
+  if (position && (position.x !== previous.px || position.y !== previous.py)) autoSave();
+}
 fieldEl.addEventListener('touchstart', e => {
   if (viewerMode) return;
+  if (e.touches.length !== 1) { cancelPlayerTouch(); return; }
   const pe = e.target.closest('.player');
   if (!pe) return;
   const id = Number(pe.dataset.id);
   const p = getPlayers().find(p => p.id === id);
   if (!p) return;
   const t = e.touches[0];
-  dragState = { id, el: pe, sx: t.clientX, sy: t.clientY, px: p.x, py: p.y, sc: getFieldScale() };
+  dragState = { id, el: pe, touchId: t.identifier, sx: t.clientX, sy: t.clientY, px: p.x, py: p.y, sc: getFieldScale() };
   pe.classList.add('dragging');
   clearTimeout(lpTimer);
   lpTimer = setTimeout(() => {
@@ -2629,7 +2639,8 @@ fieldEl.addEventListener('touchstart', e => {
 }, { passive: false });
 document.addEventListener('touchmove', e => {
   if (!dragState) return;
-  const t = e.touches[0];
+  const t = Array.from(e.touches).find(touch => touch.identifier === dragState.touchId);
+  if (!t) return;
   // 8px 이상 움직이면 드래그로 간주 → 롱프레스 취소
   if (Math.hypot(t.clientX - dragState.sx, t.clientY - dragState.sy) > 8) clearTimeout(lpTimer);
   const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + (t.clientX - dragState.sx) / dragState.sc));
@@ -2639,7 +2650,9 @@ document.addEventListener('touchmove', e => {
   dragState.el.style.top  = y+'px';
   e.preventDefault();
 }, { passive: false });
-document.addEventListener('touchend', () => {
+document.addEventListener('touchcancel', cancelPlayerTouch);
+document.addEventListener('touchend', e => {
+  if (dragState?.touchId != null && !Array.from(e.changedTouches).some(touch => touch.identifier === dragState.touchId)) return;
   clearTimeout(lpTimer);
   if (dragState) { dragState.el.classList.remove('dragging'); dragState = null; autoSave(); }
 });
@@ -3243,6 +3256,12 @@ pCanvas.addEventListener('touchmove', e => {
   e.preventDefault();
 }, { passive: false });
 
+pCanvas.addEventListener('touchcancel', () => {
+  if (!drawState) return;
+  drawState = null;
+  renderPatternFrame(0);
+});
+
 pCanvas.addEventListener('touchend', e => {
   if (!drawState) return;
   const { x, y } = canvasCoords({ touches: e.changedTouches });
@@ -3844,7 +3863,7 @@ function copyShareUrl() {
 
 // ═══════════════════════════════════════════════════════════════
 // 출시 전 기능 미리보기 — 수요 측정 (Task 0.3)
-// 기능을 약속하지 않는다: 가치 설명 + 예상 가격 + 출시 전 상태를 정직하게 안내
+// Describe planned features without committing to quantities, prices, or billing.
 // ═══════════════════════════════════════════════════════════════
 const INTEREST_FEATURES = {
   cloud: {
@@ -3855,7 +3874,7 @@ const INTEREST_FEATURES = {
       '브라우저 데이터를 지워도 전술이 보존됨',
       '취소·만료를 관리할 수 있는 공유 링크',
     ],
-    price: '무료 계정: 팀 1개 · 전술 문서 5개 / Pro(예상 월 6,900원): 여러 팀 · 무제한 문서',
+    price: '제공 범위와 가격은 아직 정해지지 않았습니다.',
   },
   export: {
     event: 'advanced_export_previewed',
@@ -3865,7 +3884,7 @@ const INTEREST_FEATURES = {
       '패턴 애니메이션을 고화질 영상(MP4 등)으로 저장',
       '해상도 · 재생 속도 · 팀명/로고 브랜딩 옵션',
     ],
-    price: 'Pro 요금제(예상 월 6,900원) 포함 기능',
+    price: '제공 범위와 가격은 아직 정해지지 않았습니다.',
   },
   briefing: {
     event: 'player_briefing_previewed',
@@ -3875,7 +3894,7 @@ const INTEREST_FEATURES = {
       '선수는 가입 없이 폰에서 바로 열람',
       '누가 확인했는지 열람 여부 표시',
     ],
-    price: 'Pro 요금제(예상 월 6,900원) 포함 기능',
+    price: '제공 범위와 가격은 아직 정해지지 않았습니다.',
   },
 };
 
@@ -4506,6 +4525,9 @@ function setStorageStatus(status, error = null) {
     'read-only': '공유 전술 열람 중', 'no-file': '보관 중인 전술이 없습니다. 새 전술을 만들어 주세요.',
   };
   document.getElementById('saveStatusText').textContent = labels[status] || labels.error;
+  if (status === 'blocked' && error === 'storage-unavailable') {
+    document.getElementById('saveStatusText').textContent = '기기 저장소를 읽지 못해 자동 저장을 멈췄습니다. 원본을 보호하고 있습니다. 저장소에 접근할 수 없어 백업 파일 복원도 실패할 수 있습니다.';
+  }
   if (status === 'blocked' && error === 'storage-rollback-failed') {
     document.getElementById('saveStatusText').textContent = '저장 실패. 이전 저장본의 복구를 확인하지 못해 자동저장을 중단했습니다. 현재 전술을 파일로 백업해 주세요.';
   }
@@ -4764,7 +4786,7 @@ _readyPromise = (async () => {
     'storage-unavailable': '기기에 저장하지 못했습니다. 다시 시도하거나 백업 파일을 받아 두세요.',
     'storage-verification': '저장한 내용을 확인하지 못했습니다. 다시 시도하거나 백업 파일을 받아 두세요.',
     'storage-conflict': '다른 곳에서 저장 데이터가 바뀌어 덮어쓰지 않았습니다. 백업 파일을 받아 두세요.',
-    'storage-read-blocked': '저장 데이터를 보호하는 중이라 바꿀 수 없습니다. 백업에서 복원해 주세요.',
+    'storage-read-blocked': '저장 데이터를 보호하는 중이라 바꿀 수 없습니다. 저장 상태를 확인해 주세요.',
     'storage-rollback-failed': '저장 데이터 복구를 확인하지 못했습니다. 백업 파일을 받아 두세요.',
     'read-only': '공유 전술 열람 중에는 바꿀 수 없습니다.',
     busy: '다른 작업을 처리하고 있습니다. 끝난 뒤 다시 시도해 주세요.',
@@ -4817,14 +4839,18 @@ _readyPromise = (async () => {
     const el = event.target.closest('.player');
     if (!el || event.touches.length !== 1 || el.querySelector('input')) { tap = null; return; }
     const touch = event.touches[0];
-    tap = { id: Number(el.dataset.id), x: touch.clientX, y: touch.clientY, at: Date.now(), moved: false };
+    tap = { id: Number(el.dataset.id), touchId: touch.identifier, x: touch.clientX, y: touch.clientY, at: Date.now(), moved: false };
   }, { passive: true });
   document.addEventListener('touchmove', event => {
-    if (!tap || !event.touches.length) return;
-    const touch = event.touches[0];
+    if (!tap) return;
+    if (event.touches.length !== 1) { tap = null; return; }
+    const touch = Array.from(event.touches).find(item => item.identifier === tap.touchId);
+    if (!touch) return;
     if (Math.hypot(touch.clientX - tap.x, touch.clientY - tap.y) > 8) tap.moved = true;
   }, { passive: true });
-  document.addEventListener('touchend', () => {
+  document.addEventListener('touchcancel', () => { tap = null; }, { passive: true });
+  document.addEventListener('touchend', event => {
+    if (!tap || !Array.from(event.changedTouches).some(touch => touch.identifier === tap.touchId)) return;
     const current = tap;
     tap = null;
     if (!current || current.moved || Date.now() - current.at > 450 || state.view?.readOnly) return;
