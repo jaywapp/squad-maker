@@ -1,7 +1,9 @@
+> **현재 웹 구현 참고**: 이 문서의 과거 단계·상품·가격·사업자 비용은 당시 가설입니다. Android 상품 방향은 [최신 기획](product-plan.md)을 따르며 분석·운영 설정은 이번 PR에서 변경하지 않습니다.
+
 # 분석 이벤트 사전
 
-- 기준: [수익화 적용 계획서](./2026-07-20-monetization-implementation-plan.md) §9, Task 0.2
-- 도구: Umami Cloud ([ADR 0001](./adr/0001-analytics-provider.md))
+- 기준: [수익화 적용 계획서](archive/legacy-planning/2026-07-20-monetization-implementation-plan.md) §9, Task 0.2
+- 도구: Umami Cloud ([ADR 0001](adr/0001-analytics-provider.md))
 - 구현: `index.html`의 `track(name, properties, options)` 어댑터
 
 ## 원칙
@@ -15,7 +17,7 @@
 5. **자동 부가 필드까지 통제** — 화이트리스트는 우리가 넘기는 속성만 통제하고,
    분석 스크립트가 스스로 붙이는 `url`·`referrer`는 통제하지 못한다.
    `#s=` 공유 스냅샷이 URL에 들어 있으므로 전송 직전 가드로 경로만 남긴다.
-   상세는 [ADR 0001 구현 규칙](./adr/0001-analytics-provider.md) 참고.
+   상세는 [ADR 0001 구현 규칙](adr/0001-analytics-provider.md) 참고.
 6. **준비 전 이벤트 보존** — 스크립트 로드 전 발생한 이벤트는 큐에 보관했다가
    순서대로 전달한다. 조용히 폐기하지 않는다.
 

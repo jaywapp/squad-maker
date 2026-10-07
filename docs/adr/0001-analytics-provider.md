@@ -1,7 +1,9 @@
+> **현재 웹 구현 참고**: 이 문서의 과거 단계·상품·가격·사업자 비용은 당시 가설입니다. Android 상품 방향은 [최신 기획](../product-plan.md)을 따르며 분석·운영 설정은 이번 PR에서 변경하지 않습니다.
+
 # ADR 0001 — 분석 도구 선정
 
 - 상태: 승인 (2026-07-20)
-- 관련 계획: [수익화 적용 계획서](../2026-07-20-monetization-implementation-plan.md) Task 0.2
+- 관련 계획: [수익화 적용 계획서](../archive/legacy-planning/2026-07-20-monetization-implementation-plan.md) Task 0.2
 
 ## 배경
 

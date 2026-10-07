@@ -1,15 +1,17 @@
+> **이력 문서**: 이 파일의 선택 대기·범위·추천은 당시 기록입니다. 현재는 A가 선택되었고 B/C는 선택되지 않았습니다. 최신 기준은 [상품 기획서](../../../product-plan.md)입니다.
+
 # UX 개편 시안 3종 (ux-redesign-20261007)
 
-계획 문서: [분석](../../ux-redesign-20261007-analysis.md) · [설계](../../ux-redesign-20261007-design.md) · [작업](../../ux-redesign-20261007-tasks.md)
+계획 문서: [분석](../ux-redesign-20261007-analysis.md) · [설계](../ux-redesign-20261007-design.md) · [작업](../ux-redesign-20261007-tasks.md)
 
-상태: 사용자 선택 대기. 운영 `index.html`은 바뀌지 않았다.
+당시 상태: 사용자 선택 대기. 현재 상태: A 선택, B/C 미선택. 운영 `index.html`은 바뀌지 않았다.
 
 ## 구성
 
 | 경로 | 내용 |
 |---|---|
 | `index.html` | 세 시안 비교 페이지(스크린샷, 장단점, 비교 기준, 점검 결과, 추천) |
-| `concept-01/index.html` | A 나이트피치: 다크 그린·라임, 피치 중심, 선택하면 나타나는 편집 도구 |
+| [선택 A 원본](../../../design-a/prototype.html) | A 나이트피치: 다크 그린·라임, 피치 중심, 선택하면 나타나는 편집 도구 |
 | `concept-02/index.html` | B 데이라이트코치: 밝은 고대비, 큰 글자, 선수 → 배치 → 움직임 단계 흐름 |
 | `concept-03/index.html` | C 택틱스스튜디오: 네이비·코발트, 전술 파일 탐색과 키프레임 타임라인 |
 | `shared/state.js` | 세 시안이 그대로 붙여 넣은 공통 데모 상태(우리 FC / 9v9 / 3-3-2) |
@@ -20,10 +22,12 @@
 ## 실행
 
 ```bash
-cd docs/ux-redesign-20261007/claude
+# 저장소 루트에서 제공해야 이동한 A 링크도 열립니다.
 python -m http.server 8765
-# http://127.0.0.1:8765/            비교 페이지
-# http://127.0.0.1:8765/concept-01/ 시안 A (02, 03 동일)
+# http://127.0.0.1:8765/docs/archive/ux-redesign-20261007/claude/ 이전 비교
+# http://127.0.0.1:8765/docs/design-a/prototype.html             선택 A
+# http://127.0.0.1:8765/docs/archive/ux-redesign-20261007/claude/concept-02/ B
+# http://127.0.0.1:8765/docs/archive/ux-redesign-20261007/claude/concept-03/ C
 ```
 
 시안 파일은 브라우저로 직접 열어도 동작한다.

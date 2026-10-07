@@ -1,10 +1,12 @@
+> **이력 문서**: 이 파일의 선택 대기·범위·추천은 당시 기록입니다. 현재는 A가 선택되었고 B/C는 선택되지 않았습니다. 최신 기준은 [상품 기획서](../../product-plan.md)입니다.
+
 # UX 개편 계획과 시안 3종: 분석
 
 - slug: `ux-redesign-20261007`
 - 작성일: 2026-10-07
 - orchestrator: Claude
 - 상태: **blocked (사용자 시안 선택 대기)**. 이번 단계는 계획 문서와 격리된 시안 데모까지만 한다. 운영 `index.html`은 바꾸지 않는다.
-- 관련 문서: [설계](ux-redesign-20261007-design.md), [작업](ux-redesign-20261007-tasks.md), [독립 검토](2026-10-07-ux-ui-independent-review.md), 시안 `docs/ux-redesign-20261007/claude/`
+- 관련 문서: [설계](ux-redesign-20261007-design.md), [작업](ux-redesign-20261007-tasks.md), [독립 검토](../../2026-10-07-ux-ui-independent-review.md), 시안 `docs/ux-redesign-20261007/claude/`
 
 ## 1. 요청
 
