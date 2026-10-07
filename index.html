@@ -874,6 +874,9 @@ main { width: 100%; }
   min-width: min(100%, 288px);
 }
 body.mode-pattern #fieldWrapper { width: min(100%, 480px, calc((100dvh - 236px) * 0.7273)); }
+@media (max-width: 1023px) and (max-height: 748px) {
+  body.platform-native.mode-squad #fieldWrapper { min-width: 0; }
+}
 .hint { font-size: 0.8125rem; color: var(--muted); text-align: center; }
 
 /* ── 피치 위 선수: 480 좌표를 scale로 줄이므로 --fi(=1/scale)로 화면 크기를 보정 ── */
@@ -4875,7 +4878,10 @@ _readyPromise = (async () => {
     const appMode = s.view?.appMode || 'squad';
     body.classList.toggle('ui-booting', !s.ready);
     body.classList.toggle('ui-busy', Boolean(s.busy?.mutation || s.export?.busy));
-    body.classList.toggle('platform-native', Boolean(s.platform?.native));
+    const native = Boolean(s.platform?.native);
+    const platformChanged = body.classList.contains('platform-native') !== native;
+    body.classList.toggle('platform-native', native);
+    if (platformChanged) { applyFieldScale(); syncFieldScale(); }
     body.classList.toggle('has-selection', !readOnly && appMode === 'squad' && $('playerActions').classList.contains('visible'));
 
     const { lib, team, file } = libraryNames(s);

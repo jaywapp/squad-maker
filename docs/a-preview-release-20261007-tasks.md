@@ -7,8 +7,8 @@ orchestrator: Codex. owner: Codex. UI는 Claude 완료 인계를 입력으로 �
 | I-01 | 원본 보존·별도 브랜치·UI merge | Codex | GPT-6 | high | 없음 | sequential | Git | 두 SHA 포함, 원본 clean | 완료 |
 | I-02 | 정책 문구·회귀·head CI 설정 | Codex | GPT-6 | high | I-01 | sequential | index.html, tests/e2e, build-preview-apk.ps1, CI | diff/단위/desktop/mobile | 완료 |
 | I-03 | native/UI 계약 읽기 리뷰 | Codex | gpt-6.1-sol | high | I-01 | read-review | index, platform-native, plugins | 구체적 위험·근거 | 완료 |
-| I-04 | commit·draft PR·exact head CI | Codex | GPT-6 | high | I-02,I-03 | sequential | docs/Git/PR | source head CI | 진행 |
-| I-05 | 승인 키 서명·실제 APK 검증 | Codex | GPT-6 | high | I-04 | sequential | .work 로컬 증거 | 패키지/버전/서명·native 흐름 | 대기 |
+| I-04 | commit·draft PR·exact head CI | Codex | GPT-6 | high | I-02,I-03 | sequential | docs/Git/PR | source head CI | 완료 |
+| I-05 | 승인 키 서명·실제 APK 검증 | Codex | GPT-6 | high | I-04 | sequential | .work 로컬 증거 | 패키지/버전/서명·native 흐름 | 진행 |
 | I-06 | Release·재다운로드·재설치·인계 | Codex | GPT-6 | high | I-05 | sequential | 공개 자산/문서 | 동일 해시/인증서·재설치 | 대기 |
 
 ## 시작 기록
@@ -25,3 +25,7 @@ native 21c2b5474e77d97aef827b0d45e311eb585d1164, UI d6c16cefb32500b02c8e975b701b
 - 저장 장치 읽기 실패 안내/터치 취소 변경 diff 재리뷰: 새 High/Critical 없음.
 - Android web bundle 생성 성공, 계약 v2/v:1/library version1, 로컬 export assets, analytics disabled.
 - 서명 helper는 동일 Node 번들+Capacitor CLI sync를 직접 호출, PowerShell syntax 검사 성공. 실제 서명 빌드는 CI 후 진행.
+
+I-05 실제 실행: d326f335 CI 2건 성공. 기존 승인 키로 동일 CI APK를 서명하고 전용 AVD에 설치했다. Android Emulator 35.6의 초기 화면 정지/ANR는 공개 진단에서 HWUI 대기로 확인됐고, 원본 SDK 변경 없이 프로젝트 로컬 공식 Emulator 37.2.12로 정상 A UI·테스트 광고 실행을 확인했다. 원본 AVD 데이터는 보존했다. 현재 발견된 짧은 높이 피치 중첩을 최소 수정한 뒤 새 head APK로 최종 검증한다.
+
+짧은 높이 보완 검증: 단위 95/95, 새 360×682/360×640 기하 2개 및 touchcancel 2개 통과. 시작 배율 assertion은 CSS만 적용한 상태에서 두 화면 모두 실패를 재현했다. 최소 수정 후 독립 diff 재리뷰에 새 High/Critical 없음. 새 소스 head의 CI 및 APK 설치를 진행한다.
