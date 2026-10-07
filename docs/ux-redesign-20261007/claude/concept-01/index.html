@@ -1,0 +1,1685 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>나이트피치 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/*
+  Concept A: Night Pitch.
+  Evolves the production identity (charcoal green ground, pitch green, lime chalk, Oswald wordmark).
+  Color roles: lime = the single primary action (내보내기·공유) and the player selection ring. Nothing else.
+  Shape rule: controls 10px, sheets/cards 16px, tokens/labels/chips full round.
+  Theme: dark only, by brief (evening and floodlit use scene).
+*/
+:root {
+  color-scheme: dark;
+  --bg: #0f1411;
+  --bg-deep: #0a0e0b;
+  --surface: #18201a;
+  --surface-2: #202a23;
+  --surface-3: #283329;
+  --line: #2f3b33;
+  --line-2: #3d4b41;
+  --ink: #e9eee9;
+  --ink-2: #c6d0c8;
+  --muted: #9dada2;
+  --accent: #b8e986;
+  --accent-ink: #18220f;
+  --warn: #f0b429;
+  --danger: #f08a84;
+  --pitch: #2b5e3f;
+  --font-ui: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', system-ui, sans-serif;
+  --font-num: 'Oswald', 'Bahnschrift', 'Arial Narrow', 'Segoe UI', sans-serif;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --note-h: 44px;
+  --r-ctl: 10px;
+  --r-card: 16px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+html, .files, .dock, .sheet-in, .chips { scrollbar-color: #3d4b41 transparent; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+svg.i { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* ---------- demo note (fixed) ---------- */
+.note {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 3px 16px; min-height: 50px;
+  background: #2a2410; color: #f6e7b8;
+  border-bottom: 1px solid #4a3f17;
+  font-size: 12px;
+}
+.note > span { flex: 1; min-width: 0; line-height: 1.35; }
+.note strong { font-weight: 600; }
+.demo-wrap { position: relative; }
+.demo-btn {
+  min-height: 44px; padding: 2px 12px; border-radius: 999px; white-space: nowrap;
+  background: transparent; border: 1px solid #8a7634; color: #f6e7b8; font-size: 12px;
+}
+.demo-btn[aria-expanded="true"] { background: #3a3216; }
+.demo-menu {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 60;
+  width: 248px; padding: 6px; border-radius: var(--r-card);
+  background: var(--surface-2); border: 1px solid var(--line-2);
+  box-shadow: 0 16px 40px rgba(0,0,0,.5);
+  display: grid; gap: 2px; color: var(--ink);
+}
+.demo-menu[hidden] { display: none; }
+.demo-menu p { margin: 4px 8px 6px; font-size: 12px; color: var(--muted); }
+.demo-menu button {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  min-height: 44px; padding: 0 10px; border-radius: var(--r-ctl);
+  border: 0; background: transparent; text-align: left; font-size: 14px;
+}
+.demo-menu button:hover { background: var(--surface-3); }
+.demo-menu button small { color: var(--muted); font-size: 12px; }
+
+.tag {
+  display: inline-flex; align-items: center; height: 18px; padding: 0 6px; border-radius: 999px;
+  font-size: 11px; font-weight: 600; letter-spacing: .02em; line-height: 1;
+  background: #3a3216; color: #f6e7b8; border: 1px solid #6b5b26; white-space: nowrap; vertical-align: middle;
+}
+
+/* ---------- shell (mobile first) ---------- */
+.app { max-width: 1480px; margin: 0 auto; }
+.shell {
+  height: calc(100dvh - var(--note-h));
+  min-height: 560px;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 0 16px calc(8px + env(safe-area-inset-bottom));
+}
+
+/* top bar */
+.topbar { display: flex; align-items: center; gap: 8px; height: 58px; flex: none; }
+.wordmark { display: none; font-family: var(--font-num); font-weight: 600; font-size: 18px; letter-spacing: .14em; color: var(--ink); }
+.team { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.team-name { font-weight: 600; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.save {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); white-space: nowrap;
+  border-radius: 999px; transition: background-color .4s var(--ease);
+}
+.save svg.i { width: 14px; height: 14px; }
+.save[data-state="failed"] { color: var(--warn); }
+.save.flash { background: rgba(240,180,41,.14); }
+.save .tag { height: 16px; font-size: 10px; }
+
+.seg { display: inline-flex; padding: 2px; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; flex: none; }
+.seg button {
+  min-height: 48px; min-width: 52px; padding: 0 12px; border: 0; border-radius: 9px;
+  background: transparent; color: var(--ink-2); font-weight: 500; font-size: 14px;
+}
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg-deep); font-weight: 600; }
+.seg button:not([aria-pressed="true"]):hover { background: var(--surface-3); color: var(--ink); }
+
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 48px; padding: 0 16px; border: 0; border-radius: var(--r-ctl);
+  background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 15px; white-space: nowrap; flex: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,.35);
+  transition: transform .15s var(--ease), filter .15s;
+}
+.btn-primary:hover { filter: brightness(1.06); }
+.btn-primary:active { transform: translateY(1px) scale(.985); }
+.btn-primary .long { display: none; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 48px; padding: 0 14px; border-radius: var(--r-ctl);
+  background: var(--surface-2); border: 1px solid var(--line-2); color: var(--ink);
+  font-weight: 500; font-size: 14px; white-space: nowrap;
+  transition: background-color .15s, transform .15s var(--ease);
+}
+.btn:hover { background: var(--surface-3); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.ghost { background: transparent; }
+.btn.solid { background: var(--ink); color: var(--bg-deep); border-color: var(--ink); font-weight: 600; }
+.btn.solid:hover { background: #fff; }
+.btn.danger { color: var(--danger); border-color: #5a3532; background: transparent; }
+.btn.danger:hover { background: #2a1918; }
+.icon-btn {
+  display: inline-grid; place-items: center; width: 48px; height: 48px; flex: none;
+  border-radius: var(--r-ctl); border: 1px solid transparent; background: transparent; color: var(--ink-2);
+}
+.icon-btn:hover { background: var(--surface-3); color: var(--ink); }
+.icon-btn:disabled { opacity: .35; cursor: not-allowed; background: transparent; }
+
+/* context row */
+.ctx { display: flex; align-items: center; gap: 8px; flex: none; min-height: 48px; }
+.ctx h2, .ctx .field-label { display: none; }
+.ctx .grp { display: flex; align-items: center; gap: 8px; }
+.ctx .grp-squad { flex: 1; min-width: 0; justify-content: space-between; }
+.ctx .grp-tactic { flex: 1; }
+.ctx .grp-tactic[hidden], .ctx .grp-squad[hidden] { display: none; }
+.select {
+  appearance: none; -webkit-appearance: none;
+  min-height: 48px; padding: 0 30px 0 12px; border-radius: var(--r-ctl);
+  background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c6d0c8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6l6 -6'/%3E%3C/svg%3E") no-repeat right 10px center;
+  border: 1px solid var(--line-2); color: var(--ink); font-size: 14px; font-weight: 500;
+}
+.select.num { font-family: var(--font-num); font-size: 16px; letter-spacing: .02em; }
+.select:hover { border-color: #56685b; }
+.ctx .grp-tactic .select { flex: 1; min-width: 0; }
+.ctx .reset-inline { display: none; }
+.ctx .fields { display: flex; gap: 8px; }
+
+/* stage */
+.stage { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.pitch-box { position: relative; flex: 1; min-height: 0; width: 100%; display: grid; place-items: center; }
+.pitch {
+  position: relative; width: 320px; height: 440px; --s: .667; --tok: 32px;
+  border-radius: 14px; overflow: visible;
+  box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 18px 50px rgba(0,0,0,.45);
+  touch-action: pan-y;
+  user-select: none; -webkit-user-select: none;
+}
+.pitch-svg, .overlay { position: absolute; inset: 0; width: 100%; height: 100%; display: block; border-radius: 14px; }
+.overlay { pointer-events: none; overflow: visible; }
+.layer { position: absolute; inset: 0; }
+.tok {
+  position: absolute; left: 0; top: 0;
+  width: max(48px, var(--tok)); height: max(48px, var(--tok));
+  transform: translate(calc(var(--x) * var(--s) * 1px - 50%), calc(var(--y) * var(--s) * 1px - 50%));
+  touch-action: none; cursor: grab; border-radius: 999px;
+  outline: none;
+}
+.tok:active { cursor: grabbing; }
+.pitch.anim .tok, .pitch.anim .ball { transition: transform .62s var(--ease); }
+.tok.dragging { transition: none !important; z-index: 5; }
+.tok.dragging .disc { transform: translate(-50%, -50%) scale(1.08); }
+.disc {
+  position: absolute; left: 50%; top: 50%; width: var(--tok); height: var(--tok);
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  display: grid; place-items: center;
+  background: var(--c, #1565b8); color: var(--tc, #fff);
+  border: 2px solid rgba(255,255,255,.92);
+  font-family: var(--font-num); font-weight: 600; font-size: calc(var(--tok) * .5); line-height: 1;
+  text-shadow: 0 1px 2px rgba(0,0,0,.55);
+  box-shadow: 0 3px 8px rgba(0,0,0,.45);
+  transition: transform .15s var(--ease);
+}
+.disc.light { text-shadow: none; }
+.tok.gk .disc { border-color: #ffe3e2; }
+.tok.sel .disc { outline: 3px solid var(--accent); outline-offset: 3px; }
+.tok:focus-visible { outline: 3px solid var(--ink); outline-offset: 1px; }
+.tok:focus-visible .disc { box-shadow: 0 0 0 2px var(--bg-deep), 0 3px 8px rgba(0,0,0,.45); }
+.lbl {
+  position: absolute; left: 50%; top: calc(50% + var(--tok) / 2 + 3px); transform: translateX(-50%);
+  padding: 1px 7px; border-radius: 999px;
+  background: rgba(9,13,10,.86); color: #f1f5f1;
+  font-size: 12px; font-weight: 500; line-height: 17px; white-space: nowrap;
+  pointer-events: none;
+}
+.tok.side .lbl { left: calc(50% + var(--tok) / 2 + 5px); top: 50%; transform: translateY(-50%); }
+.tok.sel .lbl { box-shadow: 0 0 0 1px rgba(184,233,134,.7); }
+.ball {
+  position: absolute; left: 0; top: 0; width: 16px; height: 16px; border-radius: 999px;
+  transform: translate(calc(var(--x) * var(--s) * 1px - 50%), calc(var(--y) * var(--s) * 1px - 50%));
+  background: #f7f7f2; border: 2px solid #1b221d; box-shadow: 0 2px 4px rgba(0,0,0,.5);
+  pointer-events: none;
+}
+.ball[hidden] { display: none; }
+.overlay .mv { stroke: #f4f7f4; stroke-width: 3.2; fill: none; stroke-linecap: round; opacity: .95; }
+.overlay .pass { stroke: #f7f7f2; stroke-width: 2.4; fill: none; stroke-dasharray: 7 7; opacity: .9; }
+.overlay .ghost { fill: rgba(9,13,10,.25); stroke: rgba(244,247,244,.75); stroke-width: 2; stroke-dasharray: 4 4; }
+.overlay .draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw .7s var(--ease) forwards; }
+.overlay .fade { animation: fade .5s ease-out both; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes fade { from { opacity: 0; } }
+
+.coach {
+  position: absolute; left: 50%; top: 12px; transform: translateX(-50%);
+  padding: 6px 12px; border-radius: 999px; background: rgba(9,13,10,.86); color: var(--ink);
+  font-size: 13px; white-space: nowrap; pointer-events: none;
+}
+.coach[hidden] { display: none; }
+
+/* steps strip */
+.steps { width: 100%; max-width: var(--pitch-w, 100%); flex: none; display: grid; gap: 2px; }
+.steps[hidden] { display: none; }
+.steps-row { display: flex; align-items: center; gap: 4px; }
+.chips { flex: 1; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding: 2px; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  min-width: 44px; height: 44px; padding: 0 12px; border-radius: 999px; flex: none;
+  border: 1px solid var(--line-2); background: var(--surface); color: var(--ink-2);
+  font-family: var(--font-num); font-size: 16px; font-weight: 500;
+}
+.chip.word { font-family: var(--font-ui); font-size: 13px; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg-deep); border-color: var(--ink); font-weight: 600; }
+.play { min-width: 76px; }
+.caption { font-size: 13px; color: var(--ink-2); min-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; }
+.caption b { font-family: var(--font-num); font-weight: 500; color: var(--ink); margin-right: 4px; }
+
+/* toasts */
+.toasts { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); width: min(100%, 420px); padding: 0 8px; z-index: 20; display: grid; gap: 8px; pointer-events: none; }
+.steps:not([hidden]) ~ .toasts { bottom: 92px; }
+.toast {
+  pointer-events: auto;
+  display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 6px 6px 6px 14px;
+  border-radius: var(--r-card); background: #e9eee9; color: #121813;
+  box-shadow: 0 12px 30px rgba(0,0,0,.45);
+  font-size: 14px; font-weight: 500;
+  animation: rise .32s var(--ease) both;
+}
+.toast .msg { flex: 1; min-width: 0; }
+.toast .tag { background: #f6e7b8; color: #3a3216; border-color: #c8ad5a; margin-left: 6px; }
+.toast .undo {
+  min-height: 44px; padding: 0 14px; border-radius: var(--r-ctl); border: 0;
+  background: #121813; color: #e9eee9; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;
+}
+.toast.alert { background: #2b210b; color: #fbe7b4; border: 1px solid #7a5d13; align-items: flex-start; flex-wrap: wrap; padding: 12px; }
+.toast.alert .msg { flex-basis: 100%; display: flex; gap: 8px; }
+.toast.alert .msg svg { color: var(--warn); margin-top: 1px; }
+.toast.alert .acts { display: flex; gap: 8px; margin-left: auto; }
+.toast.alert .btn { min-height: 44px; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+
+/* dock */
+.dock {
+  flex: none; height: 124px; position: relative;
+  border-radius: var(--r-card); background: var(--surface); border: 1px solid var(--line);
+  padding: 10px 12px;
+}
+.dock-idle { height: 100%; display: flex; align-items: center; gap: 12px; }
+.dock-idle .hint { flex: 1; margin: 0; font-size: 13px; color: var(--ink-2); }
+.dock-idle .hint b { color: var(--ink); font-weight: 600; }
+.dock-idle .kbd, .dock-idle h3, .dock-idle .summary { display: none; }
+.dock-sel { display: grid; grid-template-rows: 44px 1fr; height: 100%; gap: 6px; animation: dockin .28s var(--ease) both; }
+@keyframes dockin { from { opacity: 0; transform: translateY(8px); } }
+.dock-id { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.dock-num {
+  width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center; flex: none;
+  background: var(--c); color: var(--tc, #fff); border: 2px solid rgba(255,255,255,.9);
+  font-family: var(--font-num); font-weight: 600; font-size: 17px; outline: 2px solid var(--accent); outline-offset: 2px;
+}
+.dock-id .who { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.dock-id .who strong { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dock-id .who span { font-size: 12px; color: var(--muted); }
+.dock-id .icon-btn { width: 44px; height: 44px; }
+.tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.tool {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-height: 52px; border-radius: var(--r-ctl); border: 1px solid var(--line-2); background: var(--surface-2);
+  font-size: 13px; font-weight: 500;
+}
+.tool:hover { background: var(--surface-3); }
+.tool.del { color: var(--danger); border-color: #4b302e; background: transparent; }
+.panel { display: none; }
+.dock[data-panel="name"] .panel[data-p="name"],
+.dock[data-panel="color"] .panel[data-p="color"],
+.dock[data-panel="note"] .panel[data-p="note"] { display: flex; }
+.dock:not([data-panel="actions"]) .tools { display: none; }
+.panel { align-items: center; gap: 8px; min-width: 0; }
+.panel > label, .panel > .plabel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.input {
+  flex: 1; min-width: 0; min-height: 48px; padding: 0 12px; border-radius: var(--r-ctl);
+  background: var(--bg-deep); border: 1px solid var(--line-2); color: var(--ink); font-size: 15px;
+}
+.input::placeholder { color: #8a9a8f; }
+.input:focus { border-color: var(--ink-2); outline: none; box-shadow: 0 0 0 2px rgba(233,238,233,.25); }
+textarea.input { padding: 12px; resize: none; line-height: 1.45; }
+.swatches { display: flex; gap: 6px; flex: 1; flex-wrap: wrap; }
+.sw {
+  width: 40px; height: 40px; border-radius: 999px; border: 2px solid rgba(255,255,255,.25);
+  background: var(--c); display: grid; place-items: center; color: var(--tc, #fff);
+}
+.sw[aria-checked="true"] { border-color: var(--ink); box-shadow: 0 0 0 2px var(--bg-deep) inset; }
+.sw svg.i { width: 18px; height: 18px; opacity: 0; }
+.sw[aria-checked="true"] svg.i { opacity: 1; }
+.panel-del, .dock .kb-hint, .dock-sel h3 { display: none; }
+
+/* files (below the fold on mobile) */
+.files { padding: 28px 16px 48px; }
+.files-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+.files h2 { font-size: 16px; margin: 0; font-weight: 600; }
+.slots { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.slot-bar { display: inline-flex; gap: 3px; }
+.slot-bar i { width: 14px; height: 6px; border-radius: 999px; background: var(--line-2); }
+.slot-bar i.on { background: var(--ink-2); }
+.file-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+.file-row { display: flex; align-items: center; gap: 4px; border-radius: var(--r-ctl); background: var(--surface); border: 1px solid var(--line); }
+.file-row.cur { border-color: #56685b; background: var(--surface-2); }
+.file {
+  flex: 1; min-width: 0; min-height: 56px; padding: 8px 12px; text-align: left; border: 0; background: transparent;
+  display: flex; flex-direction: column; justify-content: center; border-radius: var(--r-ctl);
+}
+.file strong { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file span { font-size: 12px; color: var(--muted); }
+.file-row .icon-btn { color: var(--muted); }
+.file-row .icon-btn:hover { color: var(--danger); }
+.files .new { width: 100%; margin-top: 8px; }
+.notice {
+  margin-top: 10px; padding: 12px 12px 12px 14px; border-radius: var(--r-ctl);
+  background: var(--surface-2); border: 1px solid var(--line-2); font-size: 13px; color: var(--ink-2);
+  display: grid; gap: 8px;
+}
+.notice[hidden] { display: none; }
+.notice .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.notice strong { color: var(--ink); font-size: 14px; }
+.notice p { margin: 0; }
+.ad {
+  margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line);
+}
+.ad-box {
+  height: 84px; border-radius: var(--r-card); border: 1px dashed #4b5a4f;
+  display: grid; place-items: center; text-align: center;
+  color: var(--muted); font-size: 13px; background: repeating-linear-gradient(135deg, transparent 0 10px, rgba(255,255,255,.015) 10px 20px);
+}
+.ad-box b { display: block; color: var(--ink-2); font-weight: 500; }
+.foot { margin-top: 28px; font-size: 12px; color: var(--muted); }
+
+/* dialogs */
+dialog { border: 0; padding: 0; color: var(--ink); background: transparent; max-width: none; max-height: none; }
+dialog::backdrop { background: rgba(5,8,6,.66); }
+.sheet {
+  box-sizing: border-box; width: 100%; max-width: 100vw; min-width: 0;
+  margin: 0; margin-top: auto; left: 0; right: 0; inset-inline: 0;
+  padding: 0; overflow: hidden; max-height: 90dvh;
+}
+.sheet-in {
+  background: var(--surface); border: 1px solid var(--line-2); border-bottom: 0;
+  border-radius: 16px 16px 0 0; max-height: 90dvh; overflow: auto;
+  width: 100%; min-width: 0; overflow-x: hidden;
+  padding: 0 16px calc(20px + env(safe-area-inset-bottom));
+  animation: sheetin .34s var(--ease) both;
+}
+@keyframes sheetin { from { transform: translateY(24px); opacity: 0; } }
+.sheet-head { position: sticky; top: 0; z-index: 2; background: var(--surface); display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.sheet-head h2 { min-width: 0; }
+.sheet-head .icon-btn { flex: none; }
+.sheet-head h2 { margin: 0; font-size: 18px; font-weight: 600; }
+.grp-x { padding: 14px 0 16px; border-top: 1px solid var(--line); }
+.grp-x:first-of-type { border-top: 0; }
+.grp-x h3 { margin: 0 0 2px; font-size: 15px; font-weight: 600; }
+.grp-x > p { margin: 0 0 10px; font-size: 13px; color: var(--muted); }
+.xrow { display: flex; align-items: center; gap: 10px; padding: 8px 0; flex-wrap: wrap; }
+.xrow .what { flex: 1 1 160px; min-width: 0; }
+.xrow .what strong { display: block; font-size: 14px; font-weight: 500; }
+.xrow .what span { font-size: 12px; color: var(--muted); }
+.xrow .acts { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; max-width: 100%; }
+.xrow .btn { min-height: 48px; }
+@media (max-width: 1023px) {
+  .xrow { flex-direction: column; align-items: stretch; gap: 8px; }
+  .xrow .what { flex: none; }
+  .xrow .acts .btn { flex: 1 1 0; min-width: 0; white-space: normal; text-align: center; }
+  .grp-x, .result, .result-card { min-width: 0; max-width: 100%; }
+}
+.result { padding: 8px 0 0; display: grid; gap: 12px; }
+.result-card { display: grid; gap: 6px; padding: 16px; border-radius: var(--r-card); background: var(--surface-2); border: 1px solid var(--line-2); }
+.result-card .ok { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; }
+.result-card .ok svg { color: var(--ink); }
+.result-card .file-name { font-family: var(--font-num); font-size: 15px; letter-spacing: .01em; color: var(--ink-2); word-break: break-all; }
+.result-card p { margin: 0; font-size: 13px; color: var(--muted); }
+.result .acts { display: flex; gap: 8px; }
+.result .acts .btn { flex: 1; }
+.result .ad { margin-top: 20px; }
+.progress { height: 8px; border-radius: 999px; background: var(--bg-deep); overflow: hidden; }
+.progress i { display: block; height: 100%; width: 100%; background: var(--ink); transform-origin: left; transform: scaleX(var(--p, 0)); transition: transform .12s linear; }
+.pct { font-family: var(--font-num); font-size: 28px; font-weight: 500; }
+.kakao { width: 100%; min-height: 168px; font-size: 14px; }
+
+.confirm { width: min(calc(100% - 32px), 420px); margin: auto; }
+.confirm-in { background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-card); padding: 20px; box-shadow: 0 24px 60px rgba(0,0,0,.5); animation: rise .28s var(--ease) both; }
+.confirm h2 { margin: 0 0 8px; font-size: 18px; }
+.confirm p { margin: 0 0 10px; color: var(--ink-2); font-size: 14px; }
+.confirm ul { margin: 0 0 16px; padding: 12px 12px 12px 30px; border-radius: var(--r-ctl); background: var(--bg-deep); border: 1px solid var(--line); font-size: 14px; display: grid; gap: 4px; }
+.confirm .acts { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ---------- desktop ---------- */
+@media (min-width: 1024px) {
+  body { font-size: 14px; }
+  .note { padding: 3px 24px; }
+  .app {
+    display: grid;
+    grid-template-columns: 296px minmax(0, 1fr) 320px;
+    grid-template-rows: 68px auto minmax(0, 1fr);
+    grid-template-areas: "top top top" "ctx stage dock" "files stage dock";
+    column-gap: 28px;
+    height: calc(100dvh - var(--note-h)); min-height: 600px;
+    padding: 0 28px 20px;
+  }
+  .shell { display: contents; }
+  .topbar { grid-area: top; height: 68px; gap: 16px; }
+  .wordmark { display: block; }
+  .team { flex: 0 1 auto; padding-left: 16px; border-left: 1px solid var(--line); }
+  .topbar .seg { margin-left: auto; margin-right: auto; }
+  .btn-primary .long { display: inline; }
+  .btn-primary .short { display: none; }
+
+  .ctx { grid-area: ctx; flex-direction: column; align-items: stretch; gap: 14px; padding: 4px 0 18px; border-bottom: 1px solid var(--line); }
+  .ctx h2 { display: block; margin: 0; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .ctx .field-label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .ctx .grp-squad { flex-direction: column; align-items: stretch; gap: 14px; }
+  .ctx .grp-squad[hidden] { display: flex; }
+  .ctx .grp-tactic { display: none !important; }
+  .ctx .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ctx .fields .select { width: 100%; }
+  .ctx .seg { display: flex; }
+  .ctx .seg button { flex: 1; }
+  .ctx .reset-inline { display: inline-flex; }
+
+  .stage { grid-area: stage; grid-row: 2 / 4; padding-top: 4px; }
+  .dock { grid-area: dock; grid-row: 2 / 4; align-self: start; height: auto; min-height: 320px; max-height: 100%; overflow: auto; padding: 20px; margin-top: 4px; }
+  .files { grid-area: files; overflow: auto; min-height: 0; padding: 18px 2px 8px 0; }
+
+  .dock-idle { flex-direction: column; align-items: stretch; gap: 14px; height: auto; }
+  .dock-idle h3 { display: block; margin: 0; font-size: 16px; font-weight: 600; }
+  .dock-idle .hint { flex: none; font-size: 14px; }
+  .dock-idle .kbd { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; margin: 0; font-size: 13px; color: var(--ink-2); padding-top: 12px; border-top: 1px solid var(--line); }
+  .dock-idle .kbd dt { font-family: var(--font-num); color: var(--ink); white-space: nowrap; }
+  .dock-idle .kbd dd { margin: 0; }
+  .dock-idle .summary { display: block; margin: 0; padding: 12px 0 0; border-top: 1px solid var(--line); list-style: none; }
+  .dock-idle .summary li { margin: 0; }
+  .dock-idle .summary button { width: 100%; text-align: left; display: flex; gap: 10px; align-items: baseline; min-height: 40px; padding: 8px 10px; border-radius: var(--r-ctl); border: 0; background: transparent; color: var(--ink-2); font-size: 13px; }
+  .dock-idle .summary button:hover { background: var(--surface-2); }
+  .dock-idle .summary button[aria-current="step"] { background: var(--surface-2); color: var(--ink); }
+  .dock-idle .summary b { font-family: var(--font-num); font-weight: 500; color: var(--ink); min-width: 14px; }
+
+  .dock-sel { display: flex; flex-direction: column; gap: 18px; height: auto; }
+  .dock-sel h3 { display: block; margin: 0 0 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .dock-id { gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .dock-num { width: 52px; height: 52px; font-size: 26px; }
+  .dock-id .who strong { font-size: 20px; }
+  .dock-id .who span { font-size: 13px; }
+  .tools { display: none !important; }
+  .panel { display: block !important; }
+  .panel > label, .panel > .plabel { position: static; width: auto; height: auto; clip: auto; overflow: visible; display: block; margin: 0 0 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .panel .done { display: none; }
+  .panel .input { width: 100%; }
+  .panel textarea.input { min-height: 88px; }
+  .panel-del { display: block; padding-top: 16px; border-top: 1px solid var(--line); }
+  .panel-del .btn { width: 100%; }
+  .dock .kb-hint { display: block; margin: 0; font-size: 12px; color: var(--muted); }
+
+  .toasts { bottom: 16px; }
+  .steps:not([hidden]) ~ .toasts { bottom: 100px; }
+
+  .sheet { width: 560px; max-width: calc(100vw - 48px); margin: auto; max-height: 86dvh; }
+  .sheet-in { padding-top: 8px; }
+  .sheet-head { top: -8px; border-bottom: 0; }
+  .sheet-in { border-radius: var(--r-card); border-bottom: 1px solid var(--line-2); max-height: 86dvh; padding: 8px 24px 24px; box-shadow: 0 30px 80px rgba(0,0,0,.55); }
+  .files .ad { margin-top: 28px; }
+}
+@media (min-width: 1024px) and (max-height: 700px) {
+  .dock { min-height: 0; }
+}
+@media (max-width: 380px) {
+  .seg button { min-width: 48px; padding: 0 10px; }
+  .btn-primary { padding: 0 12px; }
+  .ctx .grp-squad .seg button { min-width: 44px; padding: 0 9px; }
+  .ctx .select { padding: 0 24px 0 10px; background-position: right 8px center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Icons: inline paths from Tabler Icons (https://tabler.io/icons), MIT License, Copyright (c) 2020-2024 Paweł Kuna. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M8.7 10.7l6.6 -3.4"/><path d="M8.7 13.3l6.6 3.4"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6l6 6"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4v16l13 -8z"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><path d="M5 5m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 21a9 9 0 0 1 0 -18c4.97 0 9 3.582 9 8c0 1.06 -.474 2.078 -1.318 2.828c-.844 .75 -1.989 1.172 -3.182 1.172h-2.5a2 2 0 0 0 -1 3.75a1.3 1.3 0 0 1 -1 2.25"/><path d="M8.5 10.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M12.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M16.5 10.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M13 20l7 -7"/><path d="M13 20v-6a1 1 0 0 1 1 -1h6v-7a2 2 0 0 0 -2 -2h-12a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 11l5 5l5 -5"/><path d="M12 4l0 12"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 9l5 -5l5 5"/><path d="M12 4l0 12"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M10 14l11 -11"/><path d="M21 3l-6.5 18a.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a.55 .55 0 0 1 0 -1l18 -6.5"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5l0 14"/><path d="M5 12l14 0"/></symbol>
+  </defs>
+</svg>
+
+<div class="note" id="note">
+  <span><strong>시안 A · 나이트피치 · 데모 데이터, 실제 저장되지 않음</strong></span>
+  <div class="demo-wrap">
+    <button type="button" class="demo-btn" id="demoBtn" aria-expanded="false" aria-controls="demoMenu">시안 상태 보기</button>
+    <div class="demo-menu" id="demoMenu" hidden>
+      <p>화면 상태를 흉내 냅니다. 실제 동작이 아닙니다.</p>
+      <button type="button" data-demo="saved">저장됨 <small>기기 저장 표시</small></button>
+      <button type="button" data-demo="processing">처리 중 <small>GIF 만들기 진행</small></button>
+      <button type="button" data-demo="failed">실패 <small>저장 실패 경고</small></button>
+      <button type="button" data-demo="undo">되돌리기 <small>초기화 후 되돌리기</small></button>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="shell">
+    <header class="topbar">
+      <span class="wordmark" aria-hidden="true">SQUADMAKER</span>
+      <div class="team">
+        <span class="team-name" id="teamName">우리 FC</span>
+        <span class="save" id="save" role="status" aria-live="polite"></span>
+      </div>
+      <div class="seg" role="group" aria-label="화면 모드">
+        <button type="button" id="modeSquad" aria-pressed="true">배치</button>
+        <button type="button" id="modeTactic" aria-pressed="false">전술</button>
+      </div>
+      <button type="button" class="btn-primary" id="exportBtn" aria-label="내보내기·공유" aria-haspopup="dialog">
+        <svg class="i" aria-hidden="true"><use href="#i-share"/></svg><span class="long">내보내기·공유</span><span class="short">공유</span>
+      </button>
+    </header>
+
+    <section class="ctx" id="ctx" aria-label="경기 설정">
+      <h2>경기 설정</h2>
+      <div class="grp grp-squad" id="grpSquad">
+        <div class="seg" role="group" aria-label="스쿼드" id="squadSeg"></div>
+        <div class="fields">
+          <div>
+            <label class="field-label" for="modeSel">인원</label>
+            <select class="select num" id="modeSel" aria-label="인원"></select>
+          </div>
+          <div>
+            <label class="field-label" for="formSel">포메이션</label>
+            <select class="select num" id="formSel" aria-label="포메이션"></select>
+          </div>
+        </div>
+        <button type="button" class="btn ghost reset-inline" data-act="reset"><svg class="i" aria-hidden="true"><use href="#i-refresh"/></svg>배치 초기화</button>
+      </div>
+      <div class="grp grp-tactic" id="grpTactic" hidden>
+        <label class="sr-only" for="tacSel">전술 선택</label>
+        <select class="select" id="tacSel"></select>
+        <button type="button" class="icon-btn" data-act="newtac" aria-label="새 전술"><svg class="i" aria-hidden="true"><use href="#i-plus"/></svg></button>
+      </div>
+    </section>
+
+    <main class="stage" id="stage">
+      <div class="pitch-box" id="pitchBox">
+        <div class="pitch" id="pitch" role="group" aria-label="축구장. 선수를 눌러 선택하고 끌어서 옮깁니다">
+          <svg class="pitch-svg" viewBox="0 0 480 660" aria-hidden="true" focusable="false">
+            <defs>
+              <radialGradient id="flood" cx="50%" cy="42%" r="70%">
+                <stop offset="0" stop-color="#ffffff" stop-opacity=".07"/>
+                <stop offset=".6" stop-color="#ffffff" stop-opacity="0"/>
+                <stop offset="1" stop-color="#000000" stop-opacity=".22"/>
+              </radialGradient>
+            </defs>
+            <rect width="480" height="660" rx="14" fill="#2b5e3f"/>
+            <g fill="#000" fill-opacity=".08">
+              <rect y="44" width="480" height="44"/><rect y="132" width="480" height="44"/><rect y="220" width="480" height="44"/>
+              <rect y="308" width="480" height="44"/><rect y="396" width="480" height="44"/><rect y="484" width="480" height="44"/>
+              <rect y="572" width="480" height="44"/>
+            </g>
+            <g fill="#fff" fill-opacity=".78">
+              <rect x="20" y="20" width="440" height="2"/><rect x="20" y="638" width="440" height="2"/>
+              <rect x="20" y="20" width="2" height="620"/><rect x="458" y="20" width="2" height="620"/>
+              <rect x="20" y="329" width="440" height="2"/><circle cx="240" cy="330" r="4"/>
+              <rect x="130" y="558" width="220" height="2"/><rect x="130" y="558" width="2" height="82"/><rect x="348" y="558" width="2" height="82"/>
+              <rect x="184" y="598" width="112" height="2"/><rect x="184" y="598" width="2" height="42"/><rect x="294" y="598" width="2" height="42"/>
+              <circle cx="240" cy="585" r="3"/>
+              <rect x="194" y="640" width="92" height="6"/>
+              <rect x="130" y="100" width="220" height="2"/><rect x="130" y="20" width="2" height="82"/><rect x="348" y="20" width="2" height="82"/>
+              <rect x="184" y="60" width="112" height="2"/><rect x="184" y="20" width="2" height="42"/><rect x="294" y="20" width="2" height="42"/>
+              <circle cx="240" cy="75" r="3"/>
+              <rect x="194" y="14" width="92" height="6"/>
+            </g>
+            <g fill="none" stroke="#fff" stroke-opacity=".78" stroke-width="2">
+              <circle cx="240" cy="330" r="60"/>
+              <path d="M203.3 558 A45.6 45.6 0 0 1 276.7 558"/>
+              <path d="M203.3 102 A45.6 45.6 0 0 0 276.7 102"/>
+            </g>
+            <rect width="480" height="660" rx="14" fill="url(#flood)"/>
+          </svg>
+          <svg class="overlay" id="overlay" viewBox="0 0 480 660" aria-hidden="true" focusable="false">
+            <defs>
+              <marker id="ah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                <path d="M0 0L10 5L0 10z" fill="#f4f7f4"/>
+              </marker>
+            </defs>
+            <g id="ovl"></g>
+          </svg>
+          <div class="layer" id="layer"></div>
+          <div class="ball" id="ball" hidden></div>
+          <div class="coach" id="coach" hidden></div>
+        </div>
+      </div>
+
+      <div class="steps" id="steps" hidden>
+        <div class="steps-row">
+          <button type="button" class="icon-btn" id="prevStep" aria-label="이전 단계"><svg class="i" aria-hidden="true"><use href="#i-left"/></svg></button>
+          <div class="chips" id="chips" role="group" aria-label="단계 선택"></div>
+          <button type="button" class="icon-btn" id="nextStep" aria-label="다음 단계"><svg class="i" aria-hidden="true"><use href="#i-right"/></svg></button>
+          <button type="button" class="btn play" id="playBtn"></button>
+        </div>
+        <div class="caption" id="caption" aria-live="polite"></div>
+      </div>
+
+      <div class="toasts" id="toasts" aria-live="polite"></div>
+    </main>
+
+    <section class="dock" id="dock" data-panel="actions" aria-label="선택한 선수 도구"></section>
+  </div>
+
+  <section class="files" id="files" aria-labelledby="filesTitle">
+    <div class="files-head">
+      <h2 id="filesTitle">전술 파일</h2>
+      <span class="slots" id="slots"></span>
+    </div>
+    <ul class="file-list" id="fileList"></ul>
+    <button type="button" class="btn new" data-act="newtac"><svg class="i" aria-hidden="true"><use href="#i-plus"/></svg>새 전술</button>
+    <div class="notice" id="slotNotice" hidden role="status">
+      <div class="row"><strong>저장 슬롯이 모두 찼습니다 <span class="tag">시안</span></strong>
+        <button type="button" class="icon-btn" data-act="closenotice" aria-label="안내 닫기"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+      <p>쓰지 않는 전술을 지우면 바로 새 전술을 만들 수 있습니다. 슬롯을 늘리는 방법과 무료 수량은 아직 정하지 않았습니다.</p>
+    </div>
+    <div class="ad" aria-label="광고 자리">
+      <div class="ad-box"><div><b>광고 자리 (시안)</b>전술 목록 끝 고정 칸</div></div>
+    </div>
+    <p class="foot">자동 저장은 이 기기 안에만 됩니다. 다른 기기로 옮기려면 내보내기·공유의 백업을 쓰세요.</p>
+  </section>
+</div>
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheetTitle">
+  <div class="sheet-in">
+    <div class="sheet-head">
+      <h2 id="sheetTitle">내보내기·공유</h2>
+      <button type="button" class="icon-btn" data-act="closesheet" aria-label="닫기"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </div>
+    <div id="sheetBody"></div>
+  </div>
+</dialog>
+
+<dialog class="confirm" id="confirm" aria-labelledby="confirmTitle" aria-describedby="confirmBody">
+  <div class="confirm-in">
+    <h2 id="confirmTitle"></h2>
+    <div id="confirmBody"></div>
+    <div class="acts">
+      <button type="button" class="btn ghost" id="confirmNo">취소</button>
+      <button type="button" class="btn solid" id="confirmYes"></button>
+    </div>
+  </div>
+</dialog>
+
+<div class="sr-only" id="live" aria-live="polite"></div>
+
+<script>
+/* SQUAD-DEMO-STATE BEGIN */
+/* SQUAD-DEMO-STATE v1 (canonical). Paste verbatim into each concept between the BEGIN/END markers.
+   Coordinate system matches production: pitch 480 x 660, own goal at the bottom (y=660). Demo data only. */
+const DEMO_STATE = {
+  team: '우리 FC',
+  mode: '9v9',
+  formation: '3-3-2',
+  roster: [
+    { id: 1, num: 1,  name: '김도윤', role: 'GK', color: '#E53935' },
+    { id: 2, num: 2,  name: '박태수', role: 'DF', color: '#1E88E5' },
+    { id: 3, num: 3,  name: '이준호', role: 'DF', color: '#1E88E5' },
+    { id: 4, num: 4,  name: '최민재', role: 'DF', color: '#1E88E5' },
+    { id: 5, num: 5,  name: '정하람', role: 'MF', color: '#1E88E5' },
+    { id: 6, num: 6,  name: '한서준', role: 'MF', color: '#1E88E5' },
+    { id: 7, num: 7,  name: '오태민', role: 'MF', color: '#1E88E5' },
+    { id: 8, num: 8,  name: '윤재현', role: 'FW', color: '#1E88E5' },
+    { id: 9, num: 9,  name: '강현우', role: 'FW', color: '#1E88E5' }
+  ],
+  positions: {
+    1: { x: 240, y: 616 },
+    2: { x: 130, y: 510 }, 3: { x: 240, y: 520 }, 4: { x: 350, y: 510 },
+    5: { x: 120, y: 385 }, 6: { x: 240, y: 400 }, 7: { x: 360, y: 385 },
+    8: { x: 175, y: 240 }, 9: { x: 305, y: 240 }
+  },
+  ball: { x: 240, y: 400 },
+  tactics: [
+    {
+      id: 't1', name: '오른쪽 전환 침투', updated: '방금 전',
+      steps: [
+        { label: '6번이 오른쪽으로 전환 패스', moves: { 7: { x: 400, y: 300 } }, ball: { from: 6, to: 7 } },
+        { label: '7번 크로스, 9번 니어 침투', moves: { 9: { x: 290, y: 120 }, 8: { x: 200, y: 150 } }, ball: { from: 7, to: 9 } },
+        { label: '수비 라인 전진', moves: { 2: { x: 140, y: 440 }, 3: { x: 240, y: 450 }, 4: { x: 340, y: 440 } }, ball: null }
+      ]
+    },
+    {
+      id: 't2', name: '왼쪽 오버래핑', updated: '어제',
+      steps: [
+        { label: '5번 전진, 2번 오버래핑', moves: { 5: { x: 110, y: 280 }, 2: { x: 70, y: 330 } }, ball: { from: 6, to: 5 } },
+        { label: '2번 컷백', moves: { 2: { x: 80, y: 150 } }, ball: { from: 5, to: 2 } }
+      ]
+    },
+    {
+      id: 't3', name: '전방 압박 3-3-2', updated: '3일 전',
+      steps: [
+        { label: '투톱 상대 센터백 압박', moves: { 8: { x: 190, y: 160 }, 9: { x: 290, y: 160 } }, ball: null }
+      ]
+    }
+  ],
+  squads: ['기본', '공격', '수비'],
+  slots: { used: 3, free: 3 } /* demo value; real free-slot count is undecided */
+};
+/* SQUAD-DEMO-STATE END */
+
+(function () {
+  'use strict';
+
+  /* ---------- constants ---------- */
+  const W = 480, H = 660;
+  const ROLE_KO = { GK: '골키퍼', DF: '수비수', MF: '미드필더', FW: '공격수' };
+  const ROLE_PRE = { DF: '수비', MF: '미드', FW: '공격' };
+  const MODES = {
+    '5v5':   ['2-2', '1-2-1', '2-1-1'],
+    '6v6':   ['2-2-1', '3-2', '2-3'],
+    '7v7':   ['3-2-1', '2-3-1', '2-2-2'],
+    '8v8':   ['3-3-1', '3-2-2', '2-3-2'],
+    '9v9':   ['3-3-2', '3-2-3', '4-3-1', '3-4-1'],
+    '10v10': ['4-3-2', '4-4-1', '3-4-2'],
+    '11v11': ['4-4-2', '4-3-3', '3-5-2']
+  };
+  const SWATCHES = [
+    { c: '#1E88E5', n: '파랑' }, { c: '#E53935', n: '빨강' }, { c: '#F57C00', n: '주황' },
+    { c: '#7E57C2', n: '보라' }, { c: '#263238', n: '검정' }, { c: '#ECEFF1', n: '흰색' }
+  ];
+  const RM = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  const DESK = window.matchMedia ? window.matchMedia('(min-width: 1024px)') : { matches: false };
+
+  const $ = (s) => document.querySelector(s);
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const icon = (id) => '<svg class="i" aria-hidden="true"><use href="#i-' + id + '"/></svg>';
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const modeLabel = (m) => m.replace('v', 'vs');
+  function lum(r, g, b) {
+    const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  }
+  /* Token fill: keep the roster color as identity, but darken it until white digits reach >= 4.6:1. */
+  function fillFor(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    if (textOn(hex) !== '#ffffff') return hex;
+    for (let i = 0; i < 40 && 1.05 / (lum(r, g, b) + 0.05) < 4.6; i++) { r *= 0.96; g *= 0.96; b *= 0.96; }
+    const h = (v) => ('0' + Math.round(v).toString(16)).slice(-2);
+    return '#' + h(r) + h(g) + h(b);
+  }
+  function textOn(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 170 ? '#141a16' : '#ffffff';
+  }
+
+  /* ---------- formations ---------- */
+  function linesFor(formation) { return formation.split('-').map(Number); }
+  function formationLayout(formation) {
+    const lines = linesFor(formation);
+    const pos = { 1: { x: 240, y: 616 } };
+    const roles = { 1: 'GK' };
+    const top = 240, bottom = 510;
+    let id = 2;
+    lines.forEach((count, li) => {
+      const y = lines.length === 1 ? 400 : Math.round(bottom - li * (bottom - top) / (lines.length - 1));
+      const gap = count === 1 ? 0 : Math.min(115, 360 / (count - 1));
+      const role = li === 0 ? 'DF' : (li === lines.length - 1 ? 'FW' : 'MF');
+      for (let i = 0; i < count; i++) {
+        pos[id] = { x: Math.round(240 + (i - (count - 1) / 2) * gap), y: y };
+        roles[id] = role;
+        id++;
+      }
+    });
+    return { pos: pos, roles: roles };
+  }
+  function shifted(pos, dy, roster) {
+    const out = {};
+    roster.forEach((p) => {
+      const q = pos[p.id]; if (!q) return;
+      out[p.id] = p.role === 'GK' ? { x: q.x, y: q.y } : { x: q.x, y: clamp(q.y + dy, 60, 590) };
+    });
+    return out;
+  }
+  function defaultPositions(st) {
+    if (st.mode === DEMO_STATE.mode && st.formation === DEMO_STATE.formation) {
+      const p = clone(DEMO_STATE.positions);
+      const out = {}; st.roster.forEach((r) => { if (p[r.id]) out[r.id] = p[r.id]; });
+      return out;
+    }
+    const lay = formationLayout(st.formation);
+    const out = {}; st.roster.forEach((r) => { if (lay.pos[r.id]) out[r.id] = lay.pos[r.id]; });
+    return out;
+  }
+
+  /* ---------- state ---------- */
+  function freshState() {
+    const s = {
+      team: DEMO_STATE.team, mode: DEMO_STATE.mode, formation: DEMO_STATE.formation,
+      roster: DEMO_STATE.roster.map((p) => Object.assign({}, p, { note: '' })),
+      squads: {}, ball: clone(DEMO_STATE.ball), tactics: clone(DEMO_STATE.tactics),
+      slotsMax: DEMO_STATE.slots.free
+    };
+    const base = clone(DEMO_STATE.positions);
+    s.squads[DEMO_STATE.squads[0]] = base;
+    s.squads[DEMO_STATE.squads[1]] = shifted(base, -40, s.roster);
+    s.squads[DEMO_STATE.squads[2]] = shifted(base, 36, s.roster);
+    return s;
+  }
+  let state = freshState();
+  const ui = {
+    view: 'squad', squad: DEMO_STATE.squads[0], selected: null, panel: 'actions',
+    tacticId: state.tactics[0] ? state.tactics[0].id : null, step: 0,
+    playing: false, timers: [], save: 'saved', firstDragDone: false, slotNotice: false
+  };
+
+  function snapshot() { return { state: clone(state), squad: ui.squad, tacticId: ui.tacticId, step: ui.step }; }
+  function restore(snap) {
+    state = clone(snap.state);
+    ui.squad = snap.squad; ui.tacticId = snap.tacticId; ui.step = snap.step;
+    if (ui.selected != null && !rosterById(ui.selected)) ui.selected = null;
+    animateOnce(); renderAll(); markDirty();
+  }
+  function rosterById(id) { return state.roster.find((p) => p.id === id) || null; }
+  function tactic() { return state.tactics.find((t) => t.id === ui.tacticId) || null; }
+  const BASE = () => DEMO_STATE.squads[0];
+
+  function posAt(k) {
+    const p = clone(state.squads[BASE()]);
+    const t = tactic(); if (!t) return p;
+    for (let i = 0; i < k && i < t.steps.length; i++) {
+      const mv = t.steps[i].moves;
+      Object.keys(mv).forEach((id) => { if (p[id]) p[id] = { x: mv[id].x, y: mv[id].y }; });
+    }
+    return p;
+  }
+  function ballAt(k) {
+    let b = clone(state.ball);
+    const t = tactic(); if (!t) return b;
+    for (let i = 0; i < k && i < t.steps.length; i++) {
+      const bl = t.steps[i].ball;
+      if (bl) { const q = posAt(i + 1)[bl.to]; if (q) b = { x: q.x, y: q.y }; }
+    }
+    return b;
+  }
+  function displayPos() { return ui.view === 'squad' ? state.squads[ui.squad] : posAt(ui.step); }
+
+  /* ---------- save status ---------- */
+  let saveTimer = 0;
+  function markDirty() {
+    if (ui.save === 'failed') return renderSave();
+    ui.save = 'saving'; renderSave();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => { ui.save = 'saved'; renderSave(); }, 650);
+  }
+  function renderSave() {
+    const el = $('#save');
+    el.dataset.state = ui.save;
+    if (ui.save === 'saving') el.innerHTML = '저장 중…';
+    else if (ui.save === 'failed') el.innerHTML = icon('alert') + '저장 실패 <span class="tag">시안</span>';
+    else el.innerHTML = icon('check') + '이 기기에 저장됨 <span class="tag">시안</span>';
+  }
+
+  /* ---------- live / toast ---------- */
+  function announce(t) { const l = $('#live'); l.textContent = ''; setTimeout(() => { l.textContent = t; }, 30); }
+  let toastTimer = 0;
+  function toast(text, opts) {
+    opts = opts || {};
+    const box = $('#toasts');
+    box.querySelectorAll('.toast:not(.alert)').forEach((n) => n.remove());
+    clearTimeout(toastTimer);
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = '<span class="msg">' + esc(text) + '<span class="tag">시안</span></span>' +
+      (opts.undo ? '<button type="button" class="undo">' + icon('undo') + '되돌리기</button>' : '');
+    if (opts.undo) {
+      t.querySelector('.undo').addEventListener('click', () => {
+        restore(opts.undo); t.remove(); toast('되돌렸습니다');
+      });
+    }
+    box.appendChild(t);
+    toastTimer = setTimeout(() => t.remove(), opts.undo ? 7000 : 3200);
+  }
+  function showFailure() {
+    ui.save = 'failed'; renderSave();
+    const box = $('#toasts');
+    if (box.querySelector('.alert')) return;
+    const a = document.createElement('div');
+    a.className = 'toast alert'; a.setAttribute('role', 'alert');
+    a.innerHTML = '<span class="msg">' + icon('alert') + '<span>이 브라우저에 저장하지 못했습니다. 작업을 잃지 않도록 백업 파일을 받아 두세요. <span class="tag">시안</span></span></span>' +
+      '<span class="acts"><button type="button" class="btn ghost" data-a="backup">' + icon('download') + '백업 받기</button>' +
+      '<button type="button" class="btn solid" data-a="retry">' + icon('refresh') + '다시 시도</button></span>';
+    a.addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.a === 'retry') { a.remove(); ui.save = 'saving'; markDirty(); announce('다시 저장했습니다'); }
+      if (b.dataset.a === 'backup') { openSheet('result', { kind: 'backup' }); }
+    });
+    box.prepend(a);
+  }
+
+  /* ---------- pitch scale ---------- */
+  const pitch = $('#pitch');
+  function fit() {
+    const box = $('#pitchBox').getBoundingClientRect();
+    if (!box.width || !box.height) return;
+    const s = Math.max(0.3, Math.min(box.width / W, box.height / H));
+    const w = Math.floor(W * s), h = Math.floor(H * s);
+    pitch.style.width = w + 'px'; pitch.style.height = h + 'px';
+    pitch.style.setProperty('--s', (w / W).toFixed(4));
+    pitch.style.setProperty('--tok', Math.round(clamp(46 * s, 30, 42)) + 'px');
+    document.documentElement.style.setProperty('--pitch-w', Math.max(w, 300) + 'px');
+  }
+  function measureNote() {
+    document.documentElement.style.setProperty('--note-h', $('#note').offsetHeight + 'px');
+  }
+  let animTimer = 0;
+  function animateOnce(ms) {
+    if (RM.matches) return;
+    pitch.classList.add('anim');
+    clearTimeout(animTimer);
+    animTimer = setTimeout(() => { if (!ui.playing) pitch.classList.remove('anim'); }, ms || 700);
+  }
+
+  /* ---------- tokens ---------- */
+  const layer = $('#layer');
+  const tokEls = new Map();
+  function tokLabel(p) {
+    return p.num + '번 ' + p.name + ', ' + ROLE_KO[p.role] + (ui.selected === p.id ? ', 선택됨' : '');
+  }
+  function renderTokens() {
+    const pos = displayPos();
+    const ids = new Set(state.roster.map((p) => p.id));
+    tokEls.forEach((el, id) => { if (!ids.has(id)) { el.remove(); tokEls.delete(id); } });
+    state.roster.slice().sort((a, b) => a.num - b.num).forEach((p) => {
+      let el = tokEls.get(p.id);
+      if (!el) {
+        el = document.createElement('div');
+        el.className = 'tok'; el.tabIndex = 0; el.setAttribute('role', 'button');
+        el.dataset.id = p.id;
+        el.innerHTML = '<span class="disc"></span><span class="lbl"></span>';
+        bindToken(el);
+        tokEls.set(p.id, el);
+        const after = Array.from(layer.children).find((n) => Number(n.dataset.num) > p.num);
+        layer.insertBefore(el, after || null);
+      }
+      el.dataset.num = p.num;
+      const q = pos[p.id] || { x: 240, y: 330 };
+      el.style.setProperty('--x', q.x); el.style.setProperty('--y', q.y);
+      const disc = el.firstChild;
+      disc.textContent = p.num;
+      disc.style.setProperty('--c', fillFor(p.color));
+      const tc = textOn(p.color);
+      disc.style.setProperty('--tc', tc);
+      disc.classList.toggle('light', tc !== '#ffffff');
+      el.lastChild.textContent = p.name;
+      el.classList.toggle('gk', p.role === 'GK');
+      el.classList.toggle('side', q.y > 590);
+      el.classList.toggle('sel', ui.selected === p.id);
+      el.setAttribute('aria-pressed', ui.selected === p.id ? 'true' : 'false');
+      el.setAttribute('aria-label', tokLabel(p));
+    });
+    renderBall();
+  }
+  function renderBall() {
+    const b = $('#ball');
+    if (ui.view !== 'tactic' || !tactic()) { b.hidden = true; return; }
+    const q = ballAt(ui.step);
+    b.hidden = false;
+    b.style.setProperty('--x', q.x + 16); b.style.setProperty('--y', q.y - 14);
+  }
+  function setTokPos(id, q) {
+    const el = tokEls.get(id); if (!el) return;
+    el.style.setProperty('--x', q.x); el.style.setProperty('--y', q.y);
+    el.classList.toggle('side', q.y > 590);
+  }
+  function writePos(id, q) {
+    if (ui.view === 'squad') { state.squads[ui.squad][id] = q; return; }
+    if (ui.step === 0) { state.squads[BASE()][id] = q; return; }
+    const t = tactic(); if (!t) return;
+    t.steps[ui.step - 1].moves[id] = q;
+    t.updated = '방금 전';
+  }
+
+  let drag = null;
+  function bindToken(el) {
+    el.addEventListener('pointerdown', (e) => {
+      if (ui.playing || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      const id = Number(el.dataset.id);
+      const q = displayPos()[id];
+      drag = { id: id, el: el, sx: e.clientX, sy: e.clientY, moved: false, pid: e.pointerId, q: q ? { x: q.x, y: q.y } : null };
+      try { el.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    });
+    el.addEventListener('pointermove', (e) => {
+      if (!drag || drag.el !== el) return;
+      const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+      if (!drag.moved && Math.hypot(dx, dy) < 8) return;
+      if (!drag.moved) { drag.moved = true; el.classList.add('dragging'); pitch.classList.remove('anim'); }
+      const r = pitch.getBoundingClientRect();
+      const s = r.width / W;
+      const q = { x: Math.round(clamp((e.clientX - r.left) / s, 16, W - 16)), y: Math.round(clamp((e.clientY - r.top) / s, 16, H - 16)) };
+      drag.q = q;
+      setTokPos(drag.id, q);
+      if (ui.view === 'tactic') { writePos(drag.id, q); renderOverlay(false); renderBall(); }
+    });
+    const end = (e) => {
+      if (!drag || drag.el !== el) return;
+      const d = drag; drag = null;
+      try { el.releasePointerCapture(d.pid); } catch (err) { /* ignore */ }
+      el.classList.remove('dragging');
+      if (e.type === 'pointercancel') { renderTokens(); return; }
+      if (d.moved && d.q) {
+        writePos(d.id, d.q);
+        if (!ui.firstDragDone) { ui.firstDragDone = true; renderCoach(); }
+        markDirty(); renderOverlay(false); renderDock();
+        const p = rosterById(d.id);
+        announce(p.num + '번 위치를 옮겼습니다');
+      } else {
+        el.focus({ preventScroll: true });
+        select(d.id);
+      }
+    };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    el.addEventListener('keydown', (e) => {
+      const id = Number(el.dataset.id);
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(id); return; }
+      if (e.key === 'Escape' && ui.selected != null) { e.preventDefault(); deselect(); return; }
+      const dirs = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+      if (dirs[e.key] && ui.selected === id && !ui.playing) {
+        e.preventDefault();
+        const step = e.shiftKey ? 16 : 4;
+        const cur = displayPos()[id];
+        const q = { x: clamp(cur.x + dirs[e.key][0] * step, 16, W - 16), y: clamp(cur.y + dirs[e.key][1] * step, 16, H - 16) };
+        writePos(id, q); setTokPos(id, q);
+        if (ui.view === 'tactic') { renderOverlay(false); renderBall(); }
+        markDirty();
+      }
+    });
+  }
+  pitch.addEventListener('click', (e) => {
+    if (e.target.closest('.tok')) return;
+    if (ui.selected != null) deselect(false);
+  });
+
+  function select(id) {
+    if (ui.playing) return;
+    const was = ui.selected;
+    ui.selected = id; ui.panel = 'actions';
+    renderTokens(); renderDock();
+    const p = rosterById(id);
+    if (was !== id) announce(p.num + '번 ' + p.name + ' 선택됨. 방향키로 옮기고 Esc로 해제합니다');
+  }
+  function deselect(refocus) {
+    const id = ui.selected;
+    ui.selected = null; ui.panel = 'actions';
+    renderTokens(); renderDock();
+    if (refocus !== false && id != null) { const el = tokEls.get(id); if (el) el.focus({ preventScroll: true }); }
+    announce('선택 해제');
+  }
+
+  /* ---------- overlay (arrows) ---------- */
+  function renderOverlay(drawAnim) {
+    const g = $('#ovl');
+    g.innerHTML = '';
+    const t = tactic();
+    if (ui.view !== 'tactic' || !t || ui.step === 0) return;
+    const st = t.steps[ui.step - 1]; if (!st) return;
+    const a = posAt(ui.step - 1), b = posAt(ui.step);
+    const anim = drawAnim && !RM.matches;
+    let html = '';
+    Object.keys(st.moves).forEach((id) => {
+      const p = a[id], q = b[id]; if (!p || !q) return;
+      const dx = q.x - p.x, dy = q.y - p.y, len = Math.hypot(dx, dy);
+      if (len < 24) return;
+      const ex = q.x - dx / len * 22, ey = q.y - dy / len * 22;
+      const sx = p.x + dx / len * 18, sy = p.y + dy / len * 18;
+      html += '<circle class="ghost' + (anim ? ' fade' : '') + '" cx="' + p.x + '" cy="' + p.y + '" r="15"/>';
+      html += '<path class="mv' + (anim ? ' draw' : '') + '" pathLength="1" marker-end="url(#ah)" d="M' + sx.toFixed(1) + ' ' + sy.toFixed(1) + 'L' + ex.toFixed(1) + ' ' + ey.toFixed(1) + '"/>';
+    });
+    if (st.ball) {
+      const f = a[st.ball.from], to = b[st.ball.to];
+      if (f && to) html += '<path class="pass' + (anim ? ' fade' : '') + '" d="M' + (f.x + 16) + ' ' + (f.y - 14) + 'L' + (to.x + 16) + ' ' + (to.y - 14) + '"/>';
+    }
+    g.innerHTML = html;
+  }
+
+  /* ---------- steps ---------- */
+  function renderSteps() {
+    const box = $('#steps');
+    box.hidden = ui.view !== 'tactic';
+    const t = tactic();
+    const chips = $('#chips');
+    if (!t) {
+      chips.innerHTML = '';
+      $('#caption').textContent = '전술이 없습니다. 새 전술을 만들어 보세요.';
+      $('#prevStep').disabled = $('#nextStep').disabled = $('#playBtn').disabled = true;
+      $('#playBtn').innerHTML = icon('play') + '재생';
+      return;
+    }
+    const n = t.steps.length;
+    let h = '<button type="button" class="chip word" data-step="0" aria-pressed="' + (ui.step === 0) + '" aria-label="시작 배치">시작</button>';
+    for (let i = 1; i <= n; i++) h += '<button type="button" class="chip" data-step="' + i + '" aria-pressed="' + (ui.step === i) + '" aria-label="' + i + '단계">' + i + '</button>';
+    chips.innerHTML = h;
+    $('#prevStep').disabled = ui.step === 0 || ui.playing;
+    $('#nextStep').disabled = ui.step >= n || ui.playing;
+    $('#playBtn').disabled = false;
+    $('#playBtn').innerHTML = ui.playing ? icon('stop') + '정지' : icon('play') + '재생';
+    $('#playBtn').setAttribute('aria-label', ui.playing ? '미리보기 정지' : '전술 미리보기 재생');
+    $('#caption').innerHTML = ui.step === 0
+      ? '시작 배치. 재생하면 단계별 움직임을 미리 봅니다.'
+      : '<b>' + ui.step + '/' + n + '</b>' + esc(t.steps[ui.step - 1].label);
+  }
+  function goStep(k, drawAnim) {
+    const t = tactic(); if (!t) return;
+    ui.step = clamp(k, 0, t.steps.length);
+    animateOnce();
+    renderTokens(); renderOverlay(drawAnim !== false); renderSteps(); renderDock();
+  }
+  function stopPlay() {
+    ui.timers.forEach(clearTimeout); ui.timers = [];
+    ui.playing = false; pitch.classList.remove('anim');
+    renderSteps(); renderDock();
+  }
+  function play() {
+    const t = tactic(); if (!t) return;
+    if (ui.playing) { stopPlay(); announce('미리보기를 멈췄습니다'); return; }
+    if (ui.selected != null) { ui.selected = null; }
+    ui.playing = true;
+    const per = RM.matches ? 1300 : 1100;
+    goStep(0, false);
+    if (!RM.matches) pitch.classList.add('anim');
+    renderSteps(); renderDock();
+    announce('미리보기 재생');
+    for (let i = 1; i <= t.steps.length; i++) {
+      ui.timers.push(setTimeout(() => {
+        ui.step = i;
+        renderTokens(); renderOverlay(true); renderSteps();
+      }, 450 + per * (i - 1)));
+    }
+    ui.timers.push(setTimeout(() => { stopPlay(); announce('미리보기 끝'); }, 450 + per * t.steps.length + 200));
+  }
+  $('#chips').addEventListener('click', (e) => { const b = e.target.closest('[data-step]'); if (b && !ui.playing) goStep(Number(b.dataset.step)); });
+  $('#prevStep').addEventListener('click', () => goStep(ui.step - 1));
+  $('#nextStep').addEventListener('click', () => goStep(ui.step + 1));
+  $('#playBtn').addEventListener('click', play);
+
+  /* ---------- dock ---------- */
+  function renderDock() {
+    const dock = $('#dock');
+    dock.dataset.panel = ui.panel;
+    const t = tactic();
+    if (ui.selected == null || ui.playing) {
+      let h = '<div class="dock-idle">';
+      if (ui.view === 'squad') {
+        h += '<h3>선택한 선수 없음</h3>' +
+          '<p class="hint"><b>선수를 누르면</b> 이름, 색상, 지침, 삭제 도구가 열립니다. 끌면 자리만 옮겨집니다.</p>' +
+          '<button type="button" class="btn" data-act="reset">' + icon('refresh') + '배치 초기화</button>';
+      } else if (!t) {
+        h += '<h3>전술 없음</h3><p class="hint">새 전술을 만들면 단계별 움직임을 그릴 수 있습니다.</p>' +
+          '<button type="button" class="btn" data-act="newtac">' + icon('plus') + '새 전술</button>';
+      } else if (ui.playing) {
+        h += '<h3>미리보기 중</h3><p class="hint">' + esc(t.name) + ' 전술을 재생하고 있습니다. 정지하면 다시 편집할 수 있습니다.</p>';
+      } else {
+        h += '<h3>' + esc(t.name) + '</h3>' +
+          '<p class="hint">' + (ui.step === 0 ? '<b>시작 배치</b>입니다. 선수를 끌면 기본 스쿼드 자리가 바뀝니다.' : '선수를 끌면 <b>' + ui.step + '단계</b> 이동으로 기록됩니다.') + '</p>' +
+          '<button type="button" class="btn" data-act="addstep">' + icon('plus') + '단계 추가</button>';
+        h += '<ol class="summary" aria-label="단계 요약">' + t.steps.map((s, i) =>
+          '<li><button type="button" data-step="' + (i + 1) + '"' + (ui.step === i + 1 ? ' aria-current="step"' : '') + '><b>' + (i + 1) + '</b>' + esc(s.label) + '</button></li>').join('') + '</ol>';
+      }
+      h += '<dl class="kbd"><dt>Enter</dt><dd>포커스한 선수 선택</dd><dt>방향키</dt><dd>선택한 선수 이동 (Shift는 크게)</dd><dt>Esc</dt><dd>선택 해제</dd></dl>';
+      h += '</div>';
+      dock.innerHTML = h;
+      return;
+    }
+    const p = rosterById(ui.selected);
+    const where = ui.view === 'squad' ? ui.squad + ' 스쿼드' : (ui.step === 0 ? '시작 배치' : ui.step + '단계');
+    const tc = textOn(p.color);
+    let h = '<div class="dock-sel">' +
+      '<div class="dock-id"><span class="dock-num" style="--c:' + fillFor(p.color) + ';--tc:' + tc + '">' + p.num + '</span>' +
+      '<div class="who"><strong>' + esc(p.name) + '</strong><span>' + ROLE_KO[p.role] + ' · ' + esc(where) + '</span></div>' +
+      '<button type="button" class="icon-btn" data-act="close" aria-label="선택 해제">' + icon('x') + '</button></div>' +
+      '<div class="tools" role="toolbar" aria-label="선수 도구">' +
+      '<button type="button" class="tool" data-act="panel" data-p="name">' + icon('pencil') + '이름</button>' +
+      '<button type="button" class="tool" data-act="panel" data-p="color">' + icon('palette') + '색상</button>' +
+      '<button type="button" class="tool" data-act="panel" data-p="note">' + icon('note') + '지침</button>' +
+      '<button type="button" class="tool del" data-act="delete">' + icon('trash') + '삭제</button></div>' +
+      '<div class="panel" data-p="name"><label for="fName">이름</label><input class="input" id="fName" maxlength="8" autocomplete="off" value="' + esc(p.name) + '">' +
+      '<button type="button" class="btn done" data-act="back">완료</button></div>' +
+      '<div class="panel" data-p="color"><span class="plabel" id="lblColor">색상</span><div class="swatches" role="radiogroup" aria-labelledby="lblColor">' +
+      SWATCHES.map((s) => '<button type="button" class="sw" role="radio" aria-checked="' + (s.c.toLowerCase() === p.color.toLowerCase()) + '" aria-label="' + s.n + '" data-act="color" data-c="' + s.c + '" style="--c:' + s.c + ';--tc:' + textOn(s.c) + '">' + icon('check') + '</button>').join('') +
+      '</div><button type="button" class="btn done" data-act="back">완료</button></div>' +
+      '<div class="panel" data-p="note"><label for="fNote">선수 지침</label>' +
+      (DESK.matches ? '<textarea class="input" id="fNote" maxlength="80" placeholder="예: 공격 때 오른쪽 터치라인까지 넓게">' + esc(p.note || '') + '</textarea>'
+        : '<input class="input" id="fNote" maxlength="80" autocomplete="off" placeholder="예: 공격 때 오른쪽으로 넓게" value="' + esc(p.note || '') + '">') +
+      '<button type="button" class="btn done" data-act="back">완료</button></div>' +
+      '<div class="panel panel-del"><button type="button" class="btn danger" data-act="delete">' + icon('trash') + '명단에서 빼기</button></div>' +
+      '<p class="kb-hint">방향키로 미세 이동, Shift와 함께 누르면 크게 움직입니다. Esc로 선택을 해제합니다.</p>' +
+      '</div>';
+    dock.innerHTML = h;
+  }
+  $('#dock').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-act],[data-step]'); if (!b) return;
+    if (b.dataset.step && !b.dataset.act) { goStep(Number(b.dataset.step)); return; }
+    const act = b.dataset.act;
+    if (act === 'close') deselect();
+    else if (act === 'panel') {
+      ui.panel = b.dataset.p; $('#dock').dataset.panel = ui.panel;
+      const f = $('#dock .panel[data-p="' + ui.panel + '"] .input, #dock .panel[data-p="' + ui.panel + '"] .sw[aria-checked="true"], #dock .panel[data-p="' + ui.panel + '"] .sw');
+      if (f) f.focus();
+    } else if (act === 'back') {
+      const prev = ui.panel; ui.panel = 'actions'; $('#dock').dataset.panel = 'actions';
+      const t = $('#dock .tool[data-p="' + prev + '"]'); if (t) t.focus();
+    } else if (act === 'color') {
+      const p = rosterById(ui.selected); p.color = b.dataset.c;
+      renderTokens(); markDirty();
+      $('#dock').querySelectorAll('.sw').forEach((s) => s.setAttribute('aria-checked', s === b ? 'true' : 'false'));
+      const n = $('#dock .dock-num'); n.style.setProperty('--c', fillFor(p.color)); n.style.setProperty('--tc', textOn(p.color));
+    } else if (act === 'delete') deletePlayer(ui.selected);
+    else if (act === 'reset') resetLayout();
+    else if (act === 'addstep') addStep();
+    else if (act === 'newtac') newTactic();
+  });
+  $('#dock').addEventListener('input', (e) => {
+    const p = rosterById(ui.selected); if (!p) return;
+    if (e.target.id === 'fName') {
+      p.name = e.target.value.trim() || (p.num + '번');
+      const el = tokEls.get(p.id); el.lastChild.textContent = p.name; el.setAttribute('aria-label', tokLabel(p));
+      $('#dock .who strong').textContent = p.name;
+      markDirty();
+    } else if (e.target.id === 'fNote') { p.note = e.target.value; markDirty(); }
+  });
+  $('#dock').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.id === 'fName' && !DESK.matches) { e.preventDefault(); ui.panel = 'actions'; $('#dock').dataset.panel = 'actions'; const t = $('#dock .tool[data-p="name"]'); if (t) t.focus(); }
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      if (ui.panel !== 'actions' && !DESK.matches) { const prev = ui.panel; ui.panel = 'actions'; $('#dock').dataset.panel = 'actions'; const t = $('#dock .tool[data-p="' + prev + '"]'); if (t) t.focus(); }
+      else if (ui.selected != null) deselect();
+    }
+    if (e.target.classList.contains('sw') && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+      const all = Array.from($('#dock').querySelectorAll('.sw'));
+      const i = all.indexOf(e.target) + (e.key === 'ArrowRight' ? 1 : -1);
+      const n = all[(i + all.length) % all.length]; n.focus(); n.click(); e.preventDefault();
+    }
+  });
+
+  /* ---------- actions ---------- */
+  function deletePlayer(id) {
+    const p = rosterById(id); if (!p) return;
+    const snap = snapshot();
+    state.roster = state.roster.filter((r) => r.id !== id);
+    Object.keys(state.squads).forEach((k) => { delete state.squads[k][id]; });
+    state.tactics.forEach((t) => t.steps.forEach((s) => {
+      delete s.moves[id];
+      if (s.ball && (s.ball.from === id || s.ball.to === id)) s.ball = null;
+    }));
+    ui.selected = null; ui.panel = 'actions';
+    renderAll(); markDirty();
+    toast(p.num + '번 ' + p.name + '을(를) 명단에서 뺐습니다', { undo: snap });
+    const first = layer.querySelector('.tok'); if (first) first.focus({ preventScroll: true });
+  }
+  function resetLayout() {
+    const snap = snapshot();
+    const target = ui.view === 'squad' ? ui.squad : BASE();
+    const def = defaultPositions(state);
+    state.squads[target] = target === DEMO_STATE.squads[1] ? shifted(def, -40, state.roster)
+      : target === DEMO_STATE.squads[2] ? shifted(def, 36, state.roster) : def;
+    animateOnce(); renderAll(); markDirty();
+    toast(target + ' 스쿼드 배치를 초기화했습니다', { undo: snap });
+  }
+  function addStep() {
+    const t = tactic(); if (!t) return;
+    t.steps.push({ label: (t.steps.length + 1) + '단계 움직임', moves: {}, ball: null });
+    t.updated = '방금 전';
+    goStep(t.steps.length, false); renderFiles(); markDirty();
+    announce(t.steps.length + '단계를 추가했습니다. 선수를 끌어 움직임을 기록하세요');
+  }
+  function newTactic() {
+    if (state.tactics.length >= state.slotsMax) {
+      ui.slotNotice = true; renderFiles();
+      if (!DESK.matches) $('#slotNotice').scrollIntoView({ block: 'center', behavior: RM.matches ? 'auto' : 'smooth' });
+      announce('저장 슬롯이 모두 찼습니다');
+      return;
+    }
+    const n = state.tactics.length + 1;
+    const t = { id: 't' + Date.now(), name: '새 전술 ' + n, updated: '방금 전', steps: [{ label: '1단계 움직임', moves: {}, ball: null }] };
+    state.tactics.push(t);
+    ui.slotNotice = false;
+    setView('tactic'); ui.tacticId = t.id; ui.step = 0;
+    renderAll(); markDirty();
+    toast('새 전술을 만들었습니다');
+  }
+  function deleteTactic(id) {
+    const t = state.tactics.find((x) => x.id === id); if (!t) return;
+    const snap = snapshot();
+    state.tactics = state.tactics.filter((x) => x.id !== id);
+    if (ui.tacticId === id) { ui.tacticId = state.tactics[0] ? state.tactics[0].id : null; ui.step = 0; }
+    ui.slotNotice = false;
+    renderAll(); markDirty();
+    toast('\'' + t.name + '\' 전술을 지웠습니다. 슬롯 1개가 비었습니다', { undo: snap });
+  }
+
+  /* ---------- views / ctx ---------- */
+  function setView(v) {
+    if (ui.playing) stopPlay();
+    ui.view = v; ui.selected = null; ui.panel = 'actions';
+    if (v === 'tactic' && !tactic() && state.tactics[0]) ui.tacticId = state.tactics[0].id;
+    if (v === 'tactic') ui.step = 0;
+    document.body.dataset.view = v;
+    $('#modeSquad').setAttribute('aria-pressed', v === 'squad');
+    $('#modeTactic').setAttribute('aria-pressed', v === 'tactic');
+    $('#grpSquad').hidden = v !== 'squad';
+    $('#grpTactic').hidden = v !== 'tactic';
+    animateOnce();
+  }
+  $('#modeSquad').addEventListener('click', () => { setView('squad'); renderAll(); });
+  $('#modeTactic').addEventListener('click', () => { setView('tactic'); renderAll(); });
+
+  function renderCtx() {
+    $('#squadSeg').innerHTML = DEMO_STATE.squads.map((s) =>
+      '<button type="button" data-sq="' + s + '" aria-pressed="' + (ui.view === 'squad' && ui.squad === s) + '">' + s + '</button>').join('');
+    $('#modeSel').innerHTML = Object.keys(MODES).map((m) => '<option value="' + m + '"' + (m === state.mode ? ' selected' : '') + '>' + modeLabel(m) + '</option>').join('');
+    $('#formSel').innerHTML = MODES[state.mode].map((f) => '<option value="' + f + '"' + (f === state.formation ? ' selected' : '') + '>' + f + '</option>').join('');
+    $('#tacSel').innerHTML = state.tactics.length
+      ? state.tactics.map((t) => '<option value="' + t.id + '"' + (t.id === ui.tacticId ? ' selected' : '') + '>' + esc(t.name) + '</option>').join('')
+      : '<option value="">전술 없음</option>';
+  }
+  $('#squadSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-sq]'); if (!b) return;
+    if (ui.view !== 'squad') setView('squad');
+    ui.squad = b.dataset.sq; ui.selected = null;
+    animateOnce(); renderAll();
+    announce(ui.squad + ' 스쿼드');
+  });
+  $('#tacSel').addEventListener('change', (e) => { if (ui.playing) stopPlay(); ui.tacticId = e.target.value; ui.step = 0; ui.selected = null; animateOnce(); renderAll(); });
+  $('#formSel').addEventListener('change', (e) => {
+    const snap = snapshot();
+    state.formation = e.target.value;
+    const def = defaultPositions(state);
+    state.squads[DEMO_STATE.squads[0]] = def;
+    state.squads[DEMO_STATE.squads[1]] = shifted(def, -40, state.roster);
+    state.squads[DEMO_STATE.squads[2]] = shifted(def, 36, state.roster);
+    animateOnce(); renderAll(); markDirty();
+    toast('포메이션을 ' + state.formation + '로 바꿨습니다', { undo: snap });
+  });
+  $('#modeSel').addEventListener('change', (e) => {
+    const next = e.target.value;
+    const prev = state.mode;
+    e.target.value = prev;
+    const nT = state.tactics.length;
+    openConfirm({
+      title: modeLabel(next) + '로 바꿀까요?',
+      body: '<p>인원을 바꾸면 아래 내용이 기본값으로 초기화됩니다.</p><ul>' +
+        '<li>선수 이름 ' + state.roster.length + '명</li><li>스쿼드 배치 ' + DEMO_STATE.squads.length + '개 (기본, 공격, 수비)</li>' +
+        '<li>전술 ' + nT + '개' + (nT ? ' (' + state.tactics.map((t) => esc(t.name)).join(', ') + ')' : '') + '</li></ul>' +
+        '<p>바꾼 뒤에도 잠시 동안 되돌리기로 지금 상태를 되살릴 수 있습니다.</p>',
+      yes: modeLabel(next) + '로 바꾸기',
+      onYes: () => changeMode(next)
+    });
+  });
+  function changeMode(mode) {
+    const snap = snapshot();
+    const formation = MODES[mode][0];
+    const lay = formationLayout(formation);
+    const counts = { DF: 0, MF: 0, FW: 0 };
+    const roster = Object.keys(lay.pos).map(Number).map((id) => {
+      const role = lay.roles[id];
+      if (role !== 'GK') counts[role]++;
+      return { id: id, num: id, name: role === 'GK' ? '골키퍼' : ROLE_PRE[role] + counts[role], role: role, color: role === 'GK' ? '#E53935' : '#1E88E5', note: '' };
+    });
+    state.mode = mode; state.formation = formation; state.roster = roster;
+    const def = defaultPositions(state);
+    state.squads = {};
+    state.squads[DEMO_STATE.squads[0]] = def;
+    state.squads[DEMO_STATE.squads[1]] = shifted(def, -40, roster);
+    state.squads[DEMO_STATE.squads[2]] = shifted(def, 36, roster);
+    state.tactics = [{ id: 't' + Date.now(), name: '새 전술 1', updated: '방금 전', steps: [{ label: '1단계 움직임', moves: {}, ball: null }] }];
+    ui.tacticId = state.tactics[0].id; ui.step = 0; ui.selected = null;
+    animateOnce(); renderAll(); markDirty();
+    toast(modeLabel(mode) + '로 바꿨습니다', { undo: snap });
+  }
+
+  /* ---------- files ---------- */
+  function renderFiles() {
+    const used = state.tactics.length, max = state.slotsMax;
+    let bar = '<span class="slot-bar" aria-hidden="true">';
+    for (let i = 0; i < max; i++) bar += '<i class="' + (i < used ? 'on' : '') + '"></i>';
+    bar += '</span>';
+    $('#slots').innerHTML = bar + '저장 슬롯 ' + used + ' / ' + max + ' 사용 (무료 수량 미정)';
+    $('#fileList').innerHTML = state.tactics.length ? state.tactics.map((t) =>
+      '<li class="file-row' + (ui.view === 'tactic' && t.id === ui.tacticId ? ' cur' : '') + '">' +
+      '<button type="button" class="file" data-open="' + t.id + '"' + (ui.view === 'tactic' && t.id === ui.tacticId ? ' aria-current="true"' : '') + '>' +
+      '<strong>' + esc(t.name) + '</strong><span>' + t.steps.length + '단계 · ' + esc(t.updated) + '</span></button>' +
+      '<button type="button" class="icon-btn" data-deltac="' + t.id + '" aria-label="' + esc(t.name) + ' 삭제">' + icon('trash') + '</button></li>').join('')
+      : '<li class="file-row"><span class="file"><strong>저장한 전술이 없습니다</strong><span>새 전술로 단계별 움직임을 그려 보세요</span></span></li>';
+    $('#slotNotice').hidden = !ui.slotNotice;
+  }
+  $('#files').addEventListener('click', (e) => {
+    const o = e.target.closest('[data-open]');
+    if (o) { setView('tactic'); ui.tacticId = o.dataset.open; ui.step = 0; renderAll(); if (!DESK.matches) window.scrollTo({ top: 0, behavior: RM.matches ? 'auto' : 'smooth' }); return; }
+    const d = e.target.closest('[data-deltac]'); if (d) { deleteTactic(d.dataset.deltac); return; }
+    const a = e.target.closest('[data-act]'); if (!a) return;
+    if (a.dataset.act === 'newtac') newTactic();
+    if (a.dataset.act === 'closenotice') { ui.slotNotice = false; renderFiles(); }
+  });
+  $('#ctx').addEventListener('click', (e) => {
+    const a = e.target.closest('[data-act]'); if (!a) return;
+    if (a.dataset.act === 'reset') resetLayout();
+    if (a.dataset.act === 'newtac') newTactic();
+  });
+
+  function renderCoach() {
+    const c = $('#coach');
+    c.hidden = ui.firstDragDone || ui.view !== 'squad';
+    c.textContent = '선수를 눌러 선택, 끌어서 자리 이동';
+  }
+
+  function renderAll() {
+    document.body.dataset.view = ui.view;
+    $('#modeSquad').setAttribute('aria-pressed', ui.view === 'squad');
+    $('#modeTactic').setAttribute('aria-pressed', ui.view === 'tactic');
+    $('#grpSquad').hidden = ui.view !== 'squad';
+    $('#grpTactic').hidden = ui.view !== 'tactic';
+    $('#teamName').textContent = state.team;
+    renderCtx(); renderSteps();
+    requestAnimationFrame(() => { fit(); });
+    renderTokens(); renderOverlay(false); renderDock(); renderFiles(); renderCoach(); renderSave();
+  }
+
+  /* ---------- confirm ---------- */
+  let confirmCb = null, lastFocus = null;
+  function openConfirm(o) {
+    lastFocus = document.activeElement;
+    $('#confirmTitle').textContent = o.title;
+    $('#confirmBody').innerHTML = o.body;
+    $('#confirmYes').textContent = o.yes;
+    confirmCb = o.onYes;
+    showDialog($('#confirm'));
+    $('#confirmNo').focus();
+  }
+  function closeConfirm() { closeDialog($('#confirm')); confirmCb = null; if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true }); }
+  $('#confirmNo').addEventListener('click', closeConfirm);
+  $('#confirmYes').addEventListener('click', () => { const cb = confirmCb; closeConfirm(); if (cb) cb(); });
+  $('#confirm').addEventListener('cancel', (e) => { e.preventDefault(); closeConfirm(); });
+
+  function showDialog(d) { if (typeof d.showModal === 'function') { if (!d.open) d.showModal(); } else d.setAttribute('open', ''); }
+  function closeDialog(d) { if (typeof d.close === 'function' && d.open) d.close(); else d.removeAttribute('open'); }
+
+  /* ---------- export sheet ---------- */
+  let gifTimer = 0, sheetOpener = null;
+  function fileBase() { return state.team.replace(/\s+/g, ''); }
+  function squadForExport() { return ui.view === 'squad' ? ui.squad : BASE(); }
+  function openSheet(view, data) {
+    if (!$('#sheet').open) { sheetOpener = document.activeElement; showDialog($('#sheet')); }
+    renderSheet(view || 'menu', data || {});
+  }
+  function closeSheet() {
+    clearInterval(gifTimer);
+    closeDialog($('#sheet'));
+    if (sheetOpener && sheetOpener.focus) sheetOpener.focus({ preventScroll: true });
+  }
+  function kakaoText() {
+    const by = { GK: [], DF: [], MF: [], FW: [] };
+    state.roster.slice().sort((a, b) => a.num - b.num).forEach((p) => by[p.role].push(p.num + ' ' + p.name));
+    const t = tactic();
+    return '[' + state.team + '] ' + squadForExport() + ' 스쿼드 ' + state.formation + ' (' + modeLabel(state.mode) + ')\n' +
+      ['GK', 'DF', 'MF', 'FW'].filter((r) => by[r].length).map((r) => r + ' ' + by[r].join(', ')).join('\n') +
+      (t ? '\n전술: ' + t.name + ' (' + t.steps.length + '단계)' : '');
+  }
+  function renderSheet(view, data) {
+    const body = $('#sheetBody');
+    clearInterval(gifTimer);
+    const t = tactic();
+    if (view === 'menu') {
+      body.innerHTML =
+        '<section class="grp-x" aria-labelledby="gx1"><h3 id="gx1">이미지·GIF 보내기</h3><p>단톡방에 바로 올릴 그림을 만듭니다.</p>' +
+        '<div class="xrow"><div class="what"><strong>현재 스쿼드 이미지</strong><span>PNG · ' + esc(squadForExport()) + ' 스쿼드 ' + state.formation + '</span></div>' +
+        '<div class="acts"><button type="button" class="btn" data-x="png-save">' + icon('download') + '기기에 저장</button><button type="button" class="btn" data-x="png-send">' + icon('send') + '보내기</button></div></div>' +
+        '<div class="xrow"><div class="what"><strong>현재 전술 움직임</strong><span>' + (t ? 'GIF · ' + esc(t.name) + ', ' + t.steps.length + '단계' : '전술이 없어 만들 수 없습니다') + '</span></div>' +
+        '<div class="acts"><button type="button" class="btn" data-x="gif-save"' + (t ? '' : ' disabled') + '>' + icon('download') + '기기에 저장</button><button type="button" class="btn" data-x="gif-send"' + (t ? '' : ' disabled') + '>' + icon('send') + '보내기</button></div></div></section>' +
+        '<section class="grp-x" aria-labelledby="gx2"><h3 id="gx2">링크·텍스트 공유</h3><p>받는 사람은 보기 전용으로 엽니다.</p>' +
+        '<div class="xrow"><div class="what"><strong>단톡방 텍스트</strong><span>명단과 포메이션을 글로 정리</span></div>' +
+        '<div class="acts"><button type="button" class="btn" data-x="kakao">' + icon('message') + '텍스트 보기</button></div></div>' +
+        '<div class="xrow"><div class="what"><strong>보기 전용 링크</strong><span>지금 스쿼드와 전술을 담은 주소</span></div>' +
+        '<div class="acts"><button type="button" class="btn" data-x="link">' + icon('link') + '링크 복사</button></div></div></section>' +
+        '<section class="grp-x" aria-labelledby="gx3"><h3 id="gx3">백업</h3><p>다른 기기로 옮기거나 예전 상태로 되살릴 때 씁니다.</p>' +
+        '<div class="xrow"><div class="what"><strong>백업 파일 받기</strong><span>.sq 파일 · 팀 전체</span></div>' +
+        '<div class="acts"><button type="button" class="btn" data-x="backup">' + icon('download') + '받기</button></div></div>' +
+        '<div class="xrow"><div class="what"><strong>백업에서 복원</strong><span>지금 작업을 백업 내용으로 바꿉니다</span></div>' +
+        '<div class="acts"><button type="button" class="btn" data-x="restore">' + icon('upload') + '파일 고르기</button></div></div></section>';
+      return;
+    }
+    if (view === 'processing') {
+      body.innerHTML = '<div class="result" aria-live="polite"><div class="result-card">' +
+        '<div class="ok">GIF 만드는 중 <span class="tag">시안</span></div>' +
+        '<span class="pct" id="pct">0%</span><div class="progress" role="progressbar" aria-label="GIF 만들기 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="prog"><i></i></div>' +
+        '<p>' + esc(t ? t.name : '전술') + ' · 단계마다 0.9초 · 480×660</p></div>' +
+        '<div class="acts"><button type="button" class="btn" data-x="cancel">' + icon('x') + '취소</button></div></div>';
+      let p = 0;
+      gifTimer = setInterval(() => {
+        p = Math.min(100, p + 4 + Math.round(Math.random() * 5));
+        const pr = $('#prog'); if (!pr) { clearInterval(gifTimer); return; }
+        pr.setAttribute('aria-valuenow', p); pr.firstChild.style.setProperty('--p', p / 100);
+        $('#pct').textContent = p + '%';
+        if (p >= 100) { clearInterval(gifTimer); setTimeout(() => renderSheet('result', { kind: data.kind || 'gif-save' }), 250); }
+      }, 140);
+      return;
+    }
+    if (view === 'kakao') {
+      body.innerHTML = '<div class="result"><label for="kk" class="sr-only">단톡방 텍스트</label><textarea class="input kakao" id="kk" readonly>' + esc(kakaoText()) + '</textarea>' +
+        '<div class="acts"><button type="button" class="btn" data-x="menu">' + icon('left') + '뒤로</button><button type="button" class="btn" data-x="kakao-copy">' + icon('copy') + '텍스트 복사</button></div></div>';
+      return;
+    }
+    if (view === 'result') {
+      const sq = squadForExport();
+      const R = {
+        'png-save': ['이미지를 기기에 저장했습니다', fileBase() + '_' + sq + ' 스쿼드_' + state.formation + '.png', '실제 파일은 만들지 않았습니다.'],
+        'png-send': ['보내기 화면을 열었습니다', fileBase() + '_' + sq + ' 스쿼드_' + state.formation + '.png', '휴대폰에서는 공유 시트로 카카오톡에 바로 넘깁니다.'],
+        'gif-save': ['GIF를 기기에 저장했습니다', fileBase() + '_' + (t ? t.name.replace(/\s+/g, '') : '전술') + '.gif', '실제 파일은 만들지 않았습니다.'],
+        'gif-send': ['GIF 보내기 화면을 열었습니다', fileBase() + '_' + (t ? t.name.replace(/\s+/g, '') : '전술') + '.gif', '휴대폰에서는 공유 시트로 바로 넘깁니다.'],
+        'kakao-copy': ['단톡방 텍스트를 복사했습니다', state.roster.length + '명 명단 · ' + state.formation, '단톡방 입력창에 붙여 넣으면 됩니다.'],
+        'link': ['보기 전용 링크를 복사했습니다', 'squadmaker 보기 전용 링크', '받는 사람의 작업은 바뀌지 않습니다.'],
+        'backup': ['백업 파일을 받았습니다', fileBase() + '_2026-10-07.sq', '이 파일로 다른 기기에서 복원할 수 있습니다.']
+      }[data.kind] || ['완료했습니다', '', ''];
+      body.innerHTML = '<div class="result" aria-live="polite"><div class="result-card">' +
+        '<div class="ok">' + icon('check') + esc(R[0]) + ' <span class="tag">시안</span></div>' +
+        (R[1] ? '<span class="file-name">' + esc(R[1]) + '</span>' : '') + '<p>' + esc(R[2]) + '</p></div>' +
+        '<div class="acts"><button type="button" class="btn" data-x="menu">다른 형식 보기</button><button type="button" class="btn solid" data-x="done">완료</button></div>' +
+        '<div class="ad" aria-label="광고 자리"><div class="ad-box"><div><b>광고 자리 (시안)</b>결과 확인 뒤에만 보입니다</div></div></div></div>';
+      const d = body.querySelector('[data-x="done"]'); if (d) d.focus();
+      announce(R[0]);
+    }
+  }
+  $('#sheet').addEventListener('click', (e) => {
+    if (e.target === $('#sheet')) { closeSheet(); return; }
+    const c = e.target.closest('[data-act="closesheet"]'); if (c) { closeSheet(); return; }
+    const b = e.target.closest('[data-x]'); if (!b) return;
+    const x = b.dataset.x;
+    if (x === 'gif-save' || x === 'gif-send') renderSheet('processing', { kind: x });
+    else if (x === 'cancel') { renderSheet('menu'); announce('GIF 만들기를 취소했습니다'); const g = $('#sheetBody [data-x="gif-save"]'); if (g) g.focus(); }
+    else if (x === 'kakao') { renderSheet('kakao'); const k = $('#kk'); if (k) k.focus(); }
+    else if (x === 'menu') { renderSheet('menu'); const f = $('#sheetBody .btn'); if (f) f.focus(); }
+    else if (x === 'done') closeSheet();
+    else if (x === 'restore') {
+      closeSheet();
+      openConfirm({
+        title: '백업으로 바꿀까요?',
+        body: '<p>지금 작업이 <strong>우리FC_2026-10-05.sq</strong> 내용으로 바뀌고, 이 기기에 바로 저장됩니다.</p>' +
+          '<ul><li>팀 우리 FC · ' + modeLabel(DEMO_STATE.mode) + ' · ' + DEMO_STATE.formation + '</li><li>선수 ' + DEMO_STATE.roster.length + '명, 전술 ' + DEMO_STATE.tactics.length + '개</li></ul>' +
+          '<p>바꾼 뒤에도 잠시 동안 되돌리기로 지금 상태를 되살릴 수 있습니다.</p>',
+        yes: '복원하기',
+        onYes: () => {
+          const snap = snapshot();
+          state = freshState(); ui.tacticId = state.tactics[0].id; ui.step = 0; ui.selected = null; ui.squad = BASE();
+          animateOnce(); renderAll();
+          ui.save = 'saved'; renderSave();
+          toast('복원하고 기기에 저장했습니다', { undo: snap });
+        }
+      });
+    } else renderSheet('result', { kind: x });
+  });
+  $('#sheet').addEventListener('close', () => { clearInterval(gifTimer); if (sheetOpener && sheetOpener.isConnected && document.activeElement === document.body) sheetOpener.focus({ preventScroll: true }); });
+  $('#exportBtn').addEventListener('click', () => { if (ui.playing) stopPlay(); openSheet('menu'); const f = $('#sheetBody .btn'); if (f) f.focus(); });
+
+  /* ---------- demo states ---------- */
+  const demoBtn = $('#demoBtn'), demoMenu = $('#demoMenu');
+  function toggleDemo(open) {
+    demoMenu.hidden = !open; demoBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) demoMenu.querySelector('button').focus();
+  }
+  demoBtn.addEventListener('click', () => toggleDemo(demoMenu.hidden));
+  demoMenu.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-demo]'); if (!b) return;
+    toggleDemo(false); demoBtn.focus();
+    const d = b.dataset.demo;
+    if (d === 'saved') {
+      const a = $('#toasts .alert'); if (a) a.remove();
+      ui.save = 'saved'; renderSave();
+      const s = $('#save'); s.classList.add('flash'); setTimeout(() => s.classList.remove('flash'), 1400);
+      announce('이 기기에 저장됨');
+    } else if (d === 'processing') {
+      if (!tactic() && state.tactics[0]) ui.tacticId = state.tactics[0].id;
+      openSheet('processing', { kind: 'gif-save' });
+      const c = $('#sheetBody [data-x="cancel"]'); if (c) c.focus();
+    } else if (d === 'failed') showFailure();
+    else if (d === 'undo') { if (ui.view !== 'squad') { setView('squad'); renderAll(); } resetLayout(); }
+  });
+  document.addEventListener('click', (e) => { if (!demoMenu.hidden && !e.target.closest('.demo-wrap')) toggleDemo(false); });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!demoMenu.hidden) { toggleDemo(false); demoBtn.focus(); return; }
+    if ($('#sheet').open || $('#confirm').open) return;
+    if (ui.playing) { stopPlay(); return; }
+    if (ui.selected != null) deselect();
+  });
+
+  /* ---------- boot ---------- */
+  function onResize() { measureNote(); fit(); }
+  if (window.ResizeObserver) {
+    new ResizeObserver(() => fit()).observe($('#pitchBox'));
+    new ResizeObserver(() => measureNote()).observe($('#note'));
+  }
+  window.addEventListener('resize', onResize);
+  if (DESK.addEventListener) DESK.addEventListener('change', () => { ui.panel = 'actions'; renderDock(); });
+  measureNote();
+  setView('squad');
+  renderAll();
+  fit();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit).catch(() => {});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1422 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>데이라이트코치 시안</title>
+<meta name="description" content="SquadMaker UX 시안 B. 햇빛 아래 한 손으로 쓰는 밝은 고대비 작전판.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Concept B: Daylight Coach. Light theme is locked on purpose (outdoor, direct sunlight use scene). */
+:root{
+  color-scheme: light;
+  --bg:#EDF1EE;
+  --surface:#FCFDFC;
+  --surface-2:#E2E8E3;
+  --ink:#0E1A13;
+  --ink-2:#2B3A31;
+  --ink-3:#45554B;
+  --line:#B4C0B7;
+  --accent:#B93A06;
+  --accent-press:#962E04;
+  --accent-soft:#FCE4D6;
+  --accent-ink:#7A2503;
+  --on-accent:#FFFCFA;
+  --pitch:#3B9C4F;
+  --pitch-2:#45A859;
+  --danger-soft:#FBE3E1;
+  --r:12px;
+  --r-lg:18px;
+  --note-h:44px;
+  --bar-h:76px;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --display:"Black Han Sans","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{
+  font-family:var(--sans);font-size:17px;line-height:1.5;color:var(--ink);background:var(--bg);
+  display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;
+  -webkit-text-size-adjust:100%;word-break:keep-all;-webkit-tap-highlight-color:transparent;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.i{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tag{display:inline-flex;align-items:center;font-size:12px;line-height:1;font-weight:700;padding:3px 6px;border-radius:6px;border:1.5px solid currentColor;white-space:nowrap;letter-spacing:0}
+.tag-inv{color:var(--surface)}
+
+/* ---------- concept note ---------- */
+.note{
+  flex:none;min-height:var(--note-h);display:flex;align-items:stretch;gap:8px;padding:0 0 0 16px;
+  background:var(--ink);color:#E9EFEA;font-size:13px;line-height:1.3;font-weight:500;position:relative;z-index:30;
+}
+.note p{margin:0;flex:1;min-width:0;padding:4px 0;align-self:center}
+.note-btn{min-height:44px;border:0;background:#26352C;color:#FCFDFC;font-size:13px;font-weight:600;padding:0 14px;display:inline-flex;align-items:center;gap:6px}
+.note-btn:hover{background:#33463A}
+.note-btn:focus-visible{outline:3px solid #FCFDFC;outline-offset:-4px}
+.demo-menu{
+  position:absolute;right:8px;top:calc(100% + 6px);width:min(300px,calc(100vw - 16px));
+  background:var(--surface);color:var(--ink);border:2px solid var(--ink);border-radius:var(--r);
+  box-shadow:0 14px 40px rgba(14,26,19,.22);padding:8px;z-index:60;
+}
+.demo-menu h2{font-size:14px;margin:4px 8px 6px;font-weight:700;color:var(--ink-2)}
+.demo-menu button{
+  width:100%;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  border:0;background:none;border-radius:8px;padding:0 10px;font-size:16px;font-weight:600;text-align:left
+}
+.demo-menu button:hover{background:var(--surface-2)}
+.demo-menu .tag{color:var(--accent-ink)}
+
+/* ---------- app bar ---------- */
+.appbar{
+  flex:none;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 16px;min-height:62px;
+  background:var(--surface);border-bottom:2px solid var(--ink);
+}
+.brand{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.15}
+.team{font-family:var(--display);font-size:22px;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta{font-size:14px;font-weight:600;color:var(--ink-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.save{
+  display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--ink-2);
+  padding:6px 10px;border-radius:999px;background:var(--surface-2);white-space:nowrap;transition:background .3s;flex:none
+}
+.save .i{width:18px;height:18px}
+.save.is-saving{background:#F2F4E6}
+.save.is-flash{background:#D7EBDB}
+.save.is-fail{background:var(--danger-soft);color:#8E1B12}
+.save .long{display:none}
+.icon-btn{
+  width:48px;height:48px;flex:none;display:inline-flex;align-items:center;justify-content:center;
+  border:2px solid var(--ink);border-radius:var(--r);background:var(--surface);color:var(--ink)
+}
+.icon-btn:hover{background:var(--surface-2)}
+.appbar .share-wide{display:none}
+@media (max-width:759px){
+  .appbar{gap:6px;padding:6px 8px 6px 16px}
+  .save{padding:4px 8px;gap:4px;font-size:13px}
+  .save .tag{font-size:11px;padding:2px 4px}
+}
+
+/* ---------- fail bar ---------- */
+.failbar{
+  flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 16px;
+  background:var(--danger-soft);color:#5E120B;border-bottom:2px solid #8E1B12;font-size:15px;font-weight:600
+}
+.failbar p{margin:0;flex:1 1 220px;display:flex;gap:8px;align-items:flex-start}
+.failbar .tag{color:#8E1B12}
+.failbar .btn{min-height:44px;font-size:15px}
+
+/* ---------- buttons ---------- */
+.btn{
+  min-height:48px;padding:0 16px;border-radius:var(--r);border:2px solid var(--ink);background:var(--surface);
+  color:var(--ink);font-size:16px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  white-space:nowrap;transition:transform .12s,background .15s
+}
+.btn:hover{background:var(--surface-2)}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn-primary:hover{background:var(--accent-press);border-color:var(--accent-press)}
+.btn-ink{background:var(--ink);color:var(--surface)}
+.btn-ink:hover{background:#26352C}
+.btn-quiet{border-color:var(--line)}
+.btn-text{border-color:transparent;background:transparent;text-decoration:underline;text-underline-offset:3px}
+.btn-text:hover{background:var(--surface-2)}
+.btn-danger{border-color:#8E1B12;color:#8E1B12}
+.btn-danger:hover{background:var(--danger-soft)}
+
+/* ---------- shell ---------- */
+.shell{
+  flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);
+  grid-template-areas:"ptop" "pitch" "pbot";grid-template-rows:auto minmax(0,1fr) auto;
+  gap:8px;padding:8px 16px;overflow:hidden
+}
+.rail{grid-area:rail;display:none}
+.ptop{grid-area:ptop;min-width:0}
+.pbot{grid-area:pbot;min-width:0}
+.pitchwrap{grid-area:pitch;min-height:0;min-width:0;display:flex;align-items:center;justify-content:center;position:relative}
+.pitch{width:100%;height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none}
+body[data-step="1"] .shell{grid-template-areas:"ptop" "pbot";grid-template-rows:auto auto;overflow-y:auto;align-content:start}
+body[data-step="1"] .pitchwrap{display:none}
+body[data-step="3"] .shell{grid-template-rows:auto auto auto;overflow-y:auto;align-content:start}
+body[data-step="3"] .pitchwrap{height:min(56dvh,calc((100vw - 32px) * 1.375))}
+.pane{display:none}
+body[data-step="1"] .pane[data-for="1"],
+body[data-step="2"] .pane[data-for="2"],
+body[data-step="3"] .pane[data-for="3"]{display:block}
+.pane.enter{animation:enter .42s var(--ease) both}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.pane-title{font-family:var(--display);font-weight:400;font-size:30px;line-height:1.1;margin:6px 0 4px;letter-spacing:.01em}
+.pane-desc{margin:0 0 14px;color:var(--ink-2);font-size:16px;max-width:42ch}
+.pane[data-for="2"] .pane-title,.pane[data-for="2"] .pane-desc{display:none}
+
+/* ---------- fields ---------- */
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.lbl{font-size:15px;font-weight:700;color:var(--ink-2)}
+.input,.select{
+  min-height:52px;width:100%;border:2px solid var(--ink);border-radius:var(--r);background:var(--surface);
+  padding:0 14px;font-size:18px;font-weight:600
+}
+.select{appearance:none;-webkit-appearance:none;padding-right:40px;
+  background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);
+  background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat}
+.field-row{display:grid;grid-template-columns:minmax(0,1fr) 128px;gap:12px}
+
+/* ---------- roster ---------- */
+.roster{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.prow{
+  display:grid;grid-template-columns:52px minmax(0,1fr) 104px;gap:10px;align-items:center;
+  background:var(--surface);border:2px solid transparent;border-radius:var(--r-lg);padding:8px 8px 8px 8px;min-height:68px
+}
+.prow.is-sel{border-color:var(--ink)}
+.pnum{
+  width:52px;height:52px;border-radius:50%;border:3px solid var(--surface);box-shadow:0 0 0 2px var(--ink);
+  color:#fff;font-family:var(--display);font-size:22px;display:flex;align-items:center;justify-content:center
+}
+.pname{min-height:52px;border:2px solid var(--line);border-radius:var(--r);background:var(--surface);padding:0 12px;font-size:19px;font-weight:700;width:100%}
+.pname:hover{border-color:var(--ink-3)}
+.prole{min-height:52px;font-size:16px;padding-left:12px;min-width:0}
+.bench{margin-top:28px;padding-top:20px;border-top:2px solid var(--line)}
+.bench h3{font-size:19px;margin:0 0 4px}
+.bench p{margin:0 0 12px;color:var(--ink-2);font-size:15px}
+.bench-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.bench-list{list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:6px}
+.bench-list li{display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:var(--r);padding:4px 4px 4px 14px;font-size:18px;font-weight:600}
+.bench-list li span{flex:1}
+.roster-foot{margin:20px 0 8px;color:var(--ink-3);font-size:15px}
+
+/* ---------- squad controls ---------- */
+.squad-row{display:grid;grid-template-columns:minmax(0,1fr) 104px;gap:8px;align-items:end}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:2px solid var(--ink);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.seg button{min-height:48px;border:0;background:none;font-size:17px;font-weight:700;color:var(--ink-2)}
+.seg button+button{border-left:2px solid var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.seg button:focus-visible{outline-offset:-5px;outline-color:var(--accent)}
+.squad-row .select{min-height:52px;font-size:17px;padding-left:12px}
+
+/* ---------- selection card ---------- */
+.card{background:var(--surface);border:2px solid var(--ink);border-radius:var(--r-lg);padding:12px;min-height:140px;display:flex;flex-direction:column;justify-content:space-between;gap:10px}
+.card-hint{margin:0;font-size:17px;font-weight:600;color:var(--ink-2)}
+.card-hint small{display:none;font-size:14px;font-weight:500;color:var(--ink-3);margin-top:2px}
+.card-idle-row{display:flex;gap:8px;flex-wrap:wrap}
+.sel-id{display:flex;align-items:center;gap:12px;min-height:52px}
+.sel-num{width:48px;height:48px;border-radius:50%;flex:none;color:#fff;font-family:var(--display);font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--ink)}
+.sel-name{font-size:21px;font-weight:700;line-height:1.2;display:block}
+.sel-sub{font-size:14px;color:var(--ink-3);font-weight:500}
+.sel-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.sel-actions .btn{padding:0 6px;font-size:15px}
+.rename{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;width:100%}
+.rename .input{min-height:48px}
+
+/* ---------- tactics ---------- */
+.slots{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;flex-wrap:wrap}
+.slots-txt{font-size:15px;font-weight:600;color:var(--ink-2)}
+.tlist{list-style:none;margin:0;padding:0 0 4px;display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.tlist li{flex:none;scroll-snap-align:start}
+.tfile{
+  min-height:60px;min-width:150px;max-width:220px;text-align:left;border:2px solid var(--line);border-radius:var(--r);
+  background:var(--surface);padding:6px 12px;display:flex;flex-direction:column;justify-content:center
+}
+.tfile b{font-size:17px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tfile small{font-size:13px;color:var(--ink-3);font-weight:500}
+.tfile[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--surface)}
+.tfile[aria-pressed="true"] small{color:#C9D4CC}
+.tempty{padding:14px;border:2px dashed var(--line);border-radius:var(--r);color:var(--ink-2);font-weight:600}
+.slotnote{margin-top:10px;background:var(--surface);border:2px solid var(--ink);border-radius:var(--r);padding:12px 14px;font-size:15px}
+.slotnote b{display:flex;align-items:center;gap:8px;font-size:16px;margin-bottom:4px}
+.slotnote .tag{color:var(--accent-ink)}
+.slotnote p{margin:0 0 8px;color:var(--ink-2)}
+
+.playrow{display:grid;grid-template-columns:52px minmax(0,1fr) 52px;gap:8px;align-items:center}
+.playrow .icon-btn{width:52px;height:52px}
+.playrow .btn{min-height:52px}
+.stepcount{margin:10px 0 8px;font-size:15px;font-weight:700;color:var(--ink-2)}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.steps li{background:var(--surface);border:2px solid transparent;border-radius:var(--r-lg)}
+.steps li.is-cur{border-color:var(--accent);background:var(--accent-soft)}
+.step-btn{width:100%;display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:center;text-align:left;background:none;border:0;padding:10px 12px;border-radius:var(--r-lg);min-height:64px}
+.step-n{width:44px;height:44px;border-radius:50%;background:var(--ink);color:var(--surface);font-family:var(--display);font-size:21px;display:flex;align-items:center;justify-content:center}
+.is-cur .step-n{background:var(--accent);color:var(--on-accent)}
+.step-txt b{display:block;font-size:18px;line-height:1.35}
+.step-txt small{display:block;font-size:14px;color:var(--ink-3);font-weight:500;margin-top:2px}
+.is-cur .step-txt small{color:var(--accent-ink)}
+.step-tools{display:flex;gap:8px;padding:0 12px 12px 68px;flex-wrap:wrap}
+.step-tools .btn{min-height:44px;font-size:15px}
+.step-edit{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:0 12px 12px}
+.step-add{margin-top:10px;width:100%}
+.hint{margin:12px 0 0;font-size:15px;color:var(--ink-3)}
+.zone{margin-top:28px;padding-top:16px;border-top:2px solid var(--line);display:flex;justify-content:flex-start}
+.final{margin-top:16px;width:100%;min-height:56px;font-size:18px}
+
+/* ---------- bottom bar (mobile) ---------- */
+.bottombar{
+  flex:none;position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:var(--surface);border-top:2px solid var(--ink);min-height:var(--bar-h)
+}
+.progress{position:absolute;left:0;right:0;top:-2px;height:4px;background:transparent;overflow:hidden}
+.progress span{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(var(--p,.333));transition:transform .6s var(--ease)}
+.mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;min-width:0}
+.mini button{
+  min-height:52px;border:0;background:none;border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  font-size:13px;font-weight:700;color:var(--ink-3);padding:2px 0
+}
+.mini .mn{width:26px;height:26px;border-radius:50%;border:2px solid var(--ink-3);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;line-height:1}
+.mini button[aria-current="step"]{color:var(--ink);background:var(--accent-soft)}
+.mini button[aria-current="step"] .mn{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.mini button.done{color:var(--ink-2)}
+.mini button.done .mn{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.next{min-height:56px;font-size:16px;padding:0 14px}
+
+/* ---------- rail (desktop) ---------- */
+.rail-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;position:relative}
+.rail-step{
+  width:100%;display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px;align-items:start;text-align:left;
+  border:0;background:none;padding:12px 10px;border-radius:var(--r-lg);color:var(--ink-3)
+}
+.rail-step:hover{background:var(--surface-2)}
+.rn{font-family:var(--display);font-size:44px;line-height:1;color:#6B7A70;transition:color .3s}
+.rail-step b{display:block;font-size:21px;color:var(--ink-2);line-height:1.3}
+.rail-step small{display:block;font-size:14px;line-height:1.4;margin-top:2px;font-weight:500}
+.rail-step[aria-current="step"]{background:var(--surface)}
+.rail-step[aria-current="step"] .rn{color:var(--accent)}
+.rail-step[aria-current="step"] b{color:var(--ink)}
+.rail-step[aria-current="step"] small{color:var(--ink-2)}
+.rail-step.done .rn{color:var(--ink)}
+.rail-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.rail-foot .btn{min-height:60px;font-size:18px;width:100%}
+.rail-foot p{margin:0;font-size:14px;color:var(--ink-3)}
+
+/* ---------- pitch svg ---------- */
+.pl-line{fill:none;stroke:#FCFDFC;stroke-width:5}
+.tok{cursor:grab;outline:none}
+.tok:focus{outline:none}
+.tok .hit{fill:transparent}
+.tok .body{stroke:#FCFDFC;stroke-width:3.5}
+.tok .num{font-family:var(--display);font-size:25px;fill:#fff;text-anchor:middle;pointer-events:none}
+.tok .lab{fill:#FCFDFC;stroke:rgba(14,26,19,.55);stroke-width:1.5}
+.tok .name{font-family:var(--sans);font-weight:700;font-size:18px;fill:#0E1A13;text-anchor:middle;pointer-events:none}
+.tok .selring{fill:none;stroke:#0E1A13;stroke-width:6}
+.tok .fring{fill:none;stroke:#0E1A13;stroke-width:3.5;stroke-dasharray:7 5;opacity:0}
+.tok .fring2{fill:none;stroke:#FCFDFC;stroke-width:7;opacity:0}
+.tok:focus-visible .fring,.tok:focus-visible .fring2{opacity:1}
+.tok.dragging{cursor:grabbing}
+.tok.dragging .body{filter:drop-shadow(0 6px 6px rgba(14,26,19,.4))}
+.ghost circle{fill:rgba(252,253,252,.22);stroke:#FCFDFC;stroke-width:4;stroke-dasharray:8 6}
+.ghost text{font-family:var(--display);font-size:22px;fill:#FCFDFC;text-anchor:middle;paint-order:stroke;stroke:#0E1A13;stroke-width:3px}
+.run-case{stroke:rgba(14,26,19,.38);stroke-width:10;fill:none;stroke-linecap:round}
+.run{stroke:#FCFDFC;stroke-width:5;fill:none;stroke-linecap:round}
+.pass{stroke:#0E1A13;stroke-width:4.5;fill:none;stroke-dasharray:12 9}
+.ball{fill:#FCFDFC;stroke:#0E1A13;stroke-width:3.5}
+
+/* ---------- overlays ---------- */
+.scrim{position:fixed;inset:0;background:rgba(14,26,19,.48);z-index:80;display:flex;align-items:flex-end;justify-content:center}
+.scrim.top{z-index:90;align-items:center;padding:16px}
+.sheet{
+  width:100%;max-width:640px;max-height:90dvh;background:var(--surface);border-radius:20px 20px 0 0;
+  display:flex;flex-direction:column;box-shadow:0 -10px 40px rgba(14,26,19,.25);animation:rise .38s var(--ease) both
+}
+@keyframes rise{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:14px 12px 10px 20px;border-bottom:2px solid var(--surface-2)}
+.sheet-head h2{flex:1;margin:0;font-family:var(--display);font-weight:400;font-size:26px;letter-spacing:.01em}
+.sheet-body{overflow-y:auto;padding:16px 20px calc(24px + env(safe-area-inset-bottom))}
+.grp{padding:4px 0 24px}
+.grp+.grp{border-top:2px solid var(--surface-2);padding-top:22px}
+.grp h3{margin:0 0 4px;font-size:20px}
+.grp>p{margin:0 0 14px;color:var(--ink-2);font-size:15px}
+.xrow{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:12px 0}
+.xrow+.xrow{border-top:1px solid var(--surface-2)}
+.xrow b{display:block;font-size:17px}
+.xrow small{display:block;font-size:14px;color:var(--ink-3)}
+.xbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.xbtns .btn{width:100%;white-space:normal;line-height:1.25;padding:6px 10px;text-align:center}
+.feedback{margin:8px 0 0;font-size:15px;font-weight:600;color:var(--ink-2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.feedback .tag{color:var(--accent-ink)}
+.sharetext{width:100%;min-height:150px;margin-top:10px;border:2px solid var(--line);border-radius:var(--r);padding:12px;font-size:15px;line-height:1.55;background:var(--bg);resize:vertical}
+.result{text-align:left;padding:8px 0 0}
+.result-mark{width:56px;height:56px;border-radius:50%;background:var(--ink);color:var(--surface);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.result-mark .i{width:30px;height:30px}
+.result h3{margin:0 0 4px;font-size:22px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.result h3 .tag{color:var(--accent-ink);font-size:12px}
+.result .file{font-size:16px;font-weight:600;word-break:break-all;margin:0 0 4px}
+.result p{margin:0 0 4px;color:var(--ink-2);font-size:15px}
+.result-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+.ad{
+  margin-top:40px;min-height:110px;border:2px dashed var(--ink-3);border-radius:4px;
+  background:repeating-linear-gradient(135deg,var(--bg) 0 10px,var(--surface) 10px 20px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--ink-2);text-align:center;padding:12px
+}
+.ad strong{font-size:15px}
+.ad small{font-size:13px;color:var(--ink-3)}
+.prog{padding:12px 0}
+.prog h3{margin:0 0 4px;font-size:22px;display:flex;gap:8px;align-items:center}
+.prog h3 .tag{color:var(--accent-ink)}
+.prog p{margin:0 0 16px;color:var(--ink-2)}
+.bar{height:14px;border-radius:7px;background:var(--surface-2);overflow:hidden;border:2px solid var(--ink)}
+.bar span{display:block;height:100%;width:100%;background:var(--ink);transform-origin:left;transform:scaleX(0);transition:transform .2s linear}
+.pct{font-family:var(--display);font-size:40px;line-height:1;margin:14px 0 18px}
+.dialog{
+  width:100%;max-width:440px;background:var(--surface);border-radius:var(--r-lg);border:2px solid var(--ink);
+  padding:22px 20px 18px;box-shadow:0 20px 50px rgba(14,26,19,.3);animation:rise .3s var(--ease) both
+}
+.dialog h2{margin:0 0 8px;font-size:22px;line-height:1.3}
+.dialog p{margin:0 0 10px;color:var(--ink-2);font-size:16px}
+.dialog ul{margin:0 0 14px;padding:12px 14px 12px 34px;background:var(--danger-soft);border-radius:var(--r);font-weight:700;font-size:17px}
+.dialog ul li+li{margin-top:2px}
+.dialog-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bar-h) + 14px + env(safe-area-inset-bottom));
+  width:min(560px,calc(100vw - 24px));z-index:70;background:var(--ink);color:var(--surface);border-radius:var(--r-lg);
+  padding:8px 8px 8px 16px;display:flex;align-items:center;gap:8px;box-shadow:0 12px 32px rgba(14,26,19,.35);
+  animation:toastIn .38s var(--ease) both
+}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}
+.toast-msg{flex:1;min-width:0;font-size:16px;font-weight:600}
+.toast-undo{min-height:48px;border:2px solid var(--surface);background:var(--surface);color:var(--ink);border-radius:var(--r);padding:0 14px;font-weight:700;font-size:16px;display:inline-flex;align-items:center;gap:6px}
+.toast-x{width:44px;height:48px;border:0;background:none;color:var(--surface);display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r)}
+.toast :focus-visible{outline-color:var(--surface)}
+
+/* ---------- tablet ---------- */
+@media (min-width:760px){
+  .shell,body[data-step="1"] .shell,body[data-step="3"] .shell{
+    grid-template-columns:minmax(0,1fr) 380px;grid-template-areas:"pitch ptop" "pitch pbot";
+    grid-template-rows:auto minmax(0,1fr);gap:12px 24px;padding:16px 24px;overflow:hidden;align-content:stretch
+  }
+  body[data-step="1"] .pitchwrap{display:flex}
+  body[data-step="3"] .pitchwrap{height:auto}
+  .pbot{overflow-y:auto;padding-bottom:16px;padding-right:4px}
+  .pane[data-for="2"] .pane-title,.pane[data-for="2"] .pane-desc{display:block}
+  .card-hint small{display:block}
+  .save .long{display:inline}.save .short{display:none}
+  .tlist{flex-direction:column;overflow:visible}
+  .tfile{max-width:none;width:100%}
+  .scrim{align-items:stretch;justify-content:flex-end}
+  .sheet{max-width:480px;max-height:none;height:100%;border-radius:0;animation-name:slide}
+  @keyframes slide{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
+}
+/* ---------- desktop ---------- */
+@media (min-width:1100px){
+  .shell,body[data-step="1"] .shell,body[data-step="3"] .shell{
+    grid-template-columns:252px minmax(0,1fr) 400px;grid-template-areas:"rail pitch ptop" "rail pitch pbot";padding:16px 24px 20px 16px
+  }
+  .rail{display:flex;flex-direction:column;gap:16px;min-height:0;padding:4px 0}
+  .bottombar{display:none}
+  .toast{bottom:24px}
+  .appbar .share-wide{display:inline-flex}
+  .appbar .share-icon{display:none}
+  .appbar{padding:8px 24px;min-height:68px}
+  .team{font-size:26px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body data-step="1">
+<!-- Icons: inline SVG paths from Tabler Icons (MIT License, https://tabler.io/icons). -->
+
+<div class="note" role="note">
+  <p>시안 B · 데이라이트코치 · 데모 데이터, 실제 저장되지 않음</p>
+  <button class="note-btn" id="demoBtn" aria-expanded="false" aria-controls="demoMenu">시안 상태 보기</button>
+  <div class="demo-menu" id="demoMenu" hidden>
+    <h2>시안 상태를 직접 띄워 봅니다</h2>
+    <button data-demo="saved">저장됨 <span class="tag">시안</span></button>
+    <button data-demo="busy">처리 중 (GIF 만들기) <span class="tag">시안</span></button>
+    <button data-demo="fail">실패 (저장 실패) <span class="tag">시안</span></button>
+    <button data-demo="undo">되돌리기 알림 <span class="tag">시안</span></button>
+  </div>
+</div>
+
+<header class="appbar">
+  <div class="brand">
+    <span class="team" id="teamTitle">우리 FC</span>
+    <span class="meta" id="metaLine">9v9 · 3-3-2</span>
+  </div>
+  <div class="save" id="saveChip" role="status" aria-live="polite">
+    <span data-ic="check" id="saveIc"></span>
+    <span id="saveTxt"><span class="long">이 기기에 저장됨</span><span class="short">저장됨</span></span>
+    <span class="tag">시안</span>
+  </div>
+  <button class="icon-btn share-icon" data-open-sheet aria-label="내보내기·공유 열기"><span data-ic="share"></span></button>
+  <button class="btn btn-quiet share-wide" data-open-sheet><span data-ic="share"></span>내보내기·공유</button>
+</header>
+
+<div class="failbar" id="failBar" role="alert" hidden>
+  <p><span data-ic="alert"></span><span>이 브라우저에 저장하지 못했습니다. 백업 파일을 받아 두세요. <span class="tag">시안</span></span></p>
+  <button class="btn btn-quiet" id="retrySave"><span data-ic="refresh"></span>다시 시도</button>
+  <button class="btn btn-ink" id="failBackup"><span data-ic="download"></span>백업 받기</button>
+</div>
+
+<div class="shell" id="shell">
+  <nav class="rail" aria-label="작업 단계">
+    <ol class="rail-steps">
+      <li><button class="rail-step" data-go="1"><span class="rn">1</span><span><b>선수</b><small>이름, 번호, 색을 정합니다</small></span></button></li>
+      <li><button class="rail-step" data-go="2"><span class="rn">2</span><span><b>배치</b><small>스쿼드마다 자리를 잡습니다</small></span></button></li>
+      <li><button class="rail-step" data-go="3"><span class="rn">3</span><span><b>움직임</b><small>단계별 움직임과 패스를 그립니다</small></span></button></li>
+    </ol>
+    <div class="rail-foot">
+      <p id="railHint">다 했으면 다음 단계로 넘어가세요.</p>
+      <button class="btn btn-primary" data-next><span class="next-label">다음: 배치</span><span data-ic="arrowR"></span></button>
+    </div>
+  </nav>
+
+  <!-- top part of each step -->
+  <div class="ptop">
+    <section class="pane" data-for="1" aria-labelledby="h1">
+      <h1 class="pane-title" id="h1" tabindex="-1">선수</h1>
+      <p class="pane-desc">이름을 바로 고치고, 번호 동그라미를 누르면 색이 바뀝니다.</p>
+      <div class="field-row">
+        <label class="field"><span class="lbl">팀 이름</span><input class="input" id="teamName" autocomplete="off"></label>
+        <label class="field"><span class="lbl">인원</span><select class="select" id="modeSel"></select></label>
+      </div>
+    </section>
+    <section class="pane" data-for="2" aria-labelledby="h2">
+      <h2 class="pane-title" id="h2" tabindex="-1">배치</h2>
+      <p class="pane-desc">선수를 탭하면 고르고, 끌면 옮깁니다. 스쿼드 3개를 따로 저장합니다.</p>
+      <div class="squad-row">
+        <div class="seg" role="group" aria-label="스쿼드" id="squadSeg"></div>
+        <label class="field"><span class="sr">포메이션</span><select class="select" id="formSel" aria-label="포메이션"></select></label>
+      </div>
+    </section>
+    <section class="pane" data-for="3" aria-labelledby="h3">
+      <h2 class="pane-title" id="h3" tabindex="-1">움직임</h2>
+      <p class="pane-desc">기본 스쿼드 자리에서 시작합니다. 단계마다 한 문장으로 적어 두세요.</p>
+      <div class="slots">
+        <span class="slots-txt" id="slotTxt"></span>
+        <button class="btn btn-quiet" id="newTactic"><span data-ic="plus"></span>새 전술</button>
+      </div>
+      <ul class="tlist" id="tList" aria-label="전술 목록"></ul>
+      <div class="slotnote" id="slotNote" role="status" hidden>
+        <b>저장 슬롯을 모두 썼습니다 <span class="tag">시안</span></b>
+        <p>지금은 전술 하나를 지우면 새로 만들 수 있습니다. 슬롯을 늘리는 방법과 무료 수량은 아직 정하지 않았습니다.</p>
+        <button class="btn btn-text" id="slotNoteClose">알겠습니다</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="pitchwrap" id="pitchWrap">
+    <svg class="pitch" id="pitch" viewBox="0 0 480 660" preserveAspectRatio="xMidYMid meet" role="group" aria-labelledby="pitchDesc">
+      <defs>
+        <marker id="mRun" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="3.4" markerHeight="3.4" orient="auto"><path d="M0 0L10 5L0 10z" fill="#FCFDFC"/></marker>
+        <marker id="mPass" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="3.6" markerHeight="3.6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0E1A13"/></marker>
+      </defs>
+      <g id="field"></g>
+      <g id="gOver"></g>
+      <g id="gTok"></g>
+      <g id="gBall"></g>
+    </svg>
+    <p class="sr" id="pitchDesc">경기장</p>
+  </div>
+
+  <!-- bottom part of each step -->
+  <div class="pbot">
+    <section class="pane" data-for="1" aria-label="선수 명단">
+      <ul class="roster" id="roster"></ul>
+      <div class="bench">
+        <h3>교체 선수</h3>
+        <p>경기장에는 나오지 않고 명단에만 남습니다.</p>
+        <ul class="bench-list" id="benchList"></ul>
+        <form class="bench-add" id="benchForm">
+          <label class="sr" for="benchName">교체 선수 이름</label>
+          <input class="input" id="benchName" placeholder="이름 입력" autocomplete="off">
+          <button class="btn btn-ink" type="submit"><span data-ic="plus"></span>추가</button>
+        </form>
+      </div>
+      <p class="roster-foot">명단은 이 기기에 자동 저장됩니다.</p>
+    </section>
+    <section class="pane" data-for="2" aria-label="선택한 선수">
+      <div id="selCard"></div>
+    </section>
+    <section class="pane" data-for="3" aria-label="단계">
+      <div class="playrow">
+        <button class="icon-btn" id="prevStep" aria-label="이전 단계"><span data-ic="chevL"></span></button>
+        <button class="btn btn-ink" id="playBtn"><span data-ic="play" id="playIc"></span><span id="playTxt">처음부터 재생</span></button>
+        <button class="icon-btn" id="nextStep" aria-label="다음 단계"><span data-ic="chevR"></span></button>
+      </div>
+      <p class="stepcount" id="stepCount" aria-live="polite"></p>
+      <ol class="steps" id="steps"></ol>
+      <button class="btn btn-quiet step-add" id="addStep"><span data-ic="plus"></span>단계 추가</button>
+      <p class="hint">선수를 끌면 지금 단계의 움직임이 그려집니다. 고른 선수는 방향키로 조금씩 옮길 수 있습니다.</p>
+      <div class="zone"><button class="btn btn-danger" id="delTactic"><span data-ic="trash"></span>이 전술 지우기</button></div>
+    </section>
+  </div>
+</div>
+
+<footer class="bottombar">
+  <div class="progress" aria-hidden="true"><span id="progFill"></span></div>
+  <nav class="mini" aria-label="작업 단계" id="mini">
+    <button data-go="1"><span class="mn">1</span>선수</button>
+    <button data-go="2"><span class="mn">2</span>배치</button>
+    <button data-go="3"><span class="mn">3</span>움직임</button>
+  </nav>
+  <button class="btn btn-primary next" data-next><span class="next-label">다음: 배치</span><span data-ic="arrowR"></span></button>
+</footer>
+
+<div class="toast" id="toast" hidden>
+  <span class="toast-msg" id="toastMsg" role="status" aria-live="polite"></span>
+  <span class="tag tag-inv">시안</span>
+  <button class="toast-undo" id="toastUndo"><span data-ic="undo"></span>되돌리기</button>
+  <button class="toast-x" id="toastX" aria-label="알림 닫기"><span data-ic="x"></span></button>
+</div>
+
+<div class="scrim" id="sheetScrim" hidden>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-head">
+      <h2 id="sheetTitle">내보내기·공유</h2>
+      <button class="icon-btn" id="sheetClose" aria-label="닫기"><span data-ic="x"></span></button>
+    </div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+</div>
+
+<div class="scrim top" id="dlgScrim" hidden>
+  <div class="dialog" id="dlg" role="alertdialog" aria-modal="true" aria-labelledby="dlgTitle" aria-describedby="dlgBody">
+    <h2 id="dlgTitle"></h2>
+    <div id="dlgBody"></div>
+    <div class="dialog-btns">
+      <button class="btn btn-quiet" id="dlgCancel"></button>
+      <button class="btn btn-ink" id="dlgOk"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* SQUAD-DEMO-STATE BEGIN */
+/* SQUAD-DEMO-STATE v1 (canonical). Paste verbatim into each concept between the BEGIN/END markers.
+   Coordinate system matches production: pitch 480 x 660, own goal at the bottom (y=660). Demo data only. */
+const DEMO_STATE = {
+  team: '우리 FC',
+  mode: '9v9',
+  formation: '3-3-2',
+  roster: [
+    { id: 1, num: 1,  name: '김도윤', role: 'GK', color: '#E53935' },
+    { id: 2, num: 2,  name: '박태수', role: 'DF', color: '#1E88E5' },
+    { id: 3, num: 3,  name: '이준호', role: 'DF', color: '#1E88E5' },
+    { id: 4, num: 4,  name: '최민재', role: 'DF', color: '#1E88E5' },
+    { id: 5, num: 5,  name: '정하람', role: 'MF', color: '#1E88E5' },
+    { id: 6, num: 6,  name: '한서준', role: 'MF', color: '#1E88E5' },
+    { id: 7, num: 7,  name: '오태민', role: 'MF', color: '#1E88E5' },
+    { id: 8, num: 8,  name: '윤재현', role: 'FW', color: '#1E88E5' },
+    { id: 9, num: 9,  name: '강현우', role: 'FW', color: '#1E88E5' }
+  ],
+  positions: {
+    1: { x: 240, y: 616 },
+    2: { x: 130, y: 510 }, 3: { x: 240, y: 520 }, 4: { x: 350, y: 510 },
+    5: { x: 120, y: 385 }, 6: { x: 240, y: 400 }, 7: { x: 360, y: 385 },
+    8: { x: 175, y: 240 }, 9: { x: 305, y: 240 }
+  },
+  ball: { x: 240, y: 400 },
+  tactics: [
+    {
+      id: 't1', name: '오른쪽 전환 침투', updated: '방금 전',
+      steps: [
+        { label: '6번이 오른쪽으로 전환 패스', moves: { 7: { x: 400, y: 300 } }, ball: { from: 6, to: 7 } },
+        { label: '7번 크로스, 9번 니어 침투', moves: { 9: { x: 290, y: 120 }, 8: { x: 200, y: 150 } }, ball: { from: 7, to: 9 } },
+        { label: '수비 라인 전진', moves: { 2: { x: 140, y: 440 }, 3: { x: 240, y: 450 }, 4: { x: 340, y: 440 } }, ball: null }
+      ]
+    },
+    {
+      id: 't2', name: '왼쪽 오버래핑', updated: '어제',
+      steps: [
+        { label: '5번 전진, 2번 오버래핑', moves: { 5: { x: 110, y: 280 }, 2: { x: 70, y: 330 } }, ball: { from: 6, to: 5 } },
+        { label: '2번 컷백', moves: { 2: { x: 80, y: 150 } }, ball: { from: 5, to: 2 } }
+      ]
+    },
+    {
+      id: 't3', name: '전방 압박 3-3-2', updated: '3일 전',
+      steps: [
+        { label: '투톱 상대 센터백 압박', moves: { 8: { x: 190, y: 160 }, 9: { x: 290, y: 160 } }, ball: null }
+      ]
+    }
+  ],
+  squads: ['기본', '공격', '수비'],
+  slots: { used: 3, free: 3 } /* demo value; real free-slot count is undecided */
+};
+/* SQUAD-DEMO-STATE END */
+
+(function(){
+'use strict';
+
+/* Tabler Icons (MIT). Paths copied from tabler.io outline set, 24x24, stroke 2. */
+const ICONS = {
+  share:'<path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M8.7 10.7l6.6 -3.4"/><path d="M8.7 13.3l6.6 3.4"/>',
+  check:'<path d="M5 12l5 5l10 -10"/>',
+  x:'<path d="M18 6l-12 12"/><path d="M6 6l12 12"/>',
+  plus:'<path d="M12 5l0 14"/><path d="M5 12l14 0"/>',
+  arrowR:'<path d="M5 12l14 0"/><path d="M13 18l6 -6"/><path d="M13 6l6 6"/>',
+  chevL:'<path d="M15 6l-6 6l6 6"/>',
+  chevR:'<path d="M9 6l6 6l-6 6"/>',
+  play:'<path d="M7 4v16l13 -8z"/>',
+  pause:'<path d="M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"/><path d="M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"/>',
+  trash:'<path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>',
+  download:'<path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 11l5 5l5 -5"/><path d="M12 4l0 12"/>',
+  upload:'<path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 9l5 -5l5 5"/><path d="M12 4l0 12"/>',
+  link:'<path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/>',
+  message:'<path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/>',
+  undo:'<path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/>',
+  refresh:'<path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>',
+  alert:'<path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/>',
+  pencil:'<path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/>',
+  photo:'<path d="M15 8h.01"/><path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12z"/><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5"/><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3"/>',
+  floppy:'<path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"/><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M14 4l0 4l-6 0l0 -4"/>'
+};
+const ic = n => '<svg class="i" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + (ICONS[n] || '') + '</svg>';
+function paintIcons(root){ (root || document).querySelectorAll('[data-ic]').forEach(el => { el.outerHTML = ic(el.dataset.ic); }); }
+
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const clone = o => JSON.parse(JSON.stringify(o));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const RM = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches:false };
+
+const FORMATIONS = {
+  '5v5':['2-2','1-2-1'], '6v6':['2-2-1','3-2'], '7v7':['3-2-1','2-3-1'], '8v8':['3-3-1','3-2-2'],
+  '9v9':['3-3-2','3-2-3','4-3-1','2-4-2'], '10v10':['4-3-2','3-4-2'], '11v11':['4-4-2','4-3-3','4-2-3-1']
+};
+const ROLE_KO = { GK:'골키퍼', DF:'수비', MF:'미드필더', FW:'공격' };
+const ROLE_SHORT = { GK:'GK', DF:'수비', MF:'미드', FW:'공격' };
+/* Token fill: keep the roster color as identity, darken until white digits reach 4.5:1 or more. */
+function lum(hex){ const n = parseInt(hex.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }).reduce((a, v, i) => a + v * [.2126, .7152, .0722][i], 0); }
+function fillFor(hex){
+  if (!/^#[0-9a-f]{6}$/i.test(hex)) return hex;
+  let n = parseInt(hex.slice(1), 16), r = n >> 16 & 255, g = n >> 8 & 255, b = n & 255;
+  for (let k = 0; k < 20; k++) {
+    const h = '#' + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
+    if (1.05 / (lum(h) + .05) >= 4.6) return h;
+    r *= .92; g *= .92; b *= .92;
+  }
+  return '#1A2A20';
+}
+const SWATCH = ['#1E88E5','#E53935','#00796B','#6D4C41','#5E35B1','#C2185B','#37474F'];
+
+/* ---------- state ---------- */
+function shifted(base, dy){ const p = clone(base); Object.keys(p).forEach(id => { if (+id !== 1) p[id].y = clamp(p[id].y + dy, 60, 600); }); return p; }
+function initialState(){
+  const base = clone(DEMO_STATE.positions);
+  return {
+    team: DEMO_STATE.team, mode: DEMO_STATE.mode,
+    roster: clone(DEMO_STATE.roster), bench: [],
+    squads: DEMO_STATE.squads.map((name, i) => ({ name, formation: DEMO_STATE.formation, pos: i === 0 ? clone(base) : shifted(base, i === 1 ? -40 : 36) })),
+    tactics: clone(DEMO_STATE.tactics), squadIdx: 0, tacticIdx: 0, stepIdx: 0, seq: 100
+  };
+}
+let S = initialState();
+const UI = { step: 1, selected: null, playing: false, renaming: false, editStep: false, slotNote: false };
+let undoSnap = null;
+const SLOT_MAX = DEMO_STATE.slots.free;
+
+function genPositions(roster, formation){
+  const lines = formation.split('-').map(Number);
+  const pos = {};
+  if (roster[0]) pos[roster[0].id] = { x: 240, y: 616 };
+  const n = lines.length, yBack = 512, yFront = 238;
+  let k = 1;
+  lines.forEach((cnt, li) => {
+    const y = n === 1 ? 380 : yBack - (yBack - yFront) * li / (n - 1);
+    const m = cnt >= 4 ? 70 : 110;
+    for (let j = 0; j < cnt; j++) {
+      const x = cnt === 1 ? 240 : m + (480 - 2 * m) * j / (cnt - 1);
+      if (roster[k]) pos[roster[k].id] = { x: Math.round(x), y: Math.round(y) };
+      k++;
+    }
+  });
+  return pos;
+}
+function defaultPositions(squadIdx, formation){
+  let base;
+  if (S.mode === DEMO_STATE.mode && formation === DEMO_STATE.formation && sameIds()) base = clone(DEMO_STATE.positions);
+  else base = genPositions(S.roster, formation);
+  return squadIdx === 0 ? base : shifted(base, squadIdx === 1 ? -40 : 36);
+}
+function sameIds(){ return S.roster.length === DEMO_STATE.roster.length && S.roster.every((p, i) => p.id === DEMO_STATE.roster[i].id); }
+function squad(){ return S.squads[S.squadIdx]; }
+function curTactic(){ return S.tactics[S.tacticIdx] || null; }
+function player(id){ return S.roster.find(p => p.id === id); }
+
+function initialHolder(p){
+  let best = null, bd = Infinity;
+  S.roster.forEach(pl => { const q = p[pl.id]; if (!q || pl.role === 'GK') return; const d = (q.x - DEMO_STATE.ball.x) ** 2 + (q.y - DEMO_STATE.ball.y) ** 2; if (d < bd) { bd = d; best = pl.id; } });
+  return best;
+}
+function stateAt(T, k){
+  const p = clone(S.squads[0].pos);
+  let holder = initialHolder(p);
+  if (T) for (let i = 0; i < k && i < T.steps.length; i++) {
+    const st = T.steps[i];
+    Object.keys(st.moves).forEach(id => { if (p[id]) p[id] = { x: st.moves[id].x, y: st.moves[id].y }; });
+    if (st.ball && st.ball.to != null) holder = st.ball.to;
+  }
+  return { p, holder };
+}
+
+/* ---------- save status ---------- */
+let saveTimer = null, failOn = false;
+function chip(state){
+  const c = $('#saveChip'), t = $('#saveTxt');
+  c.classList.remove('is-saving', 'is-fail', 'is-flash');
+  if (state === 'saving') { c.classList.add('is-saving'); t.innerHTML = '<span class="long">저장하는 중</span><span class="short">저장 중</span>'; }
+  else if (state === 'fail') { c.classList.add('is-fail'); t.innerHTML = '<span class="long">저장하지 못함</span><span class="short">저장 안 됨</span>'; }
+  else { if (state === 'flash') c.classList.add('is-flash'); t.innerHTML = '<span class="long">이 기기에 저장됨</span><span class="short">저장됨</span>'; }
+}
+function markSaved(flash){
+  if (failOn) return;
+  chip('saving'); clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => { chip(flash ? 'flash' : 'saved'); if (flash) setTimeout(() => { if (!failOn) chip('saved'); }, 1600); }, 650);
+}
+
+/* ---------- toast + undo ---------- */
+let toastTimer = null;
+function showToast(msg, withUndo){
+  const t = $('#toast');
+  $('#toastMsg').textContent = msg;
+  $('#toastUndo').hidden = !withUndo;
+  t.hidden = false; t.style.animation = 'none'; void t.offsetWidth; t.style.animation = '';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, withUndo ? 8000 : 3500);
+}
+function hideToast(){ $('#toast').hidden = true; }
+function checkpoint(){ return clone(S); }
+function offerUndo(prev, msg){ undoSnap = prev; showToast(msg, true); }
+function doUndo(){
+  if (!undoSnap) return;
+  S = undoSnap; undoSnap = null; UI.selected = null; UI.renaming = false;
+  renderAll(); markSaved(); showToast('되돌렸습니다', false);
+}
+
+/* ---------- pitch ---------- */
+const svg = $('#pitch');
+function drawField(){
+  let s = '<rect x="0" y="0" width="480" height="660" rx="14" fill="#3B9C4F"/>';
+  for (let i = 0; i < 11; i++) if (i % 2) s += '<rect x="0" y="' + (i * 60) + '" width="480" height="60" fill="#45A859"/>';
+  s += '<rect class="pl-line" x="20" y="20" width="440" height="620"/>' +
+    '<line class="pl-line" x1="20" y1="330" x2="460" y2="330"/>' +
+    '<circle class="pl-line" cx="240" cy="330" r="60"/><circle cx="240" cy="330" r="5" fill="#FCFDFC"/>' +
+    '<rect class="pl-line" x="100" y="20" width="280" height="100"/><rect class="pl-line" x="170" y="20" width="140" height="35"/>' +
+    '<circle cx="240" cy="95" r="5" fill="#FCFDFC"/><path class="pl-line" d="M196.7 120A50 50 0 0 0 283.3 120"/>' +
+    '<rect class="pl-line" x="100" y="540" width="280" height="100"/><rect class="pl-line" x="170" y="605" width="140" height="35"/>' +
+    '<circle cx="240" cy="565" r="5" fill="#FCFDFC"/><path class="pl-line" d="M196.7 540A50 50 0 0 1 283.3 540"/>' +
+    '<rect class="pl-line" x="210" y="6" width="60" height="14"/><rect class="pl-line" x="210" y="640" width="60" height="14"/>' +
+    '<path class="pl-line" d="M20 30A10 10 0 0 0 30 20M450 20A10 10 0 0 0 460 30M30 640A10 10 0 0 0 20 630M460 630A10 10 0 0 0 450 640"/>';
+  $('#field').innerHTML = s;
+}
+function nameWidth(name){ let w = 0; for (const ch of String(name)) w += /[ㄱ-힝]/.test(ch) ? 18 : 10.5; return Math.max(40, w + 18); }
+function tokenSVG(pl, q, sel){
+  const nm = pl.name || ('선수 ' + pl.num);
+  const w = nameWidth(nm), side = q.y > 588;
+  const ly = side ? -14.5 : 31;
+  const lx = side ? (q.x > 330 ? -36 - w : 36) : -w / 2;
+  return '<g class="tok' + (sel ? ' is-sel' : '') + '" data-id="' + pl.id + '" transform="translate(' + q.x + ' ' + q.y + ')" tabindex="0" role="button" aria-pressed="' + sel + '" aria-label="' + pl.num + '번 ' + esc(nm) + ', ' + ROLE_KO[pl.role] + '">' +
+    '<circle class="hit" r="37"/><circle class="fring2" r="36"/><circle class="fring" r="36"/>' +
+    (sel ? '<circle class="selring" r="31"/>' : '') +
+    '<circle class="body" r="24" fill="' + fillFor(pl.color) + '"/>' +
+    '<text class="num" y="9">' + pl.num + '</text>' +
+    '<rect class="lab" x="' + lx + '" y="' + ly + '" width="' + w + '" height="29" rx="8"/>' +
+    '<text class="name" x="' + (lx + w / 2) + '" y="' + (ly + 21) + '">' + esc(nm) + '</text></g>';
+}
+function currentPositions(){
+  if (UI.step === 3) return stateAt(curTactic(), S.stepIdx).p;
+  return squad().pos;
+}
+function renderTokens(override){
+  const active = document.activeElement && document.activeElement.closest ? document.activeElement.closest('.tok') : null;
+  const focusId = active ? +active.dataset.id : null;
+  const pos = override || currentPositions();
+  let s = '';
+  S.roster.forEach(pl => { const q = pos[pl.id]; if (q && pl.id !== UI.selected) s += tokenSVG(pl, q, false); });
+  const sp = UI.selected != null ? player(UI.selected) : null;
+  if (sp && pos[sp.id]) s += tokenSVG(sp, pos[sp.id], true);
+  $('#gTok').innerHTML = s;
+  if (focusId != null) { const g = $('#gTok .tok[data-id="' + focusId + '"]'); if (g) g.focus({ preventScroll: true }); }
+}
+function edgeLine(x1, y1, x2, y2, r1, r2){
+  const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy);
+  if (L < r1 + r2 + 8) return null;
+  const ux = dx / L, uy = dy / L;
+  return [x1 + ux * r1, y1 + uy * r1, x2 - ux * r2, y2 - uy * r2];
+}
+function renderOverlay(anim){
+  const over = $('#gOver'), ballG = $('#gBall');
+  if (UI.step !== 3) { over.innerHTML = ''; ballG.innerHTML = ''; return; }
+  const T = curTactic();
+  if (!T) { over.innerHTML = ''; ballG.innerHTML = ''; return; }
+  if (anim) { over.innerHTML = ''; ballG.innerHTML = '<circle class="ball" r="11" cx="' + anim.bx + '" cy="' + anim.by + '"/>'; return; }
+  const { p, holder } = stateAt(T, S.stepIdx);
+  const st = T.steps[S.stepIdx];
+  let s = '';
+  if (st) {
+    Object.keys(st.moves).forEach(id => {
+      const a = p[id], b = st.moves[id]; if (!a) return;
+      const l = edgeLine(a.x, a.y, b.x, b.y, 28, 30);
+      if (l) s += '<line class="run-case" x1="' + l[0] + '" y1="' + l[1] + '" x2="' + l[2] + '" y2="' + l[3] + '"/><line class="run" marker-end="url(#mRun)" x1="' + l[0] + '" y1="' + l[1] + '" x2="' + l[2] + '" y2="' + l[3] + '"/>';
+      const pl = player(+id);
+      s += '<g class="ghost" transform="translate(' + b.x + ' ' + b.y + ')"><circle r="24"/><text y="8">' + (pl ? pl.num : '') + '</text></g>';
+    });
+    if (st.ball && p[st.ball.from]) {
+      const a = p[st.ball.from], b = st.moves[st.ball.to] || p[st.ball.to];
+      if (b) { const l = edgeLine(a.x, a.y, b.x, b.y, 30, 30); if (l) s += '<line class="pass" marker-end="url(#mPass)" x1="' + l[0] + '" y1="' + l[1] + '" x2="' + l[2] + '" y2="' + l[3] + '"/>'; }
+    }
+  }
+  over.innerHTML = s;
+  const bh = st && st.ball ? st.ball.from : holder;
+  const bq = p[bh];
+  ballG.innerHTML = bq ? '<circle class="ball" r="11" cx="' + (bq.x + 22) + '" cy="' + (bq.y - 20) + '"/>' : '';
+}
+function renderPitch(){ renderTokens(); renderOverlay(); describePitch(); }
+function describePitch(){
+  let d;
+  if (UI.step === 3) {
+    const T = curTactic();
+    d = T && T.steps[S.stepIdx] ? '경기장. 전술 ' + T.name + ', ' + (S.stepIdx + 1) + '단계: ' + T.steps[S.stepIdx].label + '. ' + stepDetail(T.steps[S.stepIdx]) : '경기장. 전술이 없습니다.';
+  } else d = '경기장. ' + squad().name + ' 스쿼드, ' + squad().formation + '. 선수에 초점을 두고 Enter로 고르고 방향키로 옮깁니다.';
+  $('#pitchDesc').textContent = d;
+}
+
+/* pointer: 8px threshold, tap selects, drag moves */
+let drag = null, bgTap = null;
+function toSvg(e){ const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const m = svg.getScreenCTM(); return m ? pt.matrixTransform(m.inverse()) : { x: 0, y: 0 }; }
+svg.addEventListener('pointerdown', e => {
+  if (UI.playing) return;
+  const g = e.target.closest('.tok');
+  if (!g) { bgTap = { x: e.clientX, y: e.clientY }; return; }
+  e.preventDefault();
+  drag = { id: +g.dataset.id, g, sx: e.clientX, sy: e.clientY, moved: false, pid: e.pointerId, prev: null };
+  try { svg.setPointerCapture(e.pointerId); } catch (_) {}
+});
+svg.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.pid) return;
+  if (!drag.moved) {
+    if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 8) return;
+    drag.moved = true; drag.prev = checkpoint();
+    drag.g.classList.add('dragging'); drag.g.parentNode.appendChild(drag.g);
+  }
+  const pt = toSvg(e), x = Math.round(clamp(pt.x, 26, 454)), y = Math.round(clamp(pt.y, 26, 634));
+  if (UI.step === 3) {
+    const T = curTactic(); if (!T || !T.steps[S.stepIdx]) return;
+    T.steps[S.stepIdx].moves[drag.id] = { x, y }; renderOverlay();
+  } else {
+    squad().pos[drag.id] = { x, y }; drag.g.setAttribute('transform', 'translate(' + x + ' ' + y + ')');
+  }
+});
+function endDrag(e, cancelled){
+  if (!drag || e.pointerId !== drag.pid) return;
+  try { svg.releasePointerCapture(e.pointerId); } catch (_) {}
+  const d = drag; drag = null;
+  if (cancelled) { renderPitch(); return; }
+  if (!d.moved) { toggleSelect(d.id); return; }
+  if (UI.step === 3) { const T = curTactic(); if (T) T.updated = '방금 전'; renderSteps(); renderTactics(); }
+  renderPitch(); markSaved();
+}
+svg.addEventListener('pointerup', e => {
+  if (drag) return endDrag(e, false);
+  if (bgTap && Math.hypot(e.clientX - bgTap.x, e.clientY - bgTap.y) < 8 && UI.selected != null) select(null);
+  bgTap = null;
+});
+svg.addEventListener('pointercancel', e => endDrag(e, true));
+svg.addEventListener('keydown', e => {
+  const g = e.target.closest && e.target.closest('.tok'); if (!g) return;
+  const id = +g.dataset.id;
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSelect(id); return; }
+  const dirs = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
+  if (dirs[e.key] && UI.selected === id) { e.preventDefault(); nudge(id, dirs[e.key][0] * (e.shiftKey ? 30 : 10), dirs[e.key][1] * (e.shiftKey ? 30 : 10)); }
+});
+function nudge(id, dx, dy){
+  if (UI.step === 3) {
+    const T = curTactic(); if (!T || !T.steps[S.stepIdx]) return;
+    const st = T.steps[S.stepIdx]; const from = st.moves[id] || stateAt(T, S.stepIdx).p[id]; if (!from) return;
+    st.moves[id] = { x: clamp(from.x + dx, 26, 454), y: clamp(from.y + dy, 26, 634) };
+    renderSteps();
+  } else {
+    const q = squad().pos[id]; if (!q) return;
+    squad().pos[id] = { x: clamp(q.x + dx, 26, 454), y: clamp(q.y + dy, 26, 634) };
+  }
+  renderPitch(); markSaved();
+}
+function toggleSelect(id){ select(UI.selected === id ? null : id); }
+function select(id){
+  UI.selected = id; UI.renaming = false;
+  renderPitch(); renderSelCard(); markRosterSel();
+  if (UI.step === 1 && id != null) { const r = $('#roster [data-row="' + id + '"]'); if (r) r.scrollIntoView({ block: 'nearest', behavior: RM.matches ? 'auto' : 'smooth' }); }
+}
+
+/* ---------- step 1: roster ---------- */
+function renderModeSel(){ $('#modeSel').innerHTML = Object.keys(FORMATIONS).map(m => '<option value="' + m + '"' + (m === S.mode ? ' selected' : '') + '>' + m + '</option>').join(''); }
+function renderRoster(){
+  $('#teamName').value = S.team;
+  renderModeSel();
+  $('#roster').innerHTML = S.roster.map(pl =>
+    '<li class="prow" data-row="' + pl.id + '">' +
+      '<button class="pnum" style="background:' + fillFor(pl.color) + '" data-color="' + pl.id + '" aria-label="' + pl.num + '번 색 바꾸기">' + pl.num + '</button>' +
+      '<label class="sr" for="nm' + pl.id + '">' + pl.num + '번 이름</label>' +
+      '<input class="pname" id="nm' + pl.id + '" data-name="' + pl.id + '" value="' + esc(pl.name) + '" autocomplete="off" maxlength="8">' +
+      '<label class="sr" for="rl' + pl.id + '">' + pl.num + '번 포지션</label>' +
+      '<select class="select prole" id="rl' + pl.id + '" data-role="' + pl.id + '">' + Object.keys(ROLE_SHORT).map(r => '<option value="' + r + '"' + (r === pl.role ? ' selected' : '') + '>' + ROLE_SHORT[r] + '</option>').join('') + '</select>' +
+    '</li>').join('');
+  $('#benchList').innerHTML = S.bench.map((b, i) => '<li><span>' + esc(b) + '</span><button class="icon-btn btn-quiet" style="border-color:var(--line)" data-bench-del="' + i + '" aria-label="' + esc(b) + ' 교체 명단에서 빼기">' + ic('x') + '</button></li>').join('');
+  markRosterSel();
+}
+function markRosterSel(){ $$('#roster .prow').forEach(r => r.classList.toggle('is-sel', +r.dataset.row === UI.selected)); }
+$('#roster').addEventListener('input', e => {
+  const id = +e.target.dataset.name; if (!id) return;
+  player(id).name = e.target.value.trim(); renderPitch(); markSaved();
+});
+$('#roster').addEventListener('change', e => {
+  const id = +e.target.dataset.role; if (!id) return;
+  player(id).role = e.target.value; renderPitch(); markSaved();
+});
+$('#roster').addEventListener('click', e => {
+  const b = e.target.closest('[data-color]'); if (!b) return;
+  const pl = player(+b.dataset.color); const i = SWATCH.indexOf(pl.color);
+  pl.color = SWATCH[(i + 1) % SWATCH.length]; b.style.background = fillFor(pl.color); renderPitch(); markSaved();
+});
+$('#roster').addEventListener('focusin', e => { const r = e.target.closest('.prow'); if (r && UI.step === 1 && UI.selected !== +r.dataset.row) { UI.selected = +r.dataset.row; renderTokens(); markRosterSel(); } });
+$('#teamName').addEventListener('input', e => { S.team = e.target.value; renderMeta(); markSaved(); });
+$('#benchForm').addEventListener('submit', e => {
+  e.preventDefault(); const v = $('#benchName').value.trim(); if (!v) { $('#benchName').focus(); return; }
+  S.bench.push(v); $('#benchName').value = ''; renderRoster(); markSaved(); $('#benchName').focus();
+});
+$('#benchList').addEventListener('click', e => {
+  const b = e.target.closest('[data-bench-del]'); if (!b) return;
+  const prev = checkpoint(); const nm = S.bench.splice(+b.dataset.benchDel, 1)[0];
+  renderRoster(); markSaved(); offerUndo(prev, nm + ' 선수를 교체 명단에서 뺐습니다');
+});
+$('#modeSel').addEventListener('change', async e => {
+  const nm = e.target.value; if (nm === S.mode) return;
+  const ok = await confirmDialog({
+    title: nm + ' 인원으로 바꿀까요?',
+    body: '<p>인원을 바꾸면 아래 내용이 새로 만들어집니다.</p><ul><li>선수 이름 ' + S.roster.length + '명</li><li>스쿼드 배치 ' + S.squads.length + '개</li><li>전술 ' + S.tactics.length + '개</li></ul><p>바꾼 뒤에도 알림의 되돌리기로 지금 상태를 다시 불러올 수 있습니다.</p>',
+    ok: '인원 바꾸기', cancel: '그대로 두기'
+  });
+  if (!ok) { e.target.value = S.mode; return; }
+  const prev = checkpoint(); applyMode(nm); renderAll(); markSaved(); offerUndo(prev, nm + ' 인원으로 바꿨습니다');
+});
+function applyMode(nm){
+  const f = FORMATIONS[nm][0]; const lines = f.split('-').map(Number);
+  const roster = [{ id: 1, num: 1, name: 'GK', role: 'GK', color: '#E53935' }];
+  let id = 2;
+  lines.forEach((cnt, li) => {
+    const role = li === 0 ? 'DF' : li === lines.length - 1 ? 'FW' : 'MF';
+    const pre = { DF: '수비', MF: '미드', FW: '공격' }[role];
+    for (let j = 0; j < cnt; j++) { roster.push({ id, num: id, name: pre + (j + 1), role, color: '#1E88E5' }); id++; }
+  });
+  S.mode = nm; S.roster = roster; UI.selected = null;
+  S.squads = DEMO_STATE.squads.map((name, i) => ({ name, formation: f, pos: null }));
+  S.squads.forEach((sq, i) => { sq.pos = defaultPositions(i, f); });
+  S.tactics = [{ id: 't' + (++S.seq), name: '새 전술', updated: '방금 전', steps: [{ label: '새 단계', moves: {}, ball: null }] }];
+  S.tacticIdx = 0; S.stepIdx = 0; S.squadIdx = 0;
+}
+
+/* ---------- step 2: placement ---------- */
+function renderSquadControls(){
+  $('#squadSeg').innerHTML = S.squads.map((sq, i) => '<button aria-pressed="' + (i === S.squadIdx) + '" data-squad="' + i + '">' + sq.name + '</button>').join('');
+  $('#formSel').innerHTML = FORMATIONS[S.mode].map(f => '<option' + (f === squad().formation ? ' selected' : '') + '>' + f + '</option>').join('');
+}
+$('#squadSeg').addEventListener('click', e => {
+  const b = e.target.closest('[data-squad]'); if (!b) return;
+  S.squadIdx = +b.dataset.squad; UI.selected = null; renderSquadControls(); renderMeta(); renderPitch(); renderSelCard();
+});
+$('#formSel').addEventListener('change', e => {
+  const prev = checkpoint(); squad().formation = e.target.value; squad().pos = defaultPositions(S.squadIdx, e.target.value);
+  renderMeta(); renderPitch(); markSaved(); offerUndo(prev, squad().name + ' 스쿼드 포메이션을 바꿨습니다 (' + e.target.value + ')');
+});
+function renderSelCard(){
+  const box = $('#selCard');
+  const pl = UI.selected != null ? player(UI.selected) : null;
+  if (!pl) {
+    box.innerHTML = '<div class="card"><p class="card-hint">선수를 탭하면 고를 수 있고, 끌면 자리를 옮깁니다.<small>키보드: Tab으로 선수에 가서 Enter, 방향키로 이동, Esc로 해제</small></p>' +
+      '<div class="card-idle-row"><button class="btn btn-quiet" id="resetLayout">' + ic('refresh') + '배치 초기화</button></div></div>';
+    return;
+  }
+  const idPart = UI.renaming
+    ? '<form class="rename" id="renameForm"><label class="sr" for="renameIn">' + pl.num + '번 새 이름</label><input class="input" id="renameIn" value="' + esc(pl.name) + '" maxlength="8" autocomplete="off"><button class="btn btn-ink" type="submit">' + ic('check') + '확인</button></form>'
+    : '<div class="sel-id"><span class="sel-num" style="background:' + fillFor(pl.color) + '">' + pl.num + '</span><div><strong class="sel-name">' + esc(pl.name || ('선수 ' + pl.num)) + '</strong><span class="sel-sub">' + ROLE_KO[pl.role] + ' · 방향키로 조금씩 옮기기</span></div></div>';
+  box.innerHTML = '<div class="card" aria-label="선택한 선수 도구">' + idPart +
+    '<div class="sel-actions">' +
+      '<button class="btn btn-quiet" id="renameBtn"' + (UI.renaming ? ' disabled' : '') + '>이름 바꾸기</button>' +
+      '<button class="btn btn-quiet" id="homeBtn">원래 자리</button>' +
+      '<button class="btn btn-quiet" id="deselBtn" aria-label="선택 해제 (Esc)">선택 해제</button>' +
+    '</div></div>';
+  if (UI.renaming) { const i = $('#renameIn'); i.focus(); i.select(); }
+}
+$('#selCard').addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.id === 'resetLayout') {
+    const prev = checkpoint(); squad().pos = defaultPositions(S.squadIdx, squad().formation);
+    renderPitch(); markSaved(); offerUndo(prev, squad().name + ' 스쿼드 배치를 초기화했습니다');
+  } else if (t.id === 'renameBtn') { UI.renaming = true; renderSelCard(); }
+  else if (t.id === 'homeBtn') {
+    const d = defaultPositions(S.squadIdx, squad().formation)[UI.selected];
+    if (d) { squad().pos[UI.selected] = d; renderPitch(); markSaved(); }
+  } else if (t.id === 'deselBtn') { select(null); }
+});
+$('#selCard').addEventListener('submit', e => {
+  e.preventDefault(); const v = $('#renameIn').value.trim();
+  if (v) { player(UI.selected).name = v; markSaved(); }
+  UI.renaming = false; renderSelCard(); renderPitch(); renderRoster();
+  const b = $('#renameBtn'); if (b) b.focus();
+});
+
+/* ---------- step 3: tactics ---------- */
+function stepDetail(st){
+  const ids = Object.keys(st.moves);
+  const parts = [];
+  if (ids.length) parts.push('움직임: ' + ids.map(i => i + '번').join(', '));
+  if (st.ball) parts.push('패스: ' + st.ball.from + '번에서 ' + st.ball.to + '번');
+  return parts.length ? parts.join(' / ') : '아직 움직임이 없습니다. 선수를 끌어 보세요.';
+}
+function renderTactics(){
+  $('#slotTxt').textContent = '저장 슬롯 ' + S.tactics.length + ' / ' + SLOT_MAX + ' 사용 (무료 수량 미정)';
+  $('#tList').innerHTML = S.tactics.length
+    ? S.tactics.map((t, i) => '<li><button class="tfile" aria-pressed="' + (i === S.tacticIdx) + '" data-tactic="' + i + '"><b>' + esc(t.name) + '</b><small>' + t.steps.length + '단계 · ' + t.updated + '</small></button></li>').join('')
+    : '<li class="tempty">전술이 없습니다. 새 전술을 만들어 보세요.</li>';
+  $('#slotNote').hidden = !(UI.slotNote && S.tactics.length >= SLOT_MAX);
+  $('#delTactic').disabled = !curTactic();
+}
+function renderSteps(){
+  const T = curTactic();
+  const has = !!T;
+  ['#prevStep', '#nextStep', '#playBtn', '#addStep'].forEach(s => { $(s).disabled = !has; });
+  if (!T) { $('#steps').innerHTML = ''; $('#stepCount').textContent = ''; return; }
+  S.stepIdx = clamp(S.stepIdx, 0, T.steps.length - 1);
+  $('#prevStep').disabled = UI.playing || S.stepIdx === 0;
+  $('#nextStep').disabled = UI.playing || S.stepIdx >= T.steps.length - 1;
+  $('#addStep').disabled = UI.playing;
+  $('#stepCount').textContent = T.name + ' · ' + (S.stepIdx + 1) + ' / ' + T.steps.length + '단계';
+  $('#steps').innerHTML = T.steps.map((st, i) => {
+    const cur = i === S.stepIdx;
+    let tools = '';
+    if (cur && !UI.playing) {
+      tools = UI.editStep
+        ? '<form class="step-edit" id="stepEditForm"><label class="sr" for="stepIn">' + (i + 1) + '단계 문장</label><input class="input" id="stepIn" value="' + esc(st.label) + '" maxlength="40" autocomplete="off"><button class="btn btn-ink" type="submit">' + ic('check') + '확인</button></form>'
+        : '<div class="step-tools"><button class="btn btn-quiet" data-step-edit>' + ic('pencil') + '문장 고치기</button>' + (T.steps.length > 1 ? '<button class="btn btn-text" data-step-del>이 단계 지우기</button>' : '') + '</div>';
+    }
+    return '<li class="' + (cur ? 'is-cur' : '') + '"><button class="step-btn" data-step="' + i + '"' + (cur ? ' aria-current="step"' : '') + '><span class="step-n">' + (i + 1) + '</span><span class="step-txt"><b>' + esc(st.label) + '</b><small>' + esc(stepDetail(st)) + '</small></span></button>' + tools + '</li>';
+  }).join('');
+  if (UI.editStep) { const i = $('#stepIn'); if (i) { i.focus(); i.select(); } }
+}
+$('#tList').addEventListener('click', e => {
+  const b = e.target.closest('[data-tactic]'); if (!b || UI.playing) return;
+  S.tacticIdx = +b.dataset.tactic; S.stepIdx = 0; UI.editStep = false; UI.selected = null;
+  renderTactics(); renderSteps(); renderPitch();
+});
+$('#newTactic').addEventListener('click', () => {
+  if (UI.playing) return;
+  if (S.tactics.length >= SLOT_MAX) { UI.slotNote = true; renderTactics(); $('#slotNote').scrollIntoView({ block: 'nearest' }); return; }
+  S.tactics.push({ id: 't' + (++S.seq), name: '새 전술 ' + (S.tactics.length + 1), updated: '방금 전', steps: [{ label: '새 단계', moves: {}, ball: null }] });
+  S.tacticIdx = S.tactics.length - 1; S.stepIdx = 0; UI.slotNote = false;
+  renderTactics(); renderSteps(); renderPitch(); markSaved();
+});
+$('#slotNoteClose').addEventListener('click', () => { UI.slotNote = false; renderTactics(); $('#newTactic').focus(); });
+$('#delTactic').addEventListener('click', async () => {
+  const T = curTactic(); if (!T || UI.playing) return;
+  const prev = checkpoint();
+  S.tactics.splice(S.tacticIdx, 1); S.tacticIdx = clamp(S.tacticIdx, 0, Math.max(0, S.tactics.length - 1)); S.stepIdx = 0; UI.slotNote = false;
+  renderTactics(); renderSteps(); renderPitch(); markSaved();
+  offerUndo(prev, '\'' + T.name + '\' 전술을 지웠습니다. 슬롯 1개가 비었습니다');
+});
+$('#steps').addEventListener('click', e => {
+  const b = e.target.closest('[data-step]');
+  if (b && !UI.playing) { S.stepIdx = +b.dataset.step; UI.editStep = false; renderSteps(); renderPitch(); const nb = $('#steps [data-step="' + S.stepIdx + '"]'); if (nb) nb.focus(); return; }
+  if (e.target.closest('[data-step-edit]')) { UI.editStep = true; renderSteps(); return; }
+  if (e.target.closest('[data-step-del]')) {
+    const T = curTactic(); const prev = checkpoint(); const n = S.stepIdx + 1;
+    T.steps.splice(S.stepIdx, 1); S.stepIdx = Math.max(0, S.stepIdx - 1); T.updated = '방금 전';
+    renderSteps(); renderTactics(); renderPitch(); markSaved(); offerUndo(prev, n + '단계를 지웠습니다');
+  }
+});
+$('#steps').addEventListener('submit', e => {
+  e.preventDefault(); const T = curTactic(); const v = $('#stepIn').value.trim();
+  if (v) { T.steps[S.stepIdx].label = v; T.updated = '방금 전'; markSaved(); }
+  UI.editStep = false; renderSteps(); renderTactics(); describePitch();
+  const b = $('#steps [data-step="' + S.stepIdx + '"]'); if (b) b.focus();
+});
+$('#steps').addEventListener('keydown', e => { if (e.key === 'Escape' && UI.editStep) { e.stopPropagation(); UI.editStep = false; renderSteps(); } });
+$('#addStep').addEventListener('click', () => {
+  const T = curTactic(); if (!T) return;
+  T.steps.push({ label: '새 단계', moves: {}, ball: null }); S.stepIdx = T.steps.length - 1; T.updated = '방금 전';
+  UI.editStep = false; renderSteps(); renderTactics(); renderPitch(); markSaved();
+});
+$('#prevStep').addEventListener('click', () => { if (S.stepIdx > 0) { S.stepIdx--; UI.editStep = false; renderSteps(); renderPitch(); } });
+$('#nextStep').addEventListener('click', () => { const T = curTactic(); if (T && S.stepIdx < T.steps.length - 1) { S.stepIdx++; UI.editStep = false; renderSteps(); renderPitch(); } });
+
+/* playback */
+let playToken = 0;
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+function tween(ms, fn){ return new Promise(res => { const t0 = performance.now(); function f(now){ const t = Math.min(1, (now - t0) / ms); fn(t); if (t < 1) requestAnimationFrame(f); else res(); } requestAnimationFrame(f); }); }
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+function setPlayBtn(){
+  $('#playTxt').textContent = UI.playing ? '멈춤' : '처음부터 재생';
+  const icEl = $('#playBtn svg'); if (icEl) icEl.outerHTML = ic(UI.playing ? 'pause' : 'play');
+}
+async function play(){
+  const T = curTactic(); if (!T) return;
+  if (UI.playing) { UI.playing = false; playToken++; setPlayBtn(); renderSteps(); renderPitch(); return; }
+  UI.playing = true; UI.editStep = false; UI.selected = null; const my = ++playToken; setPlayBtn();
+  for (let i = 0; i < T.steps.length; i++) {
+    if (my !== playToken) return;
+    S.stepIdx = i; renderSteps();
+    const a = stateAt(T, i), b = stateAt(T, i + 1), st = T.steps[i];
+    const from = st.ball && a.p[st.ball.from] ? a.p[st.ball.from] : a.p[a.holder];
+    const to = st.ball && b.p[st.ball.to] ? b.p[st.ball.to] : b.p[b.holder];
+    const frame = t => {
+      const k = ease(t), pos = {};
+      Object.keys(a.p).forEach(id => { const p = a.p[id], q = b.p[id] || p; pos[id] = { x: p.x + (q.x - p.x) * k, y: p.y + (q.y - p.y) * k }; });
+      renderTokens(pos);
+      if (from && to) renderOverlay({ bx: from.x + 22 + (to.x - from.x) * k, by: from.y - 20 + (to.y - from.y) * k });
+    };
+    if (RM.matches) { frame(0); await sleep(700); if (my !== playToken) return; frame(1); await sleep(700); }
+    else { renderOverlay(); await sleep(450); if (my !== playToken) return; await tween(1000, frame); await sleep(350); }
+  }
+  if (my !== playToken) return;
+  UI.playing = false; setPlayBtn(); renderSteps(); renderPitch();
+  showToast('미리보기를 끝까지 재생했습니다', false);
+}
+$('#playBtn').addEventListener('click', play);
+function stopPlay(){ if (UI.playing) { UI.playing = false; playToken++; setPlayBtn(); } }
+
+/* ---------- step navigation ---------- */
+const NEXT_LABEL = { 1: '다음: 배치', 2: '다음: 움직임', 3: '내보내기·공유' };
+function renderStepper(){
+  $$('[data-go]').forEach(b => {
+    const n = +b.dataset.go;
+    if (n === UI.step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    b.classList.toggle('done', n < UI.step);
+  });
+  $$('[data-next]').forEach(b => {
+    b.querySelector('.next-label').textContent = NEXT_LABEL[UI.step];
+    const svgI = b.querySelector('svg'); if (svgI) svgI.outerHTML = ic(UI.step === 3 ? 'share' : 'arrowR');
+    b.classList.toggle('final', false);
+  });
+  $('#railHint').textContent = UI.step === 3 ? '다 그렸으면 단톡방으로 보내세요.' : '다 했으면 다음 단계로 넘어가세요.';
+  $('#progFill').style.setProperty('--p', UI.step / 3);
+}
+function goStep(n, focusTitle){
+  if (n === UI.step) return;
+  stopPlay(); UI.step = n; UI.renaming = false; UI.editStep = false;
+  if (n === 3) UI.selected = null;
+  document.body.dataset.step = n;
+  renderAll();
+  $$('.pane[data-for="' + n + '"]').forEach(p => { p.classList.remove('enter'); void p.offsetWidth; p.classList.add('enter'); });
+  $('#shell').scrollTop = 0;
+  if (focusTitle) { const h = $('#h' + n); if (h && h.offsetParent) h.focus({ preventScroll: true }); }
+}
+$$('[data-go]').forEach(b => b.addEventListener('click', () => goStep(+b.dataset.go)));
+$$('[data-next]').forEach(b => b.addEventListener('click', () => { if (UI.step < 3) goStep(UI.step + 1); else openSheet(); }));
+
+function renderMeta(){
+  $('#teamTitle').textContent = S.team || '팀 이름 없음';
+  $('#metaLine').textContent = S.mode + ' · ' + squad().formation + (UI.step === 2 ? ' · ' + squad().name : '');
+}
+function renderAll(){
+  renderMeta(); renderRoster(); renderSquadControls(); renderSelCard(); renderTactics(); renderSteps(); renderPitch(); renderStepper();
+}
+
+/* ---------- layers: dialog + sheet ---------- */
+const layers = [];
+function trapKey(e){
+  const top = layers[layers.length - 1]; if (!top) return;
+  if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); top.onEsc(); return; }
+  if (e.key !== 'Tab') return;
+  const f = $$('button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])', top.el).filter(x => x.offsetParent !== null);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+document.addEventListener('keydown', trapKey, true);
+
+function confirmDialog(o){
+  return new Promise(resolve => {
+    const sc = $('#dlgScrim'); const back = document.activeElement;
+    $('#dlgTitle').textContent = o.title; $('#dlgBody').innerHTML = o.body;
+    $('#dlgOk').textContent = o.ok; $('#dlgCancel').textContent = o.cancel || '취소';
+    sc.hidden = false;
+    const done = v => { sc.hidden = true; layers.pop(); $('#dlgOk').onclick = $('#dlgCancel').onclick = sc.onclick = null; if (back && back.focus) back.focus(); resolve(v); };
+    layers.push({ el: $('#dlg'), onEsc: () => done(false) });
+    $('#dlgOk').onclick = () => done(true); $('#dlgCancel').onclick = () => done(false);
+    sc.onclick = e => { if (e.target === sc) done(false); };
+    $('#dlgCancel').focus();
+  });
+}
+
+let sheetBack = null, gifTimer = null;
+function openSheet(){
+  stopPlay();
+  const sc = $('#sheetScrim');
+  if (sc.hidden) { sheetBack = document.activeElement; sc.hidden = false; layers.push({ el: $('#sheet'), onEsc: closeSheet }); }
+  sheetMain();
+  $('#sheetClose').focus();
+}
+function closeSheet(){
+  clearInterval(gifTimer);
+  const sc = $('#sheetScrim'); if (sc.hidden) return;
+  sc.hidden = true; const i = layers.findIndex(l => l.el === $('#sheet')); if (i > -1) layers.splice(i, 1);
+  if (sheetBack && sheetBack.focus && document.contains(sheetBack)) sheetBack.focus();
+}
+$('#sheetClose').addEventListener('click', closeSheet);
+$('#sheetScrim').addEventListener('click', e => { if (e.target === $('#sheetScrim')) closeSheet(); });
+$$('[data-open-sheet]').forEach(b => b.addEventListener('click', openSheet));
+
+function fileBase(){ return (S.team || '팀').replace(/\s+/g, ''); }
+function sheetMain(msg){
+  const T = curTactic(); const sq = squad();
+  $('#sheetTitle').textContent = '내보내기·공유';
+  $('#sheetBody').innerHTML =
+    (msg ? '<p class="feedback" role="status">' + esc(msg) + ' <span class="tag">시안</span></p>' : '') +
+    '<section class="grp" aria-labelledby="g1"><h3 id="g1">이미지·GIF 보내기</h3><p>단톡방에 바로 올릴 그림입니다. 기기에 저장하거나 앱으로 보냅니다.</p>' +
+      '<div class="xrow"><div><b>지금 스쿼드 이미지 (PNG)</b><small>' + esc(sq.name) + ' 스쿼드 · ' + sq.formation + '</small></div>' +
+      '<div class="xbtns"><button class="btn btn-quiet" data-x="png-save">' + ic('download') + '기기에 저장</button><button class="btn btn-ink" data-x="png-send">' + ic('share') + '보내기</button></div></div>' +
+      '<div class="xrow"><div><b>이 전술 움직임 (GIF)</b><small>' + (T ? esc(T.name) + ' · ' + T.steps.length + '단계' : '고른 전술이 없습니다') + '</small></div>' +
+      '<div class="xbtns"><button class="btn btn-quiet" data-x="gif-save"' + (T ? '' : ' disabled') + '>' + ic('download') + '기기에 저장</button><button class="btn btn-ink" data-x="gif-send"' + (T ? '' : ' disabled') + '>' + ic('share') + '보내기</button></div></div>' +
+    '</section>' +
+    '<section class="grp" aria-labelledby="g2"><h3 id="g2">링크·텍스트 공유</h3><p>받는 사람이 링크를 열면 같은 작전판을 볼 수 있습니다.</p>' +
+      '<div class="xbtns"><button class="btn btn-quiet" data-x="text">' + ic('message') + '단톡방 텍스트</button><button class="btn btn-quiet" data-x="link">' + ic('link') + '링크 복사</button></div>' +
+      '<div id="g2out"></div>' +
+    '</section>' +
+    '<section class="grp" aria-labelledby="g3"><h3 id="g3">백업</h3><p>작업은 이 기기에만 저장됩니다. 기기를 바꾸기 전에 백업 파일을 받아 두세요.</p>' +
+      '<div class="xbtns"><button class="btn btn-quiet" data-x="sq-save">' + ic('floppy') + '백업 파일 받기 (.sq)</button><button class="btn btn-quiet" data-x="sq-restore">' + ic('upload') + '백업에서 복원</button></div>' +
+    '</section>';
+}
+function shareText(){
+  const T = curTactic();
+  let s = '[' + (S.team || '우리 팀') + '] ' + (T ? T.name : squad().name + ' 스쿼드') + '\n' + S.mode + ' · ' + squad().formation + '\n';
+  if (T) T.steps.forEach((st, i) => { s += (i + 1) + '. ' + st.label + '\n'; });
+  s += '작전판 보기: (링크 자리, 시안)';
+  return s;
+}
+function sheetResult(o){
+  $('#sheetTitle').textContent = o.head;
+  $('#sheetBody').innerHTML =
+    '<div class="result" role="status"><div class="result-mark">' + ic('check') + '</div>' +
+    '<h3>' + esc(o.title) + ' <span class="tag">시안</span></h3>' +
+    (o.file ? '<p class="file">' + esc(o.file) + '</p>' : '') +
+    '<p>' + esc(o.note) + '</p>' +
+    '<div class="result-btns"><button class="btn btn-quiet" data-x="back">' + ic('chevL') + '다른 방법 고르기</button><button class="btn btn-ink" data-x="close">완료</button></div></div>' +
+    '<aside class="ad" aria-label="광고 자리 (시안)"><strong>광고 자리 (시안)</strong><small>내보내기를 마친 뒤에만 보이는 자리입니다. 편집 화면에는 넣지 않습니다.</small></aside>';
+  const b = $('#sheetBody [data-x="close"]'); if (b) b.focus();
+}
+function startGif(mode){
+  const T = curTactic(); if (!T) return;
+  clearInterval(gifTimer);
+  $('#sheetTitle').textContent = '내보내기·공유';
+  $('#sheetBody').innerHTML =
+    '<div class="prog"><h3>GIF 만드는 중 <span class="tag">시안</span></h3><p>' + esc(T.name) + ' · ' + T.steps.length + '단계. 화면을 닫지 마세요.</p>' +
+    '<div class="bar" role="progressbar" aria-label="GIF 만들기 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="gifBar"><span></span></div>' +
+    '<p class="pct" id="gifPct">0%</p><button class="btn btn-quiet" data-x="gif-cancel" style="width:100%">' + ic('x') + '취소</button></div>';
+  $('#sheetBody [data-x="gif-cancel"]').focus();
+  let p = 0;
+  gifTimer = setInterval(() => {
+    p = Math.min(100, p + 3 + Math.round(Math.random() * 4));
+    const bar = $('#gifBar'); if (!bar) { clearInterval(gifTimer); return; }
+    bar.setAttribute('aria-valuenow', p); bar.firstChild.style.transform = 'scaleX(' + (p / 100) + ')'; $('#gifPct').textContent = p + '%';
+    if (p >= 100) {
+      clearInterval(gifTimer);
+      const file = fileBase() + '_' + T.name.replace(/\s+/g, '') + '.gif';
+      if (mode === 'send') sheetResult({ head: '보내기', title: '공유 창을 열었습니다', file, note: '휴대폰에서는 카카오톡 같은 앱을 고르면 바로 전송됩니다. 시안이라 실제 공유 창은 열리지 않습니다.' });
+      else sheetResult({ head: '기기에 저장', title: 'GIF를 저장했습니다', file, note: '사진첩이나 다운로드 폴더에서 찾을 수 있습니다. 시안이라 실제 파일은 만들지 않습니다.' });
+    }
+  }, 140);
+}
+$('#sheetBody').addEventListener('click', async e => {
+  const b = e.target.closest('[data-x]'); if (!b) return;
+  const x = b.dataset.x, sq = squad();
+  const png = fileBase() + '_' + sq.name + '스쿼드_' + sq.formation + '.png';
+  if (x === 'png-save') sheetResult({ head: '기기에 저장', title: '이미지를 저장했습니다', file: png, note: '사진첩이나 다운로드 폴더에서 찾을 수 있습니다. 시안이라 실제 파일은 만들지 않습니다.' });
+  else if (x === 'png-send') sheetResult({ head: '보내기', title: '공유 창을 열었습니다', file: png, note: '휴대폰에서는 카카오톡 같은 앱을 고르면 바로 전송됩니다. 시안이라 실제 공유 창은 열리지 않습니다.' });
+  else if (x === 'gif-save') startGif('save');
+  else if (x === 'gif-send') startGif('send');
+  else if (x === 'gif-cancel') { clearInterval(gifTimer); sheetMain('GIF 만들기를 취소했습니다.'); }
+  else if (x === 'text') {
+    $('#g2out').innerHTML = '<label class="sr" for="shareTa">단톡방 텍스트</label><textarea class="sharetext" id="shareTa" readonly>' + esc(shareText()) + '</textarea>' +
+      '<div class="xbtns" style="margin-top:8px"><button class="btn btn-ink" data-x="text-copy">' + ic('check') + '텍스트 복사</button><button class="btn btn-quiet" data-x="text-file">' + ic('download') + '텍스트 파일로 받기</button></div><p class="feedback" id="g2fb" role="status"></p>';
+    $('#shareTa').focus();
+  }
+  else if (x === 'text-copy') { $('#g2fb').innerHTML = '텍스트를 복사했습니다. 단톡방에 붙여 넣으세요. <span class="tag">시안</span>'; }
+  else if (x === 'text-file') { $('#g2fb').innerHTML = fileBase() + '_공유.txt 받음 <span class="tag">시안</span>'; }
+  else if (x === 'link') { $('#g2out').innerHTML = '<p class="feedback" role="status">링크를 복사했습니다. 실제로는 복사하지 않습니다. <span class="tag">시안</span></p>'; }
+  else if (x === 'sq-save') sheetResult({ head: '백업', title: '백업 파일을 받았습니다', file: fileBase() + '_2026-10-07.sq', note: '다른 기기에서는 백업에서 복원을 눌러 이 파일을 고르면 됩니다. 시안이라 실제 파일은 만들지 않습니다.' });
+  else if (x === 'sq-restore') {
+    const ok = await confirmDialog({
+      title: '백업에서 복원할까요?',
+      body: '<p>지금 작업이 예시 백업 파일 <b>' + esc(fileBase()) + '_2026-10-05.sq</b> 내용으로 바뀝니다.</p><p>복원하면 바로 이 기기에 저장되고, 알림의 되돌리기로 지금 상태를 다시 불러올 수 있습니다.</p>',
+      ok: '복원하기', cancel: '취소'
+    });
+    if (!ok) return;
+    const prev = checkpoint();
+    restoreDemo();
+    closeSheet(); renderAll(); markSaved(true);
+    offerUndo(prev, '복원하고 기기에 저장했습니다');
+  }
+  else if (x === 'back') sheetMain();
+  else if (x === 'close') closeSheet();
+});
+function restoreDemo(){
+  /* simulated backup: 10/5 version of the same team with the 기본 squad in 3-2-3 */
+  S = initialState();
+  S.squads[0].formation = '3-2-3';
+  S.squads[0].pos = genPositions(S.roster, '3-2-3');
+  S.tactics.forEach(t => { t.updated = '10월 5일'; });
+  UI.selected = null;
+}
+
+/* ---------- demo states ---------- */
+const demoBtn = $('#demoBtn'), demoMenu = $('#demoMenu');
+function toggleDemo(open){
+  demoMenu.hidden = !open; demoBtn.setAttribute('aria-expanded', String(open));
+  if (open) demoMenu.querySelector('button').focus();
+}
+demoBtn.addEventListener('click', () => toggleDemo(demoMenu.hidden));
+document.addEventListener('pointerdown', e => { if (!demoMenu.hidden && !e.target.closest('#demoMenu') && e.target !== demoBtn) toggleDemo(false); });
+demoMenu.addEventListener('click', e => {
+  const b = e.target.closest('[data-demo]'); if (!b) return;
+  toggleDemo(false);
+  const d = b.dataset.demo;
+  if (d === 'saved') { failOn = false; $('#failBar').hidden = true; markSaved(true); showToast('저장 상태 표시: 위쪽에 "이 기기에 저장됨"이 보입니다', false); }
+  else if (d === 'busy') { openSheet(); if (curTactic()) startGif('save'); }
+  else if (d === 'fail') { failOn = true; clearTimeout(saveTimer); chip('fail'); $('#failBar').hidden = false; $('#retrySave').focus(); }
+  else if (d === 'undo') {
+    const prev = checkpoint();
+    const id = (player(7) ? 7 : S.roster[S.roster.length - 1].id);
+    const q = squad().pos[id]; if (q) squad().pos[id] = { x: clamp(q.x + 40, 26, 454), y: clamp(q.y - 50, 26, 634) };
+    renderPitch(); markSaved();
+    offerUndo(prev, id + '번 선수를 옮겼습니다');
+  }
+});
+$('#retrySave').addEventListener('click', () => {
+  chip('saving');
+  setTimeout(() => { failOn = false; $('#failBar').hidden = true; markSaved(true); showToast('다시 저장했습니다', false); }, 800);
+});
+$('#failBackup').addEventListener('click', () => {
+  openSheet();
+  sheetResult({ head: '백업', title: '백업 파일을 받았습니다', file: fileBase() + '_2026-10-07.sq', note: '저장이 다시 될 때까지 이 파일을 보관하세요. 시안이라 실제 파일은 만들지 않습니다.' });
+});
+$('#toastUndo').addEventListener('click', () => { hideToast(); doUndo(); });
+$('#toastX').addEventListener('click', hideToast);
+
+/* global Escape: menu, then selection */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (!demoMenu.hidden) { toggleDemo(false); demoBtn.focus(); return; }
+  if (UI.renaming) { UI.renaming = false; renderSelCard(); return; }
+  if (UI.selected != null) { const wasTok = document.activeElement && document.activeElement.closest && document.activeElement.closest('.tok'); const id = UI.selected; select(null); if (wasTok) { const g = $('#gTok .tok[data-id="' + id + '"]'); if (g) g.focus(); } }
+});
+
+/* ---------- boot ---------- */
+paintIcons();
+drawField();
+(function readHash(){
+  const m = /step=([123])/.exec(location.hash || '');
+  if (m) { UI.step = +m[1]; document.body.dataset.step = UI.step; }
+})();
+renderAll();
+chip('saved');
+})();
+</script>
+</body>
+</html>
