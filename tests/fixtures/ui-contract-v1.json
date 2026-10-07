@@ -1,0 +1,17 @@
+{
+  "contractVersion": 1,
+  "snapshotFixture": "snapshot-v1.json",
+  "cases": [
+    { "name": "saved-basic", "squad": "basic", "storage": { "status": "saved", "error": null, "retryable": false }, "revision": 3, "savedRevision": 3 },
+    { "name": "attack-pending", "squad": "attack", "storage": { "status": "pending", "error": null, "retryable": false }, "revision": 4, "savedRevision": 3 },
+    { "name": "defense-saving", "squad": "defense", "storage": { "status": "saving", "error": null, "retryable": false }, "revision": 5, "savedRevision": 4 },
+    { "name": "quota-error", "storage": { "status": "error", "error": "storage-quota", "retryable": true }, "revision": 6, "savedRevision": 5 },
+    { "name": "unsupported-start-data", "storage": { "status": "blocked", "error": "unsupported-version", "retryable": false } },
+    { "name": "long-name", "team": "주말에 함께 뛰는 동네 축구팀의 긴 전술 이름", "selectedPlayerName": "김공격미드필더교체선수" },
+    { "name": "empty", "roster": [], "items": [], "selectedPlayerId": null, "selectedPlayerName": null },
+    { "name": "restore-error", "result": { "status": "error", "code": "invalid-input", "completion": null } },
+    { "name": "export-error", "result": { "status": "error", "code": "export-failed", "completion": null } },
+    { "name": "share-cancelled", "illustrative": true, "supported": false, "result": { "status": "cancelled", "code": null, "completion": null } },
+    { "name": "slots-full", "illustrative": true, "supported": false, "slots": { "status": "full", "limit": 2, "used": 2 }, "policy": "Test example only; Q1/Q2/Q9 and C-03 remain undecided." }
+  ]
+}

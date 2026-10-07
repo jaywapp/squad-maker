@@ -616,6 +616,15 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   border:none; background:none; color:var(--accent); cursor:pointer;
   font:inherit; font-weight:800; text-decoration:underline; text-underline-offset:3px;
 }
+.save-status {
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  padding:8px 12px; color:var(--ink); font-size:0.875rem;
+}
+.save-status button { min-height:36px; }
+.save-status [hidden] { display:none; }
+.save-status[data-status="error"], .save-status[data-status="blocked"] {
+  position:sticky; top:8px; z-index:200; background:var(--surface);
+}
 
 /* ── 접근성: 포커스 링 ── */
 :focus-visible {
@@ -751,6 +760,10 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 </div>
 
 <main aria-label="스쿼드 메이커">
+<div class="save-status editor-only" id="saveStatus" role="status" aria-live="polite">
+  <span id="saveStatusText">저장 대기</span>
+  <button class="btn btn-slate" id="retrySaveBtn" onclick="flushSave()" hidden>다시 저장</button>
+</div>
 <div class="layout">
 <div class="pane-field">
 
@@ -1384,6 +1397,7 @@ function setAppMode(mode) {
   } else if (mode === 'strategy') {
     refreshSquadSummary();
   }
+  publishContractState();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1428,17 +1442,13 @@ function buildModePills() {
 }
 
 function onModeChange(k) {
-  if (k === currentMode) return;
-  const hasNotes = Object.values(squads).some(sq =>
-    sq.teamNote.trim() || Object.values(sq.playerNotes).some(n => n.trim())
-  );
-  const apply = () => { currentMode = k; buildModePills(); initAllSquads(); };
-  if (hasNotes) {
-    uiConfirm('인원수를 변경하면 모든 스쿼드와 지침이 초기화됩니다.\n계속할까요?', '변경')
-      .then(ok => { if (ok) apply(); });
-  } else {
-    apply();
-  }
+  if (viewerMode) return contractResult('change-mode', 'error', 'read-only');
+  if (!Object.hasOwn(MODES_CONFIG, k)) return contractResult('change-mode', 'error', 'invalid-input');
+  if (k === currentMode) return contractResult('change-mode', 'success');
+  return protectedChange('change-mode',
+    '인원수를 변경하면 선수 이름·색상, 기본/공격/수비 배치와 지침, 모든 전술 패턴이 초기화됩니다.\n현재 세션에서 최근 변경 한 번을 되돌릴 수 있습니다. 계속할까요?',
+    () => { stopAnimation(); clearSelectedPlayer(); currentMode = k; initAllSquads(); },
+    '인원수를 변경하고 저장했습니다.');
 }
 
 function initAllSquads() {
@@ -1480,7 +1490,9 @@ function saveCurrentNotes() {
   const players = getPlayers();
   players.forEach(p => {
     const el = document.getElementById('pnote_' + p.id);
-    if (el) squads[currentSquad].playerNotes[p.id] = el.value;
+    if (el && (el.value || Object.hasOwn(squads[currentSquad].playerNotes, p.id))) {
+      squads[currentSquad].playerNotes[p.id] = el.value;
+    }
   });
 }
 
@@ -1497,9 +1509,10 @@ function importSharedSquad() {
   uiConfirm('공유받은 전술을 내 스쿼드로 가져올까요?\n기존 내 스쿼드는 덮어써집니다.', '가져오기').then(ok => {
     if (!ok) return;
     try {
-      localStorage.setItem(LS_KEY, JSON.stringify(buildStateSnap()));
-    } catch {
-      showToast('저장 실패 — 브라우저 저장소 설정을 확인해주세요');
+      writeSnapshotJson(JSON.stringify(buildStateSnap()));
+    } catch (error) {
+      showToast('저장 실패. 저장소를 확인하고 다시 시도해 주세요.');
+      contractResult('import-shared', 'error', error.code || 'storage-unavailable');
       return; // 저장 성공 시에만 편집 모드로 이동
     }
     location.href = location.pathname; // 해시 제거 → 편집 모드로 리로드
@@ -1573,10 +1586,12 @@ function refreshUI() {
 }
 
 function switchSquad(type) {
-  if (type === currentSquad) return;
+  if (!Object.hasOwn(SQUAD_META, type) || type === currentSquad) return;
   saveCurrentNotes();
   currentSquad = type;
   refreshUI();
+  if (selectedPlayer) selectPlayerForEdit(selectedPlayer.id);
+  autoSave();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1640,9 +1655,16 @@ function onFormationChange() {
 }
 
 function resetLayout() {
-  squads[currentSquad].positions = defaultPositions(currentMode, squads[currentSquad].formation);
-  renderPlayers();
-  autoSave();
+  const target = currentSquad;
+  return protectedChange('reset-layout',
+    `${SQUAD_META[target].label}의 선수 배치만 기본 위치로 초기화합니다.\n이름·색상·지침·다른 스쿼드·전술 패턴은 유지됩니다. 현재 세션에서 되돌릴 수 있습니다. 계속할까요?`,
+    () => {
+      stopAnimation();
+      const defaults = defaultPositions(currentMode, squads[target].formation);
+      squads[target].positions = Object.fromEntries(roster.map(r => [r.id, defaults[r.id] || { x: 240, y: 330 }]));
+      refreshUI();
+    },
+    '현재 스쿼드 배치를 초기화하고 저장했습니다.');
 }
 
 function updateAddPlayerBtn() {
@@ -1676,7 +1698,7 @@ function uiConfirm(msg, okLabel) {
     const prevFocus = document.activeElement;
     const wrap = document.createElement('div');
     wrap.className = 'dlg-backdrop';
-    wrap.innerHTML = `<div class="dlg" role="alertdialog" aria-modal="true">
+    wrap.innerHTML = `<div class="dlg" role="alertdialog" aria-modal="true" aria-label="변경 확인">
       <p>${escHtml(msg)}</p>
       <div class="dlg-actions">
         <button class="btn btn-slate" data-r="0">취소</button>
@@ -1716,26 +1738,75 @@ function uiConfirm(msg, okLabel) {
 let lastUndo = null;
 
 function captureUndo() {
-  lastUndo = {
+  lastUndo = captureRuntime();
+}
+
+function captureRuntime() {
+  return {
     state: JSON.parse(JSON.stringify(buildStateSnap())),
     appMode,
     patternIdx: currentPatternIdx,
     stepIdx: currentStepIdx,
+    selectedId: selectedPlayer?.id ?? null,
   };
 }
 
-function restoreUndo() {
-  if (!lastUndo) return;
-  const entry = lastUndo;
-  lastUndo = null;
+function restoreRuntime(entry) {
+  stopAnimation();
   restoreState(entry.state);
   currentPatternIdx = Math.min(entry.patternIdx, patterns.length - 1);
   currentStepIdx = Math.min(entry.stepIdx, currentPattern().steps.length - 1);
   refreshUI();
   if (appMode !== entry.appMode) setAppMode(entry.appMode);
   clearSelectedPlayer();
-  autoSave();
-  showToast('이전 상태로 복구했습니다.');
+  if (roster.some(r => r.id === entry.selectedId)) selectPlayerForEdit(entry.selectedId);
+}
+
+function restoreUndo() {
+  if (viewerMode) return contractResult('undo', 'error', 'read-only');
+  if (_safetyPending || _exportKind) return contractResult('undo', 'busy', 'busy');
+  if (!lastUndo) return contractResult('undo', 'error', 'undo-unavailable');
+  const before = captureRuntime(), entry = lastUndo;
+  restoreRuntime(entry);
+  const saved = flushSave();
+  if (saved.status !== 'success') {
+    restoreRuntime(before);
+    observeSnapshot();
+    publishContractState();
+    return contractResult('undo', 'error', saved.code);
+  }
+  lastUndo = null;
+  showToast('이전 상태로 복구하고 저장했습니다.');
+  return contractResult('undo', 'success');
+}
+
+let _safetyPending = false;
+async function protectedChange(operation, message, apply, successMessage) {
+  if (viewerMode) return contractResult(operation, 'error', 'read-only');
+  if (_safetyPending || _exportKind) return contractResult(operation, 'busy', 'busy');
+  _safetyPending = true;
+  try {
+    if (!await uiConfirm(message, '변경')) return contractResult(operation, 'cancelled');
+    const before = captureRuntime(), previousUndo = lastUndo;
+    const wasBlocked = _storageReadBlocked;
+    if (operation === 'import-snapshot') _storageReadBlocked = false;
+    try {
+      apply();
+      const saved = flushSave();
+      if (saved.status !== 'success') throw Object.assign(new Error(saved.code), { code: saved.code });
+      lastUndo = before;
+      showUndoToast(successMessage);
+      return contractResult(operation, 'success');
+    } catch (error) {
+      clearTimeout(_saveTimer); _saveTimer = null;
+      restoreRuntime(before);
+      lastUndo = previousUndo;
+      _storageReadBlocked = wasBlocked || error.code === 'storage-rollback-failed';
+      observeSnapshot();
+      setStorageStatus(_storageReadBlocked ? 'blocked' : 'error', error.code || 'invalid-input');
+      return contractResult(operation, 'error', error.code || 'invalid-input');
+    }
+  } finally { _safetyPending = false; publishContractState(); }
 }
 
 function showUndoToast(msg) {
@@ -1879,6 +1950,7 @@ function selectPlayerForEdit(id) {
   const num = roster.findIndex(r => r.id === id) + 1;
   document.getElementById('playerActionsName').textContent = `${num}. ${selectedPlayer.name}`;
   bar.classList.add('visible');
+  publishContractState();
 }
 
 function clearSelectedPlayer() {
@@ -1886,6 +1958,7 @@ function clearSelectedPlayer() {
   document.querySelectorAll('.player').forEach(el => el.classList.remove('selected'));
   document.getElementById('playerActions')?.classList.remove('visible');
   hideCtxMenu();
+  publishContractState();
 }
 
 function renameSelectedPlayer() {
@@ -1952,6 +2025,8 @@ function startInlineEdit(playerEl, player) {
     if (r) r.name = newName;
     renderPlayers();
     renderNotesPanel();
+    if (selectedPlayer) selectPlayerForEdit(selectedPlayer.id);
+    autoSave();
   };
   input.addEventListener('blur', commit);
   input.addEventListener('keydown', e => {
@@ -2085,8 +2160,24 @@ function ctxRemove() {
 // SAVE IMAGE
 // ═══════════════════════════════════════════════════════════════
 let _capturing = false; // 연속 실행 시 임시 480px 고정값이 원래 값으로 저장되는 것 방지
+function setExportBusy(kind) {
+  _exportKind = kind;
+  for (const element of document.querySelectorAll('main, .app-tabs, #viewerBar, .topbar')) element.inert = Boolean(kind);
+  if (kind) hideCtxMenu();
+  publishContractState();
+}
+
+function withTimeout(promise, milliseconds) {
+  let timer;
+  return Promise.race([promise, new Promise((resolve, reject) => {
+    timer = setTimeout(() => reject(new Error('Export timed out')), milliseconds);
+  })]).finally(() => clearTimeout(timer));
+}
+
 function saveImage() {
-  if (_capturing) return;
+  if (_capturing || _exportKind || _safetyPending || activeModal) return contractResult('export-png', 'busy', 'busy');
+  observeSnapshot();
+  setExportBusy('png');
   _capturing = true;
   const teamName = document.getElementById('teamName').value.trim();
   const form     = squads[currentSquad].formation;
@@ -2104,20 +2195,26 @@ function saveImage() {
   const prevMax = wrapper.style.maxWidth, prevWidth = wrapper.style.width;
   wrapper.style.maxWidth = '480px'; wrapper.style.width = '480px';
   f.style.transform = 'none';
-  html2canvas(f, { scale:2.5, backgroundColor:'#2b5e3f', useCORS:true, logging:false })
+  return withTimeout(Promise.resolve().then(() => html2canvas(f, { scale:2.5, backgroundColor:'#2b5e3f', useCORS:true, logging:false })), 30000)
     .then(canvas => {
       const a = document.createElement('a');
       a.download = `${teamName||'스쿼드'}_${meta.label}_${form}.png`;
       a.href = canvas.toDataURL('image/png'); a.click();
       track('image_exported', { kind: 'png', ok: true });
       trackOutput();
+      return contractResult('export-png', 'success', null, 'download-requested');
     })
-    .catch(() => { track('image_exported', { kind: 'png', ok: false }); })
+    .catch(() => {
+      track('image_exported', { kind: 'png', ok: false });
+      showToast('이미지 생성에 실패했습니다. 전술은 유지됩니다. 다시 시도해 주세요.');
+      return contractResult('export-png', 'error', 'export-failed');
+    })
     .finally(() => {
       if (banner.parentNode) f.removeChild(banner);
       wrapper.style.maxWidth = prevMax; wrapper.style.width = prevWidth;
       applyFieldScale();
       _capturing = false;
+      setExportBusy(null);
     });
 }
 
@@ -2158,12 +2255,14 @@ function prevPattern() {
   currentPatternIdx = (currentPatternIdx - 1 + patterns.length) % patterns.length;
   currentStepIdx = 0;
   stopAnimation(); updatePatternUI(); renderPatternFrame(0);
+  publishContractState();
 }
 
 function nextPattern() {
   currentPatternIdx = (currentPatternIdx + 1) % patterns.length;
   currentStepIdx = 0;
   stopAnimation(); updatePatternUI(); renderPatternFrame(0);
+  publishContractState();
 }
 
 function renameCurrentPattern() {
@@ -2194,12 +2293,14 @@ function prevStep() {
   const n = currentPattern().steps.length;
   currentStepIdx = (currentStepIdx - 1 + n) % n;
   stopAnimation(); updatePatternUI(); renderPatternFrame(0);
+  publishContractState();
 }
 
 function nextStep() {
   const n = currentPattern().steps.length;
   currentStepIdx = (currentStepIdx + 1) % n;
   stopAnimation(); updatePatternUI(); renderPatternFrame(0);
+  publishContractState();
 }
 
 function clearCurrentStep() {
@@ -2665,84 +2766,107 @@ function animTick(ts) {
 // ATTACK PATTERNS — GIF 내보내기
 // ═══════════════════════════════════════════════════════════════
 async function exportGif(allPatterns) {
-  stopAnimation();
-  const patsToExport = allPatterns ? patterns : [currentPattern()];
-  const filename = allPatterns ? '전체패턴' : (currentPattern().name || '전술패턴');
-
+  if (_exportKind || _safetyPending || activeModal) return contractResult('export-gif', 'busy', 'busy');
+  observeSnapshot();
+  setExportBusy('gif');
+  let workerUrl, gif, watchdog;
+  const deadline = Date.now() + 90000;
   const prog = document.getElementById('gifProgress');
-  prog.classList.add('visible');
-  setProgress(0, 'GIF 생성 준비 중...');
-
-  // 워커 스크립트를 blob으로 가져와 CORS 문제 회피
-  let workerUrl;
   try {
-    const resp = await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
-    const text = await resp.text();
-    workerUrl = URL.createObjectURL(new Blob([text], { type: 'application/javascript' }));
-  } catch {
-    workerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js';
-  }
+    stopAnimation();
+    const patsToExport = allPatterns ? patterns : [currentPattern()];
+    const filename = allPatterns ? '전체패턴' : (currentPattern().name || '전술패턴');
 
-  const gif = new GIF({
-    workers: 2,
-    quality: 8,
-    width: FIELD_W,
-    height: FIELD_H,
-    workerScript: workerUrl,
-  });
+    prog.classList.add('visible');
+    setProgress(0, 'GIF 생성 준비 중...');
 
-  const off = document.createElement('canvas');
-  off.width = FIELD_W; off.height = FIELD_H;
-  const offCtx = off.getContext('2d');
+    // 워커 스크립트를 blob으로 가져와 CORS 문제 회피
+    const controller = new AbortController();
+    const fetchTimer = setTimeout(() => controller.abort(), 15000);
+    try {
+      const resp = await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js', { signal: controller.signal });
+      if (!resp.ok) throw new Error('Worker download failed');
+      const text = await resp.text();
+      workerUrl = URL.createObjectURL(new Blob([text], { type: 'application/javascript' }));
+    } catch {
+      workerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js';
+    } finally { clearTimeout(fetchTimer); }
 
-  const FRAMES = 30;        // 단계당 프레임 수
-  const HOLD_FRAMES = 8;
-  const FRAME_DELAY = 60;   // ms/frame ≈ 17fps
-  const HOLD_DELAY = 120;
+    gif = new GIF({
+      workers: 2,
+      quality: 8,
+      width: FIELD_W,
+      height: FIELD_H,
+      workerScript: workerUrl,
+    });
 
-  const totalSteps = patsToExport.reduce((n, p) => n + p.steps.length, 0);
-  const totalFrames = totalSteps * (FRAMES + HOLD_FRAMES);
-  let doneFrames = 0;
+    const off = document.createElement('canvas');
+    off.width = FIELD_W; off.height = FIELD_H;
+    const offCtx = off.getContext('2d');
 
-  function stepLabel(pat, si) {
-    if (allPatterns) return `${pat.name} — ${si+1}/${pat.steps.length}`;
-    return pat.steps.length > 1 ? `단계 ${si+1}/${pat.steps.length}` : null;
-  }
+    const FRAMES = 30;        // 단계당 프레임 수
+    const HOLD_FRAMES = 8;
+    const FRAME_DELAY = 60;   // ms/frame ≈ 17fps
+    const HOLD_DELAY = 120;
 
-  for (let pi = 0; pi < patsToExport.length; pi++) {
-    const pat = patsToExport[pi];
-    for (let si = 0; si < pat.steps.length; si++) {
-      const label = stepLabel(pat, si);
-      for (let f = 0; f <= FRAMES; f++) {
-        renderStepFrame(offCtx, pat, si, f / FRAMES, label);
-        gif.addFrame(offCtx, { delay: FRAME_DELAY, copy: true });
-        doneFrames++;
-        setProgress(doneFrames / totalFrames * 0.7,
-          `패턴 ${pi+1}/${patsToExport.length} · 단계 ${si+1}/${pat.steps.length} 렌더링 중...`);
-        await new Promise(r => setTimeout(r, 0)); // 브라우저에 양보
-      }
-      for (let f = 0; f < HOLD_FRAMES; f++) {
-        renderStepFrame(offCtx, pat, si, 1, label);
-        gif.addFrame(offCtx, { delay: HOLD_DELAY, copy: true });
-        doneFrames++;
+    const totalSteps = patsToExport.reduce((n, p) => n + p.steps.length, 0);
+    const totalFrames = totalSteps * (FRAMES + HOLD_FRAMES);
+    let doneFrames = 0;
+
+    function stepLabel(pat, si) {
+      if (allPatterns) return `${pat.name} — ${si+1}/${pat.steps.length}`;
+      return pat.steps.length > 1 ? `단계 ${si+1}/${pat.steps.length}` : null;
+    }
+
+    for (let pi = 0; pi < patsToExport.length; pi++) {
+      const pat = patsToExport[pi];
+      for (let si = 0; si < pat.steps.length; si++) {
+        const label = stepLabel(pat, si);
+        for (let f = 0; f <= FRAMES; f++) {
+          if (Date.now() >= deadline) throw new Error('GIF rendering timed out');
+          renderStepFrame(offCtx, pat, si, f / FRAMES, label);
+          gif.addFrame(offCtx, { delay: FRAME_DELAY, copy: true });
+          doneFrames++;
+          setProgress(doneFrames / totalFrames * 0.7,
+            `패턴 ${pi+1}/${patsToExport.length} · 단계 ${si+1}/${pat.steps.length} 렌더링 중...`);
+          await new Promise(r => setTimeout(r, 0)); // 브라우저에 양보
+        }
+        for (let f = 0; f < HOLD_FRAMES; f++) {
+          renderStepFrame(offCtx, pat, si, 1, label);
+          gif.addFrame(offCtx, { delay: HOLD_DELAY, copy: true });
+          doneFrames++;
+        }
       }
     }
-  }
 
-  gif.on('progress', p => setProgress(0.7 + p * 0.3, `GIF 인코딩 중... ${Math.round(p*100)}%`));
-  gif.on('finished', blob => {
+    const blob = await new Promise((resolve, reject) => {
+      watchdog = setTimeout(() => reject(new Error('GIF encoding timed out')), Math.max(1, deadline - Date.now()));
+      gif.on('progress', p => setProgress(0.7 + p * 0.3, `GIF 인코딩 중... ${Math.round(p*100)}%`));
+      gif.on('finished', resolve);
+      gif.on('abort', () => reject(new Error('GIF encoding aborted')));
+      gif.render();
+    });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.download = `${filename}.gif`;
-    a.href = URL.createObjectURL(blob);
+    a.href = url;
     a.click();
-    prog.classList.remove('visible');
-    renderPatternFrame(0);
-    if (workerUrl.startsWith('blob:')) URL.revokeObjectURL(workerUrl);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
     track('gif_exported', { kind: allPatterns ? 'all' : 'single', ok: true });
     trackOutput();
-  });
-
-  gif.render();
+    return contractResult('export-gif', 'success', null, 'download-requested');
+  } catch {
+    if (gif) gif.abort();
+    track('gif_exported', { kind: allPatterns ? 'all' : 'single', ok: false });
+    showToast('GIF 생성에 실패했습니다. 전술은 유지됩니다. 다시 시도해 주세요.');
+    return contractResult('export-gif', 'error', 'export-failed');
+  } finally {
+    clearTimeout(watchdog);
+    prog.classList.remove('visible');
+    if (workerUrl?.startsWith('blob:')) URL.revokeObjectURL(workerUrl);
+    renderPatternFrame(0);
+    setExportBusy(null);
+  }
 }
 
 function setProgress(ratio, text) {
@@ -3164,7 +3288,7 @@ function loadFromURL() {
   if (!match || !match[1]) return false;
   const state = decodeState(match[1]);
   if (!state || state.v !== 1) return false;
-  restoreState(state); // Data-only — INIT block handles UI refresh
+  try { restoreState(state); } catch { return false; }
   return true;
 }
 
@@ -3465,38 +3589,105 @@ function saveSquadFile() {
   a.href     = url;
   a.download = `${teamName}.sq`;
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return contractResult('export-sq', 'success', null, 'download-requested');
 }
 
 function loadSquadFile(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     try {
       const state = JSON.parse(e.target.result);
-      if (!state || state.v !== 1) { showToast('올바른 .sq 파일이 아닙니다.'); return; }
-      applyState(state);
+      await importSnapshot(state);
     } catch {
-      showToast('파일을 읽는 중 오류가 발생했습니다.');
+      showToast('파일 형식이 올바르지 않습니다. 기존 전술은 유지됩니다.');
+      contractResult('import-snapshot', 'error', 'invalid-input');
+    } finally {
+      event.target.value = '';
     }
-    // 같은 파일을 다시 불러올 수 있도록 값 초기화
+  };
+  reader.onerror = () => {
     event.target.value = '';
+    showToast('파일을 읽지 못했습니다. 기존 전술은 유지됩니다. 다시 선택해 주세요.');
+    contractResult('import-snapshot', 'error', 'file-read-failed');
   };
   reader.readAsText(file);
+}
+
+function importSnapshot(input) {
+  let state;
+  try { state = normalizeSnapshot(input); }
+  catch (error) {
+    showToast(error.code === 'unsupported-version'
+      ? '지원하지 않는 .sq 버전입니다. 기존 전술은 유지됩니다.'
+      : '파일 데이터가 올바르지 않습니다. 기존 전술은 유지됩니다.');
+    return contractResult('import-snapshot', 'error', error.code || 'invalid-input');
+  }
+  return protectedChange('import-snapshot',
+    '파일을 가져오면 현재 이름·세 스쿼드 배치·지침·전술 패턴을 교체합니다.\n즉시 저장하며, 현재 세션에서 최근 변경 한 번을 되돌릴 수 있습니다. 계속할까요?',
+    () => { clearSelectedPlayer(); applyState(state); }, '파일을 복원하고 저장했습니다.');
+}
+
+function normalizeSnapshot(input) {
+  const object = value => value && typeof value === 'object' && !Array.isArray(value);
+  const invalid = code => { throw Object.assign(new Error(code), { code }); };
+  if (!object(input)) invalid('invalid-input');
+  if (input.v !== 1) invalid('unsupported-version');
+  if (!Array.isArray(input.roster) || !object(input.squads)) invalid('invalid-input');
+  if (input.pat !== undefined && !Array.isArray(input.pat)) invalid('invalid-input');
+  const mode = Object.hasOwn(MODES_CONFIG, input.mode) ? input.mode : '9v9';
+  const ids = new Set();
+  if (input.roster.length > MODES_CONFIG[mode].max) invalid('invalid-input');
+  input.roster.forEach(r => {
+    const id = Number(r?.id);
+    if (!object(r) || !Number.isSafeInteger(id) || id < 1 || ids.has(id)) invalid('invalid-input');
+    ids.add(id);
+  });
+  const result = {
+    v: 1, team: String(input.team ?? ''), mode,
+    squad: Object.hasOwn(SQUAD_META, input.squad) ? input.squad : 'basic',
+    roster: sanitizeRoster(input.roster), squads: {},
+  };
+  const formations = MODES_CONFIG[mode].formations;
+  for (const type of ['basic', 'attack', 'defense']) {
+    const sq = input.squads[type];
+    if (!object(sq) || !object(sq.pos) || !object(sq.pn) || typeof sq.tn !== 'string') invalid('invalid-input');
+    const pos = {}, pn = {};
+    for (const [id, p] of Object.entries(sq.pos)) {
+      if (!ids.has(Number(id))) continue;
+      if (!object(p) || !Number.isFinite(Number(p.x)) || !Number.isFinite(Number(p.y))) invalid('invalid-input');
+      pos[id] = { x: Math.max(5, Math.min(FIELD_W - 5, Number(p.x))), y: Math.max(5, Math.min(FIELD_H - 5, Number(p.y))) };
+    }
+    for (const [id, note] of Object.entries(sq.pn)) {
+      if (ids.has(Number(id))) pn[id] = String(note ?? '');
+    }
+    result.squads[type] = { f: Object.hasOwn(formations, sq.f) ? sq.f : Object.keys(formations)[0], pos, tn: sq.tn, pn };
+  }
+  result.pat = sanitizePatterns(input.pat).map(pt => ({
+    n: pt.name, bs: pt.ballStart,
+    s: pt.steps.map(st => ({
+      m: Object.fromEntries(Object.entries(st.moves).filter(([id]) => ids.has(Number(id)))
+        .map(([id, mv]) => [id, { x: mv.toX, y: mv.toY }])),
+      b: st.ball ? { x: st.ball.toX, y: st.ball.toY } : null,
+    })),
+  }));
+  return result;
 }
 
 // 외부 데이터(공유 URL·.sq 파일·localStorage)를 state에 복원 (데이터만, UI 미갱신)
 // 잘못된 mode/formation/squad 값은 기본값으로 대체해 초기화 중단을 막는다
 function restoreState(state) {
-  document.getElementById('teamName').value = state.team || '';
+  state = normalizeSnapshot(state);
+  document.getElementById('teamName').value = state.team;
   currentMode = MODES_CONFIG[state.mode] ? state.mode : '9v9';
   roster = sanitizeRoster(state.roster);
-  nextId = roster.length ? Math.max(...roster.map(r => r.id)) + 1 : 1;
+  nextId = 1;
+  while (roster.some(r => r.id === nextId)) nextId++;
   const formations = MODES_CONFIG[currentMode].formations;
   ['basic','attack','defense'].forEach(type => {
     const sq = state.squads?.[type];
-    if (!sq) return;
     squads[type].formation   = formations[sq.f] ? sq.f : Object.keys(formations)[0];
     squads[type].positions   = sq.pos || {};
     squads[type].teamNote    = sq.tn  || '';
@@ -3699,16 +3890,117 @@ document.getElementById('playerViewModal').addEventListener('click', e => {
 // ═══════════════════════════════════════════════════════════════
 const LS_KEY = 'squad-maker-v1';
 let _saveTimer = null;
+let _storageReadBlocked = false;
+let _observedSnapshot = null;
+let _revision = 0;
+let _savedRevision = null;
+let _storageStatus = { status: 'idle', error: null, retryable: false };
+let _exportKind = null;
+
+function observeSnapshot() {
+  const json = JSON.stringify(buildStateSnap());
+  if (_observedSnapshot !== json) {
+    if (_observedSnapshot !== null) _revision++;
+    _observedSnapshot = json;
+  }
+  return json;
+}
+
+function getContractState() {
+  const json = observeSnapshot();
+  const storage = _storageStatus.status === 'saved' && _savedRevision !== _revision
+    ? { status: 'pending', error: null, retryable: false } : _storageStatus;
+  const selected = roster.find(r => r.id === selectedPlayer?.id);
+  return JSON.parse(JSON.stringify({
+    contractVersion: 1, snapshot: JSON.parse(json), revision: _revision, savedRevision: _savedRevision,
+    storage,
+    view: { appMode, selectedPlayerId: selected?.id ?? null, selectedPlayerName: selected?.name ?? null,
+      patternIndex: currentPatternIdx, stepIndex: currentStepIdx, readOnly: viewerMode },
+    undoAvailable: Boolean(lastUndo), export: { busy: Boolean(_exportKind), kind: _exportKind },
+    localLibrary: { supported: false, teamId: null, fileId: null, items: [],
+      slots: { status: 'unavailable', limit: null, used: null } },
+  }));
+}
+
+function publishContractState() {
+  document.dispatchEvent(new CustomEvent('squad-maker:state', { detail: getContractState() }));
+}
+
+function contractResult(operation, status, code = null, completion = null, extra = {}) {
+  const state = getContractState();
+  const result = { contractVersion: 1, operation, status, code,
+    revision: state.revision, savedRevision: state.savedRevision, completion, ...extra };
+  publishContractState();
+  document.dispatchEvent(new CustomEvent('squad-maker:result', { detail: result }));
+  return result;
+}
+
+function setStorageStatus(status, error = null) {
+  _storageStatus = { status, error, retryable: status === 'error' && !_storageReadBlocked };
+  document.getElementById('saveStatus').dataset.status = status;
+  const labels = {
+    idle: '저장 대기', pending: '변경 내용 저장 대기', saving: '저장 확인 중', saved: '기기에 저장됨',
+    error: '저장 실패. 현재 전술을 파일로 백업하거나 다시 저장해 주세요.',
+    blocked: '기존 저장 데이터를 읽지 못했습니다. 원본을 보호하고 있습니다. 유효한 .sq 파일을 가져와 복원해 주세요.',
+    'read-only': '공유 전술 열람 중',
+  };
+  document.getElementById('saveStatusText').textContent = labels[status];
+  if (status === 'blocked' && error === 'storage-rollback-failed') {
+    document.getElementById('saveStatusText').textContent = '저장 실패. 이전 저장본의 복구를 확인하지 못해 자동저장을 중단했습니다. 현재 전술을 파일로 백업해 주세요.';
+  }
+  document.getElementById('retrySaveBtn').hidden = !_storageStatus.retryable;
+  publishContractState();
+}
+
+function writeSnapshotJson(json) {
+  let previous, written = false;
+  try {
+    previous = localStorage.getItem(LS_KEY);
+    localStorage.setItem(LS_KEY, json);
+    written = true;
+    if (localStorage.getItem(LS_KEY) !== json) {
+      throw Object.assign(new Error('storage-verification'), { code: 'storage-verification' });
+    }
+  } catch (error) {
+    let code = typeof error.code === 'string' ? error.code
+      : (error.name === 'QuotaExceededError' ? 'storage-quota' : 'storage-unavailable');
+    if (written) {
+      try {
+        if (previous === null) localStorage.removeItem(LS_KEY);
+        else localStorage.setItem(LS_KEY, previous);
+        if (localStorage.getItem(LS_KEY) !== previous) throw new Error('Rollback verification failed');
+      } catch { code = 'storage-rollback-failed'; _storageReadBlocked = true; }
+    }
+    throw Object.assign(new Error(code), { code });
+  }
+}
+
+function flushSave() {
+  clearTimeout(_saveTimer); _saveTimer = null;
+  if (viewerMode) return contractResult('retry-save', 'error', 'read-only');
+  if (_storageReadBlocked) return contractResult('retry-save', 'error', 'storage-read-blocked');
+  const json = observeSnapshot();
+  setStorageStatus('saving');
+  try {
+    writeSnapshotJson(json);
+    _savedRevision = _revision;
+    setStorageStatus('saved');
+    return contractResult('retry-save', 'success');
+  } catch (error) {
+    const code = error.code || 'storage-unavailable';
+    setStorageStatus(_storageReadBlocked ? 'blocked' : 'error', code);
+    return contractResult('retry-save', 'error', code);
+  }
+}
 
 function autoSave() {
   if (viewerMode) return; // 열람자의 기존 로컬 데이터 보존
   if (_appReady) track('squad_started', { mode: currentMode }, { once: true });
+  observeSnapshot();
   clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(() => {
-    try {
-      localStorage.setItem(LS_KEY, JSON.stringify(buildStateSnap()));
-    } catch {}
-  }, 600);
+  if (_storageReadBlocked) { setStorageStatus('blocked', _storageStatus.error); return; }
+  setStorageStatus('pending');
+  _saveTimer = setTimeout(flushSave, 600);
 }
 
 function loadFromLocalStorage() {
@@ -3716,11 +4008,69 @@ function loadFromLocalStorage() {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return false;
     const state = JSON.parse(raw);
-    if (!state || state.v !== 1) return false;
     applyState(state);
+    _observedSnapshot = JSON.stringify(buildStateSnap());
+    _savedRevision = _revision;
+    setStorageStatus('saved');
     return true;
-  } catch { return false; }
+  } catch (error) {
+    _storageReadBlocked = true;
+    // Default display initialization must not overwrite unreadable stored bytes.
+    const code = typeof error.code === 'string' ? error.code
+      : (error.name === 'SyntaxError' ? 'invalid-input' : 'storage-unavailable');
+    _storageStatus = { status: 'blocked', error: code, retryable: false };
+    return false;
+  }
 }
+
+window.addEventListener('pagehide', () => { if (_saveTimer && !viewerMode) flushSave(); });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && _saveTimer && !viewerMode) flushSave();
+});
+
+window.SquadMakerContract = Object.freeze({
+  version: 1,
+  getState: getContractState,
+  subscribe(listener) {
+    const handler = event => listener(JSON.parse(JSON.stringify(event.detail)));
+    document.addEventListener('squad-maker:state', handler);
+    listener(getContractState());
+    return () => document.removeEventListener('squad-maker:state', handler);
+  },
+  async run(operation, payload = {}) {
+    const reads = ['export-sq', 'export-png', 'export-gif', 'share-url'];
+    const supported = [...reads, 'select-player', 'switch-squad', 'change-mode', 'reset-layout', 'undo', 'import-snapshot', 'retry-save'];
+    if (!supported.includes(operation)) return contractResult(operation, 'unsupported', 'unsupported-operation');
+    if (_exportKind || _safetyPending) return contractResult(operation, 'busy', 'busy');
+    if (viewerMode && !reads.includes(operation)) return contractResult(operation, 'error', 'read-only');
+    try {
+      switch (operation) {
+        case 'select-player':
+          if (!roster.some(r => r.id === payload.id)) return contractResult(operation, 'error', 'invalid-input');
+          selectPlayerForEdit(payload.id); break;
+        case 'switch-squad':
+          if (!Object.hasOwn(SQUAD_META, payload.squad)) return contractResult(operation, 'error', 'invalid-input');
+          switchSquad(payload.squad); break;
+        case 'change-mode': return await onModeChange(payload.mode);
+        case 'reset-layout': return await resetLayout();
+        case 'undo': return restoreUndo();
+        case 'import-snapshot': return await importSnapshot(payload.snapshot);
+        case 'retry-save': return flushSave();
+        case 'export-sq': return saveSquadFile();
+        case 'export-png': return await saveImage();
+        case 'export-gif': return await exportGif(Boolean(payload.allPatterns));
+        case 'share-url': {
+          const encoded = encodeState();
+          if (!encoded) return contractResult(operation, 'error', 'export-failed');
+          return contractResult(operation, 'success', null, 'url-created', {
+            url: `${location.origin}${location.pathname}#s=${encoded}`,
+          });
+        }
+      }
+      return contractResult(operation, 'success');
+    } catch (error) { return contractResult(operation, 'error', error.code || (reads.includes(operation) ? 'export-failed' : 'invalid-input')); }
+  },
+});
 
 // Hook auto-save into all state-mutating functions
 const wrapAutoSave = fn => (...args) => { const r = fn(...args); autoSave(); return r; };
@@ -3743,6 +4093,8 @@ if (loadFromURL()) {
   document.body.classList.add('viewer-mode');
   refreshUI();
   renderViewerBar();
+  _observedSnapshot = JSON.stringify(buildStateSnap());
+  setStorageStatus('read-only');
   track('share_link_opened', { kind: 'public' }, { once: true });
 } else if (!loadFromLocalStorage()) {
   initAllSquads();
