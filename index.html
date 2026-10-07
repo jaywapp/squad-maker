@@ -1279,7 +1279,6 @@ let currentMode   = '9v9';
 let currentSquad  = 'basic';  // 'basic' | 'attack' | 'defense'
 let selectedPlayer = null;
 let dragState      = null;
-let nextId         = 1;
 
 // 공유 명단 (이름·색상만, 전 스쿼드 공유)
 // roster[i] = { id, name, color }
@@ -1455,7 +1454,6 @@ function initAllSquads() {
   // Build default roster from current mode's first formation
   const defaultForm = Object.keys(MODES_CONFIG[currentMode].formations)[0];
   roster = defaultRoster(currentMode, defaultForm);
-  nextId = roster.length + 1;
 
   // Reset all squad data
   const formKeys = {
@@ -1679,7 +1677,11 @@ function updateAddPlayerBtn() {
 function addPlayer() {
   const max = MODES_CONFIG[currentMode].max;
   if (roster.length >= max) return;
-  const newP = { id: nextId++, name: `선수${roster.length+1}`, color: '#1E88E5' };
+  // 복원·삭제로 비어 있는 ID도 매번 다시 확인한다. 높은 외부 ID에 +1하지 않는다.
+  const usedIds = new Set(roster.map(r => r.id));
+  let id = 1;
+  while (usedIds.has(id)) id++;
+  const newP = { id, name: `선수${roster.length+1}`, color: '#1E88E5' };
   roster.push(newP);
   ['basic','attack','defense'].forEach(type => {
     squads[type].positions[newP.id] = { x: 240, y: 330 };
@@ -3683,8 +3685,6 @@ function restoreState(state) {
   document.getElementById('teamName').value = state.team;
   currentMode = MODES_CONFIG[state.mode] ? state.mode : '9v9';
   roster = sanitizeRoster(state.roster);
-  nextId = 1;
-  while (roster.some(r => r.id === nextId)) nextId++;
   const formations = MODES_CONFIG[currentMode].formations;
   ['basic','attack','defense'].forEach(type => {
     const sq = state.squads?.[type];

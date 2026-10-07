@@ -11,6 +11,7 @@
 | 의존성·담당·검증·미정으로 차단된 구현 | [작업 계획](squad-product-20261007-tasks.md) |
 | 운영 웹의 기능·실행·테스트·운영 참고 | [현재 웹 구현 참고](current-web-reference.md) |
 | P0-01~03 데이터 보호·C-01 구현과 검증 | [분석](data-safety-ui-contract-20261007-analysis.md), [설계](data-safety-ui-contract-20261007-design.md), [실행 기록](data-safety-ui-contract-20261007-tasks.md) |
+| 선수 ID 충돌 재현·연속 추가·저장 회귀 | [분석](player-id-safety-20261007-analysis.md), [설계](player-id-safety-20261007-design.md), [검증](player-id-safety-20261007-tasks.md) |
 | Claude A UI가 사용할 상태·저장·내보내기 계약 v1 | [UI 계약](ui-state-save-export-contract-v1.md) |
 | 문서 전수 분류·이동·참조 검증 결과 | [정리 기록](documentation-audit.md) |
 
