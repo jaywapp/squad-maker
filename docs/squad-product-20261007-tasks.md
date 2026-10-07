@@ -52,7 +52,7 @@ T-01과 R-01의 격리 실험·정책 조사만 앞 단계와 병렬 가능하�
 | G-CONTRACT UI 계약 | C-01의 이벤트/저장/내보내기 의미와 제안 계약 v0를 검증 가능한 계약으로 확정 | 운영 UI 바인딩. 독립 화면 탐색도 계약 fixture를 기준으로 수행 |
 | G-FILES 파일 소유권 | C-02의 경계 또는 순차 인계, 기준 SHA·허용 파일 기록 | 공유 파일 동시 편집 |
 | G-SLOTS 로컬 한도 | Q1 단위, Q2 무료량, Q9 중 첫 출시 백업/삭제 복구 범위 결정 | 카운터·새 파일·복원 충돌 구현. 기존 손실 보호는 진행 가능 |
-| G-FRAMEWORK Android | T-01 비교 증거와 Q6 사용자 결정 | 프레임워크별 패키징·native adapter·SDK 실제 연동 |
+| G-FRAMEWORK Android | T-01 비교 증거와 Q6 사용자 결정 | 정식 채택 기술의 운영 패키징·native adapter·SDK 실제 연동. 격리 T-01/A-04 후보 검증 빌드는 예외 |
 | G-SHARE 공유 배치 | Q8 우선순위/링크 범위 결정 | 최종 공유 시트 배치. A 피치·라벨·파일 목록 전체를 막지 않음 |
 | G-ADS 광고 | Q7 결정, A-03 기기 저장/공유/오프라인 통과, R-01 데이터 흐름 준비 | 광고 SDK 실제 연동. SDK·정책 조사와 별개 |
 | G-PAY 구매 | Q1~Q6 중 구매 관련 사항, Q9 초과/환불/복구 구분, 검증 서버·상품 복원 방식 결정 | B-01. 결제 미도입 시 Q3/Q4가 첫 출시를 막지 않음 |
@@ -234,7 +234,7 @@ Q 번호와 결정 근거는 [사용자 결정 목록](product-plan.md#14-사용
 ### U-01 A 화면·흐름 상세화
 
 - **목적:** 피치 중심 A 안에서 읽기 쉬운 라벨과 찾기 쉬운 전술 파일 목록·저장/공유 흐름을 구체화한다.
-- orchestrator: Claude · owner: Claude · model: Opus 계열 추천 · effort: high · status: blocked (구현 요청·계약)
+- orchestrator: Claude · owner: Claude · model: Opus 계열 추천 · effort: high · status: blocked (지정 세션 확인·계약)
 - depends_on: G-START,C-01; 최종 공유 시트는 G-SHARE · parallel_group: isolated-ui · files: 별도 Claude 실행 slug의 화면/흐름·fixture 기반 샘플, A 원본 읽기
 - **입력/산출:** A 실제 캡처·기획 화면·계약 fixture → 기본/빈 목록/선택/저장중/저장 실패/슬롯 가득 참/내보내기 상태의 확인 가능한 화면과 라벨.
 - **verification:** 모바일 재생 버튼 잘림과 파일 목록 진입을 해결하는 구성을 제시한다. 이미 기본 접힘인 모바일 지침을 신규 수정으로 잡지 않는다. 팀=프로젝트·전술=파일·기본/공격/수비 상태가 혼동되지 않는다. 원본 증거와 개선안 표시를 구분한다.
@@ -288,7 +288,7 @@ W0~W5는 Codex 단일 트리(당시 기록 model `gpt-6`, 설계/검토 high·�
 | W6 | 병합된 기획·지침·새 UI 담당 요청 → 범위/역할/게이트 확인 | 현재 설정 모델 / high | - / docs-read | 지침·최신 문서 읽기 | main SHA·현재 권한·기존 결정 대조 | done (로컬 확인 blocked) |
 | W7 | 기존 tasks/design → 실행 로드맵·UI 계약·인계 | 현재 설정 모델 / high | W6 / docs-draft | tasks/design/analysis/product-plan/문서 안내 | 모든 작업 ID·의존성·입출력·완료 기준, 상태 구분 | done |
 | W8 | 원본과 초안 → 독립 검토·링크/보호 범위 검사 | 현재 설정 모델 / high | W7 / docs-review | 관련 문서 읽기·정리 기록 | 내부 경로/앵커·기획 일치·비문서 blob 동일 | done (정적 검사·독립 검토와 교정 완료) |
-| W9 | 검증한 문서 → 전용 브랜치 커밋·Draft PR | 현재 설정 모델 / medium | W8 / docs-publish | 위 문서만 | 원격 최신 main/head·diff·Draft 상태 | in_progress (전용 브랜치 게시 완료·Draft PR 확인 예정) |
+| W9 | 검증한 문서 → 전용 브랜치 커밋·Draft PR | 현재 설정 모델 / medium | W8 / docs-publish | 위 문서만 | 원격 최신 main/head·diff·Draft 상태 | done ([Draft PR #41](https://github.com/jaywapp/squad-maker/pull/41)·원격 문서/범위 확인) |
 
 W6의 로컬 status/branch 확인은 Windows sandbox 초기화 오류로 실행되지 않았다. 기존 로컬 변경·설정은 건드리지 않고 GitHub 커넥터로 원격 main 기반 문서만 게시한다. W8 독립 검토는 Codex 하위 에이전트의 read-only 작업이며 작성/게시와 공유 파일을 수정하지 않는다.
 
