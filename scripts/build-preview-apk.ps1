@@ -5,7 +5,12 @@ $required = @('SQUAD_PREVIEW_KEYSTORE', 'SQUAD_PREVIEW_STORE_PASSWORD', 'SQUAD_P
 foreach ($name in $required) {
     if (-not [Environment]::GetEnvironmentVariable($name)) { throw "Required approved signing input missing: $name" }
 }
-if (-not (Test-Path -LiteralPath $env:SQUAD_PREVIEW_KEYSTORE -PathType Leaf)) { throw 'The approved preview keystore does not exist.' }
+$signingInputs=@{}
+foreach ($name in $required) {
+    $signingInputs[$name]=[Environment]::GetEnvironmentVariable($name)
+    [Environment]::SetEnvironmentVariable($name, $null, 'Process')
+}
+if (-not (Test-Path -LiteralPath $signingInputs['SQUAD_PREVIEW_KEYSTORE'] -PathType Leaf)) { throw 'The approved preview keystore does not exist.' }
 if (-not $AndroidSdk) { throw 'ANDROID_HOME or -AndroidSdk is required.' }
 $tools = Join-Path $AndroidSdk 'build-tools\36.0.0'
 $unsigned = Join-Path $repo 'android\app\build\outputs\apk\release\app-release-unsigned.apk'
@@ -24,8 +29,13 @@ try {
     } finally { Pop-Location }
     & (Join-Path $tools 'zipalign.exe') -p -f 4 $unsigned $aligned
     if ($LASTEXITCODE -ne 0) { throw 'APK alignment failed.' }
-    & (Join-Path $tools 'apksigner.bat') sign --ks $env:SQUAD_PREVIEW_KEYSTORE --ks-key-alias $env:SQUAD_PREVIEW_KEY_ALIAS --ks-pass env:SQUAD_PREVIEW_STORE_PASSWORD --key-pass env:SQUAD_PREVIEW_KEY_PASSWORD --out $apk $aligned
-    if ($LASTEXITCODE -ne 0) { throw 'Preview signing failed.' }
+    foreach ($name in $required) { [Environment]::SetEnvironmentVariable($name, $signingInputs[$name], 'Process') }
+    try {
+        & (Join-Path $tools 'apksigner.bat') sign --ks $signingInputs['SQUAD_PREVIEW_KEYSTORE'] --ks-key-alias $signingInputs['SQUAD_PREVIEW_KEY_ALIAS'] --ks-pass env:SQUAD_PREVIEW_STORE_PASSWORD --key-pass env:SQUAD_PREVIEW_KEY_PASSWORD --out $apk $aligned
+        if ($LASTEXITCODE -ne 0) { throw 'Preview signing failed.' }
+    } finally {
+        foreach ($name in $required) { [Environment]::SetEnvironmentVariable($name, $null, 'Process') }
+    }
     & (Join-Path $tools 'apksigner.bat') verify --verbose --print-certs $apk
     if ($LASTEXITCODE -ne 0) { throw 'APK signature verification failed.' }
     $hash = (Get-FileHash -LiteralPath $apk -Algorithm SHA256).Hash.ToLowerInvariant()

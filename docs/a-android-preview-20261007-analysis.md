@@ -11,7 +11,7 @@
 - PR43 CI 37576625976: success, API 7 / 웹 161 passed, 모바일 전체 GIF 1 skip. 실제 Android 증거가 아니다. 로컬 전체 회귀를 다시 실행한다.
 - Android SDK 34/35/36, build-tools 34/35/36, system images 35/36, JBR 21.0.6와 Phone API36/Tablet AVD 설치. ADB 연결 기기는 없다.
 - Orca CLI가 PATH에 없다. 지원되는 Computer Use 초기화는 kernel 시작 전에 `helper_sandbox_lock_failed`/Windows 접근 오류로 실패했다. 해당 스킬은 terminal automation을 금지한다. 세션 파일·스크린샷·추측한 ID로 우회하지 않는다. Claude 직접 전달은 미실행이며 [붙여넣기 요청문](a-android-preview-20261007-claude-request.md)을 제공한다.
-- 새 전용 preview 서명키 승인과 휴대폰 검증 방식 질문은 사용자 응답 대기. 서명키를 아직 생성하지 않는다.
+- 2026-10-07 원 사용자 대화의 명시적 승인을 확인하여 com.jaywapp.squadmaker.preview 전용 키/암호를 Git 제외 .work/signing/에 생성했다. 휴대폰 검증 방식은 별도이며 실기기 검증은 미실행이다.
 
 ## 제품 결정과 구현 원칙
 
@@ -27,6 +27,13 @@ UI는 A 원본을 보존하며 Claude가 담당한다. C-02/C-03 완료 전에�
 
 ## 진행 결과
 
-C-02/C-03와 native 경계를 구현했고 통합 단위93/웹185 passed(기존1skip), unsigned build/lint를 확인했다. 세부 결과와 남은 UI·서명·설치·Release 조건은 실행 기록에 구분한다. 현재 구현은 A UI 교체 완료나 설치 검증 APK 게시 완료가 아니다. 새 서명키/휴대폰/Claude 직접 전달 질문에 사용자 답변은 아직 없으므로 해당 종속 작업을 실행하지 않았다.
+C-02/C-03와 native 경계를 구현했고 통합 단위93/웹185 passed(기존1skip), unsigned build/lint를 확인했다. 세부 결과와 남은 UI·서명·설치·Release 조건은 실행 기록에 구분한다. 현재 구현은 A UI 교체 완료나 설치 검증 APK 게시 완료가 아니다. 서명키 생성은 이후 승인·실행됐고, 지정 Claude UI 요청은 사용자 전달로 진행됐다. 최종 UI 검증 SHA와 실기기 검증은 아직 남아 있다.
 
 cc037a8 CI의 단위93/웹187(기존1skip)/unsigned Android build도 성공했다. 후속 긴 내보내기 파일명 경계 보완에서 단위95와 unsigned build/lint를 재확인했다. 최종 native SHA의 CI는 PR에서 확인한다.
+
+## 서명 승인 이후 native 검증
+
+- 코드 기준046f5f60a775abcc05f76143bce919dbf19b56da. 기존 preview 키 없음 확인 후 승인된 새 RSA3072/PKCS12 키 한 개 생성, 로컬 보관·Git 제외 확인. 비밀값을 출력하거나 외부 서비스에 등록하지 않았다.
+- signed APK v2/v3 검증 및 API36 emulator 설치·cold launch 성공. 실제 드래그 위치 재시작 복원, 팀명 입력/키보드 완료, SAF PNG 선택기 열림/취소 후 입력·버튼 보존, 공식 테스트 광고 표시를 확인했다. PNG/GIF 파일 쓰기·공유·슬롯 UI 전체 검증은 미완료다.
+- Claude UI 별도 checkout/branch의 미커밋 상태를 읽기 전용 확인했다. 사용자는 UI 전달 완료·검증 도중 메모리 부족 중단을 보고했다. Codex의 AVD를 종료했고 추가 로컬 build/Android/QA 서버는 시작하지 않는다. 미검증 UI를 통합·덮어쓰기·커밋하지 않는다.
+- signed APK는 A UI 통합 전 baseline 증거다. 최종 APK/Release 완료로 표시하지 않는다.

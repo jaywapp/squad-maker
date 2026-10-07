@@ -24,3 +24,9 @@ Capacitor8 + 자체 AtomicFile/SAF/test-ad plugin을 선택했다. 제한된 nat
 ## Native 내보내기 복원 경계
 
 SAF 본문은 cache staging 후 작은 token으로 넘기고 worker에서 provider로 스트리밍한다. 긴 복원 팀명이 파일명/공유 제목 메타데이터로 Activity 상태나 Intent 한도를 키우지 않도록160자로 제한한다. 본문 bytes는 자르지 않는다. 같은 source의 단위 회귀와 unsigned build/lint로 재확인했다.
+
+## 승인된 서명 및 검증 자원 경계
+
+사용자가 승인한 preview 키 한 개를 Git 제외 로컬 폴더에 보관하고 환경 변수로만 서명 도구에 전달한다. public 인증서 SHA256은 기록할 수 있고 private 키/암호는 로그·문서·원격 서비스에 넣지 않는다. 최종 UI 검증을 위해 Codex native AVD와 무거운 로컬 빌드를 멈춰 자원 경합을 피한다. Claude의 feat/a-ui-20261007 검증/커밋 완료 SHA를 받은 후 순차 통합·동일 최종 APK 재검증을 진행한다.
+
+서명 입력은 build 전에 로컬 변수로 옮겨 프로세스 환경에서 제거한다. npm/Gradle/zipalign에는 서명 암호를 상속하지 않고, apksigner sign 호출 동안만 환경에 설정한 후 즉시 제거한다. 환경 변수는 OS 영구 설정으로 등록하지 않는다.
