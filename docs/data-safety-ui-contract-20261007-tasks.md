@@ -11,7 +11,7 @@
 | P0-02 | Codex / Codex | root GPT-6 / high | P0-01 | safety-write | index.html, 회귀 테스트 | 확인·취소·undo·즉시 저장·실패 보존 | 완료 |
 | P0-03 | Codex / Codex | root GPT-6 / high | P0-02 | safety-verify | tests/e2e, 실행 기록 | 전체 웹 회귀, v:1/.sq/#s=, PNG/GIF | 완료 |
 | C-01 | Codex / Codex | root GPT-6 / high | P0-03 | contract | index.html 최소 adapter, 계약·fixture·테스트 | 상태·revision·저장/내보내기 결과 매핑 | 완료 |
-| delivery | Codex / Codex | root GPT-6 / medium | C-01, review-contract | delivery | 실행 문서, docs/README.md | commit·push·draft PR·SHA 대조 | 게시 준비 완료 |
+| delivery | Codex / Codex | root GPT-6 / medium | C-01, review-contract | delivery | 실행 문서, docs/README.md | commit·push·draft PR·SHA 대조 | 완료 |
 
 읽기 전용 검토만 독립 병렬이다. 보호 구현·회귀·계약은 같은 상태와 파일을 사용하고 순차 의존하므로 직접 순차 실행한다. 선택 이유는 손실·호환성 위험으로 high, 게시 작업은 medium이다.
 
@@ -34,7 +34,7 @@ root의 세부 모델 ID/실제 sampling effort는 실행 환경에 공개되지
 
 ## 인계와 남은 단계
 
-- 완료 코드의 정확한 SHA는 이 문서와 계약을 포함한 draft PR의 head SHA를 사용한다. head/원격 branch/검증 결과를 게시 후 직접 대조한다.
+- 검증한 기능 SHA: `0b14a1c73081ed8e9a07054a2f71fabf8c231f16`. 전용 브랜치를 push하고 [Draft PR #42](https://github.com/jaywapp/squad-maker/pull/42)를 생성했다. 이 게시 기록의 후속 커밋은 문서만 바꾸며 소스·테스트는 해당 기능 SHA와 동일하다. 최종 인계는 PR head SHA를 사용하고 원격 branch와 직접 대조한다.
 - 계약: [UI 상태·저장·내보내기 v1](ui-state-save-export-contract-v1.md), `tests/fixtures/ui-contract-v1.json`, 기존 `tests/fixtures/snapshot-v1.json`.
 - 다음: C-02 파일 경계 또는 순차 인계 정리, C-03/Q1/Q2/Q9 로컬 보관 결정과 구현. 이 완료만으로 U-02 운영 `index.html` 편집을 시작하지 않는다. U-01 fixture 화면 탐색은 Claude 고유 경로에서 가능.
 - A UI·통합 뒤 T-01/Q6 기술 선택, Android 저장/공유·실기기 확인, 새 서명 설정 확인, 같은 검증 APK·SHA-256·버전·기준 commit·설치 안내의 GitHub Releases 게시가 후속이다. 이번에는 APK·서명·계정·비밀값을 만들지 않았다.
