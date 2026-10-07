@@ -69,4 +69,3 @@ native 테스트 광고는 WebView 아래 별도 예약 영역(레이블20dp+배
 C-03 검증 SHA 인계 전 root가 index 기능 통합을 소유한다. 이후 Claude의 U-02/U-03은 별도 checkout/branch에서 index.html 및 고유 UI 자산을 소유하며 root는 해당 파일 수정을 멈춘다. app/local-library.js, app/platform-native.js, Android, package/lockfile, 기능 회귀 테스트는 Codex가 소유한다. 이름 변경/파일 목록/내보내기 화면에서 위 공개 계약을 사용하고 데이터 모델을 중복 구현하지 않는다.
 
 검증한 SHA·draft PR 및 전수 결과는 [실행 기록](a-android-preview-20261007-tasks.md)에 갱신한다. 이 계약의 구현 완료는 A UI 통합·APK 설치·Release 게시 완료를 뜻하지 않는다.
-

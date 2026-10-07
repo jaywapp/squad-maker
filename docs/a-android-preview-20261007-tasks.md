@@ -37,3 +37,9 @@
 2. 사용자의 전용 preview 키 생성 승인 또는 기존 승인된 전용 키 입력. 비밀값은 출력·커밋·GitHub secret에 등록하지 않는다.
 3. 합친 최종 UI/native 코드에서 전체 회귀 및 같은 signed APK의 emulator 설치·재시작·오프라인·SAF/공유 취소·광고 비간섭 확인.
 4. GitHub Releases에 동일 APK/checksum/서명 종류·빌드 SHA·제한을 게시하고 다시 내려받아 해시/설치 확인. phone 결과는 emulator와 분리 기록.
+
+## C-03 구현 SHA와 UI 파일 동결
+
+구현/관련 회귀 SHA: `bc1e76a0de598ec651a717438086c42014f36ef7`. snapshot v1을 유지한 계약 v2. 전체93단위/185웹+1skip 후 선택 보존 변경의 관련56/56도 통과했다. 최종 CI는 PR head에서 별도로 확인한다.
+
+현재 Codex는 index.html/UI 자산 편집을 멈췄다. Claude는 원격 전용 브랜치의 최신 commit에서 별도 checkout/branch를 만들고 U-02/U-03을 진행할 수 있다. app/local-library.js·app/platform-native.js·Android·package/lockfile·기능 회귀 테스트는 Codex 소유다. 직접 세션 전달은 여전히 미실행이며 준비된 요청문으로 인계한다.

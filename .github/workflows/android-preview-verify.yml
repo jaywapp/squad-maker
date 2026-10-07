@@ -64,4 +64,3 @@ jobs:
             android/app/build/reports/lint-results-release.*
             .work/android-web/bundle-manifest.json
           retention-days: 7
-
