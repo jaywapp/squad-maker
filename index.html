@@ -21,7 +21,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%232b5e3f'/><text y='24' x='4' font-size='22'>⚽</text></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%232b5e3f'/><text y='24' x='4' font-size='22'>⚽</text></svg>">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
 <style>
 /* ── 전술 보드 팔레트 ── */
 :root {
@@ -732,6 +732,418 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 .feedback-status.success { color:var(--accent); }
 .feedback-honeypot { position:absolute !important; left:-10000px !important; width:1px !important; height:1px !important; overflow:hidden !important; }
 
+/* ═══════════════════════════════════════════════════════════════
+   A 나이트피치 운영 UI (docs/a-ui-20261007-design.md)
+   레이아웃: 모바일 1열(헤더 → 탭 → 피치 → 하단 선수 트레이), 데스크톱은
+   [피치 + 선수 도구] 고정 열과 설정 열. 기존 ID·문구는 회귀 계약이라 유지한다.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --faint: #8b9a90;            /* 작은 보조 글자 대비 4.5:1 이상 */
+  --chalk: #e9f0e9;            /* 활성 탭 바탕 (라임은 주 행동 전용) */
+  --chalk-ink: #141a16;
+  --danger-ink: #ff9d9d;
+  --focus: #f4f8f4;
+  --font: 'IBM Plex Sans KR', 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif;
+  --num: 'Oswald', 'Bahnschrift', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --tap: 48px;
+}
+
+body {
+  font-family: var(--font); font-size: 1rem; line-height: 1.5;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-content: start; align-items: center;
+  column-gap: 8px; row-gap: 10px;
+  padding: 10px 12px calc(32px + env(safe-area-inset-bottom, 0px));
+}
+body > * { grid-column: 1 / -1; justify-self: center; width: 100%; }
+[hidden] { display: none !important; }
+body > script, body > input[type="file"] { display: none; }
+button, input, select, textarea { font-family: inherit; }
+button, .app-tab, .squad-tab { word-break: keep-all; }  /* 한글은 단어 단위로만 줄바꿈 (큰 글자 대비) */
+
+/* 아이콘: Tabler Icons(MIT) 경로를 인라인으로 사용 */
+.ui-icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+/* ── 헤더 ── */
+.wordmark { grid-column: 1; justify-self: start; width: auto; font-size: 1.05rem; letter-spacing: 0.12em; }
+.wordmark .wm-sub { font-family: var(--font); font-size: 0.75rem; letter-spacing: 0.2em; }
+.topbar { grid-column: 2; justify-self: end; width: auto; max-width: none; margin: 0; padding: 0; gap: 6px; }
+.topbar-version { margin-right: 4px; font-size: 0.75rem; color: var(--faint); }
+.topbar-btn { min-height: 44px; padding: 0 14px; font-size: 0.875rem; }
+
+.file-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.file-title {
+  flex: 1 1 140px; min-width: 0; min-height: 52px;
+  display: flex; align-items: center; gap: 10px; text-align: left; cursor: pointer;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--border); border-radius: 12px; padding: 6px 12px;
+}
+.file-title:hover { border-color: var(--muted); }
+.file-title-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+.file-title-sub, .file-title-main { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-title-sub { font-size: 0.8125rem; color: var(--muted); }
+.file-title-main { font-size: 1rem; font-weight: 700; }
+.file-squad { margin-left: 8px; font-size: 0.8125rem; font-weight: 600; color: var(--ink2); }
+.save-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 0.875rem; color: var(--muted); white-space: nowrap; }
+.save-chip .ui-icon { width: 18px; height: 18px; }
+.save-chip-warn { display: none; color: var(--danger-ink); }
+.save-chip[data-status="saved"] { color: var(--ink2); }
+.save-chip[data-status="saved"] .save-chip-ok { color: var(--accent); }
+.save-chip:not([data-status="saved"]) .save-chip-ok { display: none; }
+.save-chip[data-status="error"], .save-chip[data-status="blocked"] { color: var(--danger-ink); font-weight: 700; }
+.save-chip[data-status="error"] .save-chip-warn, .save-chip[data-status="blocked"] .save-chip-warn { display: inline; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: var(--tap); padding: 0 16px; border: none; border-radius: var(--radius);
+  background: var(--accent); color: var(--accent-ink); font-size: 0.9375rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+.btn-primary:hover { filter: brightness(1.06); }
+.btn-primary:active { transform: translateY(1px); }
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: var(--tap); height: var(--tap); border-radius: var(--radius);
+  background: transparent; color: var(--ink); border: 1px solid var(--border); cursor: pointer;
+}
+.icon-btn:hover { background: var(--surface2); }
+.export-open { flex-shrink: 0; }
+
+/* ── 앱 탭 / 스쿼드 탭 ── */
+.app-tabs { max-width: none; border-radius: 12px; }
+.app-tab { min-height: var(--tap); font-size: 0.9375rem; color: var(--ink2); }
+.app-tab.active { background: var(--chalk); color: var(--chalk-ink); }
+.squad-tabs { max-width: none; border-radius: 12px; }
+.squad-tab { min-height: var(--tap); font-size: 0.9375rem; color: var(--ink2); padding: 0 10px; }
+.squad-tab[data-squad].active { background: var(--chalk); color: var(--chalk-ink); }
+.formation-bar { max-width: none; width: auto; flex-wrap: nowrap; }
+.formation-select { min-height: var(--tap); font-size: 1rem; font-family: var(--num); letter-spacing: 0.04em; padding: 0 10px; border-radius: var(--radius); }
+.reset-btn { min-width: var(--tap); padding: 0 12px; }
+body:not(.viewer-mode) .squad-badge { display: none; }
+
+/* ── 저장 상태: 평상시 화면에서 숨기고(상태 알림은 유지) 문제가 있을 때만 경고 띠 ── */
+#saveStatus { width: 100%; max-width: none; }
+#saveStatus:not([data-status="error"]):not([data-status="blocked"]):not([data-status="no-file"]) {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+#saveStatus[data-status] { gap: 10px; }
+#saveStatus[data-status="error"], #saveStatus[data-status="blocked"] {
+  position: sticky; top: 8px; z-index: 200; margin-bottom: 4px;
+  background: #2d1b1b; border: 1px solid var(--danger); border-radius: 12px; padding: 12px 14px; font-size: 0.9375rem;
+}
+#saveStatus[data-status="no-file"] { display: none; }
+.save-status-actions { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+/* 경고 띠 버튼은 해당 상태에서만 렌더링한다 (평상시 숨은 상태 영역 안에서 Tab으로 닿지 않게) */
+#saveStatus .save-status-backup, #saveStatus .save-status-restore { display: none; }
+#saveStatus[data-status="error"] .save-status-backup,
+#saveStatus[data-status="blocked"] .save-status-backup,
+#saveStatus[data-status="blocked"] .save-status-restore { display: inline-flex; }
+#saveStatus .btn { min-height: var(--tap); }
+#retrySaveBtn:not([hidden]) { display: inline-flex; }
+
+.empty-file {
+  display: grid; gap: 8px; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--surface); text-align: left;
+}
+.empty-file[hidden] { display: none; }
+.empty-file-title { font-weight: 700; font-size: 1rem; }
+.empty-file-text { font-size: 0.875rem; color: var(--ink2); }
+.empty-file .btn-primary { justify-self: start; }
+
+/* ── 레이아웃 (모바일 기본) ── */
+main { width: 100%; }
+.layout { gap: 12px; }
+.pane-field {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; max-width: 560px; align-items: center;
+}
+.pane-field > * { grid-column: 1 / -1; }
+.pane-field > .squad-tabs { grid-column: 1; }
+.pane-field > .formation-bar { grid-column: 2; }
+/* 큰 글자(루트 글자 크기 확대)에서는 스쿼드 탭과 포메이션을 두 줄로 쌓는다. rem 기준이라 기본 글자 360px에서는 적용되지 않음 */
+.layout { container-type: inline-size; }
+@container (max-width: 20rem) {
+  .pane-field > .squad-tabs, .pane-field > .formation-bar { grid-column: 1 / -1; }
+  .pane-field > .formation-bar { justify-self: end; }
+}
+.pane-side { max-width: 560px; }
+.team-setup, .notes-wrap, #patternUI, #strategyUI, .interest-section, #viewerBar, .controls { max-width: 560px; }
+/* 피치: 폭과 화면 높이 중 작은 쪽에 맞춰 선수 트레이와 함께 보이게 한다 (480/660 = 0.7273) */
+#fieldWrapper {
+  justify-self: center; max-width: 100%;
+  width: min(100%, 480px, calc((100vh - 352px) * 0.7273));
+  width: min(100%, 480px, calc((100dvh - 352px) * 0.7273));
+  min-width: min(100%, 288px);
+}
+body.mode-pattern #fieldWrapper { width: min(100%, 480px, calc((100dvh - 236px) * 0.7273)); }
+.hint { font-size: 0.8125rem; color: var(--muted); text-align: center; }
+
+/* ── 피치 위 선수: 480 좌표를 scale로 줄이므로 --fi(=1/scale)로 화면 크기를 보정 ── */
+#fieldWrapper { --fi: 1; }
+#field { --c: max(44px, calc(36px * var(--fi))); --hit: max(48px, calc(48px * var(--fi))); }
+#field .player { width: max-content; min-width: var(--c); display: flex; flex-direction: column; align-items: center; }
+#field .player::before {
+  content: ''; position: absolute; left: 50%; top: calc(var(--c) / 2);
+  width: var(--hit); height: var(--hit); transform: translate(-50%, -50%); border-radius: 50%;
+}
+#field .player-circle {
+  width: var(--c); height: var(--c); font-family: var(--num); font-size: calc(var(--c) * 0.42); font-weight: 600;
+  border-width: calc(2.5px * var(--fi)); position: relative;
+}
+#field .player-name {
+  font-size: calc(12px * var(--fi)); line-height: 1.35; font-weight: 600; color: #fff; text-shadow: none;
+  background: rgba(8, 13, 10, 0.82); border-radius: 999px; padding: 0 calc(6px * var(--fi));
+  margin-top: calc(3px * var(--fi)); max-width: calc(84px * var(--fi)); position: relative;  /* 4명 간격(88)에서도 이웃과 겹치지 않게. 전체 이름은 선택 트레이에 표시 */
+}
+#field .player.selected .player-circle, #field .player:focus-visible .player-circle {
+  outline: calc(3px * var(--fi)) solid var(--accent); outline-offset: calc(3px * var(--fi));
+}
+#field .player:focus-visible { outline: none; }
+#field .player:focus-visible:not(.selected) .player-circle { outline-color: var(--focus); }
+#field .player input {
+  width: calc(120px * var(--fi)) !important; font-size: calc(14px * var(--fi)) !important;
+  padding: calc(3px * var(--fi)) calc(6px * var(--fi)) !important; border-radius: calc(8px * var(--fi)) !important;
+  margin-top: calc(3px * var(--fi)) !important; background: #0b120e !important; position: relative;
+}
+/* 골라인 근처(골키퍼) 이름표는 토큰 옆에 두어 골라인과 겹치지 않게 */
+#field .player.near-goal .player-name, #field .player.near-goal input {
+  position: absolute; left: calc(100% + 4px * var(--fi)); top: calc(var(--c) / 2); transform: translateY(-50%); margin-top: 0 !important;
+}
+#field .player.near-goal.near-edge .player-name, #field .player.near-goal.near-edge input { left: auto; right: calc(100% + 4px * var(--fi)); }
+body.mode-pattern .player-actions, body.mode-strategy .player-actions, .viewer-mode .player-actions { display: none !important; }
+
+/* ── 선택한 선수 도구 ── */
+.player-actions { max-width: 560px; }
+.player-actions.visible { display: grid; gap: 8px; }
+.pa-empty { display: none; font-size: 0.875rem; color: var(--ink2); }
+.pa-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.player-actions-name { flex: 1 1 auto; min-width: 0; font-size: 1rem; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pa-squad { flex-shrink: 0; font-size: 0.8125rem; color: var(--ink2); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; }
+.pa-close { min-width: var(--tap); padding: 0 10px; }
+.pa-close-label { display: none; }
+.pa-tools { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.pa-tools .btn { padding: 0 6px; }
+
+/* ── 버튼·입력 공통 ── */
+.btn { min-height: var(--tap); padding: 0 14px; border-radius: var(--radius); font-size: 0.9375rem; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.btn:hover { opacity: 1; filter: brightness(1.12); transform: none; }
+.btn-slate, .btn-blue, .btn-amber, .btn-purple { color: var(--ink); }
+.btn-red { color: var(--danger-ink); border-color: var(--danger); }
+.team-name-input, .pattern-name-input, .notes-textarea, .player-note-input, .strategy-input, .pv-selector { font-size: 1rem; }
+.team-name-input, .pattern-name-input { min-height: var(--tap); border-radius: var(--radius); min-width: 0; }
+.team-name-input { width: 100%; flex: 1 1 140px; }
+.setup-row { flex-wrap: wrap; }
+.player-note-input { height: auto; min-height: var(--tap); border-color: var(--border); }
+.setup-label { font-size: 0.875rem; }
+.mode-pill { min-height: 44px; font-size: 0.875rem; font-family: var(--num); letter-spacing: 0.03em; }
+.notes-card-title { font-size: 0.875rem; letter-spacing: 0.02em; text-transform: none; }
+.notes-count { font-size: 0.8125rem; }
+.player-note-header { font-size: 0.875rem; }
+.notes-card > summary { min-height: var(--tap); align-items: center; }
+
+/* ── 움직임 패턴 패널 ── */
+#patternUI { gap: 10px; }
+.pattern-bar { gap: 8px; }
+.pattern-label { flex: 1 1 100%; font-size: 0.875rem; font-weight: 700; color: var(--ink2); }
+.pattern-name-input { flex: 1 1 150px; }
+.pattern-name-view { flex: 1 1 150px; font-weight: 700; font-size: 1rem; }
+.pattern-nav { min-height: var(--tap); padding: 0 4px; border-radius: var(--radius); }
+.pattern-nav button { min-width: var(--tap); min-height: var(--tap); font-size: 1rem; color: var(--ink2); }
+.pattern-nav span { font-size: 0.9375rem; font-family: var(--num); letter-spacing: 0.03em; }
+.step-bar { flex-wrap: wrap; order: -1; }  /* 단계 이동·재생을 피치 바로 아래 첫 줄에 */
+.step-nav { flex: 1 1 200px; justify-content: space-between; min-width: 0; }
+.play-btn { flex: 1 0 116px; }
+.step-edit .btn { flex: 1 1 auto; }
+.pattern-export { justify-content: flex-start; }
+
+/* ── 내보내기·공유 ── */
+.export-panel {
+  width: 100%; max-width: 560px; display: grid; gap: 14px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px;
+}
+body.mode-strategy .export-panel:not(.as-sheet) { display: none; }
+body.mode-pattern .export-panel .exp-png { display: none; }
+.export-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.export-title { font-size: 1.0625rem; font-weight: 700; }
+.export-close { display: none; }
+.export-target { font-size: 0.875rem; color: var(--ink2); }
+.export-target:empty { display: none; }
+.export-group { display: grid; gap: 6px; padding-top: 12px; border-top: 1px solid var(--border); }
+.export-group h3 { font-size: 0.9375rem; font-weight: 700; }
+.export-group p { font-size: 0.875rem; color: var(--ink2); }
+.export-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.export-actions .btn { flex: 1 1 140px; }
+.native-only { display: none !important; }
+body.platform-native .native-only { display: inline-flex !important; }
+.export-status { font-size: 0.9375rem; min-height: 1.5em; color: var(--ink); }
+.export-status:empty { min-height: 0; }
+.export-status[data-tone="error"] { color: var(--danger-ink); }
+.export-status[data-tone="ok"] { color: var(--accent); }
+
+/* ── 시트(전술 목록·내보내기) ── */
+.ui-backdrop { position: fixed; inset: 0; background: rgba(4, 8, 6, 0.66); z-index: 2090; }
+.ui-backdrop[hidden] { display: none; }
+.ui-sheet { position: fixed; inset: 0; z-index: 2100; display: flex; align-items: flex-end; justify-content: center; background: rgba(4, 8, 6, 0.66); }
+.ui-sheet[hidden] { display: none; }
+.ui-sheet-panel, .export-panel.as-sheet {
+  width: 100%; max-width: 560px; max-height: 88vh; max-height: 88dvh;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.5);
+}
+.ui-sheet-panel { display: flex; flex-direction: column; overflow: hidden; }
+.ui-sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 12px 12px 18px; border-bottom: 1px solid var(--border); }
+.ui-sheet-head h2 { font-size: 1.0625rem; font-weight: 700; }
+.ui-sheet-body { overflow-y: auto; padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 12px; overscroll-behavior: contain; }
+.export-panel.as-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; margin: 0 auto; z-index: 2100;
+  overflow-y: auto; overscroll-behavior: contain; padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+}
+.export-panel.as-sheet .export-head { position: sticky; top: -16px; margin: -16px -16px 0; padding: 12px 12px 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border); z-index: 1; }
+.export-panel.as-sheet .export-close { display: inline-flex; }
+body.ui-sheet-open { overflow: hidden; }
+
+/* 전술 목록 */
+.lib-label { font-size: 0.875rem; font-weight: 700; color: var(--ink2); }
+.lib-teams { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.lib-chip {
+  min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--ink2); font-size: 0.9375rem; cursor: pointer; max-width: 100%;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lib-chip[aria-pressed="true"] { background: var(--chalk); color: var(--chalk-ink); border-color: var(--chalk); font-weight: 700; }
+.lib-chip-add { border-style: dashed; }
+.lib-team-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.lib-team-actions .btn { min-height: 44px; font-size: 0.875rem; }
+.lib-files { list-style: none; display: grid; gap: 8px; }
+.lib-file { display: flex; align-items: stretch; gap: 6px; }
+.lib-open {
+  flex: 1 1 auto; min-width: 0; min-height: 60px; text-align: left; cursor: pointer;
+  display: grid; gap: 2px; align-content: center; padding: 8px 12px;
+  background: var(--bg); color: var(--ink); border: 1px solid var(--border); border-radius: 12px;
+}
+.lib-open[aria-current="true"] { border-color: var(--accent); }
+.lib-file-name { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lib-file-meta { font-size: 0.8125rem; color: var(--muted); }
+.lib-current { color: var(--accent); font-weight: 700; }
+.lib-file .icon-btn { height: auto; min-height: 60px; }
+.lib-file .icon-btn.danger { color: var(--danger-ink); border-color: var(--danger); }
+.lib-empty { font-size: 0.9375rem; color: var(--ink2); padding: 12px; border: 1px dashed var(--border); border-radius: 12px; }
+.lib-form { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); }
+.lib-form[hidden] { display: none; }
+.lib-form label { font-size: 0.875rem; font-weight: 700; color: var(--ink2); }
+.lib-form-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.lib-form-row input {
+  flex: 1 1 180px; min-width: 0; min-height: var(--tap); padding: 0 12px; font-size: 1rem;
+  border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--ink);
+}
+.lib-footer { display: flex; flex-wrap: wrap; gap: 8px; }
+.lib-footer .btn-primary { flex: 1 1 160px; }
+.lib-slots { font-size: 0.875rem; color: var(--ink2); }
+.lib-status { font-size: 0.9375rem; min-height: 1.5em; }
+.lib-status:empty { min-height: 0; }
+.lib-status[data-tone="error"] { color: var(--danger-ink); }
+
+/* ── 부팅·처리 중 ── */
+body.ui-booting #fieldWrapper::after {
+  content: '기기 저장소를 여는 중'; position: absolute; inset: 0; z-index: 60; border-radius: 6px;
+  display: grid; place-items: center; background: rgba(20, 26, 22, 0.78); color: var(--ink); font-size: 0.9375rem; font-weight: 600;
+}
+body.ui-busy { cursor: progress; }
+
+/* ── 기타 다듬기 ── */
+.toast { font-size: 0.9375rem; max-width: calc(100vw - 24px); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); border-radius: 12px; padding: 10px 16px; }
+.toast-action { min-height: 44px; }
+.dlg { max-width: 380px; }
+.dlg p { font-size: 1rem; }
+.dlg .btn { min-width: 88px; }
+.swatch { width: 36px; height: 36px; }
+.ctx-btn { min-height: 44px; font-size: 0.9375rem; }
+.interest-section { opacity: 0.92; }
+.interest-label { font-size: 0.75rem; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.btn-primary:focus-visible, .app-tab.active:focus-visible, .lib-chip[aria-pressed="true"]:focus-visible { outline-color: var(--accent); }
+
+/* 모바일: 선수 트레이를 하단에 고정해 피치와 함께 보이게 한다 */
+@media (max-width: 1023px) {
+  .player-actions.visible {
+    position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    width: auto; margin: 0 auto; max-width: 560px; z-index: 150;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+  }
+  /* 트레이를 2줄(이름 / 도구 4개 + 닫기)로 압축해 피치를 가리지 않게 한다 */
+  .player-actions.visible {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) var(--tap); column-gap: 6px; row-gap: 6px; padding: 8px;
+  }
+  .player-actions.visible .pa-head, .player-actions.visible .pa-tools { display: contents; }
+  .player-actions.visible .player-actions-name { grid-column: 1 / 4; grid-row: 1; font-size: 0.9375rem; line-height: 1.4; }
+  .player-actions.visible .pa-squad { grid-column: 4 / 6; grid-row: 1; justify-self: end; padding: 0 8px; font-size: 0.8125rem; }
+  .player-actions.visible .pa-tools .btn { grid-row: 2; padding: 0 4px; font-size: 0.875rem; }
+  .player-actions.visible .pa-close { grid-column: 5; grid-row: 2; padding: 0; }
+  body.has-selection { padding-bottom: calc(150px + env(safe-area-inset-bottom, 0px)); }
+  body.has-selection .hint { visibility: hidden; }
+  body.has-selection .toast { bottom: calc(132px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (max-width: 420px) {
+  .export-open-long, .reset-label, .topbar-version { display: none; }
+  .wordmark .wm-sub { display: none; }
+  .file-title { padding: 6px 10px; gap: 8px; }
+  .export-open { padding: 0 12px; }
+}
+@media (max-width: 500px) {
+  body { padding: 10px 12px calc(32px + env(safe-area-inset-bottom, 0px)); }
+  .formation-bar { flex-wrap: nowrap; }
+}
+@media (max-width: 1023px) {
+  /* 인원: 4열 격자로 접어 48px 터치 영역과 큰 글자에서의 줄바꿈을 보장 */
+  .mode-pills { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); flex: 1 1 100%; }
+  .mode-pill, .mode-pill:not(:last-child) { min-height: var(--tap); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); white-space: normal; overflow-wrap: anywhere; line-height: 1.2; padding: 4px 2px; }
+}
+@media (pointer: coarse) {
+  .topbar-btn, .interest-chip { min-height: var(--tap); }
+}
+
+/* 데스크톱: [피치 | 선수 도구] 고정 + 설정 열 */
+@media (min-width: 1024px) {
+  body {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-inline: max(20px, calc((100vw - 1240px) / 2));
+  }
+  .file-bar { grid-column: 1; }
+  .app-tabs { grid-column: 2; width: 380px; }
+  .layout { display: grid; grid-template-columns: auto minmax(340px, 440px); gap: 24px; justify-content: center; align-items: start; max-width: none; }
+  .pane-field {
+    display: grid; max-width: none; position: sticky; top: 12px;
+    grid-template-columns: auto 280px; grid-template-areas: "tabs form" "empty empty" "pitch tools" "hint tools";
+    column-gap: 16px; align-items: start;
+  }
+  .pane-field > .squad-tabs { grid-area: tabs; }
+  .pane-field > .formation-bar { grid-area: form; justify-self: end; }
+  .pane-field > .empty-file { grid-area: empty; }
+  .pane-field > #fieldWrapper, .pane-field #fieldWrapper { grid-area: pitch; max-width: none; width: min(560px, calc((100vh - 236px) * 0.7273)); width: min(560px, calc((100dvh - 236px) * 0.7273)); }
+  .pane-field > .hint { grid-area: hint; }
+  .pane-field > .player-actions { grid-area: tools; align-self: start; }
+  .player-actions { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; }
+  .player-actions:not(.visible) > :not(.pa-empty) { display: none; }
+  .player-actions:not(.visible) > .pa-empty { display: block; }
+  .pa-tools { grid-template-columns: 1fr 1fr; }
+  .pa-close-label { display: none; }
+  body.mode-pattern .pane-field { grid-template-areas: "pitch" "hint"; grid-template-columns: auto; }
+  body.mode-pattern .pane-field > .player-actions { display: none; }
+  body.mode-pattern #fieldWrapper { width: min(600px, calc((100dvh - 150px) * 0.7273)); }
+  body.mode-strategy .layout { grid-template-columns: minmax(0, 640px); }
+  .ui-sheet { align-items: center; }
+  .ui-sheet-panel { border-radius: var(--radius-lg); max-height: 84vh; }
+  .export-panel.as-sheet { top: 50%; bottom: auto; transform: translateY(-50%); max-height: 84vh; border-radius: var(--radius-lg); }
+}
+@media (min-width: 1024px) and (pointer: fine) {
+  .btn, .btn-primary, .app-tab, .squad-tab, .formation-select, .team-name-input, .pattern-name-input, .pattern-nav, .reset-btn { min-height: 44px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ui-sheet:not([hidden]) .ui-sheet-panel, .export-panel.as-sheet { animation: ui-sheet-in 0.18s ease-out; }
+  @keyframes ui-sheet-in { from { opacity: 0.4; transform: translateY(24px); } }
+  @media (min-width: 1024px) { .export-panel.as-sheet { animation: none; } }
+}
+
 </style>
 </head>
 <body class="mode-squad">
@@ -745,6 +1157,26 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   <button class="topbar-btn" onclick="openFeedback()">제보</button>
 </div>
 
+<!-- A 파일 헤더: 팀 › 전술 · 현재 상태 · 저장 상태 · 내보내기 (편집 전용, 상태는 SquadMakerContract에서 읽는다) -->
+<div class="file-bar editor-only" id="fileBar" role="group" aria-label="현재 전술">
+  <button type="button" class="file-title" id="fileTitleBtn" aria-haspopup="dialog" aria-controls="librarySheet">
+    <svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 6l11 0M9 12l11 0M9 18l11 0M5 6l0 .01M5 12l0 .01M5 18l0 .01"/></svg>
+    <span class="file-title-text">
+      <span class="file-title-sub"><span class="sr-only">전술 목록 열기. 현재 팀 </span><span id="fileTeamName">팀</span></span>
+      <span class="file-title-main"><span class="sr-only">현재 전술 </span><span id="fileName">전술</span><span class="file-squad" id="fileSquadName"></span></span>
+    </span>
+  </button>
+  <span class="save-chip" id="saveChip" data-status="idle">
+    <svg class="ui-icon save-chip-ok" aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10"/></svg>
+    <svg class="ui-icon save-chip-warn" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 9v4M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0zM12 16h.01"/></svg>
+    <span id="saveChipText">저장 확인 중</span>
+  </span>
+  <button type="button" class="btn-primary export-open" id="exportOpenBtn" aria-haspopup="dialog" aria-controls="exportPanel">
+    <svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M8.7 10.7l6.6 -3.4M8.7 13.3l6.6 3.4"/></svg>
+    <span>내보내기<span class="export-open-long">·공유</span></span>
+  </button>
+</div>
+
 <!-- 공유 링크로 열린 경우 뷰어 바 -->
 <div id="viewerBar" role="status">
   <span class="vb-title" id="vbTitle"></span>
@@ -754,24 +1186,28 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 
 <!-- 앱 모드 탭 -->
 <div class="app-tabs" role="tablist" aria-label="앱 모드 선택">
-  <button class="app-tab active" role="tab" aria-selected="true"  tabindex="0"  data-app="squad"    onclick="setAppMode('squad')">스쿼드</button>
-  <button class="app-tab"        role="tab" aria-selected="false" tabindex="-1" data-app="pattern"  onclick="setAppMode('pattern')">전술 패턴</button>
+  <button class="app-tab active" role="tab" aria-selected="true"  tabindex="0"  data-app="squad"    onclick="setAppMode('squad')">배치</button>
+  <button class="app-tab"        role="tab" aria-selected="false" tabindex="-1" data-app="pattern"  onclick="setAppMode('pattern')">움직임 패턴</button>
   <button class="app-tab editor-only" role="tab" aria-selected="false" tabindex="-1" data-app="strategy" onclick="setAppMode('strategy')">매치 전략</button>
 </div>
 
 <main aria-label="스쿼드 메이커">
 <div class="save-status editor-only" id="saveStatus" role="status" aria-live="polite">
   <span id="saveStatusText">저장 대기</span>
-  <button class="btn btn-slate" id="retrySaveBtn" onclick="flushSave()" hidden>다시 저장</button>
+  <span class="save-status-actions">
+    <button class="btn btn-slate" id="retrySaveBtn" onclick="flushSave()" hidden>다시 저장</button>
+    <button class="btn btn-slate save-status-backup" type="button" data-ui-action="backup">백업 파일 저장 (.sq)</button>
+    <button class="btn btn-slate save-status-restore" type="button" data-ui-action="restore">백업에서 복원</button>
+  </span>
 </div>
 <div class="layout">
 <div class="pane-field">
 
 <!-- 스쿼드 탭 -->
 <div class="squad-tabs app-squad-only" role="tablist" aria-label="스쿼드 선택">
-  <button class="squad-tab active" role="tab" aria-selected="true"  tabindex="0"  data-squad="basic"   onclick="switchSquad('basic')">기본 스쿼드</button>
-  <button class="squad-tab"        role="tab" aria-selected="false" tabindex="-1" data-squad="attack"  onclick="switchSquad('attack')">공격 스쿼드</button>
-  <button class="squad-tab"        role="tab" aria-selected="false" tabindex="-1" data-squad="defense" onclick="switchSquad('defense')">수비 스쿼드</button>
+  <button class="squad-tab active" role="tab" aria-selected="true"  tabindex="0"  data-squad="basic"   onclick="switchSquad('basic')">기본</button>
+  <button class="squad-tab"        role="tab" aria-selected="false" tabindex="-1" data-squad="attack"  onclick="switchSquad('attack')">공격</button>
+  <button class="squad-tab"        role="tab" aria-selected="false" tabindex="-1" data-squad="defense" onclick="switchSquad('defense')">수비</button>
 </div>
 
 <!-- 포메이션 바 -->
@@ -779,7 +1215,14 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   <span class="squad-badge basic" id="squadBadge">기본</span>
   <label for="formationSelect" class="sr-only">포메이션</label>
   <select class="formation-select editor-only" id="formationSelect" aria-label="포메이션 선택" onchange="onFormationChange()"></select>
-  <button class="btn btn-slate editor-only" style="padding:6px 12px;font-size:0.8rem;" aria-label="포메이션 초기화" onclick="resetLayout()">↺ 초기화</button>
+  <button class="btn btn-slate editor-only reset-btn" aria-label="포메이션 초기화" title="현재 상태의 배치를 포메이션 기본 위치로 되돌립니다" onclick="resetLayout()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg><span class="reset-label">초기화</span></button>
+</div>
+
+<!-- 보관된 전술이 없을 때 (storage.status = no-file) -->
+<div class="empty-file editor-only" id="emptyFileCard" hidden>
+  <p class="empty-file-title">보관된 전술이 없습니다</p>
+  <p class="empty-file-text">지금 보이는 보드는 새 전술을 만들 때 쓰는 임시 화면입니다. 새 전술을 만들면 이 기기에 저장됩니다.</p>
+  <button type="button" class="btn-primary" data-ui-action="new-file">새 전술 만들기</button>
 </div>
 
 <!-- 필드 -->
@@ -791,12 +1234,18 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 <p class="hint editor-only" id="hintText">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제</p>
 
 <div class="player-actions editor-only" id="playerActions" role="toolbar" aria-label="선택한 선수 작업">
-  <span class="player-actions-name" id="playerActionsName"></span>
-  <button class="btn btn-slate" onclick="renameSelectedPlayer()">이름</button>
-  <button class="btn btn-slate" onclick="openSelectedPlayerMenu()">색상·더보기</button>
-  <button class="btn btn-slate" onclick="focusSelectedPlayerNote()">지침</button>
-  <button class="btn btn-red" onclick="removeSelectedPlayer()">삭제</button>
-  <button class="btn btn-slate" aria-label="선수 선택 해제" onclick="clearSelectedPlayer()">닫기</button>
+  <p class="pa-empty">선수를 누르면 이름·색상·지침 도구가 열립니다. 끌면 자리만 옮겨집니다.</p>
+  <div class="pa-head">
+    <span class="player-actions-name" id="playerActionsName"></span>
+    <span class="pa-squad" id="playerActionsSquad"></span>
+    <button class="btn btn-slate pa-close" aria-label="선수 선택 해제" onclick="clearSelectedPlayer()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6l-12 12M6 6l12 12"/></svg><span class="pa-close-label">닫기</span></button>
+  </div>
+  <div class="pa-tools">
+    <button class="btn btn-slate" onclick="renameSelectedPlayer()">이름</button>
+    <button class="btn btn-slate" aria-label="색상·더보기" onclick="openSelectedPlayerMenu()">색상</button>
+    <button class="btn btn-slate" onclick="focusSelectedPlayerNote()">지침</button>
+    <button class="btn btn-red" onclick="removeSelectedPlayer()">삭제</button>
+  </div>
 </div>
 
 </div><!-- /pane-field -->
@@ -806,7 +1255,7 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 <div class="team-setup app-squad-only editor-only" role="group" aria-label="팀 설정">
   <div class="setup-row">
     <label class="setup-label" for="teamName">팀명</label>
-    <input class="team-name-input" id="teamName" type="text" placeholder="팀 이름 입력..." maxlength="20" autocomplete="off" />
+    <input class="team-name-input" id="teamName" type="text" placeholder="이미지·공유 텍스트에 표시" maxlength="20" autocomplete="off" enterkeyhint="done" />
   </div>
   <div class="setup-row">
     <span class="setup-label" id="modeLabel">인원</span>
@@ -816,30 +1265,36 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 
 <!-- 전술 패턴 컨트롤 -->
 <div id="patternUI">
-  <div class="pattern-bar">
-    <label for="patternName" class="sr-only">패턴 이름</label>
-    <input class="pattern-name-input editor-only" id="patternName" placeholder="패턴 이름..." maxlength="20" onchange="renameCurrentPattern()" />
-    <span id="patternNameView" class="viewer-only" style="font-weight:700;font-size:0.9rem;"></span>
+  <!-- 1) 움직임 패턴 고르기 -->
+  <div class="pattern-bar pattern-pick" role="group" aria-label="움직임 패턴 선택">
+    <label for="patternName" class="pattern-label">움직임 패턴</label>
+    <input class="pattern-name-input editor-only" id="patternName" placeholder="패턴 이름..." maxlength="20" enterkeyhint="done" onchange="renameCurrentPattern()" />
+    <span id="patternNameView" class="viewer-only pattern-name-view"></span>
     <div class="pattern-nav">
       <button aria-label="이전 패턴" onclick="prevPattern()">◀</button>
       <span id="patternCounter">1 / 1</span>
       <button aria-label="다음 패턴" onclick="nextPattern()">▶</button>
     </div>
-    <button class="btn btn-blue editor-only" onclick="addPattern()"    style="padding:7px 12px;">+ 추가</button>
-    <button class="btn btn-red editor-only"  onclick="deletePattern()" style="padding:7px 12px;">삭제</button>
+    <button class="btn btn-slate editor-only" onclick="addPattern()">+ 추가<span class="sr-only"> 패턴</span></button>
+    <button class="btn btn-red editor-only"  onclick="deletePattern()">삭제<span class="sr-only"> 패턴</span></button>
   </div>
-  <div class="pattern-bar">
-    <div class="pattern-nav">
+  <!-- 2) 단계 이동과 재생: 좁은 화면에서도 한 줄로 고정 -->
+  <div class="pattern-bar step-bar" role="group" aria-label="단계 이동과 미리보기">
+    <div class="pattern-nav step-nav">
       <button aria-label="이전 단계" onclick="prevStep()">◀</button>
       <span id="stepCounter">단계 1 / 1</span>
       <button aria-label="다음 단계" onclick="nextStep()">▶</button>
     </div>
-    <button class="btn btn-blue editor-only" onclick="addStep()"    style="padding:7px 12px;">+ 단계</button>
-    <button class="btn btn-red editor-only"  onclick="deleteStep()" style="padding:7px 12px;">단계 삭제</button>
+    <button class="btn btn-green play-btn" id="playBtn" onclick="togglePlay()">미리보기</button>
   </div>
-  <div class="controls">
-    <button class="btn btn-green"  id="playBtn"   onclick="togglePlay()">미리보기</button>
-    <button class="btn btn-slate editor-only"  onclick="clearCurrentStep()">↺ 단계 초기화</button>
+  <!-- 3) 단계 편집 -->
+  <div class="pattern-bar step-edit editor-only" role="group" aria-label="단계 편집">
+    <button class="btn btn-slate" onclick="addStep()">+ 단계</button>
+    <button class="btn btn-slate" onclick="clearCurrentStep()">↺ 단계 초기화</button>
+    <button class="btn btn-red"   onclick="deleteStep()">단계 삭제</button>
+  </div>
+  <!-- 4) 움직임 GIF -->
+  <div class="controls pattern-export" role="group" aria-label="움직임 GIF">
     <button class="btn btn-amber"  id="gifBtn"    onclick="exportGif(false)">GIF 저장</button>
     <button class="btn btn-purple" id="gifAllBtn" onclick="exportGif(true)">전체 패턴 GIF</button>
     <button class="interest-chip editor-only" onclick="openInterestPreview('export', 'pattern_controls')">고급 영상 (준비 중)</button>
@@ -848,8 +1303,8 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 
 <!-- 선수 컨트롤 -->
 <div class="controls app-squad-only editor-only" role="toolbar" aria-label="선수 조작">
-  <button class="btn btn-blue" id="addPlayerBtn" onclick="addPlayer()">+ 선수 추가</button>
-  <button class="btn btn-green" onclick="saveImage()">이미지 저장</button>
+  <button class="btn btn-slate" id="addPlayerBtn" onclick="addPlayer()">+ 선수 추가</button>
+  <button class="btn btn-slate" onclick="openPlayerView(null)">선수 시점 보기</button>
 </div>
 
 <!-- 지침 입력 -->
@@ -876,13 +1331,47 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   <button class="btn btn-blue" onclick="openPlayerView(null)">선수 시점 보기</button>
 </div>
 
-<!-- 공유 버튼 -->
-<div class="controls app-squad-only editor-only" role="toolbar" aria-label="공유 및 파일">
-  <button class="btn btn-orange" onclick="openShare()">단톡방 공유 텍스트 생성</button>
-  <button class="btn btn-blue"   onclick="openPlayerView(null)">선수 시점 보기</button>
-  <button class="btn btn-slate"  onclick="saveSquadFile()">파일 저장</button>
-  <button class="btn btn-slate"  onclick="document.getElementById('sqFileInput').click()">파일 불러오기</button>
-</div>
+<!-- 내보내기·공유: 평소에는 카드, 헤더 버튼으로 열면 시트. 결과물(이미지·GIF)·링크·편집 원본 백업을 나눠 표시 -->
+<section class="export-panel editor-only" id="exportPanel" role="region" aria-label="공유 및 파일" tabindex="-1">
+  <div class="export-head">
+    <h2 class="export-title" id="exportTitle">내보내기·공유</h2>
+    <button type="button" class="icon-btn export-close" id="exportCloseBtn" aria-label="내보내기·공유 닫기"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
+  </div>
+  <p class="export-target" id="exportTarget"></p>
+  <div class="export-group exp-png">
+    <h3>이미지 (PNG)</h3>
+    <p>지금 보이는 상태의 배치를 그림으로 만듭니다.</p>
+    <div class="export-actions">
+      <button class="btn btn-slate" onclick="saveImage()">이미지 저장</button>
+      <button class="btn btn-slate native-only" type="button" data-ui-export="export-png" data-ui-destination="share">이미지 공유</button>
+    </div>
+  </div>
+  <div class="export-group exp-gif">
+    <h3>움직임 GIF</h3>
+    <p>움직임 패턴의 단계를 순서대로 보여 줍니다.</p>
+    <div class="export-actions">
+      <button class="btn btn-slate" type="button" data-ui-export="export-gif">현재 패턴 GIF 저장</button>
+      <button class="btn btn-slate" type="button" data-ui-export="export-gif" data-ui-all="true">전체 패턴 GIF 저장</button>
+      <button class="btn btn-slate native-only" type="button" data-ui-export="export-gif" data-ui-destination="share">GIF 공유</button>
+    </div>
+  </div>
+  <div class="export-group exp-link">
+    <h3>링크·텍스트</h3>
+    <p>받는 사람은 읽기 전용 화면으로 열고, 그 사람의 데이터는 바뀌지 않습니다.</p>
+    <div class="export-actions">
+      <button class="btn btn-slate" onclick="openShare()">단톡방 공유 텍스트 생성</button>
+    </div>
+  </div>
+  <div class="export-group exp-backup">
+    <h3>백업 (.sq)</h3>
+    <p>다시 편집할 수 있는 원본 파일입니다. 앱 삭제나 기기 변경에 대비해 따로 보관하세요. 이미지·GIF로는 복원할 수 없습니다.</p>
+    <div class="export-actions">
+      <button class="btn btn-slate" onclick="saveSquadFile()">백업 파일 저장 (.sq)</button>
+      <button class="btn btn-slate" onclick="document.getElementById('sqFileInput').click()">백업에서 복원</button>
+    </div>
+  </div>
+  <p class="export-status" id="exportStatus" role="status" aria-live="polite"></p>
+</section>
 <input type="file" id="sqFileInput" accept=".sq" style="display:none" aria-hidden="true" onchange="loadSquadFile(event)">
 
 <!-- 출시 전 기능 미리보기 — 수요 측정 전용, 기존 무료 기능에 제한 없음 (Task 0.3) -->
@@ -981,6 +1470,42 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
         <div class="share-url-box" id="shareUrlBox" onclick="this.select()"></div>
         <button class="btn btn-blue" style="white-space:nowrap;" onclick="copyShareUrl()">링크 복사</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- 전술 목록 시트: 팀 = 프로젝트, 전술 = 파일. 계약 v2 localLibrary만 읽고 run()으로 바꾼다 -->
+<div class="ui-sheet" id="librarySheet" role="dialog" aria-modal="true" aria-labelledby="librarySheetTitle" hidden>
+  <div class="ui-sheet-panel">
+    <div class="ui-sheet-head">
+      <h2 id="librarySheetTitle">전술 목록</h2>
+      <button type="button" class="icon-btn" id="libraryCloseBtn" aria-label="전술 목록 닫기"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
+    </div>
+    <div class="ui-sheet-body" id="libraryBody">
+      <div class="lib-teams-wrap">
+        <p class="lib-label" id="libTeamsLabel">팀</p>
+        <div class="lib-teams" id="libTeams" role="group" aria-labelledby="libTeamsLabel"></div>
+      </div>
+      <div class="lib-team-actions" id="libTeamActions">
+        <button type="button" class="btn btn-slate" data-lib="rename-team">팀 이름 변경</button>
+        <button type="button" class="btn btn-red" data-lib="delete-team">팀 삭제</button>
+      </div>
+      <form class="lib-form" id="libForm" hidden novalidate>
+        <label for="libFormInput" id="libFormLabel">이름</label>
+        <div class="lib-form-row">
+          <input id="libFormInput" type="text" maxlength="40" autocomplete="off" enterkeyhint="done" required>
+          <button type="submit" class="btn-primary" id="libFormSubmit">저장</button>
+          <button type="button" class="btn btn-slate" id="libFormCancel">취소</button>
+        </div>
+      </form>
+      <p class="lib-label" id="libFilesLabel">전술</p>
+      <ul class="lib-files" id="libFiles" aria-labelledby="libFilesLabel"></ul>
+      <div class="lib-footer">
+        <button type="button" class="btn-primary" data-lib="create-file">+ 새 전술</button>
+        <button type="button" class="btn btn-slate" data-lib="undo-delete" id="libUndoBtn" hidden>최근 삭제 되돌리기</button>
+      </div>
+      <p class="lib-slots" id="libSlots"></p>
+      <p class="lib-status" id="libStatus" role="status" aria-live="polite"></p>
     </div>
   </div>
 </div>
@@ -4207,6 +4732,517 @@ _readyPromise = (async () => {
   }
 })();
 
+</script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// A UI LAYER: 화면 표시 전용 (docs/a-ui-20261007-design.md)
+// 상태는 window.SquadMakerContract에서 읽고 변경은 run()으로만 요청한다.
+// 저장·검증·확인·되돌리기 로직을 여기서 다시 구현하지 않는다.
+// ═══════════════════════════════════════════════════════════════
+(() => {
+  const contract = window.SquadMakerContract;
+  if (!contract) return;
+  const $ = id => document.getElementById(id);
+  const body = document.body;
+  const SQUAD_LABEL = { basic: '기본', attack: '공격', defense: '수비' };
+  const SAVE_SHORT = { idle: '확인 중', pending: '저장 중', saving: '저장 중', saved: '저장됨', error: '저장 실패',
+    blocked: '저장 중단', 'no-file': '전술 없음', 'read-only': '열람 중' };
+  const SAVE_LONG = { idle: '저장 상태 확인 중', pending: '변경 내용을 저장하는 중', saving: '기기에 저장하는 중',
+    saved: '이 기기에 저장됨', error: '저장 실패. 다시 저장하거나 백업 파일을 받아 두세요.',
+    blocked: '저장 데이터를 보호하려고 자동 저장을 멈췄습니다.', 'no-file': '보관된 전술이 없습니다.', 'read-only': '공유 전술 열람 중' };
+  const KIND_LABEL = { png: '이미지', gif: 'GIF', sq: '백업 파일' };
+  const OP_KIND = { 'export-png': 'png', 'export-gif': 'gif', 'export-sq': 'sq' };
+  const CODE_TEXT = {
+    'slots-full': '보관 공간이 가득 찼습니다. 지금 전술은 계속 편집할 수 있고, 다른 전술을 삭제하면 다시 쓸 수 있습니다.',
+    'invalid-name': '이름을 입력해 주세요.',
+    'no-active-file': '열려 있는 전술이 없습니다. 새 전술을 만들어 주세요.',
+    'team-not-found': '팀 목록이 바뀌었습니다. 목록을 다시 확인해 주세요.',
+    'file-not-found': '전술 목록이 바뀌었습니다. 목록을 다시 확인해 주세요.',
+    'undo-unavailable': '되돌릴 삭제가 없습니다.',
+    'revision-overflow': '이 전술의 저장 번호가 한도에 도달했습니다. 백업 파일을 받은 뒤 새 전술로 옮겨 주세요.',
+    'storage-quota': '기기 저장 공간이 부족해 저장하지 못했습니다. 백업 파일을 받아 두세요.',
+    'storage-unavailable': '기기에 저장하지 못했습니다. 다시 시도하거나 백업 파일을 받아 두세요.',
+    'storage-verification': '저장한 내용을 확인하지 못했습니다. 다시 시도하거나 백업 파일을 받아 두세요.',
+    'storage-conflict': '다른 곳에서 저장 데이터가 바뀌어 덮어쓰지 않았습니다. 백업 파일을 받아 두세요.',
+    'storage-read-blocked': '저장 데이터를 보호하는 중이라 바꿀 수 없습니다. 백업에서 복원해 주세요.',
+    'storage-rollback-failed': '저장 데이터 복구를 확인하지 못했습니다. 백업 파일을 받아 두세요.',
+    'read-only': '공유 전술 열람 중에는 바꿀 수 없습니다.',
+    busy: '다른 작업을 처리하고 있습니다. 끝난 뒤 다시 시도해 주세요.',
+    'export-failed': '만들지 못했습니다. 전술은 그대로입니다. 다시 시도해 주세요.',
+    'native-unavailable': '이 브라우저에서는 바로 공유할 수 없습니다. 기기에 저장한 뒤 메신저에서 첨부해 주세요.',
+    'invalid-input': '입력 내용을 확인해 주세요.',
+  };
+  const codeText = code => CODE_TEXT[code] || '처리하지 못했습니다. 전술은 그대로입니다. 다시 시도해 주세요.';
+  let state = contract.getState();
+  let libTeamId = null;
+  let libFormMode = null;
+  let libFormTarget = null;
+  let libScrollTop = 0;
+  const layers = [];
+
+  // ── 피치 배율 보정과 골라인 근처 이름표 ─────────────────────────
+  const field = $('field');
+  const fieldWrapper = $('fieldWrapper');
+  function syncFieldScale() {
+    const match = /scale\(([\d.]+)\)/.exec(field.style.transform || '');
+    const scale = match ? parseFloat(match[1]) : 1;
+    const inverse = Math.min(2.4, Math.max(1, 1 / (scale || 1)));
+    fieldWrapper.style.setProperty('--fi', inverse.toFixed(3));
+  }
+  function decoratePlayers() {
+    field.querySelectorAll('.player').forEach(el => {
+      const top = parseFloat(el.style.top), left = parseFloat(el.style.left);
+      el.classList.toggle('near-goal', top > 590);
+      el.classList.toggle('near-edge', top > 590 && left > 360);
+      const input = el.querySelector('input');
+      if (input && !input.dataset.uiReady) {
+        input.dataset.uiReady = '1';
+        input.enterKeyHint = 'done';
+        input.setAttribute('aria-label', '선수 이름');
+        input.autocomplete = 'off';
+      }
+    });
+  }
+  new MutationObserver(records => {
+    if (records.some(r => r.target === field && r.attributeName === 'style')) syncFieldScale();
+    decoratePlayers();
+  }).observe(field, { attributes: true, attributeFilter: ['style'], childList: true, subtree: true });
+  syncFieldScale();
+  decoratePlayers();
+
+  // 짧은 터치 탭 → 공개 계약 select-player (R1: touchstart가 click을 막는 환경에서도 선택 도구가 열리게).
+  // select-player는 멱등이라 브라우저가 click을 함께 보내도 결과가 같다. 끌기·길게 누르기는 기존 처리 그대로.
+  let tap = null;
+  field.addEventListener('touchstart', event => {
+    const el = event.target.closest('.player');
+    if (!el || event.touches.length !== 1 || el.querySelector('input')) { tap = null; return; }
+    const touch = event.touches[0];
+    tap = { id: Number(el.dataset.id), x: touch.clientX, y: touch.clientY, at: Date.now(), moved: false };
+  }, { passive: true });
+  document.addEventListener('touchmove', event => {
+    if (!tap || !event.touches.length) return;
+    const touch = event.touches[0];
+    if (Math.hypot(touch.clientX - tap.x, touch.clientY - tap.y) > 8) tap.moved = true;
+  }, { passive: true });
+  document.addEventListener('touchend', () => {
+    const current = tap;
+    tap = null;
+    if (!current || current.moved || Date.now() - current.at > 450 || state.view?.readOnly) return;
+    if ($('ctxMenu').classList.contains('visible')) return;
+    contract.run('select-player', { id: current.id });
+  }, { passive: true });
+
+  // ── 공통 렌더 ─────────────────────────────────────────────────
+  function libraryNames(s) {
+    const lib = s.localLibrary || {};
+    const team = (lib.teams || []).find(t => t.id === lib.teamId);
+    const file = (lib.items || []).find(f => f.id === lib.fileId);
+    return { lib, team, file };
+  }
+  function currentPatternName(s) {
+    const pattern = (s.snapshot?.pat || [])[s.view?.patternIndex || 0];
+    return pattern?.n || '';
+  }
+  function render() {
+    const s = state;
+    const readOnly = Boolean(s.view?.readOnly);
+    const appMode = s.view?.appMode || 'squad';
+    body.classList.toggle('ui-booting', !s.ready);
+    body.classList.toggle('ui-busy', Boolean(s.busy?.mutation || s.export?.busy));
+    body.classList.toggle('platform-native', Boolean(s.platform?.native));
+    body.classList.toggle('has-selection', !readOnly && appMode === 'squad' && $('playerActions').classList.contains('visible'));
+
+    const { lib, team, file } = libraryNames(s);
+    const squad = SQUAD_LABEL[s.snapshot?.squad] || '기본';
+    $('fileTeamName').textContent = team?.name || (lib.supported ? '팀 없음' : '이 기기');
+    $('fileName').textContent = file?.name || (s.storage?.status === 'no-file' ? '보관된 전술 없음' : '전술');
+    $('fileSquadName').textContent = appMode === 'pattern' ? '움직임 패턴' : `${squad} 배치`;
+
+    const status = s.storage?.status || 'idle';
+    const chip = $('saveChip');
+    chip.dataset.status = status;
+    $('saveChipText').textContent = SAVE_SHORT[status] || SAVE_SHORT.error;
+    chip.title = SAVE_LONG[status] || SAVE_LONG.error;
+
+    $('emptyFileCard').hidden = readOnly || status !== 'no-file';
+    $('playerActionsSquad').textContent = `${squad} 배치`;
+
+    const form = s.snapshot?.squads?.[s.snapshot?.squad]?.f || '';
+    const target = appMode === 'pattern'
+      ? `${file?.name || '현재 보드'} · 움직임 패턴 "${currentPatternName(s)}"`
+      : `${file?.name || '현재 보드'} · ${squad} 배치${form ? ' ' + form : ''}`;
+    $('exportTarget').textContent = `대상: ${target}`;
+    if (s.export?.busy) setExportStatus(`${KIND_LABEL[s.export.kind] || '결과물'} 만드는 중입니다.`, 'busy');
+    // 목록 데이터가 실제로 바뀐 경우에만 다시 그린다 (저장 상태 변화마다 다시 그리면 키보드 포커스를 잃는다)
+    if (!$('librarySheet').hidden && librarySignature(lib) !== lastLibrarySignature) renderLibrary();
+  }
+  let lastLibrarySignature = '';
+  function librarySignature(lib) {
+    return JSON.stringify([lib.teams, (lib.items || []).map(f => [f.id, f.teamId, f.name, f.updatedAt]),
+      lib.fileId, lib.undoDeleteAvailable, lib.slots, libTeamId]);
+  }
+
+  // ── 레이어(시트) 관리 ─────────────────────────────────────────
+  const backdrop = document.createElement('div');
+  backdrop.className = 'ui-backdrop';
+  backdrop.hidden = true;
+  document.body.appendChild(backdrop);
+  const focusables = root => [...root.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+    .filter(el => !el.disabled && !el.hidden && el.getClientRects().length);
+  function pushLayer(layer) {
+    layer.opener = document.activeElement;
+    layer.scrollY = window.scrollY;
+    layers.push(layer);
+    body.classList.add('ui-sheet-open');
+  }
+  function popLayer(layer) {
+    const index = layers.indexOf(layer);
+    if (index >= 0) layers.splice(index, 1);
+    if (!layers.length) body.classList.remove('ui-sheet-open');
+    window.scrollTo(0, layer.scrollY);
+    if (layer.opener && typeof layer.opener.focus === 'function' && document.contains(layer.opener)) layer.opener.focus({ preventScroll: true });
+  }
+  const topLayer = () => layers[layers.length - 1];
+
+  // 내보내기: 같은 카드를 시트로 띄운다 (기존 모달 장치를 쓰지 않아 내보내기가 busy로 막히지 않는다)
+  const exportPanel = $('exportPanel');
+  const exportLayer = { el: exportPanel, close: () => closeExport() };
+  function openExport() {
+    if (exportPanel.classList.contains('as-sheet')) return;
+    pushLayer(exportLayer);
+    exportPanel.classList.add('as-sheet');
+    exportPanel.setAttribute('role', 'dialog');
+    exportPanel.setAttribute('aria-modal', 'true');
+    exportPanel.setAttribute('aria-labelledby', 'exportTitle');
+    exportPanel.removeAttribute('aria-label');
+    backdrop.hidden = false;
+    exportPanel.scrollTop = 0;
+    $('exportCloseBtn').focus({ preventScroll: true });
+  }
+  function closeExport() {
+    if (!exportPanel.classList.contains('as-sheet')) return false;
+    exportPanel.classList.remove('as-sheet');
+    exportPanel.setAttribute('role', 'region');
+    exportPanel.removeAttribute('aria-modal');
+    exportPanel.removeAttribute('aria-labelledby');
+    exportPanel.setAttribute('aria-label', '공유 및 파일');
+    backdrop.hidden = true;
+    popLayer(exportLayer);
+    return true;
+  }
+  backdrop.addEventListener('click', () => closeExport());
+  $('exportOpenBtn').addEventListener('click', openExport);
+  $('exportCloseBtn').addEventListener('click', closeExport);
+  // 링크·텍스트는 기존 공유 창을 연다. 시트를 먼저 닫아 창이 겹치지 않게 한다.
+  exportPanel.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (button && /단톡방 공유 텍스트/.test(button.textContent)) closeExport();
+  }, true);
+
+  function setExportStatus(text, tone) {
+    const el = $('exportStatus');
+    el.textContent = text;
+    el.dataset.tone = tone || '';
+  }
+  exportPanel.querySelectorAll('[data-ui-export]').forEach(button => {
+    button.addEventListener('click', () => {
+      const payload = {};
+      if (button.dataset.uiAll === 'true') payload.allPatterns = true;
+      if (button.dataset.uiDestination) payload.destination = button.dataset.uiDestination;
+      contract.run(button.dataset.uiExport, payload);
+    });
+  });
+
+  function exportMessage(result) {
+    const kind = KIND_LABEL[OP_KIND[result.operation]] || '결과물';
+    if (result.status === 'success') {
+      if (result.completion === 'file-saved') return [`${kind}을(를) 선택한 위치에 저장했습니다.`, 'ok'];
+      if (result.completion === 'share-sheet-finished') return ['공유 화면을 닫았습니다. 받는 사람에게 전달됐는지는 메신저에서 확인해 주세요.', 'ok'];
+      return [`${kind} 다운로드를 요청했습니다. 브라우저의 다운로드 목록을 확인해 주세요.`, 'ok'];
+    }
+    if (result.status === 'cancelled') return ['취소했습니다. 전술은 그대로입니다.', ''];
+    if (result.status === 'unsupported') return [codeText(result.code), 'error'];
+    return [codeText(result.code), 'error'];
+  }
+
+  // 전술 목록 시트
+  const librarySheet = $('librarySheet');
+  const libraryLayer = { el: librarySheet, close: () => closeLibrary() };
+  function openLibrary(options = {}) {
+    if (!librarySheet.hidden) return;
+    const { lib } = libraryNames(state);
+    libTeamId = lib.teamId || lib.teams?.[0]?.id || null;
+    pushLayer(libraryLayer);
+    librarySheet.hidden = false;
+    setLibStatus('');
+    hideLibForm();
+    renderLibrary();
+    $('libraryBody').scrollTop = libScrollTop;
+    if (options.create) showLibForm('create-file');
+    else (librarySheet.querySelector('.lib-open[aria-current="true"]') || $('libraryCloseBtn')).focus({ preventScroll: true });
+  }
+  function closeLibrary() {
+    if (librarySheet.hidden) return false;
+    libScrollTop = $('libraryBody').scrollTop;
+    librarySheet.hidden = true;
+    hideLibForm();
+    popLayer(libraryLayer);
+    return true;
+  }
+  $('fileTitleBtn').addEventListener('click', () => openLibrary());
+  $('libraryCloseBtn').addEventListener('click', closeLibrary);
+  librarySheet.addEventListener('click', event => { if (event.target === librarySheet) closeLibrary(); });
+
+  function setLibStatus(text, tone) {
+    const el = $('libStatus');
+    el.textContent = text;
+    el.dataset.tone = tone || '';
+  }
+  function relativeTime(value) {
+    const time = typeof value === 'number' ? value : Date.parse(value);
+    if (!Number.isFinite(time)) return '';
+    const diff = Date.now() - time;
+    if (diff < 60000) return '방금 수정';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}분 전 수정`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}시간 전 수정`;
+    return `${new Date(time).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })} 수정`;
+  }
+  const iconPath = {
+    edit: 'M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4M13.5 6.5l4 4',
+    trash: 'M4 7l16 0M10 11l0 6M14 11l0 6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3',
+  };
+  function iconButton(kind, label, onClick, danger) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'icon-btn' + (danger ? ' danger' : '');
+    button.setAttribute('aria-label', label);
+    button.innerHTML = `<svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="${iconPath[kind]}"/></svg>`;
+    button.addEventListener('click', onClick);
+    return button;
+  }
+  function renderLibrary() {
+    const { lib } = libraryNames(state);
+    const teams = lib.teams || [];
+    if (!teams.some(t => t.id === libTeamId)) libTeamId = lib.teamId || teams[0]?.id || null;
+    lastLibrarySignature = librarySignature(lib);
+    const focusKey = librarySheet.contains(document.activeElement) ? document.activeElement.dataset.libKey : null;
+    const teamsEl = $('libTeams');
+    teamsEl.replaceChildren();
+    teams.forEach(team => {
+      const count = (lib.items || []).filter(f => f.teamId === team.id).length;
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'lib-chip';
+      chip.setAttribute('aria-pressed', String(team.id === libTeamId));
+      chip.dataset.libKey = `team:${team.id}`;
+      chip.textContent = `${team.name} (${count})`;
+      chip.addEventListener('click', () => { libTeamId = team.id; hideLibForm(); renderLibrary(); });
+      teamsEl.appendChild(chip);
+    });
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'lib-chip lib-chip-add';
+    add.dataset.libKey = 'team-add';
+    add.textContent = '+ 새 팀';
+    add.addEventListener('click', () => showLibForm('create-team'));
+    teamsEl.appendChild(add);
+    $('libTeamActions').hidden = !libTeamId;
+
+    const files = (lib.items || []).filter(f => f.teamId === libTeamId)
+      .sort((a, b) => (Date.parse(b.updatedAt) || b.updatedAt || 0) - (Date.parse(a.updatedAt) || a.updatedAt || 0));
+    const list = $('libFiles');
+    list.replaceChildren();
+    if (!files.length) {
+      const empty = document.createElement('li');
+      empty.className = 'lib-empty';
+      empty.textContent = libTeamId ? '이 팀에 보관된 전술이 없습니다. 새 전술을 만들어 보세요.' : '팀을 먼저 만들어 주세요.';
+      list.appendChild(empty);
+    }
+    files.forEach(file => {
+      const item = document.createElement('li');
+      item.className = 'lib-file';
+      const open = document.createElement('button');
+      open.type = 'button';
+      open.className = 'lib-open';
+      open.dataset.libKey = `open:${file.id}`;
+      const current = file.id === lib.fileId;
+      if (current) open.setAttribute('aria-current', 'true');
+      const name = document.createElement('span');
+      name.className = 'lib-file-name';
+      name.textContent = file.name;
+      const meta = document.createElement('span');
+      meta.className = 'lib-file-meta';
+      meta.textContent = relativeTime(file.updatedAt);
+      if (current) {
+        const mark = document.createElement('span');
+        mark.className = 'lib-current';
+        mark.textContent = ' · 편집 중';
+        meta.appendChild(mark);
+      }
+      open.append(name, meta);
+      open.addEventListener('click', () => current ? closeLibrary() : runLibrary('open-file', { id: file.id }, file.name));
+      const edit = iconButton('edit', `${file.name} 이름 변경`, () => showLibForm('rename-file', file));
+      const remove = iconButton('trash', `${file.name} 삭제`, () => runLibrary('delete-file', { id: file.id }, file.name), true);
+      edit.dataset.libKey = `edit:${file.id}`;
+      remove.dataset.libKey = `del:${file.id}`;
+      item.append(open, edit, remove);
+      list.appendChild(item);
+    });
+    $('libUndoBtn').hidden = !lib.undoDeleteAvailable;
+    const createButton = librarySheet.querySelector('[data-lib="create-file"]');
+    createButton.disabled = !libTeamId;
+    $('libSlots').textContent = slotText(lib);
+    // 다시 그린 뒤에도 같은 항목에 포커스를 돌려준다. 항목이 사라졌으면 닫기 버튼으로.
+    if (focusKey) {
+      const target = librarySheet.querySelector(`[data-lib-key="${CSS.escape(focusKey)}"]`) || $('libraryCloseBtn');
+      target.focus({ preventScroll: true });
+    }
+  }
+  function slotText(lib) {
+    const slots = lib.slots || {};
+    if (!lib.supported) return '';
+    if (slots.policy === 'preview-unlimited' || slots.limit == null) {
+      return `보관 중 ${slots.used ?? 0}개. 미리보기 빌드는 보관 개수를 제한하지 않습니다. 무료 보관 수량은 아직 정해지지 않았습니다.`;
+    }
+    const base = `보관 중 ${slots.used} / ${slots.limit} (테스트 정책 값)`;
+    return slots.status === 'full' ? `${base}. 가득 찼습니다. 지금 전술은 계속 편집할 수 있고, 삭제하면 다시 쓸 수 있습니다.` : base;
+  }
+
+  const FORM_LABEL = { 'create-file': '새 전술 이름', 'rename-file': '전술 이름', 'create-team': '새 팀 이름', 'rename-team': '팀 이름' };
+  function showLibForm(mode, target) {
+    const { lib } = libraryNames(state);
+    libFormMode = mode;
+    libFormTarget = target || null;
+    $('libFormLabel').textContent = FORM_LABEL[mode];
+    const input = $('libFormInput');
+    if (mode === 'rename-file') input.value = target.name;
+    else if (mode === 'rename-team') input.value = (lib.teams || []).find(t => t.id === libTeamId)?.name || '';
+    else if (mode === 'create-file') input.value = `전술 ${(lib.items || []).filter(f => f.teamId === libTeamId).length + 1}`;
+    else input.value = '';
+    $('libFormSubmit').textContent = mode.startsWith('create') ? '만들기' : '저장';
+    $('libForm').hidden = false;
+    if (mode === 'create-file') setLibStatus('지금 보드를 복사해 새 전술로 보관합니다.');
+    input.focus();
+    input.select();
+  }
+  function hideLibForm() {
+    libFormMode = null;
+    libFormTarget = null;
+    $('libForm').hidden = true;
+  }
+  $('libFormCancel').addEventListener('click', () => { hideLibForm(); setLibStatus(''); });
+  $('libForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    const name = $('libFormInput').value.trim();
+    if (!name) { setLibStatus(codeText('invalid-name'), 'error'); $('libFormInput').focus(); return; }
+    const mode = libFormMode;
+    const payload = mode === 'create-file' ? { teamId: libTeamId, name }
+      : mode === 'rename-file' ? { id: libFormTarget.id, name }
+      : mode === 'rename-team' ? { id: libTeamId, name } : { name };
+    const result = await runLibrary(mode, payload, name);
+    if (result?.status === 'success') {
+      hideLibForm();
+      if (mode === 'create-team' && result.teamId) { libTeamId = result.teamId; renderLibrary(); }
+    }
+  });
+  librarySheet.querySelectorAll('[data-lib]').forEach(button => {
+    button.addEventListener('click', () => {
+      const action = button.dataset.lib;
+      if (action === 'create-file') showLibForm('create-file');
+      else if (action === 'rename-team') showLibForm('rename-team');
+      else if (action === 'delete-team') {
+        const team = (state.localLibrary?.teams || []).find(t => t.id === libTeamId);
+        if (team) runLibrary('delete-team', { id: team.id }, team.name);
+      } else if (action === 'undo-delete') runLibrary('undo-delete', {}, '');
+    });
+  });
+  const LIB_DONE = {
+    'create-file': name => `"${name}" 전술을 만들고 이 기기에 저장했습니다.`,
+    'rename-file': name => `이름을 "${name}"(으)로 바꿨습니다.`,
+    'create-team': name => `"${name}" 팀을 만들었습니다.`,
+    'rename-team': name => `팀 이름을 "${name}"(으)로 바꿨습니다.`,
+    'delete-file': name => `"${name}" 전술을 삭제했습니다. 이 세션에서 최근 삭제 한 번을 되돌릴 수 있습니다.`,
+    'delete-team': name => `"${name}" 팀과 전술을 삭제했습니다. 이 세션에서 최근 삭제 한 번을 되돌릴 수 있습니다.`,
+    'undo-delete': () => '최근 삭제를 되돌렸습니다.',
+  };
+  async function runLibrary(operation, payload, name) {
+    setLibStatus('처리하고 있습니다.');
+    const result = await contract.run(operation, payload);
+    if (result.status === 'success') {
+      if (operation === 'open-file') {
+        closeLibrary();
+        showToast(`"${name}" 전술을 열었습니다.`);
+      } else setLibStatus(LIB_DONE[operation]?.(name) || '완료했습니다.');
+    } else if (result.status === 'cancelled') setLibStatus('취소했습니다. 바뀐 것은 없습니다.');
+    else setLibStatus(codeText(result.code), 'error');
+    return result;
+  }
+
+  // ── 저장 경고 띠·빈 상태 버튼 ──────────────────────────────────
+  document.addEventListener('click', event => {
+    const button = event.target.closest('[data-ui-action]');
+    if (!button) return;
+    const action = button.dataset.uiAction;
+    if (action === 'backup') contract.run('export-sq');
+    else if (action === 'restore') $('sqFileInput').click();
+    else if (action === 'new-file') openLibrary({ create: true });
+  });
+
+  // ── 결과 표시 ─────────────────────────────────────────────────
+  document.addEventListener('squad-maker:result', event => {
+    const result = event.detail || {};
+    if (OP_KIND[result.operation] && result.status !== 'busy') {
+      const [text, tone] = exportMessage(result);
+      setExportStatus(text, tone);
+    } else if (OP_KIND[result.operation] && result.status === 'busy') {
+      setExportStatus(codeText('busy'), 'error');
+    }
+  });
+
+  // ── 키보드: 열린 시트 안에서 Tab 순환, Esc 닫기 ────────────────
+  document.addEventListener('keydown', event => {
+    const layer = topLayer();
+    if (!layer || document.querySelector('.dlg-backdrop')) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      if (layer === libraryLayer && !$('libForm').hidden) { hideLibForm(); setLibStatus(''); return; }
+      layer.close();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const items = focusables(layer.el);
+    if (!items.length) return;
+    const index = items.indexOf(document.activeElement);
+    if (event.shiftKey && (index <= 0)) { event.preventDefault(); items[items.length - 1].focus(); }
+    else if (!event.shiftKey && (index === items.length - 1 || index < 0)) { event.preventDefault(); items[0].focus(); }
+  });
+
+  // ── 소프트 키보드: 입력 칸이 키보드에 가리지 않게 ─────────────────
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      const active = document.activeElement;
+      if (active && active.matches('input, textarea') && !active.closest('#field')) active.scrollIntoView({ block: 'nearest' });
+    });
+  }
+
+  // ── Android 뒤로가기: 열린 레이어 하나만 닫고 처리 여부 반환 (선택은 유지) ──
+  function closeTopLayer() {
+    const menu = $('ctxMenu');
+    if (menu && menu.classList.contains('visible')) { hideCtxMenu(); return true; }
+    const arrowPop = document.querySelector('.arrow-pop');
+    if (arrowPop) { arrowPop.remove(); return true; }
+    const layer = topLayer();
+    if (layer === libraryLayer && !$('libForm').hidden) { hideLibForm(); return true; }
+    if (layer) { layer.close(); return true; }
+    const interest = $('interestModal');
+    if (interest && interest.classList.contains('visible') && typeof closeInterestPreview === 'function') { closeInterestPreview(); return true; }
+    return false;
+  }
+  window.SquadUi = Object.freeze({ closeTopLayer, openLibrary, openExport });
+
+  contract.subscribe(next => { state = next; render(); });
+  contract.ready().then(next => { state = next; render(); });
+})();
 </script>
 </body>
 </html>
