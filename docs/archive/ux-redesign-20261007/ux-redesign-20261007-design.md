@@ -1,3 +1,5 @@
+> **이력 문서**: 이 파일의 선택 대기·범위·추천은 당시 기록입니다. 현재는 A가 선택되었고 B/C는 선택되지 않았습니다. 최신 기준은 [상품 기획서](../../product-plan.md)입니다.
+
 # UX 개편 계획과 시안 3종: 설계
 
 - slug: `ux-redesign-20261007` · [분석](ux-redesign-20261007-analysis.md) · [작업](ux-redesign-20261007-tasks.md)

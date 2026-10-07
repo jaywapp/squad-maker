@@ -1,19 +1,27 @@
-# squad-maker 문서 규칙
+# 스쿼드 메이커 문서 안내
 
-이 디렉터리는 `D:\\work\\squad-maker\\docs\\`에 있는 프로젝트 관련 문서의 기준 위치입니다.
+**최신 기준은 [상세 상품 기획서](product-plan.md)입니다.** 사용자 선택은 A — 피치 중심 코치형입니다. 제품 방향과 현재 웹 구현을 구분하며, 미정 수량·가격·기술을 확정하지 않습니다.
 
-## 문서 작성 규칙
+| 읽을 목적 | 문서 |
+|---|---|
+| 사용자·문제·단계별 기능·화면·슬롯·출시 기준 | [상세 상품 기획서](product-plan.md) |
+| A의 실제 원본 캡처와 아직 반영되지 않은 개선 | [A 자료](design-a/README.md) |
+| 요청·권한·근거·이번 문서 작업 범위 | [분석](squad-product-20261007-analysis.md) |
+| 정보 구조·저장/이전·화면·구매 계약 제안 | [설계](squad-product-20261007-design.md) |
+| 의존성·담당·검증·미정으로 차단된 구현 | [작업 계획](squad-product-20261007-tasks.md) |
+| 운영 웹의 기능·실행·테스트·운영 참고 | [현재 웹 구현 참고](current-web-reference.md) |
+| 문서 전수 분류·이동·참조 검증 결과 | [정리 기록](documentation-audit.md) |
 
-- 요구사항이 부족하거나 모호하면 구현 전에 질문을 모아 확인하고, 답변·근거·가정을 `*-analysis.md`에 기록합니다.
-- 확정 설계는 `*-design.md`, 실행 순서는 `*-tasks.md`에 기록합니다.
-- `*-tasks.md`의 모든 작업에는 `owner`, `model`, `effort`, `depends_on`, `parallel_group`, `verification`, `status`를 지정합니다.
-- 독립 작업은 같은 오케스트레이터의 Codex 서브에이전트로 병렬 실행하고, 공유 파일·스키마를 변경하는 작업은 순차 실행합니다.
-- 웹 페이지나 주요 UX/UI 변경은 `docs/ux-concepts/<slug>/concept-01..03`의 서로 다른 콘셉트 샘플을 먼저 제시하고 사용자 선택을 받은 뒤 구현합니다.
-- UX/UI 작업에는 `impeccable`과 `design-taste-frontend` 스킬을 적용합니다.
-- Vercel은 웹 프리뷰·호스팅 기본값이며, 동적 데이터·인증·스토리지는 Supabase를 우선 검토합니다. 실제 배포는 명시적 요청이 있을 때만 수행합니다.
-- 시크릿·토큰·키·`.env` 값은 문서·로그·커밋에 기록하지 않습니다.
+## 유지하는 근거와 운영 참고
 
-이 저장소의 기존 문서 인덱스와 생성 규칙이 있으면 그 규칙을 우선하며, 기존 파일을 덮어쓰지 않습니다.
+- [2026-10-07 독립 UX 검토 원본](2026-10-07-ux-ui-independent-review.md): 원본 환경의 관찰·추정. 새로운 Android 검증 결과가 아니다.
+- [분석 이벤트 사전](analytics-event-dictionary.md), [분석 ADR 0001](adr/0001-analytics-provider.md): 현재 웹 구현 참고. 과거 가격·가입 가설은 최신 상품 기준에서 제외.
+- 성능·안정성 이력: [분석](runtime-resilience-20260909-analysis.md), [설계](runtime-resilience-20260909-design.md), [작업·검증](runtime-resilience-20260909-tasks.md).
+- 워크스페이스 설정 이력: [분석](workspace-environment-setup-analysis.md), [설계](workspace-environment-setup-design.md), [작업](workspace-environment-setup-tasks.md).
+- [보관 문서·선택되지 않은 B/C·이전 비교안](archive/README.md). 과거 “선택 대기”, 구독·가격·GitHub Pages·CI 부재 언급은 당시 기록이다.
 
-- 2026-09-09 성능·안정성: [분석](runtime-resilience-20260909-analysis.md), [설계](runtime-resilience-20260909-design.md), [작업](runtime-resilience-20260909-tasks.md)
-- 2026-10-07 UX 개편 계획·시안 3종: [분석](ux-redesign-20261007-analysis.md), [설계](ux-redesign-20261007-design.md), [작업](ux-redesign-20261007-tasks.md), [시안](ux-redesign-20261007/claude/README.md)
+## 작성 규칙
+
+저장소 [AGENTS](../AGENTS.md)와 [CLAUDE](../CLAUDE.md)를 우선합니다. 분석·설계·작업의 역할을 나누고 확정/제안/미정/현 구현을 표기합니다. 실제 UX 구현 전에는 요구된 디자인 스킬·pre-flight와 사용자 선택 기록을 확인합니다. 이번 작업은 기존 A 선택을 기록하며 운영 UI를 구현하지 않습니다.
+
+문서의 진입점은 이 파일 하나로 유지합니다. 새 내용은 여기서 연결하고 오래된 계획은 archive로 분류합니다. 원본 증거·라이선스·지침·운영 설정을 임의로 삭제하지 않습니다. 시크릿·토큰·키·.env 값은 문서에 남기지 않습니다.
