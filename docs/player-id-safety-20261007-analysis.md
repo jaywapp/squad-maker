@@ -28,3 +28,7 @@
 - C-03의 팀/파일 보관·슬롯 카운터는 Q1/Q2/Q9가 미정이므로 이번 수정으로 완료 표시하지 않는다. Android 프레임워크/서명도 임의 확정하지 않는다.
 
 수정 요구와 범위는 사용자가 이미 승인했으므로 반복 승인을 요구하지 않는다. Claude 대상 확인 후에도 운영 index.html 인계는 C-02/C-03 및 검증 head 조건을 충족해야 한다. APK는 빌드·설치·서명·체크섬 검증 및 실제 Release 게시 전까지 미제공 상태다.
+
+## 검증 결과
+
+[GitHub Actions #37576252366](https://github.com/jaywapp/squad-maker/actions/runs/37576252366)에서 기준 브라우저의 중복 ID assertion 실패를 확인하고, 수정본은 API 7 / 웹 161 passed / 1 skipped를 통과했다. 5개 신규 회귀를 두 viewport에서 모두 통과했다. 기존 모바일 전체 GIF skip은 유지했다. 검증한 소스/테스트 SHA는 `aafc5efa0f9e033576ae98b63fcc718c06d596c1`이다. 실제 Android·OS 공유·설치 검증은 실행하지 않았다.

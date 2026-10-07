@@ -24,3 +24,11 @@ CI는 현재 저장소의 Node 22·npm ci·고정 vendor·Playwright 설정을 �
 ## 인터페이스와 소유권
 
 SquadMakerContract v1과 v:1/.sq/#s= 인터페이스는 변하지 않는다. 새 팀/파일/슬롯/native adapter는 포함하지 않는다. Codex는 별도 branch의 index.html과 새 회귀 파일, 이 문서만 쓴다. 독립 Codex 리뷰는 읽기 전용이고 공유 로컬 파일이나 원본 PR42를 쓰지 않는다. Claude 운영 UI 인계는 별도 실행 트리와 최종 검증 SHA에서 순차로 한다.
+
+## APK 후속 전달 준비 (미빌드)
+
+[참고 Android workflow](https://github.com/jaywapp/gyungchung-mobile/blob/fa176d2b44b9d6604a39807e22b1fff20a8ead10/.github/workflows/android-release.yml#L100)의 서명 검사→동일 APK 설치→해시 패키징→Draft 자산 검증→공개 순서를 확인했다. [원격 자산 검사](https://github.com/jaywapp/gyungchung-mobile/blob/fa176d2b44b9d6604a39807e22b1fff20a8ead10/scripts/verify-public-release.mjs)는 APK/manifest/체크섬 일치와 Draft 상태를 요구한다. 해당 앱의 ID·키·토큰·Expo 스택·업데이트 서버는 복사하지 않는다.
+
+현재 Squad Maker main/PR42 트리에 Android 앱·Gradle·APK workflow가 없고 조회 당시 Releases도 0개다. 정상 지원 실행 경로로 T-01 후보를 만들어 파일 저장/복원·OS 공유·오프라인·접근성을 시험해야 한다. PR41 A-04는 Q6 정식 채택 전 제한된 후보 APK도 허용하므로 Q6 미정 하나만으로 초기 APK를 차단하지 않는다.
+
+초기 후보도 P0-03·T-01 검증, 전용 앱 식별자·서명 경로, 동일 APK의 설치/오프라인 저장/재시작·서명·해시 확인이 필요하다. 기본 Release 후보는 squad-maker 자체다. 현재는 그 증거와 빌드가 없으며, 새 서명 자격 증명·영구 권한 설정은 목적/보관/복구 책임이 구체화된 뒤 승인을 받는다.
