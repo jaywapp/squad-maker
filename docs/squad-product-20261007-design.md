@@ -28,7 +28,7 @@ flowchart LR
 |---|---|---|
 | 팀 프로젝트 | id, name, createdAt, updatedAt | 전술 파일의 그룹. 팀 공통 명단 상속/동기화는 미확정 |
 | 전술 파일 | id, teamId, title, schemaVersion, revision, snapshot | 기본/공격/수비와 패턴을 포함하는 안 |
-| 파일 내용 | 현 v:1 roster/squads/patterns/match 등 | 실제 필드는 현 snapshot 계약에서 추출. 누락·임의 변경 금지 |
+| 파일 내용 | 현 v:1 roster/squads/pat 등 | 실제 필드는 현 snapshot 계약에서 추출. 매치 입력의 영속화는 별도 제안이며 현재 v:1에 없음 |
 | 목록 요약 | fileId, title, updatedAt, saveStatus | 원본 저장 성공 후 일관되게 갱신 |
 | 슬롯 정책 | policyVersion, unit, freeCapacity | 모두 사용자 결정 뒤 확정. 시안 숫자 사용 금지 |
 | 구매 권한 | 확인된 상품·권한량·처리 식별·검증 상태 | 전술 백업/공유 문서와 분리. 민감 원문을 문서·로그에 기록하지 않음 |
