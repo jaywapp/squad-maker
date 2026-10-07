@@ -28,3 +28,5 @@ UI는 A 원본을 보존하며 Claude가 담당한다. C-02/C-03 완료 전에�
 ## 진행 결과
 
 C-02/C-03와 native 경계를 구현했고 통합 단위93/웹185 passed(기존1skip), unsigned build/lint를 확인했다. 세부 결과와 남은 UI·서명·설치·Release 조건은 실행 기록에 구분한다. 현재 구현은 A UI 교체 완료나 설치 검증 APK 게시 완료가 아니다. 새 서명키/휴대폰/Claude 직접 전달 질문에 사용자 답변은 아직 없으므로 해당 종속 작업을 실행하지 않았다.
+
+cc037a8 CI의 단위93/웹187(기존1skip)/unsigned Android build도 성공했다. 후속 긴 내보내기 파일명 경계 보완에서 단위95와 unsigned build/lint를 재확인했다. 최종 native SHA의 CI는 PR에서 확인한다.

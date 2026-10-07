@@ -45,6 +45,7 @@ async function toBase64(blob) {
 async function exportFile(blob, filename, mimeType, destination = 'save') {
   if (!native) return { status: 'unsupported', code: 'native-unavailable' };
   try {
+    filename = String(filename).replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_').slice(0, 160) || 'squad-export';
     const data = await toBase64(blob);
     if (destination === 'share') {
       const staged = await Documents.stage({ data, filename, mimeType });

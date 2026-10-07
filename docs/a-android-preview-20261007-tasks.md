@@ -11,7 +11,7 @@
 | C-02/03 integration | Codex/Codex | root GPT-6 / high | module | sequential-core | index.html, 계약/fixture | async 저장·모듈 연결·v1 교환 유지·목록 선택 보존 | 완료 |
 | C-03 E2E | Codex/Codex | gpt-6.1-sol / high + root 회귀 보완 | integration | independent-test | e2e/local-library.spec.js | 팀/파일·재시작·슬롯·실패·readonly·revision | 완료: 최종 관련56/56 |
 | native review | Codex/Codex | gpt-6.1-sol / high | native 코드 | independent-read | 읽기 전용 | Bundle 크기·UI thread·마지막 저장·AtomicFile read | 4건 보완 완료 |
-| native JS boundary | Codex/Codex | gpt-6.1-sol / high | native 보완 | independent-test | unit/platform-native.test.js | back·bytes·취소/오류·CAS·광고 facade | 완료: 36/36 |
+| native JS boundary | Codex/Codex | gpt-6.1-sol / high | native 보완 | independent-test | unit/platform-native.test.js | back·bytes·취소/오류·CAS·광고 facade | 완료: 최종38/38 |
 | A-01/02 | Codex/Codex | root GPT-6 / high | T-01·계약 | native | Android, app/platform-native.js, bundle/scripts | unsigned assembleRelease·lint·로컬 export 실제 생성 | 구현/빌드 완료, OS 설치 검증 대기 |
 | R-02 preview | Codex/Codex | root GPT-6 / high | native | test-ads | SquadAdsPlugin, sample manifest ID | 별도 영역·test SDK·오프라인 | 연결 구현 완료, 광고 실동작·비간섭 검증 대기 |
 | Claude handoff | Codex/Codex | root GPT-6 / medium | C-03 SHA | handoff | 요청문·계약 v2 | 지원 대상·직접 전달 여부 구분 | 요청문 준비, 직접 전달 미실행 |
@@ -26,7 +26,7 @@
 - PR43 CI 37576625976 success/정확한 head 확인. baseline 재실행 API7+web161 passed/1skip.
 - 통합 전체 `npm test`: 단위93/93, 웹185 passed / 기존 mobile 전체 GIF 1skip(총186). 외부 web 요청을 차단하고 Android 오프라인 bundle 실제 PNG/GIF 생성도 두 viewport 통과.
 - 이후 다른 파일 삭제·undo 시 현재 선택을 유지하는 회귀를 추가했다. 최종 관련 재검증(local-library + ui-contract, 두 viewport)은 56/56 통과했다.
-- native JS mock 테스트와 브라우저 fake adapter는 OS/SAF/광고 검증으로 주장하지 않는다.
+- 후속 native 파일명 메타데이터 제한(160자) 및 본문 무손실 회귀2개를 추가했고 단위95/95, unsigned build/lint를 재확인했다. native JS mock 테스트와 브라우저 fake adapter는 OS/SAF/광고 검증으로 주장하지 않는다.
 - unsigned `:app:assembleRelease :app:lintRelease` 성공. package `com.jaywapp.squadmaker.preview`, versionCode1001/versionName0.1.0-preview.1, min24/target36. 최종 lint0errors/15warnings; ManifestOrder 및 Android12 데이터 추출 규칙을 보완했다. 라이브러리 업데이트 권고/템플릿 unused/icon 경고를 무단 의존성 업그레이드로 숨기지 않는다.
 - 새 키 생성·서명·APK 설치·실기기·Release 게시/재다운로드는 실행하지 않았다. ADB 연결 기기는 없음. 다른 앱의 키·ID·계정/비밀값을 사용하지 않았다.
 - UI 전용 session 도구 확인은 실패했으며 Claude에게 직접 보냈다고 보고하지 않는다. 사용자 붙여넣기 및 UI 완료 SHA 응답 대기.
@@ -40,6 +40,6 @@
 
 ## C-03 구현 SHA와 UI 파일 동결
 
-구현/관련 회귀 SHA: `bc1e76a0de598ec651a717438086c42014f36ef7`. snapshot v1을 유지한 계약 v2. 전체93단위/185웹+1skip 후 선택 보존 변경의 관련56/56도 통과했다. 최종 CI는 PR head에서 별도로 확인한다.
+구현/관련 회귀 SHA: `bc1e76a0de598ec651a717438086c42014f36ef7`. snapshot v1을 유지한 계약 v2. 전체93단위/185웹+1skip 후 선택 보존 변경의 관련56/56도 통과했다. cc037a8 head CI 37586386849: 단위93/웹187 passed+기존1skip, unsigned Android build 성공. native 메타데이터 보완의 최종 CI는 PR head에서 별도로 확인한다.
 
 현재 Codex는 index.html/UI 자산 편집을 멈췄다. Claude는 원격 전용 브랜치의 최신 commit에서 별도 checkout/branch를 만들고 U-02/U-03을 진행할 수 있다. app/local-library.js·app/platform-native.js·Android·package/lockfile·기능 회귀 테스트는 Codex 소유다. 직접 세션 전달은 여전히 미실행이며 준비된 요청문으로 인계한다.

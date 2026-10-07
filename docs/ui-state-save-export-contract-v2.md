@@ -58,7 +58,7 @@
 
 웹 `completion:'download-requested'`는 다운로드 요청이다. Android save는 SAF 파일 선택기에서 쓰기와 close 완료 후 `file-saved`, 취소는 cancelled/null이다. Android share는 cache 파일+OS sheet 종료 후 `share-sheet-finished`이며 수신 앱 전달 완료로 표시하지 않는다. 웹 destination:share는 native-unavailable이다. native 생성 공유 링크는 `https://squad-maker.vercel.app/#s=...`이고 localhost 링크를 외부에 전달하지 않는다.
 
-생성/선택기/공유 동안 export.busy를 유지한다. 실패·취소 이후 원래 snapshot·선택을 보존하고 잠금을 해제한다. PNG 생성 timeout 30초, GIF 생성 90초/worker fetch 15초. 사용자가 파일 위치를 선택하는 시간에 임의 timeout을 두지 않는다. 큰 SAF 데이터는 cache 파일로 전달하여 Activity Bundle에 이미지 본문을 넣지 않는다. OS 강제 종료로 중단된 export 성공을 주장하지 않는다.
+생성/선택기/공유 동안 export.busy를 유지한다. 실패·취소 이후 원래 snapshot·선택을 보존하고 잠금을 해제한다. PNG 생성 timeout 30초, GIF 생성 90초/worker fetch 15초. 사용자가 파일 위치를 선택하는 시간에 임의 timeout을 두지 않는다. 큰 SAF 데이터는 cache 파일로 전달하여 Activity Bundle에 이미지 본문을 넣지 않는다. 파일명/OS 공유 제목은 native 경계에서 160자로 제한하고 경로 제어 문자를 치환하며 파일 본문은 그대로 유지한다. OS 강제 종료로 중단된 export 성공을 주장하지 않는다.
 
 Android 뒤로가기는 확인 취소/시트·모달 닫기 우선, 내보내기/보호 작업 중 종료 금지, 종료 전 저장·revision 일치 확인이다. Claude UI는 `window.SquadUi.closeTopLayer():boolean`으로 열린 레이어만 닫고 처리 여부를 반환할 수 있다. 레이어 닫기는 선택을 지우지 않는다.
 

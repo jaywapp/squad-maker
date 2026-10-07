@@ -63,6 +63,7 @@ public class SquadDocumentsPlugin extends Plugin {
                 try (FileOutputStream output = new FileOutputStream(staged)) { output.write(data(call)); }
                 // Capacitor persists this call in Activity saved state. Keep the large bytes out of its Bundle.
                 call.getData().remove("data");
+                call.getData().put("filename", filename(call));
                 call.getData().put("stagedToken", token);
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);

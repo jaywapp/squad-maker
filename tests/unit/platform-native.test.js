@@ -302,3 +302,17 @@ test('web evaluation registers no native listeners and cannot access native stor
   assert.deepEqual(copy(await app.platform.getAdState()), { status: 'unsupported' });
   assert.equal(app.calls.length, 0); assert.equal(Object.isFrozen(app.platform), true);
 });
+
+for (const destination of ['save', 'share']) {
+  test('native ' + destination + ' bounds long filename metadata without truncating file bytes', async () => {
+    const app = harness();
+    const bytes = Buffer.from('original snapshot content');
+    const result = await app.platform.exportFile(new Blob([bytes]), '../' + 'x'.repeat(1200000) + '.sq', 'application/json', destination);
+    assert.equal(result.status, 'success');
+    const staged = app.calls.find(call => call.method === (destination === 'save' ? 'document-save' : 'document-stage')).payload;
+    assert.ok(staged.filename.length <= 160);
+    assert.equal(staged.filename.includes('/'), false);
+    assert.deepEqual(Buffer.from(staged.data, 'base64'), bytes);
+    if (destination === 'share') assert.ok(app.calls.find(call => call.method === 'share').payload.title.length <= 160);
+  });
+}

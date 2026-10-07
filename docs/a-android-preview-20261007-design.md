@@ -20,3 +20,7 @@ Codex는 `app/local-library.js`, 보관/native 테스트·Android/build/scripts,
 Capacitor8 + 자체 AtomicFile/SAF/test-ad plugin을 선택했다. 제한된 native WebView는 bridge/lifecycle 부담, RN/Flutter 재작성은 기존 회귀 및 렌더러 재사용 손실 때문에 제외했다. [결정 근거](android-preview-architecture.md)와 [계약 v2](ui-state-save-export-contract-v2.md)를 따른다. Android asset bundle은 export 라이브러리와 원문 MIT notice를 포함하며 웹 CDN/분석 요청에 의존하지 않는다. 기존 앱의 ID/키/secret/서버/자동 업데이트를 복사하지 않는다.
 
 서명 승인 전에는 프로젝트와 unsigned 빌드까지 준비한다. 새 자격 증명을 묵시적으로 만드는 debug build는 실행하지 않는다. 승인 후 전용 test 서명 APK를 동일 파일로 설치·검증한다. Release에는 APK, SHA-256, package/version/build SHA, 서명 종류와 포함/미포함 범위, 설치·업데이트/로컬 백업 안내를 제공한다. 게시 자산을 바꿔치기하지 않는다.
+
+## Native 내보내기 복원 경계
+
+SAF 본문은 cache staging 후 작은 token으로 넘기고 worker에서 provider로 스트리밍한다. 긴 복원 팀명이 파일명/공유 제목 메타데이터로 Activity 상태나 Intent 한도를 키우지 않도록160자로 제한한다. 본문 bytes는 자르지 않는다. 같은 source의 단위 회귀와 unsigned build/lint로 재확인했다.
