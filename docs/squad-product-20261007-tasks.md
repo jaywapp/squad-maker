@@ -60,8 +60,8 @@ Q 번호와 결정 근거는 [사용자 결정 목록](product-plan.md#14-사용
 
 현재 운영 UI와 기능이 모두 `index.html`에 있으므로 아래 규칙을 기본으로 한다.
 
-1. Codex가 P0 보호와 C-01 계약을 완료한다. C-02에서 동작 보존 가능한 최소 경계를 만들 수 있으면 파일별 소유권을 정한다. 경계를 위한 대규모 프레임워크 이전은 추가하지 않는다.
-2. 경계를 만들지 않으면 **같은 파일은 순차 인계**한다. Codex 변경의 검증된 커밋과 정리된 작업 상태를 넘긴 뒤 Claude가 그 SHA에서 별도 실행 트리로 시작한다. 두 도구가 `index.html`을 동시에 수정하지 않는다.
+1. Codex가 P0 보호와 C-01 계약을 완료한다. C-02에서 동작 보존 가능한 최소 경계를 만들 수 있으면 파일별 소유권을 정하고, 그렇지 않으면 순차 인계 규칙을 정한다. 이어 C-03 로컬 보관을 완료·검증한다. 경계를 위한 대규모 프레임워크 이전은 추가하지 않는다.
+2. 경계를 만들지 않으면 **같은 파일은 순차 인계**한다. C-02에서 인계 조건만 정하고, C-03까지 완료·검증한 최종 커밋과 정리된 작업 상태를 넘긴 뒤 Claude가 그 SHA에서 운영 UI 작업을 시작한다. 두 도구가 `index.html`을 동시에 수정하지 않는다.
 3. Claude는 U-01~03 범위만 구현하고 기능 계약 변경 요청은 별도 인계한다. I-01 통합 담당은 Claude의 마지막 SHA에서 기능 회귀를 확인한다. UI 수정이 필요하면 Claude로 돌려보내고 기능 결함은 Codex 묶음에서 고친다.
 4. 코드 통합·PR·병합은 해당 후속 요청의 권한 안에서만 한다. 상태가 달라졌으면 새 변경을 읽고 계획을 조정하며 기존 작업을 reset/덮어쓰기 하지 않는다.
 
@@ -124,14 +124,14 @@ Q 번호와 결정 근거는 [사용자 결정 목록](product-plan.md#14-사용
 - **목적:** 동일 `index.html`의 충돌을 예방한다.
 - orchestrator: Codex · owner: Codex · model: 구현용 Codex 계열 추천 · effort: medium · status: blocked (C-01)
 - depends_on: C-01 · parallel_group: ownership · files: `index.html`과 최소 경계 파일(선택 시), 회귀·인계 기록
-- **입력/산출:** 계약 → UI/상태/저장/export의 실제 허용 경로 목록 또는 한 파일의 순차 인계 규칙.
-- **verification:** 분리할 경우 동작 보존 회귀가 통과하고 각 파일 담당이 하나다. 분리하지 않을 경우 기능 작업을 정리한 SHA와 Claude 독점 편집 기간을 명시한다. 두 도구가 같은 파일을 수정하는 병렬 계획은 허용하지 않는다.
+- **입력/산출:** 계약 → UI/상태/저장/export의 실제 허용 경로 목록 또는 한 파일의 순차 인계 조건. 운영 UI 실제 인계는 C-03 완료 뒤다.
+- **verification:** 분리할 경우 동작 보존 회귀가 통과하고 각 파일 담당이 하나다. 분리하지 않을 경우 C-02는 규칙만 확정하고 C-03 완료·검증된 최종 SHA에서 Claude 독점 편집 기간을 시작한다. U-01 mock은 별도 경로로만 진행할 수 있다. 두 도구가 같은 파일을 수정하는 병렬 계획은 허용하지 않는다.
 
 ### C-03 팀/전술 로컬 보관과 이전
 
 - **목적:** 팀=프로젝트, 전술=파일의 로컬 목록과 재사용 슬롯을 구현한다.
 - orchestrator: Codex · owner: Codex · model: 고성능 Codex 계열 추천 · effort: high · status: blocked (G-SLOTS)
-- depends_on: C-01,C-02,G-SLOTS; native 저장 방식은 G-FRAMEWORK · parallel_group: local-data · files: 로컬 저장 계층·이전/카운터 테스트·fixture
+- depends_on: C-01,C-02,G-SLOTS; native 저장 방식은 G-FRAMEWORK · parallel_group: local-data · files: 로컬 저장 계층·이전/카운터 테스트·fixture, 미분리 시 `index.html` (Claude 운영 인계 전)
 - **입력/산출:** Q1/Q2 및 Q9의 첫 출시 복구/백업 결정, 기존 단일 저장 레코드 → 버전 있는 팀/파일 저장·목록 요약·이전 기록·UI용 상태.
 - **verification:** 신규/수정/자동저장/삭제/복원/되돌리기의 원본과 카운터가 일치한다. 수정·자동저장은 차감하지 않고 삭제하면 슬롯을 다시 쓴다. 이전·복원 실패는 원본을 보존한다. 기존 브라우저 데이터는 Android에서 자동 접근한다고 가정하지 않는다.
 
@@ -181,7 +181,7 @@ Q 번호와 결정 근거는 [사용자 결정 목록](product-plan.md#14-사용
 - orchestrator: Codex · owner: Codex · model: 구현용 Codex 계열 추천 · effort: high · status: blocked (G-ADS)
 - depends_on: A-03,R-01,Q7,Q11; 광고 UI 변경은 Claude 별도 인계 · parallel_group: sdk-integration · files: 광고 adapter·필요 앱 설정·테스트·실측 정책 문서
 - **입력/산출:** 사용자 광고 결정·검증된 Android 기반 → 테스트 광고·동의/오류 동작·실측 통신 고지.
-- **verification:** 테스트 광고로 무응답/오프라인/취소·레이아웃 안정·오클릭·편집/자동저장 무중단을 확인한다. 실제 수집·전송과 Data safety/개인정보 고지가 일치한다. 설정·공유 파일을 쓰는 다른 SDK 작업과 순차 실행한다.
+- **verification:** 실제 Android 테스트 빌드의 테스트 광고로 무응답/오프라인/취소·레이아웃 안정·오클릭·편집/자동저장 무중단을 확인한다. 실제 수집·전송과 Data safety/개인정보 고지가 일치한다. 설정·공유 파일을 쓰는 다른 SDK 작업과 순차 실행한다.
 
 ### R-03 첫 출시 완료 기준과 제출 준비
 
@@ -189,7 +189,7 @@ Q 번호와 결정 근거는 [사용자 결정 목록](product-plan.md#14-사용
 - orchestrator: Codex · owner: Codex · model: 고성능 Codex 계열 추천 · effort: high · status: blocked (선행 검증)
 - depends_on: A-03,R-02,R-01; B-01은 Q5에서 첫 출시 포함을 정했을 때만 · parallel_group: release-verify · files: 출시 검증 기록·스토어 자료·지원/정책 문서
 - **입력/산출:** 포함 범위·테스트/기기/정책 증거 → [기획 12장](product-plan.md#12-테스트와-출시-완료-기준) 항목별 결과와 제출 준비 판정.
-- **verification:** Q1/Q2/Q6/Q7/Q8 중 포함 공유 범위/Q9 중 첫 출시 백업·복구/Q11 및 Q5의 도입 시점이 결정되어야 한다. 결제를 미뤘다면 Q3/Q4/구매 환불 상세, 2차 Q10은 제외 이유와 함께 후속 blocked로 남긴다. 치명적 손실·접근 불가·저장/공유 실패가 남으면 보류한다. 스토어 제출·공개·배포는 실제 별도 요청에서 수행한다.
+- **verification:** Q1/Q2/Q6/Q7/Q8 중 포함 공유 범위/Q9 중 첫 출시 백업·복구/Q11 및 Q5의 도입 시점이 결정되어야 한다. 결제를 미뤘다면 Q3/Q4/구매 환불 상세, 2차 Q10은 제외 이유와 함께 후속 blocked로 남긴다. 광고와 도입한 구매·동의 UI까지 포함한 최종 head SHA의 동일 테스트 빌드에서 저장/복원/오프라인/PNG·GIF/OS 공유와 핵심 접근성 회귀를 실제 Android로 확인한다. SDK 도입 전 A-03 증거만으로 새 빌드를 통과시키지 않는다. UI 변경은 Claude 증거도 갱신한다. 치명적 손실·접근 불가·저장/공유 실패가 남으면 보류한다. 스토어 제출·공개·배포는 실제 별도 요청에서 수행한다.
 
 ### B-01 선택 시점의 영구 슬롯 구매·권한 복원
 
@@ -267,8 +267,8 @@ W0~W5는 Codex 단일 트리(당시 기록 model `gpt-6`, 설계/검토 high·�
 |---|---|---|---|---|---|---|
 | W6 | 병합된 기획·지침·새 UI 담당 요청 → 범위/역할/게이트 확인 | 현재 설정 모델 / high | - / docs-read | 지침·최신 문서 읽기 | main SHA·현재 권한·기존 결정 대조 | done (로컬 확인 blocked) |
 | W7 | 기존 tasks/design → 실행 로드맵·UI 계약·인계 | 현재 설정 모델 / high | W6 / docs-draft | tasks/design/analysis/product-plan/문서 안내 | 모든 작업 ID·의존성·입출력·완료 기준, 상태 구분 | done |
-| W8 | 원본과 초안 → 독립 검토·링크/보호 범위 검사 | 현재 설정 모델 / high | W7 / docs-review | 관련 문서 읽기·정리 기록 | 내부 경로/앵커·기획 일치·비문서 blob 동일 | in_progress (정적 검사 통과·독립 초안 검토 대기) |
-| W9 | 검증한 문서 → 전용 브랜치 커밋·Draft PR | 현재 설정 모델 / medium | W8 / docs-publish | 위 문서만 | 원격 최신 main/head·diff·Draft 상태 | ready (게시 권한 있음·원격 PR 결과 확인 예정) |
+| W8 | 원본과 초안 → 독립 검토·링크/보호 범위 검사 | 현재 설정 모델 / high | W7 / docs-review | 관련 문서 읽기·정리 기록 | 내부 경로/앵커·기획 일치·비문서 blob 동일 | done (정적 검사·독립 검토와 교정 완료) |
+| W9 | 검증한 문서 → 전용 브랜치 커밋·Draft PR | 현재 설정 모델 / medium | W8 / docs-publish | 위 문서만 | 원격 최신 main/head·diff·Draft 상태 | in_progress (전용 브랜치 게시 완료·Draft PR 확인 예정) |
 
 W6의 로컬 status/branch 확인은 Windows sandbox 초기화 오류로 실행되지 않았다. 기존 로컬 변경·설정은 건드리지 않고 GitHub 커넥터로 원격 main 기반 문서만 게시한다. W8 독립 검토는 Codex 하위 에이전트의 read-only 작업이며 작성/게시와 공유 파일을 수정하지 않는다.
 
