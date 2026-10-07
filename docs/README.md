@@ -23,6 +23,7 @@
 - [분석 이벤트 사전](analytics-event-dictionary.md), [분석 ADR 0001](adr/0001-analytics-provider.md): 현재 웹 구현 참고. 과거 가격·가입 가설은 최신 상품 기준에서 제외.
 - 성능·안정성 이력: [분석](runtime-resilience-20260909-analysis.md), [설계](runtime-resilience-20260909-design.md), [작업·검증](runtime-resilience-20260909-tasks.md).
 - 워크스페이스 설정 이력: [분석](workspace-environment-setup-analysis.md), [설계](workspace-environment-setup-design.md), [작업](workspace-environment-setup-tasks.md).
+- A 운영 UI(U-02/U-03, Claude): [분석](a-ui-20261007-analysis.md), [설계](a-ui-20261007-design.md), [작업·검증](a-ui-20261007-tasks.md), [Codex 인계](a-ui-20261007-handoff.md). 화면 검증은 Chromium 에뮬레이션이며 실제 Android 검증이 아니다.
 - [보관 문서·선택되지 않은 B/C·이전 비교안](archive/README.md). 과거 “선택 대기”, 구독·가격·GitHub Pages·CI 부재 언급은 당시 기록이다.
 
 ## 작성 규칙
