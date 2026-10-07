@@ -1,0 +1,1562 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>택틱스스튜디오 시안</title>
+<meta name="color-scheme" content="dark">
+<meta name="description" content="SquadMaker UX 시안 C. 팀은 프로젝트, 전술은 파일로 다루는 편집 도구 콘셉트. 데모 데이터만 사용합니다.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Concept C: Tactics Studio. Navy workspace, cobalt as the single accent.
+   Shape rule: controls, panels, chips = 6px radius. Pitch glyphs (tokens, ball, keyframe diamonds) keep domain shapes.
+   Icons: inline SVG paths from Tabler Icons (MIT License, https://tabler.io/icons). */
+:root{
+  --bg:#0A1222;
+  --panel:#0F1A2E;
+  --panel-2:#14223C;
+  --raise:#1A2B4A;
+  --line:#22324F;
+  --line-2:#2F4369;
+  --text:#E9EEF8;
+  --text-2:#AAB7CF;
+  --text-3:#8695B1;
+  --cobalt:#2F55E6;
+  --cobalt-hover:#3A61F0;
+  --cobalt-ink:#93ABFF;
+  --cobalt-wash:rgba(47,85,230,.18);
+  --warn:#F0B44C;
+  --warn-bg:#2A2013;
+  --warn-line:#6E5122;
+  --pitch-a:#1C4F3B;
+  --pitch-b:#1A4936;
+  --r:6px;
+  --font:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font:400 14px/1.5 var(--font);-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+button,input,select,textarea{font:inherit;color:inherit}
+*{scrollbar-color:#2F4369 transparent;scrollbar-width:thin}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#2F4369;border-radius:6px;border:2px solid var(--panel)}
+::-webkit-scrollbar-thumb:hover{background:#3B5383}
+h1,h2,h3,p{margin:0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid var(--cobalt-ink);outline-offset:2px}
+[hidden]{display:none!important}
+
+.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- buttons & fields ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 14px;border-radius:var(--r);border:1px solid var(--line-2);background:var(--panel-2);color:var(--text);font-weight:500;font-size:14px;cursor:pointer;white-space:nowrap;transition:background-color .15s,border-color .15s,transform .1s}
+.btn:hover{background:var(--raise);border-color:#3B5383}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--cobalt);border-color:var(--cobalt);color:#F4F7FF}
+.btn.primary:hover{background:var(--cobalt-hover);border-color:var(--cobalt-hover)}
+.btn.ghost{background:transparent}
+.btn.ghost:hover{background:var(--panel-2)}
+.btn.wide{width:100%}
+.btn.small{min-height:36px;padding:0 12px;font-size:13px}
+.btn[disabled],.icon-btn[disabled]{opacity:.42;cursor:not-allowed;transform:none}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:var(--r);border:1px solid transparent;background:transparent;color:var(--text-2);cursor:pointer;transition:background-color .15s,color .15s}
+.icon-btn:hover{background:var(--panel-2);color:var(--text)}
+.icon-btn.boxed{border-color:var(--line-2);background:var(--panel-2);color:var(--text)}
+.icon-btn.play{background:var(--cobalt);color:#F4F7FF;border-color:var(--cobalt)}
+.icon-btn.play:hover{background:var(--cobalt-hover)}
+.field{display:flex;flex-direction:column;gap:6px}
+.lbl{font-size:12px;font-weight:500;color:var(--text-2)}
+.inp,.sel{height:40px;border-radius:var(--r);border:1px solid var(--line-2);background:var(--bg);color:var(--text);padding:0 10px;min-width:0}
+.sel{padding-right:30px;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--text-2) 50%),linear-gradient(135deg,var(--text-2) 50%,transparent 50%);background-position:calc(100% - 15px) 17px,calc(100% - 10px) 17px;background-size:5px 5px;background-repeat:no-repeat;cursor:pointer}
+.inp:focus,.sel:focus{border-color:var(--cobalt-ink)}
+.help{font-size:12px;color:var(--text-3);line-height:1.5}
+kbd{font-family:var(--mono);font-size:11px;padding:1px 5px;border:1px solid var(--line-2);border-radius:4px;color:var(--text-2)}
+.tag{display:inline-flex;align-items:center;height:20px;padding:0 6px;border:1px dashed var(--cobalt-ink);border-radius:var(--r);color:var(--cobalt-ink);font-size:11px;font-weight:600;line-height:1;flex:none;white-space:nowrap}
+
+/* ---------- app shell ---------- */
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:600px}
+.note{flex:none;min-height:26px;display:flex;align-items:center;justify-content:center;padding:3px 12px;font-size:12px;color:var(--text-2);background:#070D19;border-bottom:1px solid var(--line);text-align:center;line-height:1.35}
+.top{flex:none;height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--panel);border-bottom:1px solid var(--line);position:relative;z-index:5}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;letter-spacing:-.01em;white-space:nowrap}
+.brand-mark{width:12px;height:12px;background:var(--cobalt);transform:rotate(45deg);border-radius:2px;box-shadow:0 0 0 3px var(--cobalt-wash)}
+.crumb{display:flex;align-items:baseline;gap:8px;min-width:0;padding-left:14px;border-left:1px solid var(--line)}
+.crumb-team{color:var(--text-2);white-space:nowrap}
+.crumb-sep{color:var(--text-3)}
+.crumb-file{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumb-meta{font-size:12px;color:var(--text-3);white-space:nowrap}
+.spacer{flex:1}
+.save{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);white-space:nowrap;padding:4px 8px;border-radius:var(--r);transition:background-color .4s}
+.save .ic{width:18px;height:18px}
+.save.is-saved .ic{color:var(--cobalt-ink)}
+.save.is-failed{color:var(--warn)}
+.save.flash{background:var(--cobalt-wash)}
+.save-ago{font-size:12px;color:var(--text-3)}
+.save-short{display:none}
+.top .btn-files{display:none;gap:6px;width:auto;padding:0 10px}
+.mobile-demo{display:none}
+.btn-files .mono{font-size:12px;color:var(--text-2)}
+.demo-wrap{position:relative}
+.demo-menu{position:absolute;right:0;top:calc(100% + 8px);width:300px;background:var(--panel);border:1px solid var(--line-2);border-radius:var(--r);box-shadow:0 18px 48px rgba(2,6,14,.55);padding:8px;z-index:20}
+.demo-menu p{font-size:12px;color:var(--text-3);padding:6px 8px 8px}
+.demo-item{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;min-height:48px;padding:8px 10px;border:0;border-radius:var(--r);background:transparent;text-align:left;cursor:pointer}
+.demo-item:hover,.demo-item:focus-visible{background:var(--panel-2)}
+.demo-item b{font-weight:600;font-size:14px}
+.demo-item span{font-size:12px;color:var(--text-3)}
+
+.fail{flex:none;display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--warn-bg);border-bottom:1px solid var(--warn-line);color:#F6DDB0;font-size:13px}
+.fail > .ic{color:var(--warn)}
+.fail p{flex:1;min-width:0}
+.fail b{color:#FCE7C2;font-weight:600}
+.fail-act{display:flex;gap:8px;flex:none}
+.fail .btn{background:transparent;border-color:var(--warn-line);color:#FCE7C2}
+.fail .btn:hover{background:#3A2C17}
+
+.work{flex:1;min-height:0;display:grid;grid-template-columns:272px minmax(0,1fr) 304px;grid-template-areas:"files center insp"}
+
+/* ---------- files (project tree) ---------- */
+.files{grid-area:files;display:flex;flex-direction:column;min-height:0;overflow:auto;background:var(--panel);border-right:1px solid var(--line)}
+.files-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px 4px}
+.files-h h2{font-size:12px;font-weight:600;color:var(--text-3);letter-spacing:.02em}
+.files-close{display:none}
+.files-body{display:flex;flex-direction:column;flex:1;padding:6px 12px 16px}
+.proj{display:flex;flex-direction:column;gap:12px;padding:10px 8px 16px;border-bottom:1px solid var(--line)}
+.proj-h{display:flex;align-items:center;gap:8px}
+.proj-h .ic{color:var(--cobalt-ink)}
+.proj-name{font-weight:600;font-size:15px}
+.proj-meta{margin-left:auto;font-size:12px;color:var(--text-3)}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;padding:16px 8px 8px}
+.sec-h h3{font-size:13px;font-weight:600;color:var(--text-2)}
+.sec-h .mono{font-size:12px;color:var(--text-3)}
+.flist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.frow{display:flex;align-items:stretch;border-radius:var(--r);transition:background-color .15s}
+.frow:hover{background:var(--panel-2)}
+.frow.is-active{background:var(--cobalt-wash)}
+.fopen{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;min-height:56px;padding:8px 8px 8px 10px;border:0;background:transparent;text-align:left;cursor:pointer;border-radius:var(--r)}
+.fname{display:flex;align-items:baseline;gap:1px;max-width:100%;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.frow.is-active .fname{color:#DCE4FF;font-weight:600}
+.fext{font-size:12px;color:var(--text-3)}
+.fmeta{display:flex;gap:10px;font-size:12px;color:var(--text-3)}
+.frow.is-active .fmeta{color:var(--text-2)}
+.fdel{height:auto;min-height:48px;width:48px;color:var(--text-3)}
+.fdel:hover{color:var(--text)}
+.fempty{padding:14px 10px;color:var(--text-3);font-size:13px;border:1px dashed var(--line-2);border-radius:var(--r)}
+.newtac{margin-top:10px}
+.slots{margin-top:16px;padding:12px 8px 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.slots-top{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--text-2)}
+.slots-top .mono{color:var(--text)}
+.cells{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px}
+.cell{height:8px;border-radius:2px;border:1px solid var(--line-2)}
+.cell.on{background:var(--cobalt);border-color:var(--cobalt)}
+.slotnote{margin-top:12px;padding:12px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--panel-2);display:flex;flex-direction:column;gap:8px}
+.slotnote-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.slotnote-h b{font-size:14px}
+.slotnote p{font-size:13px;color:var(--text-2)}
+.slotnote .btn{align-self:flex-start}
+.files-foot{margin-top:auto;padding-top:40px}
+.ad-slot{display:flex;flex-direction:column;gap:2px;padding:14px;border:1px dashed var(--line-2);border-radius:var(--r);color:var(--text-3);font-size:12px;background:repeating-linear-gradient(135deg,transparent 0 9px,rgba(134,149,177,.06) 9px 10px)}
+.ad-slot b{font-weight:500;font-size:13px;color:var(--text-2)}
+
+/* ---------- center ---------- */
+.center{grid-area:center;display:flex;flex-direction:column;min-width:0;min-height:0}
+.toolbar{flex:none;display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+.seg{display:inline-flex;padding:3px;gap:2px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--bg)}
+.seg button{min-height:34px;min-width:52px;padding:0 12px;border:0;border-radius:4px;background:transparent;color:var(--text-2);font-weight:500;cursor:pointer}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--raise);color:var(--text);box-shadow:inset 0 0 0 1px var(--line-2)}
+.formf{display:flex;align-items:center;gap:8px}
+.formf .lbl{white-space:nowrap}
+.formf .sel{height:40px;font-family:var(--mono)}
+.edit-ctx{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-3);white-space:nowrap}
+.edit-ctx b{color:var(--cobalt-ink);font-weight:600}
+.stage{flex:1;min-height:0;position:relative;background:var(--bg)}
+#pitch{position:absolute;top:10px;left:12px;width:calc(100% - 24px);height:calc(100% - 20px);display:block;touch-action:none;overflow:visible;user-select:none;-webkit-user-select:none}
+
+/* pitch svg */
+.pl{fill:none;stroke:rgba(240,246,255,.72);stroke-width:2.5}
+.pf{fill:rgba(240,246,255,.8)}
+.mv{stroke:var(--cobalt-ink);stroke-width:3.5;stroke-linecap:round;fill:none}
+.pass{stroke:#F7F9FD;stroke-width:2.5;stroke-dasharray:7 6;fill:none;opacity:.92}
+.ghost{fill:none;stroke:rgba(247,249,253,.55);stroke-width:2;stroke-dasharray:4 4}
+.tok{cursor:grab;outline:none}
+.tok:active{cursor:grabbing}
+.t-hit{fill:transparent}
+.t-body{stroke-width:3}
+.t-num{fill:#F7F9FD;font-family:var(--font);font-weight:700;font-size:18px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.t-lblbg{fill:rgba(8,14,28,.8)}
+.t-lbl{fill:#E9EEF8;font-family:var(--font);font-weight:500;font-size:18px;text-anchor:middle;pointer-events:none}
+.t-ring,.t-halo,.t-focus{fill:none;opacity:0;pointer-events:none}
+.tok.is-sel .t-ring{opacity:1;stroke:#F7F9FD;stroke-width:3}
+.tok.is-sel .t-halo{opacity:1;stroke:var(--cobalt-ink);stroke-width:3.5}
+.t-focusbg{fill:none;opacity:0;pointer-events:none}
+.tok:focus-visible .t-focusbg{opacity:1;stroke:#0A1222;stroke-width:6}
+.tok:focus-visible .t-focus{opacity:1;stroke:#F7F9FD;stroke-width:3;stroke-dasharray:5 4}
+.ball-c{fill:#F7F9FD;stroke:#0A1222;stroke-width:2}
+
+/* ---------- timeline ---------- */
+.timeline{flex:none;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"ctl track add";align-items:center;gap:8px 14px;padding:8px 16px 10px;border-top:1px solid var(--line);background:var(--panel)}
+.tl-ctl{grid-area:ctl;display:flex;align-items:center;gap:4px}
+.tl-read{font-size:12px;color:var(--text-2);min-width:72px;padding-left:8px;white-space:nowrap}
+.tl-add{grid-area:add}
+.tl-track{grid-area:track;position:relative;--kp:30px;min-width:0}
+.tl-scrub{-webkit-appearance:none;appearance:none;display:block;height:22px;margin:0 calc(var(--kp) - 4px);width:calc(100% - 2 * (var(--kp) - 4px));background:transparent;cursor:pointer}
+.tl-scrub:disabled{cursor:default;opacity:.5}
+.tl-scrub::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--cobalt) var(--pct,0%),var(--line-2) var(--pct,0%))}
+.tl-scrub::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height:20px;margin-top:-8px;border-radius:2px;background:var(--cobalt-ink);border:0}
+.tl-scrub::-moz-range-track{height:4px;border-radius:2px;background:var(--line-2)}
+.tl-scrub::-moz-range-progress{height:4px;border-radius:2px;background:var(--cobalt)}
+.tl-scrub::-moz-range-thumb{width:8px;height:20px;border:0;border-radius:2px;background:var(--cobalt-ink)}
+.tl-keys{position:relative;height:56px}
+.tl-key{position:absolute;top:0;left:calc(var(--kp) + var(--f) * (100% - 2 * var(--kp)));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px;min-width:48px;height:56px;padding:6px 4px 0;border:0;border-radius:var(--r);background:transparent;color:var(--text-3);cursor:pointer}
+.tl-key:hover{color:var(--text);background:var(--panel-2)}
+.tl-key .dia{width:12px;height:12px;transform:rotate(45deg);border:2px solid var(--text-3);background:var(--bg);border-radius:2px;transition:background-color .2s,border-color .2s,transform .2s var(--ease-out)}
+.tl-key .kn{font-size:12px;line-height:1.2}
+.tl-key .kl{font-size:12px;line-height:1.2;max-width:var(--kw,140px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-key.passed .dia{border-color:var(--cobalt-ink)}
+.tl-key[aria-current="step"]{color:var(--text)}
+.tl-key[aria-current="step"] .dia{background:var(--cobalt);border-color:var(--cobalt-ink);transform:rotate(45deg) scale(1.25)}
+.tl-track.no-labels .kl{display:none}
+.tl-empty{grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;color:var(--text-2);font-size:13px}
+
+/* ---------- inspector ---------- */
+.inspector{grid-area:insp;min-height:0;overflow:auto;background:var(--panel);border-left:1px solid var(--line)}
+.insp-sec{padding:16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.insp-h{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;color:var(--text-3);letter-spacing:.02em}
+.sel-head{display:flex;align-items:flex-end;gap:12px}
+.sel-head .field{flex:1;min-width:0}
+.mini-tok{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;flex:none;color:#F7F9FD;font-weight:700;font-size:16px;box-shadow:0 0 0 2px #F7F9FD,0 0 0 5px var(--cobalt-ink)}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);margin:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.kv div{padding:8px 10px;border-right:1px solid var(--line)}
+.kv div:last-child{border-right:0}
+.kv dt{font-size:11px;color:var(--text-3)}
+.kv dd{margin:0;font-family:var(--mono);font-size:15px;font-variant-numeric:tabular-nums}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.empty-p{font-size:13px;color:var(--text-2);line-height:1.6}
+.moves{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.moves li{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.moves .mono{color:var(--text-2);font-size:12px}
+.sub-h{font-size:12px;color:var(--text-3);font-weight:500}
+.cmp{display:none}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;top:112px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 32px);width:max-content;padding:8px 8px 8px 12px;background:#18284A;border:1px solid #3B5383;border-radius:var(--r);box-shadow:0 14px 40px rgba(2,6,14,.5);font-size:14px}
+.toast p{min-width:0}
+.toast.in{animation:toastIn .35s var(--ease-out)}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* ---------- dialogs ---------- */
+dialog{border:0;padding:0;background:transparent;color:var(--text);max-width:none;max-height:none}
+dialog::backdrop{background:rgba(4,8,16,.68)}
+dialog[open] .sheet,dialog[open] .cf{animation:sheetIn .32s var(--ease-out)}
+@keyframes sheetIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.sheet,.cf{background:var(--panel);border:1px solid var(--line-2);border-radius:var(--r);box-shadow:0 24px 64px rgba(2,6,14,.55)}
+.sheet{width:min(620px,calc(100vw - 32px));max-height:min(88vh,800px);overflow:auto}
+.sheet-h{position:sticky;top:0;z-index:1;display:flex;align-items:flex-start;gap:12px;padding:16px 16px 14px 20px;background:var(--panel);border-bottom:1px solid var(--line)}
+.sheet-h h2{font-size:18px;font-weight:600}
+.sheet-h .sub{font-size:13px;color:var(--text-3);margin-top:2px}
+.sheet-h > div{flex:1;min-width:0}
+.exg{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.exg h3{font-size:15px;font-weight:600}
+.exg .gdesc{font-size:13px;color:var(--text-3);margin-top:-6px}
+.exrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg)}
+.exwhat{display:flex;flex-direction:column;gap:2px;min-width:0}
+.exwhat b{font-weight:600}
+.exwhat .mono{font-size:12px;color:var(--text-3)}
+.exact{display:flex;gap:8px;flex-wrap:wrap}
+.chat{width:100%;min-height:112px;resize:vertical;padding:10px 12px;border-radius:var(--r);border:1px solid var(--line-2);background:var(--bg);color:var(--text);font-size:13px;line-height:1.6}
+.exres{padding:20px}
+.exres:empty{display:none}
+.res{display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--panel-2)}
+.res > .ic{color:var(--cobalt-ink);margin-top:1px}
+.res > div{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.res-t{font-weight:600}
+.res-f{font-size:12px;color:var(--text-2)}
+.res-n{font-size:12px;color:var(--text-3)}
+.res.cancel > .ic{color:var(--text-3)}
+.proc{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--panel-2)}
+.proc-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.proc-top p{display:flex;align-items:center;gap:8px;font-weight:600}
+.bar{height:6px;border-radius:3px;background:var(--line-2);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--cobalt-ink);transform-origin:left center;transform:scaleX(0);transition:transform .12s linear}
+.proc .btn{align-self:flex-start}
+.ad-sheet{margin-top:32px}
+.cf{width:min(440px,calc(100vw - 32px));padding:20px;display:flex;flex-direction:column;gap:14px}
+.cf-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.cf-h h2{font-size:18px;font-weight:600;line-height:1.4}
+.cf-body{display:flex;flex-direction:column;gap:10px;font-size:14px;color:var(--text-2)}
+.cf-list{margin:0;padding:10px 12px 10px 30px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--text);display:flex;flex-direction:column;gap:4px}
+.cf-act{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.scrim{position:fixed;inset:0;background:rgba(4,8,16,.6);z-index:29}
+
+/* ---------- tablet: tree becomes a drawer ---------- */
+@media (max-width:1179px){
+  .work{grid-template-columns:minmax(0,1fr) 288px;grid-template-areas:"center insp"}
+  .files{position:fixed;top:0;bottom:0;left:0;width:min(320px,88vw);z-index:30;transform:translateX(-102%);transition:transform .3s var(--ease-out);box-shadow:18px 0 48px rgba(2,6,14,.5);border-right:1px solid var(--line-2)}
+  .files.open{transform:none}
+  .files-close{display:inline-flex}
+  .top .btn-files{display:inline-flex}
+  .brand-name{display:none}
+}
+
+/* ---------- phone ---------- */
+@media (max-width:759px){
+  .note{font-size:11.5px;min-height:24px}
+  .top{height:52px;gap:6px;padding:0 8px 0 4px}
+  .brand,.crumb-team,.crumb-sep,.crumb-meta{display:none}
+  .crumb{padding-left:2px;border-left:0;flex:1}
+  .crumb-file{font-size:14px}
+  .spacer{display:none}
+  .save{padding:4px 2px;gap:4px}
+  .save-long,.save-ago{display:none}
+  .save-short{display:inline;font-size:12px}
+  .save .tag{display:none}
+  .btn-demo{padding:0 10px}
+  .btn-demo .full{display:none}
+  .btn-export{padding:0 12px}
+  .btn-export .full{display:none}
+  .btn,.icon-btn{min-height:48px;min-width:48px}
+  .icon-btn{width:48px;height:48px}
+  .top .btn-files{min-height:48px}
+  .mobile-demo{display:inline}
+  .demo-menu{position:fixed;left:16px;right:16px;top:90px;width:auto}
+  .fail{flex-wrap:wrap;padding:8px 16px;gap:8px}
+  .fail-act{width:100%}
+  .fail-act .btn{flex:1}
+  .work{display:flex;flex-direction:column}
+  .center{flex:1 1 auto;min-height:0}
+  .toolbar{padding:2px 16px;gap:8px}
+  .seg{padding:0;gap:0}
+  .seg button{min-height:48px;min-width:52px;padding:0 8px;border-radius:5px}
+  .sel{height:48px}
+  .formf .lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .formf .sel{height:48px;width:92px}
+  .btn-reset .full{display:none}
+  .btn-reset{width:48px;padding:0}
+  .edit-ctx{display:none}
+  .stage{flex:1 1 auto;min-height:200px}
+  #pitch{top:6px;left:16px;width:calc(100% - 32px);height:calc(100% - 12px)}
+  .timeline{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"track track" "ctl add";gap:2px 8px;padding:2px 16px 4px}
+  .tl-track{--kp:24px}
+  .tl-scrub{height:48px}
+  .tl-keys{height:44px}
+  .tl-key{height:44px;padding-top:5px;gap:2px}
+  .tl-key .kl{display:none}
+  .tl-read{min-width:0;padding-left:4px}
+  .tl-add .full{display:none}
+  .tl-add{width:auto;padding:0 12px}
+  .inspector{flex:none;border-left:0;border-top:1px solid var(--line);overflow:visible}
+  .insp-sec{display:none}
+  .cmp{display:flex;flex-direction:column;gap:2px;padding:4px 16px 6px}
+  .cmp-row{display:flex;align-items:center;gap:8px;min-height:48px}
+  .cmp-row .inp{flex:1;height:44px}
+  .cmp-step{flex:1;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cmp-step .mono{color:var(--cobalt-ink);margin-right:6px;font-size:13px}
+  .cmp-sub{font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cmp-sub .mono{color:var(--text-2);margin-right:8px}
+  .mini-tok{width:34px;height:34px;font-size:14px;box-shadow:0 0 0 2px #F7F9FD,0 0 0 4px var(--cobalt-ink)}
+  .toast{top:92px}
+  #dlgExport[open]{margin:auto 0 0 0;max-width:100vw}
+  .sheet{width:100vw;max-height:90vh;border-radius:var(--r) var(--r) 0 0;border-bottom:0}
+  .exg{padding:16px}
+  .exrow{padding:10px}
+  .exact{width:100%}
+  .exact .btn{flex:1}
+  .exres{padding:16px}
+}
+@media (pointer:coarse){
+  .btn{min-height:48px}
+  .icon-btn{width:48px;height:48px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="note" role="note">시안 C · 택틱스스튜디오 · 데모 데이터, 실제 저장되지 않음</div>
+
+  <header class="top">
+    <button type="button" class="icon-btn boxed btn-files" id="btnFiles" aria-controls="files" aria-expanded="false" aria-label="전술 파일 목록 열기">
+      <span data-ic="menu"></span><span class="mono" id="filesBadge">3/3</span>
+    </button>
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">Tactics Studio</span></div>
+    <nav class="crumb" aria-label="현재 파일">
+      <span class="crumb-team" id="crumbTeam">우리 FC</span><span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-file" id="crumbFile">오른쪽 전환 침투</span>
+      <span class="crumb-meta mono" id="crumbMeta">9vs9 3-3-2</span>
+    </nav>
+    <div class="spacer"></div>
+    <div class="save is-saved" id="saveStatus" role="status" aria-live="polite"></div>
+    <div class="demo-wrap" id="demoWrap">
+      <button type="button" class="btn ghost btn-demo" id="btnDemo" aria-label="시안 상태 보기" aria-expanded="false" aria-controls="demoMenu"><span class="full" aria-hidden="true">시안 상태 보기</span><span class="mobile-demo" aria-hidden="true">시안</span></button>
+      <div class="demo-menu" id="demoMenu" hidden>
+        <p>실제 동작이 아니라 화면 상태를 보여 주는 시안입니다.</p>
+        <button type="button" class="demo-item" data-demo="saved"><b>저장됨</b><span>기기 저장 상태 표시</span></button>
+        <button type="button" class="demo-item" data-demo="processing"><b>처리 중</b><span>GIF 만들기 진행률과 취소</span></button>
+        <button type="button" class="demo-item" data-demo="fail"><b>실패</b><span>기기 저장 실패, 다시 시도와 백업 안내</span></button>
+        <button type="button" class="demo-item" data-demo="undo"><b>되돌리기</b><span>배치 초기화 뒤 되돌리기 알림</span></button>
+        <button type="button" class="demo-item" data-demo="slots"><b>슬롯 가득 참</b><span>네 번째 전술 파일을 만들 때 안내</span></button>
+        <button type="button" class="demo-item" data-demo="restore"><b>백업에서 복원</b><span>확인 후 복원하고 기기에 저장</span></button>
+      </div>
+    </div>
+    <button type="button" class="btn primary btn-export" id="btnExport" aria-label="내보내기·공유"><span data-ic="share"></span><span class="full">내보내기·공유</span></button>
+  </header>
+
+  <div class="fail" id="failBanner" role="alert" hidden>
+    <span data-ic="alert"></span>
+    <p><b>이 브라우저에 저장하지 못했습니다.</b> 저장 공간이 부족하거나 사생활 보호 모드일 수 있습니다. 백업 파일을 받아 두세요.</p>
+    <span class="tag">시안</span>
+    <div class="fail-act">
+      <button type="button" class="btn small" id="failRetry"><span data-ic="refresh"></span>다시 시도</button>
+      <button type="button" class="btn small" id="failBackup"><span data-ic="download"></span>백업 파일 받기</button>
+    </div>
+  </div>
+
+  <div class="work">
+    <aside class="files" id="files" aria-label="팀 프로젝트와 전술 파일">
+      <div class="files-h">
+        <h2>팀 프로젝트</h2>
+        <button type="button" class="icon-btn files-close" id="filesClose" aria-label="파일 목록 닫기"><span data-ic="x"></span></button>
+      </div>
+      <div class="files-body" id="filesBody"></div>
+    </aside>
+
+    <main class="center" id="center">
+      <h1 class="sr-only">택틱스스튜디오 전술 편집기 시안</h1>
+      <div class="toolbar">
+        <div class="seg" id="squadSeg" role="group" aria-label="스쿼드"></div>
+        <div class="formf">
+          <label class="lbl" for="selForm">포메이션</label>
+          <select class="sel" id="selForm"></select>
+        </div>
+        <button type="button" class="btn ghost btn-reset" id="btnReset" aria-label="배치 초기화"><span data-ic="refresh"></span><span class="full">배치 초기화</span></button>
+        <p class="edit-ctx" id="editCtx"></p>
+      </div>
+      <div class="stage" id="stage">
+        <svg id="pitch" viewBox="0 0 480 660" preserveAspectRatio="xMidYMid meet" role="group" aria-label="축구장. 선수를 눌러 선택하고 끌어서 옮깁니다.">
+          <defs>
+            <marker id="ahMove" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto"><path d="M0 0L10 5L0 10z" fill="#93ABFF"/></marker>
+            <marker id="ahPass" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#F7F9FD"/></marker>
+          </defs>
+          <g aria-hidden="true">
+            <rect x="0" y="0" width="480" height="660" rx="4" fill="#1A4936"/>
+            <g id="stripes"></g>
+            <rect class="pl" x="14" y="14" width="452" height="632"/>
+            <line class="pl" x1="14" y1="330" x2="466" y2="330"/>
+            <circle class="pl" cx="240" cy="330" r="56"/>
+            <circle class="pf" cx="240" cy="330" r="3.5"/>
+            <rect class="pl" x="108" y="14" width="264" height="104"/>
+            <rect class="pl" x="180" y="14" width="120" height="38"/>
+            <circle class="pf" cx="240" cy="88" r="3"/>
+            <path class="pl" d="M192.7 118 A56 56 0 0 0 287.3 118"/>
+            <rect class="pl" x="108" y="542" width="264" height="104"/>
+            <rect class="pl" x="180" y="608" width="120" height="38"/>
+            <circle class="pf" cx="240" cy="572" r="3"/>
+            <path class="pl" d="M192.7 542 A56 56 0 0 1 287.3 542"/>
+            <rect class="pl" x="212" y="5" width="56" height="9"/>
+            <rect class="pl" x="212" y="646" width="56" height="9"/>
+            <path class="pl" d="M14 24 A10 10 0 0 0 24 14 M456 14 A10 10 0 0 0 466 24 M466 636 A10 10 0 0 0 456 646 M24 646 A10 10 0 0 0 14 636"/>
+          </g>
+          <g id="gOver" aria-hidden="true"></g>
+          <g id="gTok"></g>
+          <g id="ball" aria-hidden="true"><circle class="ball-c" r="8"/></g>
+        </svg>
+      </div>
+      <section class="timeline" id="timeline" aria-label="전술 단계 타임라인">
+        <div class="tl-ctl">
+          <button type="button" class="icon-btn" id="tlPrev" aria-label="이전 단계"><span data-ic="chevL"></span></button>
+          <button type="button" class="icon-btn play" id="tlPlay" aria-label="미리보기 재생"><span id="tlPlayIc"></span></button>
+          <button type="button" class="icon-btn" id="tlNext" aria-label="다음 단계"><span data-ic="chevR"></span></button>
+          <span class="tl-read mono" id="tlRead" aria-live="off"></span>
+        </div>
+        <div class="tl-track" id="tlTrack">
+          <input type="range" class="tl-scrub" id="tlScrub" min="0" max="3" step="0.01" value="0" aria-label="미리보기 위치">
+          <div class="tl-keys" id="tlKeys" role="group" aria-label="단계 바로 가기"></div>
+        </div>
+        <button type="button" class="btn tl-add" id="tlAdd" aria-label="단계 추가"><span data-ic="plus"></span><span class="full" aria-hidden="true">단계 추가</span></button>
+        <div class="tl-empty" id="tlEmpty" hidden>
+          <p>열린 전술 파일이 없습니다. 새 전술 파일을 만들면 단계별 움직임을 기록할 수 있습니다.</p>
+          <button type="button" class="btn" id="tlEmptyNew"><span data-ic="plus"></span>새 전술 파일</button>
+        </div>
+      </section>
+    </main>
+
+    <aside class="inspector" id="inspector" aria-label="선택 항목 속성"></aside>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<div class="sr-only" id="sr" aria-live="polite"></div>
+
+<dialog id="dlgExport" aria-labelledby="exTitle">
+  <div class="sheet">
+    <div class="sheet-h">
+      <div><h2 id="exTitle">내보내기·공유</h2><p class="sub" id="exSub"></p></div>
+      <button type="button" class="icon-btn" data-close aria-label="닫기"><span data-ic="x"></span></button>
+    </div>
+    <section class="exg" aria-labelledby="g1">
+      <h3 id="g1">이미지·GIF 보내기</h3>
+      <p class="gdesc">단톡방에 바로 올릴 그림 파일입니다. 저장은 이 기기에, 보내기는 공유 화면으로 넘깁니다.</p>
+      <div class="exrow">
+        <div class="exwhat"><b>PNG 이미지</b><span class="mono" id="exPngMeta"></span></div>
+        <div class="exact">
+          <button type="button" class="btn" data-ex="png-save"><span data-ic="download"></span>기기에 저장</button>
+          <button type="button" class="btn" data-ex="png-send"><span data-ic="share"></span>보내기</button>
+        </div>
+      </div>
+      <div class="exrow">
+        <div class="exwhat"><b>GIF 움직임</b><span class="mono" id="exGifMeta"></span></div>
+        <div class="exact">
+          <button type="button" class="btn" data-ex="gif-save" data-gif><span data-ic="download"></span>기기에 저장</button>
+          <button type="button" class="btn" data-ex="gif-send" data-gif><span data-ic="share"></span>보내기</button>
+        </div>
+      </div>
+    </section>
+    <section class="exg" aria-labelledby="g2">
+      <h3 id="g2">링크·텍스트 공유</h3>
+      <p class="gdesc">받는 사람은 읽기 전용으로 봅니다. 상대 기기의 작업은 바뀌지 않습니다.</p>
+      <div class="field">
+        <label class="lbl" for="chatText">단톡방 텍스트 미리보기</label>
+        <textarea class="chat" id="chatText" readonly rows="5"></textarea>
+      </div>
+      <div class="exact">
+        <button type="button" class="btn" data-ex="text-copy"><span data-ic="copy"></span>텍스트 복사</button>
+        <button type="button" class="btn" data-ex="link-copy"><span data-ic="link"></span>링크 복사</button>
+      </div>
+    </section>
+    <section class="exg" aria-labelledby="g3">
+      <h3 id="g3">백업</h3>
+      <p class="gdesc">스쿼드 3개와 전술 파일 전체를 .sq 파일 하나로 보관합니다. 다른 기기로 옮길 때도 씁니다.</p>
+      <div class="exact">
+        <button type="button" class="btn" data-ex="sq-save"><span data-ic="download"></span>.sq 백업 파일 받기</button>
+        <button type="button" class="btn" data-ex="sq-restore"><span data-ic="upload"></span>백업에서 복원</button>
+      </div>
+    </section>
+    <div class="exres" id="exResult" aria-live="polite"></div>
+  </div>
+</dialog>
+
+<dialog id="dlgConfirm" aria-labelledby="cfTitle" aria-describedby="cfBody">
+  <form method="dialog" class="cf">
+    <div class="cf-h"><h2 id="cfTitle"></h2><span class="tag" id="cfTag">시안</span></div>
+    <div class="cf-body" id="cfBody"></div>
+    <div class="cf-act">
+      <button type="submit" value="cancel" class="btn" id="cfCancel" autofocus>취소</button>
+      <button type="submit" value="ok" class="btn primary" id="cfOk">확인</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+/* SQUAD-DEMO-STATE BEGIN */
+/* SQUAD-DEMO-STATE v1 (canonical). Paste verbatim into each concept between the BEGIN/END markers.
+   Coordinate system matches production: pitch 480 x 660, own goal at the bottom (y=660). Demo data only. */
+const DEMO_STATE = {
+  team: '우리 FC',
+  mode: '9v9',
+  formation: '3-3-2',
+  roster: [
+    { id: 1, num: 1,  name: '김도윤', role: 'GK', color: '#E53935' },
+    { id: 2, num: 2,  name: '박태수', role: 'DF', color: '#1E88E5' },
+    { id: 3, num: 3,  name: '이준호', role: 'DF', color: '#1E88E5' },
+    { id: 4, num: 4,  name: '최민재', role: 'DF', color: '#1E88E5' },
+    { id: 5, num: 5,  name: '정하람', role: 'MF', color: '#1E88E5' },
+    { id: 6, num: 6,  name: '한서준', role: 'MF', color: '#1E88E5' },
+    { id: 7, num: 7,  name: '오태민', role: 'MF', color: '#1E88E5' },
+    { id: 8, num: 8,  name: '윤재현', role: 'FW', color: '#1E88E5' },
+    { id: 9, num: 9,  name: '강현우', role: 'FW', color: '#1E88E5' }
+  ],
+  positions: {
+    1: { x: 240, y: 616 },
+    2: { x: 130, y: 510 }, 3: { x: 240, y: 520 }, 4: { x: 350, y: 510 },
+    5: { x: 120, y: 385 }, 6: { x: 240, y: 400 }, 7: { x: 360, y: 385 },
+    8: { x: 175, y: 240 }, 9: { x: 305, y: 240 }
+  },
+  ball: { x: 240, y: 400 },
+  tactics: [
+    {
+      id: 't1', name: '오른쪽 전환 침투', updated: '방금 전',
+      steps: [
+        { label: '6번이 오른쪽으로 전환 패스', moves: { 7: { x: 400, y: 300 } }, ball: { from: 6, to: 7 } },
+        { label: '7번 크로스, 9번 니어 침투', moves: { 9: { x: 290, y: 120 }, 8: { x: 200, y: 150 } }, ball: { from: 7, to: 9 } },
+        { label: '수비 라인 전진', moves: { 2: { x: 140, y: 440 }, 3: { x: 240, y: 450 }, 4: { x: 340, y: 440 } }, ball: null }
+      ]
+    },
+    {
+      id: 't2', name: '왼쪽 오버래핑', updated: '어제',
+      steps: [
+        { label: '5번 전진, 2번 오버래핑', moves: { 5: { x: 110, y: 280 }, 2: { x: 70, y: 330 } }, ball: { from: 6, to: 5 } },
+        { label: '2번 컷백', moves: { 2: { x: 80, y: 150 } }, ball: { from: 5, to: 2 } }
+      ]
+    },
+    {
+      id: 't3', name: '전방 압박 3-3-2', updated: '3일 전',
+      steps: [
+        { label: '투톱 상대 센터백 압박', moves: { 8: { x: 190, y: 160 }, 9: { x: 290, y: 160 } }, ball: null }
+      ]
+    }
+  ],
+  squads: ['기본', '공격', '수비'],
+  slots: { used: 3, free: 3 } /* demo value; real free-slot count is undecided */
+};
+/* SQUAD-DEMO-STATE END */
+
+(function () {
+  'use strict';
+
+  /* Formation table mirrors production MODES_CONFIG (index.html). */
+  const MODES = {
+    '5v5': { label: '5vs5', formations: {
+      '2-2': [{ count: 2, y: 490, pre: '수비' }, { count: 2, y: 270, pre: '공격' }],
+      '1-2-1': [{ count: 1, y: 510, pre: '수비' }, { count: 2, y: 370, pre: '미드' }, { count: 1, y: 230, pre: '공격' }],
+      '2-1-1': [{ count: 2, y: 510, pre: '수비' }, { count: 1, y: 370, pre: '미드' }, { count: 1, y: 230, pre: '공격' }] } },
+    '6v6': { label: '6vs6', formations: {
+      '2-2-1': [{ count: 2, y: 510, pre: '수비' }, { count: 2, y: 380, pre: '미드' }, { count: 1, y: 240, pre: '공격' }],
+      '3-2': [{ count: 3, y: 510, pre: '수비' }, { count: 2, y: 310, pre: '공격' }],
+      '2-3': [{ count: 2, y: 510, pre: '수비' }, { count: 3, y: 310, pre: '공격' }],
+      '1-3-1': [{ count: 1, y: 510, pre: '수비' }, { count: 3, y: 380, pre: '미드' }, { count: 1, y: 240, pre: '공격' }] } },
+    '7v7': { label: '7vs7', formations: {
+      '3-2-1': [{ count: 3, y: 510, pre: '수비' }, { count: 2, y: 385, pre: '미드' }, { count: 1, y: 240, pre: '공격' }],
+      '2-3-1': [{ count: 2, y: 510, pre: '수비' }, { count: 3, y: 385, pre: '미드' }, { count: 1, y: 240, pre: '공격' }],
+      '2-2-2': [{ count: 2, y: 510, pre: '수비' }, { count: 2, y: 385, pre: '미드' }, { count: 2, y: 240, pre: '공격' }],
+      '3-3': [{ count: 3, y: 510, pre: '수비' }, { count: 3, y: 310, pre: '공격' }] } },
+    '8v8': { label: '8vs8', formations: {
+      '3-3-1': [{ count: 3, y: 510, pre: '수비' }, { count: 3, y: 385, pre: '미드' }, { count: 1, y: 240, pre: '공격' }],
+      '3-2-2': [{ count: 3, y: 510, pre: '수비' }, { count: 2, y: 385, pre: '미드' }, { count: 2, y: 240, pre: '공격' }],
+      '2-3-2': [{ count: 2, y: 510, pre: '수비' }, { count: 3, y: 385, pre: '미드' }, { count: 2, y: 240, pre: '공격' }],
+      '4-3': [{ count: 4, y: 510, pre: '수비' }, { count: 3, y: 310, pre: '공격' }] } },
+    '9v9': { label: '9vs9', formations: {
+      '3-3-2': [{ count: 3, y: 510, pre: '수비' }, { count: 3, y: 385, pre: '미드' }, { count: 2, y: 240, pre: '공격' }],
+      '3-2-3': [{ count: 3, y: 510, pre: '수비' }, { count: 2, y: 385, pre: '미드' }, { count: 3, y: 240, pre: '공격' }],
+      '4-3-1': [{ count: 4, y: 510, pre: '수비' }, { count: 3, y: 380, pre: '미드' }, { count: 1, y: 230, pre: '공격' }],
+      '2-4-2': [{ count: 2, y: 510, pre: '수비' }, { count: 4, y: 385, pre: '미드' }, { count: 2, y: 240, pre: '공격' }],
+      '3-4-1': [{ count: 3, y: 510, pre: '수비' }, { count: 4, y: 385, pre: '미드' }, { count: 1, y: 240, pre: '공격' }] } },
+    '10v10': { label: '10vs10', formations: {
+      '4-4-1': [{ count: 4, y: 510, pre: '수비' }, { count: 4, y: 380, pre: '미드' }, { count: 1, y: 230, pre: '공격' }],
+      '4-3-2': [{ count: 4, y: 510, pre: '수비' }, { count: 3, y: 380, pre: '미드' }, { count: 2, y: 230, pre: '공격' }],
+      '3-4-2': [{ count: 3, y: 510, pre: '수비' }, { count: 4, y: 380, pre: '미드' }, { count: 2, y: 230, pre: '공격' }],
+      '3-5-1': [{ count: 3, y: 510, pre: '수비' }, { count: 5, y: 380, pre: '미드' }, { count: 1, y: 230, pre: '공격' }] } },
+    '11v11': { label: '11vs11', formations: {
+      '4-4-2': [{ count: 4, y: 510, pre: '수비' }, { count: 4, y: 380, pre: '미드' }, { count: 2, y: 230, pre: '공격' }],
+      '4-3-3': [{ count: 4, y: 510, pre: '수비' }, { count: 3, y: 370, pre: '미드' }, { count: 3, y: 220, pre: '공격' }],
+      '3-5-2': [{ count: 3, y: 510, pre: '수비' }, { count: 5, y: 375, pre: '미드' }, { count: 2, y: 230, pre: '공격' }],
+      '5-3-2': [{ count: 5, y: 510, pre: '수비' }, { count: 3, y: 370, pre: '미드' }, { count: 2, y: 230, pre: '공격' }] } }
+  };
+  const ROLE_KO = { GK: '골키퍼', DF: '수비수', MF: '미드필더', FW: '공격수' };
+  const SQUADS = DEMO_STATE.squads.slice();
+  const NS = 'http://www.w3.org/2000/svg';
+
+  /* Tabler Icons (MIT), outline set, 24x24, stroke based. */
+  const ICONS = {
+    play: '<path d="M7 4v16l13 -8z"/>',
+    pause: '<path d="M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"/><path d="M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"/>',
+    chevL: '<path d="M15 6l-6 6l6 6"/>',
+    chevR: '<path d="M9 6l6 6l-6 6"/>',
+    plus: '<path d="M12 5l0 14"/><path d="M5 12l14 0"/>',
+    x: '<path d="M18 6l-12 12"/><path d="M6 6l12 12"/>',
+    trash: '<path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>',
+    share: '<path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M8.7 10.7l6.6 -3.4"/><path d="M8.7 13.3l6.6 3.4"/>',
+    folder: '<path d="M5 4h4l3 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2"/>',
+    undo: '<path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/>',
+    alert: '<path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/>',
+    check: '<path d="M5 12l5 5l10 -10"/>',
+    menu: '<path d="M4 6l16 0"/><path d="M4 12l16 0"/><path d="M4 18l16 0"/>',
+    download: '<path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 11l5 5l5 -5"/><path d="M12 4l0 12"/>',
+    upload: '<path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 9l5 -5l5 5"/><path d="M12 4l0 12"/>',
+    link: '<path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/>',
+    copy: '<path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.564 0 .892 .144 1.112 .413"/>',
+    refresh: '<path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>',
+    device: '<path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"/><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M14 4l0 4l-6 0l0 -4"/>'
+  };
+  const ic = (name) => '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + ICONS[name] + '</svg>';
+
+  const $ = (s, r) => (r || document).querySelector(s);
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
+  const narrowMQ = matchMedia('(max-width: 1179px)');
+  const mobileMQ = matchMedia('(max-width: 759px)');
+
+  /* ---------- model ---------- */
+  function layoutFor(mode, fkey) {
+    const lines = MODES[mode].formations[fkey];
+    const pos = { 1: { x: 240, y: 616 } };
+    const roster = [{ id: 1, num: 1, name: 'GK', role: 'GK', color: '#E53935' }];
+    let id = 1;
+    lines.forEach((l) => {
+      for (let j = 0; j < l.count; j++) {
+        id++;
+        pos[id] = { x: Math.round(480 * (j + 1) / (l.count + 1)), y: l.y };
+        roster.push({ id, num: id, name: l.pre + (j + 1), role: l.pre === '수비' ? 'DF' : l.pre === '공격' ? 'FW' : 'MF', color: '#1E88E5' });
+      }
+    });
+    return { roster, pos };
+  }
+
+  function buildModel() {
+    const d = clone(DEMO_STATE);
+    const gk = d.roster.find((r) => r.role === 'GK');
+    const shift = (dy) => {
+      const o = {};
+      Object.keys(d.positions).forEach((id) => {
+        const p = d.positions[id];
+        o[id] = gk && +id === gk.id ? { x: p.x, y: p.y } : { x: p.x, y: clamp(p.y + dy, 70, 600) };
+      });
+      return o;
+    };
+    let holder = null;
+    d.roster.forEach((r) => { const p = d.positions[r.id]; if (p && p.x === d.ball.x && p.y === d.ball.y) holder = r.id; });
+    return {
+      team: d.team, mode: d.mode, roster: d.roster,
+      squads: {
+        '기본': { formation: d.formation, positions: clone(d.positions) },
+        '공격': { formation: d.formation, positions: shift(-45) },
+        '수비': { formation: d.formation, positions: shift(40) }
+      },
+      activeSquad: '기본',
+      tactics: d.tactics,
+      activeTactic: d.tactics.length ? d.tactics[0].id : null,
+      slotLimit: d.slots.free,
+      ball: d.ball, ballHolder: holder, seq: d.tactics.length + 1
+    };
+  }
+
+  let M = buildModel();
+  const ui = { p: 0, playing: false, raf: 0, timer: 0, selected: null, save: 'saved', savedAt: Date.now(), fail: false, drawer: false, slotNote: false, gif: null };
+  let undoSnap = null;
+  let drag = null;
+
+  const tactic = () => M.tactics.find((t) => t.id === M.activeTactic) || null;
+  const nSteps = () => { const t = tactic(); return t ? t.steps.length : 0; };
+  const curStep = () => clamp(Math.round(ui.p), 0, nSteps());
+  const squad = () => M.squads[M.activeSquad];
+  const player = (id) => M.roster.find((r) => r.id === id) || null;
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const lerp = (a, b, t) => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+
+  function posAt(id, k) {
+    let p = squad().positions[id] || { x: 240, y: 330 };
+    const t = tactic();
+    if (t) for (let i = 0; i < k && i < t.steps.length; i++) { const m = t.steps[i].moves[id]; if (m) p = m; }
+    return p;
+  }
+  function posAtP(id, p) {
+    const n = nSteps(); const k = Math.floor(p); const t = p - k;
+    if (t < 1e-4 || k >= n) return posAt(id, clamp(Math.round(p), 0, n));
+    return lerp(posAt(id, k), posAt(id, k + 1), ease(t));
+  }
+  function holderAt(k) {
+    let h = M.ballHolder; const t = tactic();
+    if (t) for (let i = 0; i < k && i < t.steps.length; i++) { const b = t.steps[i].ball; if (b) h = b.to; }
+    return h != null && player(h) ? h : null;
+  }
+  const BO = { x: 17, y: -15 };
+  const off = (p) => ({ x: p.x + BO.x, y: p.y + BO.y });
+  function ballAtStep(k) { const h = holderAt(k); return h == null ? M.ball : off(posAt(h, k)); }
+  function ballAtP(p) {
+    const n = nSteps(); const k = Math.floor(p); const t = p - k;
+    if (t < 1e-4 || k >= n) return ballAtStep(clamp(Math.round(p), 0, n));
+    const s = tactic().steps[k];
+    if (s.ball && player(s.ball.from) && player(s.ball.to)) return lerp(off(posAt(s.ball.from, k)), off(posAt(s.ball.to, k + 1)), ease(t));
+    const h = holderAt(k);
+    return h == null ? M.ball : off(posAtP(h, p));
+  }
+  function setPos(id, pos) {
+    const k = curStep(); const t = tactic();
+    if (k === 0 || !t) squad().positions[id] = pos;
+    else { t.steps[k - 1].moves[id] = pos; t.updated = '방금 전'; }
+  }
+  const movesCount = (t) => t.steps.reduce((a, s) => a + Object.keys(s.moves).length, 0);
+
+  function snapshot() { undoSnap = { m: clone(M), p: ui.p }; }
+  function undo() {
+    if (!undoSnap) return;
+    stopPlay();
+    M = undoSnap.m; ui.p = clamp(undoSnap.p, 0, nSteps()); ui.selected = null; undoSnap = null;
+    renderAll(); markEdited(); toast('되돌렸습니다');
+  }
+
+  /* ---------- announcements, save status ---------- */
+  function announce(msg) { const el = $('#sr'); el.textContent = ''; setTimeout(() => { el.textContent = msg; }, 30); }
+  function ago() { const s = Math.round((Date.now() - ui.savedAt) / 1000); return s < 60 ? '방금' : Math.floor(s / 60) + '분 전'; }
+  function renderSave(flash) {
+    const el = $('#saveStatus');
+    let h;
+    if (ui.save === 'saving') h = ic('device') + '<span class="save-long">이 기기에 저장 중</span><span class="save-short">저장 중</span>';
+    else if (ui.save === 'failed') h = ic('alert') + '<span class="save-long">저장 안 됨</span><span class="save-short">저장 안 됨</span>';
+    else h = ic('check') + '<span class="save-long">이 기기에 저장됨</span><span class="save-short">저장됨</span><span class="save-ago mono">' + ago() + '</span>';
+    el.className = 'save is-' + ui.save;
+    el.innerHTML = h + '<span class="tag">시안</span>';
+    if (flash) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1200); }
+    $('#failBanner').hidden = !ui.fail;
+  }
+  let saveTimer = 0;
+  function markEdited() {
+    ui.save = 'saving'; renderSave();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      if (ui.fail) ui.save = 'failed'; else { ui.save = 'saved'; ui.savedAt = Date.now(); }
+      renderSave();
+    }, 650);
+  }
+
+  /* ---------- toast ---------- */
+  let toastTimer = 0;
+  function toast(msg, opts) {
+    const o = opts || {};
+    const el = $('#toast');
+    el.innerHTML = (o.undo ? '<span class="tag">시안</span>' : '') + '<p>' + esc(msg) + '</p>' +
+      (o.undo ? '<button type="button" class="btn small" id="tUndo">' + ic('undo') + '되돌리기</button>' : '') +
+      '<button type="button" class="icon-btn" id="tClose" aria-label="알림 닫기">' + ic('x') + '</button>';
+    el.hidden = false; el.classList.remove('in'); void el.offsetWidth; el.classList.add('in');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, o.undo ? 8000 : 4000);
+    const u = $('#tUndo'); if (u) u.addEventListener('click', () => { hideToast(); undo(); });
+    $('#tClose').addEventListener('click', hideToast);
+  }
+  function hideToast() { $('#toast').hidden = true; clearTimeout(toastTimer); }
+
+  /* ---------- header ---------- */
+  function renderHeader() {
+    const t = tactic();
+    $('#crumbTeam').textContent = M.team;
+    $('#crumbFile').textContent = t ? t.name : M.activeSquad + ' 스쿼드';
+    $('#crumbMeta').textContent = MODES[M.mode].label + ' ' + squad().formation;
+    $('#filesBadge').textContent = M.tactics.length + '/' + M.slotLimit;
+    $('#btnFiles').setAttribute('aria-label', '전술 파일 목록 열기, 저장 슬롯 ' + M.tactics.length + '/' + M.slotLimit + ' 사용');
+  }
+
+  /* ---------- files tree ---------- */
+  function renderTree() {
+    const used = M.tactics.length, lim = M.slotLimit;
+    let opts = '';
+    Object.keys(MODES).forEach((k) => { opts += '<option value="' + k + '"' + (k === M.mode ? ' selected' : '') + '>' + MODES[k].label + '</option>'; });
+    let rows = '';
+    if (!M.tactics.length) rows = '<li class="fempty">전술 파일이 없습니다. 새 전술 파일을 만들어 단계별 움직임을 기록하세요.</li>';
+    M.tactics.forEach((t) => {
+      const act = t.id === M.activeTactic;
+      rows += '<li class="frow' + (act ? ' is-active' : '') + '">' +
+        '<button type="button" class="fopen" data-open="' + t.id + '"' + (act ? ' aria-current="true"' : '') + '>' +
+        '<span class="fname">' + esc(t.name) + '<span class="fext mono">.tac</span></span>' +
+        '<span class="fmeta mono"><span>' + t.steps.length + '단계</span><span>이동 ' + movesCount(t) + '</span><span>' + esc(t.updated) + '</span></span></button>' +
+        '<button type="button" class="icon-btn fdel" data-del="' + t.id + '" aria-label="' + esc(t.name) + ' 파일 삭제">' + ic('trash') + '</button></li>';
+    });
+    let cells = '';
+    for (let i = 0; i < lim; i++) cells += '<span class="cell' + (i < used ? ' on' : '') + '"></span>';
+    const note = ui.slotNote ? (
+      '<div class="slotnote" id="slotNote" tabindex="-1" role="note">' +
+      '<div class="slotnote-h"><b>저장 슬롯이 모두 찼습니다</b><span class="tag">시안</span></div>' +
+      '<p>무료로 쓸 수 있는 슬롯 수와 슬롯을 늘리는 방법은 아직 정해지지 않았습니다. 지금은 쓰지 않는 전술 파일을 지우면 새 파일을 만들 수 있습니다.</p>' +
+      '<button type="button" class="btn small" id="slotNoteClose">알겠습니다</button></div>') : '';
+    $('#filesBody').innerHTML =
+      '<div class="proj">' +
+        '<div class="proj-h">' + ic('folder') + '<span class="proj-name">' + esc(M.team) + '</span><span class="proj-meta mono">' + MODES[M.mode].label + '</span></div>' +
+        '<div class="field"><label class="lbl" for="selMode">인원</label><select class="sel" id="selMode">' + opts + '</select>' +
+        '<p class="help">바꾸면 선수 이름, 배치, 전술이 새로 시작합니다. 바꾸기 전에 확인합니다.</p></div>' +
+      '</div>' +
+      '<div class="sec-h"><h3>전술 파일</h3><span class="mono">' + used + '개</span></div>' +
+      '<ul class="flist">' + rows + '</ul>' +
+      '<button type="button" class="btn wide newtac" id="btnNewTac">' + ic('plus') + '새 전술 파일</button>' +
+      '<div class="slots"><div class="slots-top"><span>저장 슬롯</span><span class="mono">' + used + ' / ' + lim + ' 사용</span></div>' +
+      '<div class="cells" aria-hidden="true">' + cells + '</div>' +
+      '<p class="help">무료 수량 미정. 전술 파일 하나가 슬롯 하나를 씁니다.</p></div>' +
+      note +
+      '<div class="files-foot"><div class="ad-slot" role="note" aria-label="광고 자리 시안"><b>광고 자리 (시안)</b><span>파일 목록 맨 아래 고정 칸입니다. 편집 도구와 떨어져 있습니다.</span></div></div>';
+  }
+
+  /* ---------- toolbar ---------- */
+  function renderToolbar() {
+    $('#squadSeg').innerHTML = SQUADS.map((s) => '<button type="button" data-squad="' + s + '" aria-pressed="' + (s === M.activeSquad) + '">' + s + '</button>').join('');
+    const sel = $('#selForm');
+    sel.innerHTML = Object.keys(MODES[M.mode].formations).map((f) => '<option' + (f === squad().formation ? ' selected' : '') + '>' + f + '</option>').join('');
+    renderEditCtx();
+  }
+  function renderEditCtx() {
+    const k = curStep();
+    $('#editCtx').innerHTML = (k === 0 || !tactic())
+      ? '<b>시작 배치</b> 편집 중, 끌면 ' + M.activeSquad + ' 스쿼드 위치가 바뀝니다'
+      : '<b>단계 ' + k + '</b> 이동 기록 중, 끌면 이 단계의 도착 위치가 바뀝니다';
+  }
+
+  /* ---------- pitch ---------- */
+  const svg = $('#pitch'), gTok = $('#gTok'), gOver = $('#gOver'), ballEl = $('#ball');
+  const tokEls = new Map();
+  (function stripes() {
+    let h = '';
+    for (let i = 0; i < 10; i++) if (i % 2 === 0) h += '<rect x="0" y="' + (i * 66) + '" width="480" height="66" fill="#1C4F3B"/>';
+    $('#stripes').innerHTML = h;
+  })();
+  /* darker derived fill so white digits reach >= 4.5:1; DEMO_STATE color stays as the ring */
+  const fillCache = {};
+  function lum(h) { const c = [1, 3, 5].map((i) => parseInt(h.substr(i, 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4))); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+  function tokFill(hex) {
+    if (fillCache[hex]) return fillCache[hex];
+    let rgb = [1, 3, 5].map((i) => parseInt(hex.substr(i, 2), 16));
+    const W = lum('#F7F9FD');
+    const toHex = (a) => '#' + a.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+    let out = toHex(rgb);
+    for (let i = 0; i < 30 && (W + 0.05) / (lum(out) + 0.05) < 4.8; i++) { rgb = rgb.map((v) => v * 0.93); out = toHex(rgb); }
+    fillCache[hex] = out; return out;
+  }
+  function textW(s) { let w = 0; for (const ch of s) w += /[ㄱ-힝]/.test(ch) ? 18 : 10.5; return Math.max(w + 14, 30); }
+  function ensureTokens() {
+    const sig = M.roster.map((r) => r.id).join(',');
+    if (gTok.dataset.sig !== sig) {
+      gTok.innerHTML = ''; tokEls.clear();
+      M.roster.forEach((r) => {
+        const g = document.createElementNS(NS, 'g');
+        g.setAttribute('class', 'tok'); g.setAttribute('tabindex', '0'); g.setAttribute('role', 'button');
+        g.dataset.id = r.id;
+        g.innerHTML = '<circle class="t-hit" r="38"/><circle class="t-halo" r="31"/><circle class="t-focusbg" r="29"/><circle class="t-focus" r="29"/><circle class="t-ring" r="25"/>' +
+          '<circle class="t-body" r="20"/><text class="t-num" y="1"></text>' +
+          '<g class="t-lblg"><rect class="t-lblbg" rx="4" y="27" height="25"/><text class="t-lbl" y="45.5"></text></g>';
+        g.addEventListener('pointerdown', onTokDown);
+        g.addEventListener('pointermove', onTokMove);
+        g.addEventListener('pointerup', onTokUp);
+        g.addEventListener('pointercancel', onTokCancel);
+        g.addEventListener('keydown', onTokKey);
+        gTok.appendChild(g); tokEls.set(r.id, g);
+      });
+      gTok.dataset.sig = sig;
+    }
+    M.roster.forEach((r) => {
+      const g = tokEls.get(r.id);
+      const body = g.querySelector('.t-body'); body.setAttribute('fill', tokFill(r.color)); body.setAttribute('stroke', r.color);
+      g.querySelector('.t-num').textContent = r.num;
+      g.querySelector('.t-lbl').textContent = r.name || ' ';
+      const w = textW(r.name || '');
+      const bg = g.querySelector('.t-lblbg'); bg.setAttribute('x', (-w / 2).toFixed(1)); bg.setAttribute('width', w.toFixed(1));
+      g.dataset.w = w.toFixed(1);
+      g.setAttribute('aria-label', r.num + '번 ' + (r.name || '이름 없음') + ', ' + (ROLE_KO[r.role] || r.role));
+    });
+  }
+  function renderPitch() {
+    ensureTokens();
+    M.roster.forEach((r) => {
+      const g = tokEls.get(r.id); const q = posAtP(r.id, ui.p);
+      g.setAttribute('transform', 'translate(' + q.x.toFixed(1) + ' ' + q.y.toFixed(1) + ')');
+      /* near own goal line: put the name pill beside the token so it clears the goal line and the back line */
+      const lg = g.querySelector('.t-lblg');
+      if (q.y > 590) lg.setAttribute('transform', 'translate(' + (q.x > 360 ? -(+g.dataset.w / 2 + 26) : (+g.dataset.w / 2 + 26)) + ' -39.5)');
+      else lg.removeAttribute('transform');
+      const sel = ui.selected === r.id;
+      g.classList.toggle('is-sel', sel);
+      g.setAttribute('aria-pressed', sel ? 'true' : 'false');
+    });
+    const b = ballAtP(ui.p);
+    ballEl.setAttribute('transform', 'translate(' + b.x.toFixed(1) + ' ' + b.y.toFixed(1) + ')');
+    renderOverlay();
+  }
+  function seg(a, b, s0, s1) {
+    const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy);
+    if (L < s0 + s1 + 8) return null;
+    return { x1: a.x + dx / L * s0, y1: a.y + dy / L * s0, x2: b.x - dx / L * s1, y2: b.y - dy / L * s1 };
+  }
+  function renderOverlay() {
+    const t = tactic(), n = nSteps();
+    const k = ui.playing ? Math.min(n, Math.floor(ui.p) + 1) : curStep();
+    if (!t || k < 1 || k > n) { gOver.innerHTML = ''; return; }
+    const s = t.steps[k - 1]; let h = '';
+    Object.keys(s.moves).forEach((key) => {
+      const id = +key; if (!player(id)) return;
+      const a = posAt(id, k - 1), b = posAt(id, k);
+      if (Math.hypot(b.x - a.x, b.y - a.y) < 4) return;
+      h += '<circle class="ghost" cx="' + a.x + '" cy="' + a.y + '" r="20"/>';
+      const l = seg(a, b, 22, 30);
+      if (l) h += '<line class="mv" x1="' + l.x1.toFixed(1) + '" y1="' + l.y1.toFixed(1) + '" x2="' + l.x2.toFixed(1) + '" y2="' + l.y2.toFixed(1) + '" marker-end="url(#ahMove)"/>';
+    });
+    if (s.ball && player(s.ball.from) && player(s.ball.to)) {
+      const l = seg(off(posAt(s.ball.from, k - 1)), off(posAt(s.ball.to, k)), 10, 16);
+      if (l) h += '<line class="pass" x1="' + l.x1.toFixed(1) + '" y1="' + l.y1.toFixed(1) + '" x2="' + l.x2.toFixed(1) + '" y2="' + l.y2.toFixed(1) + '" marker-end="url(#ahPass)"/>';
+    }
+    gOver.innerHTML = h;
+  }
+  function toSvg(e) {
+    const m = svg.getScreenCTM(); if (!m) return { x: 240, y: 330 };
+    const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const r = pt.matrixTransform(m.inverse());
+    return { x: r.x, y: r.y };
+  }
+
+  /* tap selects, drag (8px threshold) moves */
+  function onTokDown(e) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault();
+    const g = e.currentTarget; const id = +g.dataset.id;
+    stopPlay(); ui.p = curStep();
+    const pt = toSvg(e); const cur = posAt(id, curStep());
+    drag = { id, g, sx: e.clientX, sy: e.clientY, moved: false, off: { x: cur.x - pt.x, y: cur.y - pt.y } };
+    try { g.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+  }
+  function onTokMove(e) {
+    if (!drag || drag.g !== e.currentTarget) return;
+    if (!drag.moved && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 8) return;
+    drag.moved = true;
+    const pt = toSvg(e);
+    setPos(drag.id, { x: Math.round(clamp(pt.x + drag.off.x, 20, 460)), y: Math.round(clamp(pt.y + drag.off.y, 20, 640)) });
+    renderPitch();
+    if (ui.selected === drag.id) patchSelPos();
+  }
+  function onTokUp(e) {
+    if (!drag || drag.g !== e.currentTarget) return;
+    const d = drag; drag = null;
+    if (!d.moved) {
+      select(ui.selected === d.id ? null : d.id);
+      try { d.g.focus({ preventScroll: true }); } catch (err) { /* ignore */ }
+    } else {
+      markEdited(); renderTree(); renderInspector(); renderTimeline();
+      const p = posAt(d.id, curStep()); const r = player(d.id);
+      announce(r.num + '번 위치 X ' + p.x + ', Y ' + p.y);
+    }
+  }
+  function onTokCancel() { if (drag) { drag = null; renderPitch(); } }
+  function onTokKey(e) {
+    const id = +e.currentTarget.dataset.id;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); stopPlay(); select(ui.selected === id ? null : id); return; }
+    const d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+    if (d && ui.selected === id) {
+      e.preventDefault(); stopPlay(); ui.p = curStep();
+      const st = e.shiftKey ? 20 : 5; const q = posAt(id, curStep());
+      setPos(id, { x: clamp(q.x + d[0] * st, 20, 460), y: clamp(q.y + d[1] * st, 20, 640) });
+      markEdited(); renderPitch(); patchSelPos();
+      clearTimeout(onTokKey.t);
+      onTokKey.t = setTimeout(() => { const p = posAt(id, curStep()); announce('X ' + p.x + ', Y ' + p.y); renderTree(); }, 400);
+    }
+  }
+  svg.addEventListener('pointerup', (e) => {
+    if (e.target.closest && e.target.closest('.tok')) return;
+    if (ui.selected != null) select(null);
+  });
+
+  function select(id) {
+    ui.selected = id; renderPitch(); renderInspector();
+    if (id != null) { const r = player(id); announce(r.num + '번 ' + r.name + ' 선택됨. 방향키로 옮기고 Esc로 해제합니다.'); }
+    else announce('선택 해제');
+  }
+
+  /* ---------- timeline & playback ---------- */
+  const track = $('#tlTrack');
+  function renderTimeline() {
+    const t = tactic(), n = nSteps(), k = curStep();
+    const has = !!t;
+    $('#tlEmpty').hidden = has;
+    ['.tl-ctl', '.tl-track', '.tl-add'].forEach((s) => { $(s).hidden = !has; });
+    if (!has) return;
+    const sc = $('#tlScrub');
+    sc.max = String(n); sc.disabled = n === 0; sc.value = String(ui.p);
+    sc.style.setProperty('--pct', (n ? ui.p / n * 100 : 0) + '%');
+    sc.setAttribute('aria-valuetext', ui.p % 1 === 0 ? (ui.p === 0 ? '시작 배치' : '단계 ' + ui.p) : '단계 ' + ui.p.toFixed(1));
+    const keys = $('#tlKeys');
+    const sig = t.id + ':' + n + ':' + t.steps.map((s) => s.label).join('|');
+    if (keys.dataset.sig !== sig) {
+      let h = '';
+      for (let i = 0; i <= n; i++) {
+        const lbl = i === 0 ? '' : t.steps[i - 1].label;
+        h += '<button type="button" class="tl-key" data-k="' + i + '" style="--f:' + (n ? i / n : 0) + '" aria-label="' + (i === 0 ? '시작 배치' : '단계 ' + i + ': ' + esc(lbl)) + '">' +
+          '<span class="dia" aria-hidden="true"></span><span class="kn mono" aria-hidden="true">' + (i === 0 ? '시작' : i) + '</span><span class="kl" aria-hidden="true">' + esc(lbl) + '</span></button>';
+      }
+      keys.innerHTML = h; keys.dataset.sig = sig; fitLabels();
+    }
+    keys.querySelectorAll('.tl-key').forEach((b) => {
+      const i = +b.dataset.k;
+      if (!ui.playing && i === k && Math.abs(ui.p - k) < 1e-4) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      b.classList.toggle('passed', i <= ui.p + 1e-4);
+    });
+    $('#tlRead').textContent = k === 0 ? '시작 / ' + n : '단계 ' + k + ' / ' + n;
+    $('#tlPrev').disabled = ui.p <= 0;
+    $('#tlNext').disabled = ui.p >= n;
+    const pb = $('#tlPlay'); pb.disabled = n === 0;
+    $('#tlPlayIc').innerHTML = ic(ui.playing ? 'pause' : 'play');
+    pb.setAttribute('aria-label', ui.playing ? '미리보기 일시정지' : '미리보기 재생');
+  }
+  function fitLabels() {
+    const n = nSteps(); const w = track.clientWidth - 60;
+    const per = n ? w / n : w;
+    track.style.setProperty('--kw', Math.max(0, Math.min(160, per - 14)) + 'px');
+    track.classList.toggle('no-labels', per < 70);
+  }
+  if ('ResizeObserver' in window) new ResizeObserver(fitLabels).observe(track);
+
+  function goStep(k) {
+    stopPlay();
+    ui.p = clamp(k, 0, nSteps());
+    renderPitch(); renderTimeline(); renderInspector(); renderEditCtx();
+    const t = tactic();
+    announce(ui.p === 0 ? '시작 배치' : '단계 ' + ui.p + ': ' + (t ? t.steps[ui.p - 1].label : ''));
+  }
+  function play() {
+    const n = nSteps(); if (!n) return;
+    if (ui.p >= n - 1e-4) ui.p = 0;
+    ui.playing = true; renderTimeline();
+    if (reduceMQ.matches) {
+      ui.p = Math.floor(ui.p); renderPitch();
+      ui.timer = setInterval(() => {
+        ui.p = Math.min(n, Math.floor(ui.p) + 1); renderPitch(); renderTimeline();
+        if (ui.p >= n) stopPlay();
+      }, 1100);
+      return;
+    }
+    let last = performance.now();
+    const tick = (now) => {
+      const dt = Math.min(64, now - last); last = now;
+      ui.p = Math.min(n, ui.p + dt / 1150);
+      renderPitch(); renderTimeline();
+      if (ui.p >= n) { stopPlay(); return; }
+      ui.raf = requestAnimationFrame(tick);
+    };
+    ui.raf = requestAnimationFrame(tick);
+  }
+  function stopPlay() {
+    if (!ui.playing) return;
+    cancelAnimationFrame(ui.raf); clearInterval(ui.timer);
+    ui.playing = false;
+    if (Math.abs(ui.p - Math.round(ui.p)) < 0.02) ui.p = Math.round(ui.p);
+    renderPitch(); renderTimeline(); renderInspector(); renderEditCtx();
+  }
+
+  /* ---------- inspector ---------- */
+  function renderInspector() {
+    const el = $('#inspector');
+    const t = tactic(), k = curStep(), n = nSteps();
+    const r = ui.selected != null ? player(ui.selected) : null;
+    const frac = Math.abs(ui.p - k) > 1e-4;
+    const stepName = k === 0 || !t ? '시작 배치' : '단계 ' + k;
+    if (mobileMQ.matches) {
+      let h = '<div class="cmp">';
+      if (r) {
+        const p = posAt(r.id, k); const movedHere = t && k > 0 && t.steps[k - 1].moves[r.id];
+        h += '<div class="cmp-row"><span class="mini-tok" style="background:' + tokFill(r.color) + '" aria-hidden="true">' + r.num + '</span>' +
+          '<label class="sr-only" for="selName">' + r.num + '번 선수 이름</label><input class="inp" id="selName" value="' + esc(r.name) + '" autocomplete="off" maxlength="8">' +
+          '<button type="button" class="icon-btn" id="selClear" aria-label="' + stepName + ' 이동 지우기"' + (movedHere ? '' : ' disabled') + '>' + ic('undo') + '</button>' +
+          '<button type="button" class="icon-btn" id="selDone" aria-label="선택 해제">' + ic('x') + '</button></div>' +
+          '<p class="cmp-sub"><span class="mono"><span id="selX">X ' + p.x + '</span> <span id="selY">Y ' + p.y + '</span></span>' + stepName + ' 기준, 끌거나 방향키로 이동</p>';
+      } else {
+        const lbl = k === 0 || !t ? M.activeSquad + ' 스쿼드 ' + squad().formation : t.steps[k - 1].label;
+        h += '<div class="cmp-row"><p class="cmp-step"><span class="mono">' + (k === 0 || !t ? '시작' : k + '/' + n) + '</span>' + esc(frac ? '미리보기 중' : lbl) + '</p>' +
+          (t && k > 0 ? '<button type="button" class="icon-btn" id="stepDel" aria-label="단계 ' + k + ' 삭제">' + ic('trash') + '</button>' : '') + '</div>' +
+          '<p class="cmp-sub">선수를 탭하면 도구가 열립니다. 끌면 ' + (k === 0 || !t ? '시작 배치가' : '이 단계 위치가') + ' 바뀝니다.</p>';
+      }
+      el.innerHTML = h + '</div>';
+      return;
+    }
+    let h = '<section class="insp-sec" aria-labelledby="hSel"><h2 class="insp-h" id="hSel">선택한 선수</h2>';
+    if (r) {
+      const p = posAt(r.id, k); const movedHere = t && k > 0 && t.steps[k - 1].moves[r.id];
+      h += '<div class="sel-head"><span class="mini-tok" style="background:' + tokFill(r.color) + '" aria-hidden="true">' + r.num + '</span>' +
+        '<div class="field"><label class="lbl" for="selName">' + r.num + '번 이름</label><input class="inp" id="selName" value="' + esc(r.name) + '" autocomplete="off" maxlength="8"></div></div>' +
+        '<dl class="kv"><div><dt>X</dt><dd id="selX">' + p.x + '</dd></div><div><dt>Y</dt><dd id="selY">' + p.y + '</dd></div><div><dt>역할</dt><dd>' + r.role + '</dd></div></dl>' +
+        '<p class="help">' + stepName + ' 기준 위치' + (movedHere ? ', 이 단계에서 움직입니다.' : '입니다.') + ' 방향키로 5씩, <kbd>Shift</kbd>와 함께 20씩 옮깁니다.</p>' +
+        '<div class="row">' + (t && k > 0 ? '<button type="button" class="btn small" id="selClear"' + (movedHere ? '' : ' disabled') + '>' + ic('undo') + '이 단계 이동 지우기</button>' : '') +
+        '<button type="button" class="btn small ghost" id="selDone">선택 해제 <kbd>Esc</kbd></button></div>';
+    } else {
+      h += '<p class="empty-p">피치에서 선수를 누르면 이름과 위치를 고칠 수 있습니다. 누른 채 끌면 바로 옮겨집니다.</p>';
+    }
+    h += '</section><section class="insp-sec" aria-labelledby="hStep"><h2 class="insp-h" id="hStep"><span>' + (frac ? '미리보기' : stepName) + '</span>' + (t ? '<span class="mono">' + k + ' / ' + n + '</span>' : '') + '</h2>';
+    if (!t || k === 0) {
+      h += '<p class="empty-p">' + esc(M.activeSquad) + ' 스쿼드 ' + esc(squad().formation) + ' 배치가 모든 단계의 출발점입니다.' + (t ? ' 단계를 고르면 그 단계의 이동을 기록합니다.' : '') + '</p>';
+    } else {
+      const s = t.steps[k - 1];
+      const mv = Object.keys(s.moves).filter((id) => player(+id)).map((id) => {
+        const pl = player(+id); const q = s.moves[id];
+        return '<li><span>' + pl.num + '번 ' + esc(pl.name) + '</span><span class="mono">X ' + q.x + ' Y ' + q.y + '</span></li>';
+      }).join('');
+      const ball = s.ball && player(s.ball.from) && player(s.ball.to)
+        ? player(s.ball.from).num + '번 ' + esc(player(s.ball.from).name) + '에서 ' + player(s.ball.to).num + '번 ' + esc(player(s.ball.to).name) + '에게'
+        : '없음';
+      h += '<div class="field"><label class="lbl" for="stepLabel">단계 이름</label><input class="inp" id="stepLabel" value="' + esc(s.label) + '" autocomplete="off" maxlength="30"></div>' +
+        '<p class="sub-h">이동</p>' + (mv ? '<ul class="moves">' + mv + '</ul>' : '<p class="help">아직 이동이 없습니다. 선수를 끌어 도착 위치를 기록하세요.</p>') +
+        '<p class="sub-h">패스</p><p class="empty-p">' + ball + '</p>' +
+        '<div class="row"><button type="button" class="btn small" id="stepDel">' + ic('trash') + '이 단계 삭제</button></div>';
+    }
+    h += '</section>';
+    el.innerHTML = h;
+  }
+  function patchSelPos() {
+    if (ui.selected == null) return;
+    const p = posAt(ui.selected, curStep());
+    const x = $('#selX'), y = $('#selY');
+    const m = mobileMQ.matches;
+    if (x) x.textContent = (m ? 'X ' : '') + p.x;
+    if (y) y.textContent = (m ? 'Y ' : '') + p.y;
+    const t = tactic(), k = curStep(); const c = $('#selClear');
+    if (c && t && k > 0) c.disabled = !t.steps[k - 1].moves[ui.selected];
+  }
+
+  /* ---------- drawer ---------- */
+  const files = $('#files');
+  function applyInert() {
+    if (narrowMQ.matches && !ui.drawer) files.setAttribute('inert', ''); else files.removeAttribute('inert');
+    if (!narrowMQ.matches && ui.drawer) setDrawer(false, true);
+  }
+  function setDrawer(open, silent) {
+    ui.drawer = open;
+    files.classList.toggle('open', open);
+    $('#scrim').hidden = !open;
+    $('#btnFiles').setAttribute('aria-expanded', String(open));
+    applyInert();
+    if (silent) return;
+    if (open) setTimeout(() => { const f = files.querySelector('#filesClose'); if (f) f.focus(); }, 40);
+    else $('#btnFiles').focus();
+  }
+
+  /* ---------- confirm dialog ---------- */
+  const dlgC = $('#dlgConfirm');
+  let cfHandlers = null, cfReturn = null;
+  function openConfirm(o) {
+    cfReturn = document.activeElement;
+    $('#cfTitle').textContent = o.title;
+    $('#cfTag').hidden = !o.tag;
+    $('#cfBody').innerHTML = o.body + (o.items ? '<p>' + esc(o.listTitle || '') + '</p><ul class="cf-list">' + o.items.map((i) => '<li>' + esc(i) + '</li>').join('') + '</ul>' : '');
+    $('#cfOk').textContent = o.ok || '확인';
+    cfHandlers = o; dlgC.returnValue = '';
+    dlgC.showModal();
+    $('#cfCancel').focus();
+  }
+  dlgC.addEventListener('close', () => {
+    const h = cfHandlers; cfHandlers = null;
+    const ok = dlgC.returnValue === 'ok';
+    if (h) { if (ok) h.onOk(); else if (h.onCancel) h.onCancel(); }
+    if (h && ok && h.noReturn) return;
+    let back = cfReturn;
+    if (back && !document.contains(back) && back.id) back = document.getElementById(back.id);
+    if (back && document.contains(back)) { try { back.focus(); } catch (e) { /* ignore */ } }
+  });
+
+  /* ---------- export sheet ---------- */
+  const dlgE = $('#dlgExport');
+  let exReturn = null;
+  const teamSlug = () => M.team.replace(/\s+/g, '');
+  function chatText() {
+    const t = tactic();
+    let s = '[' + M.team + '] ' + (t ? t.name : M.activeSquad + ' 스쿼드') + ' (' + MODES[M.mode].label + ', ' + squad().formation + ')\n';
+    if (t) t.steps.forEach((st, i) => { s += (i + 1) + '. ' + st.label + '\n'; });
+    s += '전술판 링크: 공유 링크 자리 (시안)';
+    return s;
+  }
+  function openExport() {
+    exReturn = document.activeElement;
+    const t = tactic();
+    $('#exSub').textContent = (t ? t.name + ', ' : '') + M.activeSquad + ' 스쿼드 ' + squad().formation;
+    $('#exPngMeta').textContent = M.activeSquad + ' 스쿼드 ' + squad().formation + ', 480x660';
+    $('#exGifMeta').textContent = t ? t.name + ', ' + t.steps.length + '단계' : '열린 전술 파일 없음';
+    dlgE.querySelectorAll('[data-gif]').forEach((b) => { b.disabled = !t || !t.steps.length || !!ui.gif; });
+    $('#chatText').value = chatText();
+    if (!dlgE.open) dlgE.showModal();
+  }
+  function closeExport() { if (dlgE.open) dlgE.close(); }
+  dlgE.addEventListener('close', () => {
+    cancelGif(true);
+    $('#exResult').innerHTML = '';
+    if (exReturn && document.contains(exReturn)) { try { exReturn.focus(); } catch (e) { /* ignore */ } }
+  });
+  dlgE.addEventListener('click', (e) => {
+    if (e.target === dlgE) closeExport();
+    const c = e.target.closest('[data-close]'); if (c) closeExport();
+    const b = e.target.closest('[data-ex]'); if (b && !b.disabled) exAction(b.dataset.ex);
+  });
+  const AD_SHEET = '<div class="ad-slot ad-sheet" role="note" aria-label="광고 자리 시안"><b>광고 자리 (시안)</b><span>결과 안내 아래, 작업을 마친 뒤에만 보이는 칸입니다.</span></div>';
+  function showResult(title, file, note) {
+    const box = $('#exResult');
+    box.innerHTML = '<div class="res" tabindex="-1">' + ic('check') + '<div><p class="res-t">' + esc(title) + '</p>' +
+      (file ? '<p class="res-f mono">' + esc(file) + '</p>' : '') +
+      '<p class="res-n">' + esc(note || '시안이라 실제 파일이나 공유는 일어나지 않습니다.') + '</p></div><span class="tag">시안</span></div>' + AD_SHEET;
+    const r = box.querySelector('.res');
+    r.scrollIntoView({ block: 'nearest', behavior: reduceMQ.matches ? 'auto' : 'smooth' });
+  }
+  function exAction(kind) {
+    const t = tactic();
+    const png = teamSlug() + '_' + M.activeSquad + '_' + squad().formation + '.png';
+    const today = new Date(); const mmdd = String(today.getMonth() + 1).padStart(2, '0') + String(today.getDate()).padStart(2, '0');
+    switch (kind) {
+      case 'png-save': showResult('이미지를 기기에 저장했습니다', png); break;
+      case 'png-send': showResult('보내기 화면으로 넘겼습니다', png, '시안이라 실제 공유 화면은 열리지 않습니다. 지원하지 않는 기기에서는 저장으로 대신합니다.'); break;
+      case 'gif-save': case 'gif-send': startGif(kind); break;
+      case 'text-copy': showResult('단톡방 텍스트를 복사했습니다', null, '시안이라 클립보드에는 아무것도 들어가지 않습니다.'); break;
+      case 'link-copy': showResult('읽기 전용 링크를 복사했습니다', null, '시안이라 클립보드에는 아무것도 들어가지 않습니다.'); break;
+      case 'sq-save': showResult('백업 파일을 받았습니다', teamSlug() + '_백업_' + mmdd + '.sq'); break;
+      case 'sq-restore': confirmRestore(); break;
+      default: break;
+    }
+  }
+  function startGif(kind) {
+    const t = tactic(); if (!t || ui.gif) return;
+    const file = teamSlug() + '_' + t.name + '.gif';
+    ui.gif = { pct: 0, kind, file, timer: 0 };
+    dlgE.querySelectorAll('[data-gif]').forEach((b) => { b.disabled = true; });
+    const box = $('#exResult');
+    box.innerHTML = '<div class="proc" role="group" aria-label="GIF 만드는 중">' +
+      '<div class="proc-top"><p>GIF 만드는 중 <span class="tag">시안</span></p><span class="mono" id="gifPct">0%</span></div>' +
+      '<div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="GIF 진행률" id="gifBarWrap"><span id="gifBar"></span></div>' +
+      '<p class="help">' + esc(t.name) + ', ' + t.steps.length + '단계. 이 창을 닫으면 취소됩니다.</p>' +
+      '<button type="button" class="btn small" id="gifCancel">' + ic('x') + '취소</button></div>';
+    $('#gifCancel').addEventListener('click', () => cancelGif(false));
+    box.scrollIntoView({ block: 'nearest' });
+    ui.gif.timer = setInterval(() => {
+      const g = ui.gif; if (!g) return;
+      g.pct = Math.min(100, g.pct + 2 + Math.random() * 3);
+      const v = Math.round(g.pct);
+      const pe = $('#gifPct'); if (pe) pe.textContent = v + '%';
+      const b = $('#gifBar'); if (b) b.style.transform = 'scaleX(' + (g.pct / 100) + ')';
+      const w = $('#gifBarWrap'); if (w) w.setAttribute('aria-valuenow', String(v));
+      if (g.pct >= 100) {
+        clearInterval(g.timer); ui.gif = null;
+        dlgE.querySelectorAll('[data-gif]').forEach((bt) => { bt.disabled = false; });
+        if (g.kind === 'gif-save') showResult('GIF를 기기에 저장했습니다', g.file);
+        else showResult('GIF를 보내기 화면으로 넘겼습니다', g.file, '시안이라 실제 공유 화면은 열리지 않습니다.');
+      }
+    }, 90);
+  }
+  function cancelGif(silent) {
+    if (!ui.gif) return;
+    clearInterval(ui.gif.timer); ui.gif = null;
+    dlgE.querySelectorAll('[data-gif]').forEach((b) => { b.disabled = false; });
+    if (!silent) {
+      $('#exResult').innerHTML = '<div class="res cancel" tabindex="-1">' + ic('x') + '<div><p class="res-t">GIF 만들기를 취소했습니다</p><p class="res-n">작업 내용은 그대로입니다. 다시 누르면 처음부터 만듭니다.</p></div><span class="tag">시안</span></div>';
+    }
+  }
+  function confirmRestore() {
+    openConfirm({
+      title: '백업에서 복원할까요?', tag: true,
+      body: '<p>백업 파일 <b class="mono">' + esc(teamSlug()) + '_백업_1005.sq</b>(10월 5일)의 내용으로 지금 작업을 바꿉니다. 바꾼 직후에는 되돌리기로 지금 상태를 되살릴 수 있습니다.</p>',
+      listTitle: '바뀌는 항목',
+      items: ['선수 이름 ' + M.roster.length + '명', '스쿼드 배치 3개 (기본, 공격, 수비)', '전술 ' + M.tactics.length + '개'],
+      ok: '복원하기', noReturn: true,
+      onOk() {
+        stopPlay(); snapshot();
+        M = buildModel(); ui.p = 0; ui.selected = null; ui.slotNote = false;
+        ui.fail = false; ui.save = 'saved'; ui.savedAt = Date.now();
+        closeExport(); renderAll(); renderSave(true);
+        toast('복원하고 기기에 저장했습니다', { undo: true });
+      }
+    });
+  }
+
+  /* ---------- actions ---------- */
+  function openTactic(id) {
+    stopPlay(); M.activeTactic = id; ui.p = 0; ui.selected = null;
+    renderAll();
+    if (narrowMQ.matches && ui.drawer) setDrawer(false);
+    const t = tactic(); announce(t.name + ' 파일을 열었습니다. ' + t.steps.length + '단계');
+  }
+  function newTactic() {
+    if (M.tactics.length >= M.slotLimit) {
+      ui.slotNote = true; renderTree();
+      const n = $('#slotNote'); if (n) n.focus();
+      announce('저장 슬롯이 모두 찼습니다. 쓰지 않는 전술 파일을 지우면 새로 만들 수 있습니다.');
+      return;
+    }
+    stopPlay();
+    const id = 't' + (++M.seq);
+    let i = 1; while (M.tactics.some((t) => t.name === '새 전술 ' + i)) i++;
+    M.tactics.push({ id, name: '새 전술 ' + i, updated: '방금 전', steps: [{ label: '단계 1', moves: {}, ball: null }] });
+    M.activeTactic = id; ui.p = 1; ui.selected = null; ui.slotNote = false;
+    renderAll(); markEdited();
+    if (narrowMQ.matches && ui.drawer) setDrawer(false);
+    toast('새 전술 ' + i + ' 파일을 만들었습니다. 선수를 끌어 단계 1의 움직임을 기록하세요.');
+  }
+  function deleteTactic(id) {
+    const t = M.tactics.find((x) => x.id === id); if (!t) return;
+    stopPlay(); snapshot();
+    M.tactics = M.tactics.filter((x) => x.id !== id);
+    if (M.activeTactic === id) { M.activeTactic = M.tactics.length ? M.tactics[0].id : null; ui.p = 0; ui.selected = null; }
+    ui.slotNote = false;
+    renderAll(); markEdited();
+    toast('\'' + t.name + '\' 파일을 지웠습니다. 슬롯 1개가 비었습니다', { undo: true });
+  }
+  function addStep() {
+    const t = tactic(); if (!t) return;
+    stopPlay();
+    t.steps.push({ label: '단계 ' + (t.steps.length + 1), moves: {}, ball: null });
+    t.updated = '방금 전'; ui.p = t.steps.length;
+    renderAll(); markEdited();
+    announce('단계 ' + t.steps.length + '를 추가했습니다. 선수를 끌어 이동을 기록하세요.');
+  }
+  function deleteStep() {
+    const t = tactic(); const k = curStep(); if (!t || k < 1) return;
+    stopPlay(); snapshot();
+    t.steps.splice(k - 1, 1); t.updated = '방금 전';
+    ui.p = Math.min(k, t.steps.length); ui.selected = null;
+    renderAll(); markEdited();
+    toast('단계 ' + k + '를 지웠습니다', { undo: true });
+  }
+  function resetLayout() {
+    stopPlay(); snapshot();
+    squad().positions = layoutFor(M.mode, squad().formation).pos;
+    renderAll(); markEdited();
+    toast(M.activeSquad + ' 스쿼드 배치를 초기화했습니다', { undo: true });
+  }
+  function changeFormation(f) {
+    if (f === squad().formation) return;
+    stopPlay(); snapshot();
+    squad().formation = f; squad().positions = layoutFor(M.mode, f).pos;
+    renderAll(); markEdited();
+    toast('포메이션을 ' + f + '로 바꿨습니다', { undo: true });
+  }
+  function applyMode(mode) {
+    const fkey = Object.keys(MODES[mode].formations)[0];
+    const L = layoutFor(mode, fkey);
+    M.mode = mode; M.roster = L.roster;
+    SQUADS.forEach((s) => { M.squads[s] = { formation: fkey, positions: clone(L.pos) }; });
+    const id = 't' + (++M.seq);
+    M.tactics = [{ id, name: '새 전술 1', updated: '방금 전', steps: [{ label: '단계 1', moves: {}, ball: null }] }];
+    M.activeTactic = id; M.ballHolder = null; M.ball = { x: 240, y: 330 };
+    ui.p = 0; ui.selected = null; ui.slotNote = false;
+  }
+  function requestMode(v, selEl) {
+    if (v === M.mode) return;
+    if (selEl) selEl.value = M.mode;
+    const label = MODES[v].label;
+    openConfirm({
+      title: label + '로 바꿀까요?', tag: true,
+      body: '<p>인원을 바꾸면 아래 항목이 처음 상태로 돌아갑니다. 바꾼 직후에는 되돌리기로 되살릴 수 있습니다.</p>',
+      listTitle: '초기화되는 항목',
+      items: ['선수 이름 ' + M.roster.length + '명', '스쿼드 배치 3개 (기본, 공격, 수비)', '전술 ' + M.tactics.length + '개'],
+      ok: label + '로 바꾸기',
+      onOk() { stopPlay(); snapshot(); applyMode(v); renderAll(); markEdited(); toast(label + '로 바꿨습니다', { undo: true }); }
+    });
+  }
+
+  /* ---------- demo states menu ---------- */
+  const demoMenu = $('#demoMenu'), btnDemo = $('#btnDemo');
+  function setDemoMenu(open) {
+    demoMenu.hidden = !open; btnDemo.setAttribute('aria-expanded', String(open));
+    if (open) { const f = demoMenu.querySelector('.demo-item'); if (f) f.focus(); }
+  }
+  function runDemo(kind) {
+    setDemoMenu(false);
+    switch (kind) {
+      case 'saved':
+        ui.fail = false; ui.save = 'saved'; ui.savedAt = Date.now(); renderSave(true);
+        announce('이 기기에 저장됨'); break;
+      case 'processing':
+        if (!tactic() || !nSteps()) { toast('GIF를 만들 전술 파일이 없습니다. 먼저 전술 파일을 여세요.'); break; }
+        openExport(); startGif('gif-save'); break;
+      case 'fail':
+        ui.fail = true; ui.save = 'failed'; renderSave();
+        setTimeout(() => { const b = $('#failRetry'); if (b) b.focus(); }, 30); break;
+      case 'undo': resetLayout(); break;
+      case 'slots':
+        if (narrowMQ.matches) setDrawer(true, true);
+        if (M.tactics.length >= M.slotLimit) newTactic();
+        else { ui.slotNote = true; renderTree(); const n = $('#slotNote'); if (n) n.focus(); }
+        break;
+      case 'restore': openExport(); confirmRestore(); break;
+      default: break;
+    }
+  }
+
+  /* ---------- render all ---------- */
+  function renderAll() {
+    renderHeader(); renderTree(); renderToolbar(); renderPitch(); renderTimeline(); renderInspector(); renderSave();
+  }
+
+  /* ---------- wiring ---------- */
+  document.querySelectorAll('[data-ic]').forEach((el) => { el.outerHTML = ic(el.dataset.ic); });
+
+  $('#btnFiles').addEventListener('click', () => setDrawer(!ui.drawer));
+  $('#filesClose').addEventListener('click', () => setDrawer(false));
+  $('#scrim').addEventListener('click', () => setDrawer(false));
+  $('#btnExport').addEventListener('click', openExport);
+  btnDemo.addEventListener('click', () => setDemoMenu(demoMenu.hidden));
+  demoMenu.addEventListener('click', (e) => { const b = e.target.closest('[data-demo]'); if (b) runDemo(b.dataset.demo); });
+  document.addEventListener('pointerdown', (e) => { if (!demoMenu.hidden && !e.target.closest('#demoWrap')) setDemoMenu(false); });
+
+  $('#failRetry').addEventListener('click', () => {
+    ui.fail = false; ui.save = 'saving'; renderSave();
+    setTimeout(() => { ui.save = 'saved'; ui.savedAt = Date.now(); renderSave(true); toast('이 기기에 다시 저장했습니다'); }, 700);
+  });
+  $('#failBackup').addEventListener('click', () => { openExport(); exAction('sq-save'); });
+
+  files.addEventListener('click', (e) => {
+    const o = e.target.closest('[data-open]'); if (o) { openTactic(o.dataset.open); return; }
+    const d = e.target.closest('[data-del]'); if (d) { deleteTactic(d.dataset.del); return; }
+    if (e.target.closest('#btnNewTac')) { newTactic(); return; }
+    if (e.target.closest('#slotNoteClose')) { ui.slotNote = false; renderTree(); const b = $('#btnNewTac'); if (b) b.focus(); }
+  });
+  files.addEventListener('change', (e) => { if (e.target.id === 'selMode') requestMode(e.target.value, e.target); });
+
+  $('#squadSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-squad]'); if (!b || b.dataset.squad === M.activeSquad) return;
+    stopPlay(); M.activeSquad = b.dataset.squad; renderAll();
+    const nb = $('#squadSeg [data-squad="' + M.activeSquad + '"]'); if (nb) nb.focus();
+    announce(M.activeSquad + ' 스쿼드');
+  });
+  $('#selForm').addEventListener('change', (e) => changeFormation(e.target.value));
+  $('#btnReset').addEventListener('click', resetLayout);
+
+  $('#tlPrev').addEventListener('click', () => goStep(Math.ceil(ui.p - 1e-4) - 1));
+  $('#tlNext').addEventListener('click', () => goStep(Math.floor(ui.p + 1e-4) + 1));
+  $('#tlPlay').addEventListener('click', () => { if (ui.playing) stopPlay(); else { ui.selected = null; renderInspector(); play(); } });
+  $('#tlAdd').addEventListener('click', addStep);
+  $('#tlEmptyNew').addEventListener('click', newTactic);
+  $('#tlKeys').addEventListener('click', (e) => { const b = e.target.closest('[data-k]'); if (b) goStep(+b.dataset.k); });
+  const scrub = $('#tlScrub');
+  scrub.addEventListener('input', () => {
+    if (ui.playing) { cancelAnimationFrame(ui.raf); clearInterval(ui.timer); ui.playing = false; }
+    ui.p = +scrub.value; renderPitch(); renderTimeline();
+  });
+  scrub.addEventListener('change', () => {
+    const r = Math.round(ui.p); if (Math.abs(ui.p - r) < 0.12) ui.p = r;
+    renderPitch(); renderTimeline(); renderInspector(); renderEditCtx();
+  });
+  scrub.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); goStep(Math.ceil(ui.p - 1e-4) - 1); }
+    else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); goStep(Math.floor(ui.p + 1e-4) + 1); }
+    else if (e.key === 'Home') { e.preventDefault(); goStep(0); }
+    else if (e.key === 'End') { e.preventDefault(); goStep(nSteps()); }
+  });
+
+  const insp = $('#inspector');
+  insp.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b || b.disabled) return;
+    if (b.id === 'selDone') { const id = ui.selected; select(null); const g = tokEls.get(id); if (g) g.focus(); }
+    else if (b.id === 'selClear') {
+      const t = tactic(), k = curStep(); if (!t || k < 1 || ui.selected == null) return;
+      delete t.steps[k - 1].moves[ui.selected]; t.updated = '방금 전';
+      renderPitch(); renderInspector(); renderTree(); markEdited();
+      announce('이 단계 이동을 지웠습니다');
+    } else if (b.id === 'stepDel') deleteStep();
+  });
+  insp.addEventListener('input', (e) => {
+    if (e.target.id === 'selName' && ui.selected != null) {
+      const r = player(ui.selected); r.name = e.target.value.trim(); ensureTokens(); markEdited();
+    } else if (e.target.id === 'stepLabel') {
+      const t = tactic(), k = curStep(); if (!t || k < 1) return;
+      t.steps[k - 1].label = e.target.value; t.updated = '방금 전'; renderTimeline(); markEdited();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (dlgE.open || dlgC.open) return;
+    if (!demoMenu.hidden) { setDemoMenu(false); btnDemo.focus(); return; }
+    if (ui.drawer) { setDrawer(false); return; }
+    if (ui.playing) { stopPlay(); return; }
+    if (ui.selected != null) { const id = ui.selected; select(null); const g = tokEls.get(id); if (g && document.activeElement && document.activeElement.closest && document.activeElement.closest('#inspector')) g.focus(); }
+  });
+
+  narrowMQ.addEventListener('change', applyInert);
+  mobileMQ.addEventListener('change', () => { renderInspector(); fitLabels(); });
+  setInterval(() => { if (ui.save === 'saved') renderSave(); }, 30000);
+
+  /* optional per-viewer convenience: remember last opened tactic (never required) */
+  try {
+    const last = window.localStorage && localStorage.getItem('tacticsStudioDemo.lastTactic');
+    if (last && M.tactics.some((t) => t.id === last)) M.activeTactic = last;
+  } catch (e) { /* storage unavailable, ignore */ }
+  const remember = () => { try { if (M.activeTactic) localStorage.setItem('tacticsStudioDemo.lastTactic', M.activeTactic); } catch (e) { /* ignore */ } };
+  files.addEventListener('click', remember);
+
+  applyInert();
+  renderAll();
+})();
+</script>
+</body>
+</html>
