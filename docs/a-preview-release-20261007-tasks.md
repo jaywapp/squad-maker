@@ -29,3 +29,5 @@ native 21c2b5474e77d97aef827b0d45e311eb585d1164, UI d6c16cefb32500b02c8e975b701b
 I-05 실제 실행: d326f335 CI 2건 성공. 기존 승인 키로 동일 CI APK를 서명하고 전용 AVD에 설치했다. Android Emulator 35.6의 초기 화면 정지/ANR는 공개 진단에서 HWUI 대기로 확인됐고, 원본 SDK 변경 없이 프로젝트 로컬 공식 Emulator 37.2.12로 정상 A UI·테스트 광고 실행을 확인했다. 원본 AVD 데이터는 보존했다. 현재 발견된 짧은 높이 피치 중첩을 최소 수정한 뒤 새 head APK로 최종 검증한다.
 
 짧은 높이 보완 검증: 단위 95/95, 새 360×682/360×640 기하 2개 및 touchcancel 2개 통과. 시작 배율 assertion은 CSS만 적용한 상태에서 두 화면 모두 실패를 재현했다. 최소 수정 후 독립 diff 재리뷰에 새 High/Critical 없음. 새 소스 head의 CI 및 APK 설치를 진행한다.
+
+I-05 native 진단: .sq 복원 후 2회 추가는 ID [1,3,2,4]로 모두 고유하며 빈 ID를 재사용하는 기존 계약을 따른다. 검사기의 [1,3,4,5] 가정은 잘못되어 수정했고 실제 위치·지침·패턴 비교를 진행한다. Android SAF가 .sq.json으로 저장하는 문제를 발견해 SquadDocumentsPlugin.java의 선택기 MIME만 최소 보완하고 새 CI/APK를 검증한다.

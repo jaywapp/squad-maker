@@ -33,3 +33,7 @@
 새 기하 회귀가 시작 시 native 클래스 적용 후 배율이 이전 최소 폭에 남는 문제를 잡았다(두 화면 각각 48px/78.5px 차이). 플랫폼 클래스가 바뀔 때만 배율을 동기화하여 처음 실행부터 피치와 선수 좌표를 맞춘다.
 
 최종 기하 회귀는 실제 360dp 폭의 높이 682px와 640px를 대상으로 한다. 추가 탐색한 320×640에서는 기존 큰 글자용 컨테이너 분기로 상단 두 줄이 늘어 피치와 선택 도구를 함께 보려면 세로 스크롤이 필요하다. 360dp 미만·큰 글자·가로 화면의 전체 가시성은 이번 preview 검증의 제한으로 기록한다.
+
+## 실제 Android 백업 확장자 보완
+
+API 36의 파일 저장 완료 뒤 NativeSparseQA-final.sq.json이 만들어짐을 확인했다. JSON MIME 타입에 따른 Android 파일 제공자의 확장자 추가이며, .sq 복원 선택성과 백업 명명 계약을 지키기 위해 native Documents.save의 JSON .sq 파일 선택기에서만 application/octet-stream을 지정한다. 브리지의 허용 MIME, JSON bytes, 계약 v2, 웹 .sq, PNG/GIF와 공유 동작은 보존한다. 승인된 최소 native 보완이다. 기존 AOSP FileUtils splitFileName 근거: https://android.googlesource.com/platform/frameworks/base/+/cf628c4/core/java/android/os/FileUtils.java . 최종 APK로 실제 .sq 파일명·원본 bytes·재복원을 확인한다.

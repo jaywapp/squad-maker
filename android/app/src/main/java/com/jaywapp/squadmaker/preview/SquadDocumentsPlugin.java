@@ -67,7 +67,11 @@ public class SquadDocumentsPlugin extends Plugin {
                 call.getData().put("stagedToken", token);
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType(mime);
+                // Keep the custom backup extension when the document provider chooses a filename.
+                String pickerMime = "application/json".equals(mime)
+                    && filename(call).toLowerCase(java.util.Locale.ROOT).endsWith(".sq")
+                    ? "application/octet-stream" : mime;
+                intent.setType(pickerMime);
                 intent.putExtra(Intent.EXTRA_TITLE, filename(call));
                 startActivityForResult(call, intent, "documentCreated");
             } catch (Exception error) {
