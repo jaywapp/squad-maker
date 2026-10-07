@@ -8,7 +8,7 @@
 | A의 실제 원본 캡처와 아직 반영되지 않은 개선 | [A 자료](design-a/README.md) |
 | 요청·권한·근거·이번 문서 작업 범위 | [분석](squad-product-20261007-analysis.md) |
 | 정보 구조·저장/이전·UI 인계·구매 계약 제안 | [설계](squad-product-20261007-design.md) |
-| 작업 ID·Claude UI/Codex 기능 역할·인계·결정 게이트·완료 기준 | [실행 로드맵과 작업계획](squad-product-20261007-tasks.md) |
+| 작업 ID·Claude UI/Codex 기능 역할·세션 인계·APK 전달·완료 기준 | [실행 로드맵과 작업계획](squad-product-20261007-tasks.md) |
 | 운영 웹의 기능·실행·테스트·운영 참고 | [현재 웹 구현 참고](current-web-reference.md) |
 | 문서 전수 분류·이동·참조 검증 결과 | [정리 기록](documentation-audit.md) |
 
