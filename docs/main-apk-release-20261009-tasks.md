@@ -8,10 +8,14 @@ orchestrator: Codex. root는 workflow/version/metadata/sign/local smoke/Git/docs
 | CI-02 | Codex | Codex | gpt-6.1-sol | high | CI-01 | implementation | release-apk.yml, ci-apk-version.gradle, apk-release-metadata.mjs, sign-release-apk.ps1, metadata unit | event/permission/version/sign/identity 경계 | 완료 |
 | CI-03 | Codex | Codex | gpt-6.1-sol | medium | CI-01 | implementation | publish-apk-release.mjs, publish unit | stale-main/draft/redownload/idempotence/fail boundaries | 완료 |
 | CI-04 | Codex | Codex | gpt-6.1-sol | high | CI-02,CI-03 | review | 읽기만 | 독립 diff 및 artifact 계약 리뷰 | 완료 |
-| CI-05 | Codex | Codex | gpt-6.1-sol | high | CI-04 | sequential | 로컬 .work만/CI PR | unit·workflow·실제 init/local sign/PR unsigned CI | 구현 SHA 검증 완료·최종 PR CI 확인 |
-| CI-06 | Codex | Codex | gpt-6.1-sol | medium | CI-05 | approval | 원격 encrypted Secrets·자동화PR만 | 사용자 승인 후 registry/main activation/실제 run | 승인 대기·미실행 |
+| CI-05 | Codex | Codex | gpt-6.1-sol | high | CI-04 | sequential | 로컬 .work만/CI PR | unit·workflow·실제 init/local sign/PR unsigned CI | 완료(d59b917 CI 및 local sign) |
+| CI-06 | Codex | Codex | gpt-6.1-sol | medium | CI-05 | sequential | 원격 encrypted Secrets·자동화PR만 | 사용자 승인 후 registry/main activation/실제 run | 사용자 승인·등록 완료, 병합/실행 확인 진행 |
 
 원격 서명/Release 게시와 휴대폰/T7 검증은 현재 미실행/미검증이다. local smoke와 mock 테스트를 원격 게시 결과로 보고하지 않는다. 기존 광고/브랜딩 변경·서명 APK·키는 보존한다.
+
+2026-10-09(KST) 사용자 "승인"을 받았다. root가 기존 인증서 pin 확인 후 기존4개 서명값을 stdin으로 encrypted GitHub Secrets에 등록하고 이름만 확인했다. 기존 private 입력 전후 hash 동일/새 키·plaintext 파일 생성 없음. 승인 증거는 `.work/auto-apk-release-20261009/secret-registration.json`(공개 이름/상태만). GitHub 설정·main 병합·해당 push run·Release 검증은 순차 의존이고 private 입력 공유를 피하기 위해 root가 직접 처리한다. 병합 이후 CI-06의 실행 결과·main SHA·Release·재다운로드 증거와 완료 상태는 [PR48](https://github.com/jaywapp/squad-maker/pull/48)에 기록한다. 휴대폰/T7은 별도로 미검증을 유지한다.
+
+승인 전 최종 head d59b917의 [Main APK run37805705491](https://github.com/jaywapp/squad-maker/actions/runs/37805705491)과 [verification run37805705452](https://github.com/jaywapp/squad-maker/actions/runs/37805705452) 모두 PASS. unit128/E2E195/skip1, sync/bundle·unsigned·lint(0errors/15warnings)·manifest PASS. PR merge ref6b9dd7bc source/version1076의 기존-key local sign/cert/v2/v3/zipalign/hash 및4개 artifact publisher 계약도 PASS. 증거는 `.work/auto-apk-release-20261009/{ci-run-d59b917.log,final-ci-unsigned,final-ci-lint,final-signed-smoke,final-sign-smoke-verification.json}`다.
 
 검증 기준 구현 SHA=`b930dbd100a256258a3dfc6f5b4b72ee78e0b95f`. 전체 unit 128/128 통과(새 release unit 33개), 로컬 desktop/mobile E2E 195 PASS/1 skip. Node syntax·PowerShell AST·YAML parse 통과. 독립 정적 리뷰의 artifact 디렉터리 정리와 equal-code/different-SHA gate 수정 반영.
 

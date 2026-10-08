@@ -2,7 +2,13 @@
 
 orchestrator: Codex. 사용자 요청: main에 push되면 최신 설치용 APK를 자동 빌드하여 GitHub Releases에 게시한다. 중단된 정리 요청은 취소되었으며 stash/삭제/서버 종료/인계 파일 생성은 실행되지 않았다.
 
-## 시작 상태와 승인 경계
+## 2026-10-09 사용자 승인 및 활성화
+
+사용자가 기존 Preview signing Secrets 등록과 PR48만 main에 병합하여 최초 자동 APK Release 및 재다운로드 검증까지 진행하는 제안에 "승인"이라고 답했다. 이 범위에서는 앞선 원격 저장/main 병합 금지 조건이 해제되었다. PR47 병합·웹 배포 재개·휴대폰 설치·새 키/계정/PAT 생성은 포함하지 않는다.
+
+기존 key의 실제 인증서 pin을 재확인하고 서명용4개 encrypted repository Secrets를 stdin으로 등록했다. 이후 이름4개만 확인했고, 원본 key/credential 파일의 전후 hash가 동일하다. 값 출력·commandline 전달·새 plaintext 파일 저장은 없었다. 원격 Secret 전달·서명·Release는 main push run에서 실제 확인할 단계이며 완료라고 보고하지 않는다. 활성화 결과와 exact main/source SHA·Release·APK 재다운로드 증거는 [PR48](https://github.com/jaywapp/squad-maker/pull/48)에 기록한다.
+
+## 시작 상태와 승인 경계(승인 전 기록)
 
 origin/main `aa891870d9bb1649a7d64b507c232534e16cb6dd`(reachable commits71)에서 전용 `feat/main-apk-release-20261009` 작업 트리를 생성한다. 기존 Run Line PR #47은 Draft/head e67e61d, signed APK source a736c498/1002는 기존 트리에 보존한다. 기존 광고 미커밋12개와 브랜딩 트리의3개 로컬 변경을 변경하지 않는다.
 

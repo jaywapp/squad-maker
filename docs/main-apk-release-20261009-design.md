@@ -26,6 +26,8 @@ module unit/CLI 검사·workflow 정적 검토·Gradle init 실제 unsigned/sign
 
 ## 운영 절차
 
+2026-10-09(KST) 사용자가 기존4개 signing 값의 GitHub encrypted Secrets 신규 저장과 PR48 main 병합·최초 자동 Release 및 재다운로드 검증을 승인했다. 실제 key 인증서 pin 확인, stdin 등록, 이름4개 확인과 원본 private 입력 전후 hash 동일 검사가 완료되었다. 원격 sign/publish와 설치 데이터 유지 검증을 이 등록 결과만으로 완료 처리하지 않는다. PR CI 확인→PR48 ready/merge→exact main push run→공개4개 asset 재다운로드→APK identity/cert/hash 검증 순으로 진행하고, 실제 결과는 PR48에 기록한다. branch/tag 삭제·force push·웹 배포 재개·휴대폰 설치는 수행하지 않는다.
+
 승인 후 기존4개 signing 값을 encrypted repository Secrets에 등록하고 이름만 확인한다. CLI 등록은 stdin으로 전달하며 값/키의 commandline·로그·새 plaintext 파일 저장을 금지한다. 인증서 pin이나 app ID를 변경하지 않는다. 그런 변경이 필요하면 자동 생성/교체하지 않고 중단한다.
 
 자동화 PR48만 main에 병합하면 첫 push run이 시작된다. regression/unsigned/sign/release를 실제 확인하고 공개 APK·SHA256SUMS·build-info를 내려받아 package/version/cert와 SHA256을 재확인한다. Secret 누락·서명/cert 오류·검증 실패에는 Release를 공개하지 않는다. 이미 만들어진 owned draft는 동일 SHA run 재시도로 복구한다. public release/tag를 삭제하거나 덮어써서 복구하지 않는다. 새로운 main이 있으면 최신 main push run에서 계속한다.
