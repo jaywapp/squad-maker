@@ -17,3 +17,13 @@ GitHub repo signing Secrets/variables는 현재 없음. GITHUB_TOKEN 기본 perm
 커밋별 immutable Release를 보존하고 `releases/latest/download/squad-maker-latest.apk`를 제공한다. GitHub Latest 링크를 위해 release 자체는 non-prerelease로 게시하지만 APK는 기존 Preview namespace/인증서이며 이름·notes·metadata에 그 사실과 실기기 미검증을 명시한다. 동일 SHA 재시도, 실패·superseded main·누락/잘못된 cert·부분 업로드를 테스트한다.
 
 원격 Sign/Release는 승인된 Secrets 등록과 main 병합 후 실제 실행을 확인해야 운영 완료다. 승인 전에는 local signing smoke(기존 key path 직접 사용, 새 key copy 없음), publish mock, PR의 무서명 CI까지 검증한다. 원격 key/암호나 실제 게시를 이미 검증했다고 주장하지 않는다.
+
+## 확인 결과와 남은 제약
+
+구현 SHA b930dbd 및 PR merge source db09bb11에서 새 CI의 실제 sync/bundle·version init·unsigned·lint·unit128/E2E195를 검증했다. 기존 키를 직접 사용한 local signing smoke 및 공개4파일 publisher 계약도 통과했다. [PR48](https://github.com/jaywapp/squad-maker/pull/48)은 Draft이며 최종 문서 변경도 새 workflow PR CI로 확인한다.
+
+기존 모바일 전체패턴 GIF E2E skip1은 인코딩 시간 절약을 위한 desktop-only 조건이다. 데스크톱 전체 GIF 및 모바일 단일 GIF는 PASS이며 모바일 전체 GIF는 미검증이다.
+
+이번 main 기반 lint는 **0 errors/15 warning instances, 8종류**다. 이전 PR47에서 보고한 경고8개와 수를 혼동하지 않는다. 8종은 Gradle 최신버전 권고1, AppCompat 최신버전 권고1, min24에서 drawable-v24 불필요1, UnusedResources7, monochrome 누락2, splash density 크기1·중복1·densityless 위치1이다. 빌드를 차단하지 않지만 테마 아이콘과 스플래시의 시각적 제약이 남는다. PR47의 브랜딩 자산·리소스를 이 자동화 브랜치에서 수정하지 않는다. 의존성 경고는 업데이트 권고이며 무단 upgrade를 하지 않는다. npm ci는 기존 lockfile에서 moderate 취약점4개도 보고했으며 범위 밖의 audit fix/lockfile 변경은 하지 않았다.
+
+원격 Ubuntu signing step의 실제 Secret 전달·키 복원·삭제, draft Release 업로드/다운로드·latest 게시는 승인 전 **미검증**이다. publishing의 실패/재시도/동일code 다른source 경계는 mock unit29개로 검증했으며 실원격 실행으로 표시하지 않는다. 휴대폰 설치와 실기기 T7도 미검증이다.

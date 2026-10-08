@@ -12,6 +12,7 @@ on:
       - 'tests/**'
       - 'package*.json'
       - 'capacitor.config.json'
+      - 'docs/main-apk-release-20261009-*.md'
       - '.github/workflows/release-apk.yml'
 
 permissions:
