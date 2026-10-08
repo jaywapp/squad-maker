@@ -5,7 +5,7 @@
 
 | 항목 | 내용 |
 |---|---|
-| 상태 | **적용 완료 · Draft PR 검토 단계** · T7 실기기 미검증 |
+| 상태 | **적용 완료 · [Draft PR #47](https://github.com/jaywapp/squad-maker/pull/47)** · T7 실기기 미검증 |
 | 선택 | 시안 A "런 라인" — 2026-10-08 사용자 선택 |
 | 시안 원본 | `design/brand-20261008`의 `docs/ux-concepts/brand-20261008/` (A·B·C 비교, A = `concept-01/`, 원본 작업 트리에 보존) |
 | 작업 기준 브랜치 | `feat/a-preview-release-20261007` (`7f1f1a9`, `v0.1.0-preview.1` APK 기준) |
@@ -66,4 +66,4 @@ work/tasks/branding/
 
 전체 PR을 병합한 main aa891870d9bb1649a7d64b507c232534e16cb6dd에서 feat/brand-run-line으로 적용했다. [작업·검증·실기기 대기표](../../../docs/brand-run-line-20261008-tasks.md)를 기준으로 확인한다. 원본 시안 비교는 D:/station/.worktrees/squad-maker-brand-20261008/docs/ux-concepts/brand-20261008/에 보존되어 있다. 이 branch에는 사용자 지시대로 작업 패키지만 복사했다.
 
-제공 assets41개/적용 Android res17개는 원본 SHA256과 동일하며 스토어512 PNG는 기존 파일을 재사용했다. 이전 적용 단계에서는 서명 APK·배포·PR 게시를 하지 않았다. 이후 사용자 요청으로 최종 검증·commit/push·main 대상 Draft PR을 진행한다. [최신 실행 기록](../../../docs/brand-run-line-pr-20261008-tasks.md)과 [T7 체크리스트](../../../docs/brand-run-line-pr-20261008-t7.md)를 따른다. PR은 GitHub의 feat/brand-run-line head로 조회한다. 실제기기의 흰 깜빡임·마스크·테마 아이콘·warm start는 미검증이며 서명/설치/배포/병합을 보류한다.
+제공 assets41개/적용 Android res17개는 원본 SHA256과 동일하며 스토어512 PNG는 기존 파일을 재사용했다. 이전 적용 단계에서는 서명 APK·배포·PR 게시를 하지 않았다. 이후 사용자 요청으로 최종 검증·commit/push·main 대상 Draft PR을 진행한다. [최신 실행 기록](../../../docs/brand-run-line-pr-20261008-tasks.md)과 [T7 체크리스트](../../../docs/brand-run-line-pr-20261008-t7.md)를 따른다. [Draft PR #47](https://github.com/jaywapp/squad-maker/pull/47)의 최종 SHA/검증 결과를 기준으로 검토한다. 실제기기의 흰 깜빡임·마스크·테마 아이콘·warm start는 미검증이며 서명/설치/배포/병합을 보류한다.

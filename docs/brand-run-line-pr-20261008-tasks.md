@@ -8,8 +8,8 @@ orchestrator: Codex. 공급 자산/기존 브랜딩만 범위. root 단독 편�
 | F-02 | Codex | Codex | gpt-6.1-sol | high | F-01 | audit | 공급 assets/code/test 읽기 | 별도 reviewer와 root diff 확인 | 완료 |
 | F-03 | Codex | Codex | gpt-6.1-sol | medium | F-01 | documentation | 이 문서 4개·index·기존 브랜딩 문서/패키지 README | T7 절차/기대/증거·미검증·질문 일괄 | 완료·답변 대기 |
 | F-04 | Codex | Codex | gpt-6.1-sol | medium | F-02,F-03 | sequential | 범위 내 브랜딩 파일 | 새 candidate unit/E2E/sync/bundle/unsigned/lint | 완료 |
-| F-05 | Codex | Codex | gpt-6.1-sol | high | F-04 | sequential | 범위 내 staged diff/Git | Conventional Commit·최종 SHA의 전체 검증 | 대기 |
-| F-06 | Codex | Codex | gpt-6.1-sol | medium | F-05 | sequential | 원격 작업 branch/Draft PR | main 대상 Draft·정상 push·자동 배포 중단 유지 | 대기 |
+| F-05 | Codex | Codex | gpt-6.1-sol | high | F-04 | sequential | 범위 내 staged diff/Git | Conventional Commit·최종 SHA의 전체 검증 | 커밋 완료·최종 재검증 단계 |
+| F-06 | Codex | Codex | gpt-6.1-sol | medium | F-05 | sequential | 원격 작업 branch/Draft PR | main 대상 Draft·정상 push·자동 배포 중단 유지 | Draft #47 생성 완료·최종 SHA push 단계 |
 | T7 | Codex | Codex | gpt-6.1-sol | high | F-06,향후 사용자 실행 승인 | blocked | 향후 서명/기기 증거만 | 별도 체크리스트 10개 | 미검증·이번 실행 금지 |
 
 ## 이번 새 검증 결과
@@ -39,3 +39,7 @@ candidate와 final 결과를 구분한다. 이전 `.work/branding/` 기록은 �
 ## 제외 및 보존
 
 기존 `docs/pr-cleanup-20261008-tasks.md` 로컬 변경은 커밋 제외·보존. sync 생성 Gradle 2파일은 정규화한 내용 diff0이어서 제외. 광고 트리와 원본 design/UI/native 브랜치는 변경하지 않는다. 서명 APK·실기기 설치·공개 배포·main 병합·branch 삭제·force push를 하지 않는다.
+
+## Git 실행과 최종 SHA 검증
+
+구현 commit 40833effb5bb6726f8a0e04a2815b905b58126cb을 정상 push하고 main 대상 [Draft PR #47](https://github.com/jaywapp/squad-maker/pull/47)을 생성했다. 이 문서와 패키지 README의 PR 링크를 별도 docs 커밋으로 반영한 뒤 그 최종 SHA에서 전체 검증을 실행한다. 아래 상태는 커밋 전 시점이며 이후 완료 SHA/명령/결과/CI는 PR 본문과 final/verification.json에서 확인한다. source 추가 수정은 없으며 1차 커밋과 최종 docs 커밋의 제품 코드·자산은 동일하다.
