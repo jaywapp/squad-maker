@@ -7,8 +7,8 @@
 | 사용자·문제·단계별 기능·화면·슬롯·출시 기준 | [상세 상품 기획서](product-plan.md) |
 | A의 실제 원본 캡처와 아직 반영되지 않은 개선 | [A 자료](design-a/README.md) |
 | 요청·권한·근거·이번 문서 작업 범위 | [분석](squad-product-20261007-analysis.md) |
-| 정보 구조·저장/이전·화면·구매 계약 제안 | [설계](squad-product-20261007-design.md) |
-| 의존성·담당·검증·미정으로 차단된 구현 | [작업 계획](squad-product-20261007-tasks.md) |
+| 정보 구조·저장/이전·UI 인계·구매 계약 제안 | [설계](squad-product-20261007-design.md) |
+| 작업 ID·Claude UI/Codex 기능 역할·세션 인계·APK 전달·완료 기준 | [실행 로드맵과 작업계획](squad-product-20261007-tasks.md) |
 | 운영 웹의 기능·실행·테스트·운영 참고 | [현재 웹 구현 참고](current-web-reference.md) |
 | P0-01~03 데이터 보호·C-01 구현과 검증 | [분석](data-safety-ui-contract-20261007-analysis.md), [설계](data-safety-ui-contract-20261007-design.md), [실행 기록](data-safety-ui-contract-20261007-tasks.md) |
 | 선수 ID 충돌 재현·연속 추가·저장 회귀 | [분석](player-id-safety-20261007-analysis.md), [설계](player-id-safety-20261007-design.md), [검증](player-id-safety-20261007-tasks.md) |
@@ -30,6 +30,6 @@
 
 ## 작성 규칙
 
-저장소 [AGENTS](../AGENTS.md)와 [CLAUDE](../CLAUDE.md)를 우선합니다. 분석·설계·작업의 역할을 나누고 확정/제안/미정/현 구현을 표기합니다. 실제 UX 구현 전에는 요구된 디자인 스킬·pre-flight와 사용자 선택 기록을 확인합니다. 이번 작업은 기존 A 선택을 기록하며 운영 UI를 구현하지 않습니다.
+저장소 [AGENTS](../AGENTS.md)와 [CLAUDE](../CLAUDE.md)를 우선합니다. 분석·설계·작업의 역할을 나누고 확정/제안/미정/현 구현을 표기합니다. 실제 UX 구현 전에는 요구된 디자인 스킬·pre-flight와 사용자 선택 기록을 확인합니다. UI·시각·반응형·접근성은 Claude 담당으로 확정했습니다. 실제 구현은 작업계획의 계약·파일 소유권을 기준으로 도구별 별도 실행 트리에서 진행합니다. 현재 문서 작업은 운영 UI를 구현하지 않습니다.
 
 문서의 진입점은 이 파일 하나로 유지합니다. 새 내용은 여기서 연결하고 오래된 계획은 archive로 분류합니다. 원본 증거·라이선스·지침·운영 설정을 임의로 삭제하지 않습니다. 시크릿·토큰·키·.env 값은 문서에 남기지 않습니다.
