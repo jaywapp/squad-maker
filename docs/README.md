@@ -17,10 +17,11 @@
 | 현재 C-03·native 저장/내보내기 계약 v2 | [UI 계약 v2](ui-state-save-export-contract-v2.md), [Claude 요청문](a-android-preview-20261007-claude-request.md), [Android 결정](android-preview-architecture.md) |
 | 문서 전수 분류·이동·참조 검증 결과 | [정리 기록](documentation-audit.md) |
 | A UI 통합 APK 및 Release 검증 | [분석](a-preview-release-20261007-analysis.md), [설계](a-preview-release-20261007-design.md), [실행](a-preview-release-20261007-tasks.md) |
-
+| 2026-10-08 전체 PR 병합·자동 배포 중단·기존 작업 보존 | [분석](pr-cleanup-20261008-analysis.md), [설계](pr-cleanup-20261008-design.md), [실행](pr-cleanup-20261008-tasks.md) |
 
 ## 유지하는 근거와 운영 참고
 
+- 2026-10-03 이전 UI 시안(PR #37): [분석](ui-redesign-analysis.md), [설계](ui-redesign-design.md), [작업](ui-redesign-tasks.md), [1차 시안](ux-concepts/ui-redesign/README.md), [2차 시안](ux-concepts/ui-redesign-v2/README.md). 고유 원본·폰트 라이선스를 보존한 과거 비교 자료이며 현재 선택된 A 운영 기준은 위의 최신 계약과 통합 실행 문서를 따른다.
 - [2026-10-07 독립 UX 검토 원본](2026-10-07-ux-ui-independent-review.md): 원본 환경의 관찰·추정. 새로운 Android 검증 결과가 아니다.
 - [분석 이벤트 사전](analytics-event-dictionary.md), [분석 ADR 0001](adr/0001-analytics-provider.md): 현재 웹 구현 참고. 과거 가격·가입 가설은 최신 상품 기준에서 제외.
 - 성능·안정성 이력: [분석](runtime-resilience-20260909-analysis.md), [설계](runtime-resilience-20260909-design.md), [작업·검증](runtime-resilience-20260909-tasks.md).
