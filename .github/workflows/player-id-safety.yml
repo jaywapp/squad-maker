@@ -1,0 +1,55 @@
+name: Player ID data safety
+
+on:
+  push:
+    branches:
+      - fix/player-id-safety-20261007
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    name: Baseline reproduction and complete regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out isolated review branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Reproduce collision on original PR42 head
+        run: |
+          git show 0d71b540a1a2be1c2cddd25364575725dc66d31d:index.html > "$RUNNER_TEMP/player-id-baseline.html"
+          node tests/helpers/player-id-source-reproduction.js "$RUNNER_TEMP/player-id-baseline.html" --expect-collision
+
+      - name: Verify fixed source functions
+        run: node tests/helpers/player-id-source-reproduction.js
+
+      - name: Prove browser regression catches baseline
+        run: |
+          cp index.html "$RUNNER_TEMP/player-id-fixed.html"
+          cp "$RUNNER_TEMP/player-id-baseline.html" index.html
+          set +e
+          npx playwright test tests/e2e/player-id-safety.spec.js --project=desktop-1280 --grep="sparse restored" --reporter=json > "$RUNNER_TEMP/player-id-baseline-report.json"
+          status=$?
+          set -e
+          cp "$RUNNER_TEMP/player-id-fixed.html" index.html
+          test "$status" -ne 0
+          node -e 'const fs=require("fs"),assert=require("node:assert/strict"); const report=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+"/player-id-baseline-report.json","utf8")); const specs=report.suites.flatMap(s=>s.specs||[]); assert.equal(specs.length,1); const results=specs[0].tests[0].results; assert.equal(results[0].status,"failed"); const message=results[0].error.message.replace(/\u001b\[[0-9;]*m/g,""); assert.ok(message.includes("Expected: 4")); assert.ok(message.includes("Received: 3")); console.log("Baseline browser regression detected duplicate ID: expected 4 distinct, received 3.");'
+
+      - name: Run API and all browser regressions on fixed source
+        run: npm test

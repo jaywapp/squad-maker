@@ -27,6 +27,11 @@ function collectAnalytics(page) {
   return events;
 }
 
+async function expectUndecidedOffer(modal) {
+  await expect(modal).toContainText('제공 범위와 가격은 아직 정해지지 않았습니다.');
+  await expect(modal).not.toContainText(/\d[\d,]*\s*원|월\s*\d|팀\s*1개|문서\s*5개|Pro/);
+}
+
 test.describe('출시 전 기능 미리보기', () => {
 
   test('세 진입점이 편집 모드에 표시되고 클릭 시 정직한 안내 모달이 열린다', async ({ page }) => {
@@ -39,10 +44,10 @@ test.describe('출시 전 기능 미리보기', () => {
     await section.locator('button:has-text("클라우드에 팀 저장")').click();
     const modal = page.locator('#interestModal');
     await expect(modal).toBeVisible();
-    // 출시 전 상태·가격·개인정보 미수집을 정직하게 고지
+    // Disclose the preview, undecided offer, and unchanged privacy boundary.
     await expect(modal).toContainText('아직 출시 전인 기능입니다');
     await expect(modal).toContainText('무료 기능은 그대로 무료');
-    await expect(modal).toContainText('6,900원');
+    await expectUndecidedOffer(modal);
     await expect(modal).toContainText('개인정보는 수집하지 않습니다');
     await expect
       .poll(() => events.filter(e => e.name === 'cloud_save_interest_clicked').length)
@@ -58,8 +63,10 @@ test.describe('출시 전 기능 미리보기', () => {
     const events = collectAnalytics(page);
     await page.goto('/index.html');
     await page.click('.interest-section button:has-text("고급 영상 내보내기")');
+    await expectUndecidedOffer(page.locator('#interestModal'));
     await page.click('#interestModal button:has-text("닫기")');
     await page.click('.interest-section button:has-text("선수별 브리핑")');
+    await expectUndecidedOffer(page.locator('#interestModal'));
     await page.click('#interestModal button:has-text("닫기")');
     // 패턴 모드의 진입점은 pattern_controls로 구분된다
     await page.click('.app-tab[data-app="pattern"]');
@@ -85,6 +92,7 @@ test.describe('출시 전 기능 미리보기', () => {
     const events = collectAnalytics(page);
     await page.goto('/index.html');
     await page.click('.interest-section button:has-text("선수별 브리핑")');
+    await expectUndecidedOffer(page.locator('#interestModal'));
     const href = await page.locator('#interestMail').getAttribute('href');
     expect(href).toMatch(/^mailto:/);
     await expect

@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>자석 전술판</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gothic+A1:wght@400;600;800&display=swap">
+<style>
+/* Layout: the whiteboard is the app. Board left, sticky notes right, marker tray docked at the bottom. */
+:root {
+  --wall: #e4e8ea;        /* 벽 */
+  --board: #fbfcfc;       /* 화이트보드 면 */
+  --frame: #b9c2c7;       /* 알루미늄 테두리 */
+  --line: #2f8a5b;        /* 초록 마커 라인 */
+  --ink: #1f2a30;         /* 검정 마커 */
+  --muted: #5d6b73;
+  --note: #ffe680;        /* 포스트잇 */
+  --note-ink: #3b3210;
+  --note-2: #ffd1dc;
+  --red: #d8433a;
+  --blue: #2563c9;
+  --tape: rgba(240, 232, 200, .85);
+  --tag-bg: rgba(240, 232, 200, .9);
+  --tag-ink: #2a2a22;
+  --shadow: 0 1px 0 rgba(0,0,0,.08), 0 6px 14px rgba(31,42,48,.14);
+  --font-hand: 'Gaegu', 'Comic Sans MS', cursive;
+  --font-ui: 'Gothic A1', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --wall: #151a19; --board: #26302d; --frame: #4a3a2a; --line: #e9efe6; --ink: #eef2ee; --muted: #a7b3ad;
+  --note: #e9d26a; --note-ink: #2e2808; --note-2: #e7a9b8; --red: #ff7a6e; --blue: #7aa7ff; --tape: rgba(220,210,170,.35); --tag-bg: rgba(10,14,13,.55); --tag-ink: #eef2ee;
+  --shadow: 0 1px 0 rgba(0,0,0,.4), 0 8px 18px rgba(0,0,0,.45); color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --wall: #151a19; --board: #26302d; --frame: #4a3a2a; --line: #e9efe6; --ink: #eef2ee; --muted: #a7b3ad;
+  --note: #e9d26a; --note-ink: #2e2808; --note-2: #e7a9b8; --red: #ff7a6e; --blue: #7aa7ff; --tape: rgba(220,210,170,.35); --tag-bg: rgba(10,14,13,.55); --tag-ink: #eef2ee;
+  --shadow: 0 1px 0 rgba(0,0,0,.4), 0 8px 18px rgba(0,0,0,.45); color-scheme: dark; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--wall); color: var(--ink); font-family: var(--font-ui); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 16px 104px; }
+button, input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+.top { max-width: 1240px; margin: 0 auto 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.brand { font-family: var(--font-hand); font-weight: 700; font-size: 1.9rem; line-height: 1; letter-spacing: -.01em; }
+.brand small { font-family: var(--font-ui); font-size: .72rem; color: var(--muted); font-weight: 600; margin-left: 6px; letter-spacing: .04em; }
+.team-name { border: 0; border-bottom: 2px dashed var(--frame); background: transparent; font-weight: 800; font-size: 1rem; padding: 4px 2px; min-width: 0; width: 13em; }
+.top .spacer { flex: 1; }
+.ghost { background: none; border: 0; color: var(--muted); font-weight: 600; font-size: .85rem; padding: 8px 6px; cursor: pointer; border-radius: 6px; }
+.ghost:hover { color: var(--ink); }
+
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+@media (max-width: 860px) { .wrap { grid-template-columns: 1fr; } }
+
+/* Board */
+.board { background: var(--board); border: 10px solid var(--frame); border-radius: 6px; box-shadow: var(--shadow), inset 0 0 40px rgba(0,0,0,.04); padding: 14px; position: relative; }
+.board-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 10px; }
+.squads { display: flex; gap: 4px; }
+.squad { font-family: var(--font-hand); font-weight: 700; font-size: 1.25rem; background: none; border: 0; padding: 2px 10px; cursor: pointer; color: var(--muted); position: relative; }
+.squad[aria-selected="true"] { color: var(--ink); }
+.squad[aria-selected="true"]::after { content: ''; position: absolute; left: 6px; right: 6px; bottom: 2px; height: 6px; background: var(--note); opacity: .9; z-index: -1; transform: skewX(-12deg); }
+.squad { z-index: 0; isolation: isolate; }
+.chip-select { font-family: var(--font-hand); font-weight: 700; font-size: 1.2rem; background: transparent; border: 2px solid var(--ink); border-radius: 999px; padding: 0 10px; cursor: pointer; }
+.modes { display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto; }
+.mode { font-size: .75rem; font-weight: 600; border: 1px solid var(--frame); background: transparent; border-radius: 999px; padding: 3px 9px; cursor: pointer; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mode[aria-pressed="true"] { background: var(--ink); color: var(--board); border-color: var(--ink); }
+
+.pitch { position: relative; width: 100%; max-width: min(560px, calc((100vh - 250px) * .68), 100%); margin: 0 auto; aspect-ratio: 68 / 100; touch-action: none; user-select: none; }
+.pitch svg.lines { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pitch svg.lines * { fill: none; stroke: var(--line); stroke-width: .55; stroke-linecap: round; }
+.pitch svg.arrows { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.arrow-run { fill: none; stroke: var(--red); stroke-width: .9; stroke-linecap: round; stroke-dasharray: 9 7; }
+.arrow-pass { fill: none; stroke: var(--blue); stroke-width: .8; stroke-linecap: round; }
+.draw { animation: draw .7s ease-out both; }
+@keyframes draw { from { stroke-dashoffset: 120; } to { stroke-dashoffset: 0; } }
+.arrow-pass.draw { stroke-dasharray: 120; }
+
+.magnet { position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; border: 0; padding: 0; cursor: grab; touch-action: none;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.55), rgba(255,255,255,0) 45%), var(--c);
+  box-shadow: 0 2px 0 rgba(0,0,0,.25), 0 4px 8px rgba(0,0,0,.22); color: #fff; font-weight: 800; font-size: 1rem; font-variant-numeric: tabular-nums;
+  transition: transform .28s cubic-bezier(.34,1.7,.5,1), box-shadow .2s; display: grid; place-items: center; }
+.magnet .tag { position: absolute; top: 46px; left: 50%; transform: translateX(-50%) rotate(-2deg); white-space: nowrap; background: var(--tag-bg); color: var(--tag-ink); font-family: var(--font-hand); font-weight: 700; font-size: .95rem; line-height: 1.1; padding: 1px 7px; pointer-events: none; }
+.magnet.dragging { cursor: grabbing; transform: scale(1.18) translateY(-4px); box-shadow: 0 4px 0 rgba(0,0,0,.18), 0 16px 22px rgba(0,0,0,.28); transition: box-shadow .2s; z-index: 5; }
+.magnet.sel { outline: 3px dashed var(--ink); outline-offset: 4px; }
+.ball { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #ddd 60%, #999); box-shadow: 0 2px 4px rgba(0,0,0,.35); pointer-events: none; }
+.ball::after { content: ''; position: absolute; inset: 5px; background: #222; clip-path: polygon(50% 0,100% 38%,82% 100%,18% 100%,0 38%); }
+.hint { font-family: var(--font-hand); font-size: 1.05rem; color: var(--muted); text-align: center; margin: 8px 0 0; }
+
+/* Pattern controls on board */
+.steps { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; justify-content: center; }
+.step-dot { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--ink); background: transparent; font-weight: 800; cursor: pointer; }
+.step-dot[aria-current="true"] { background: var(--red); border-color: var(--red); color: #fff; }
+.pill { border: 2px solid var(--ink); background: transparent; border-radius: 999px; padding: 6px 14px; font-weight: 700; cursor: pointer; min-height: 40px; }
+.pill.solid { background: var(--ink); color: var(--board); }
+
+/* Notes column */
+.notes { display: grid; gap: 22px; }
+.postit { background: var(--note); color: var(--note-ink); padding: 22px 20px 18px; box-shadow: var(--shadow); position: relative; transform: rotate(-.6deg); }
+.postit:nth-child(2n) { transform: rotate(.5deg); }
+.postit.pink { background: var(--note-2); }
+.postit::before { content: ''; position: absolute; top: -10px; left: 50%; width: 92px; height: 22px; margin-left: -46px; background: var(--tape); transform: rotate(-3deg); }
+.postit h2 { font-family: var(--font-hand); font-weight: 700; font-size: 1.45rem; margin: 0 0 6px; line-height: 1.15; text-wrap: balance; }
+.postit textarea { width: 100%; border: 0; background: repeating-linear-gradient(transparent 0 29px, rgba(0,0,0,.12) 29px 30px); font-family: var(--font-hand); font-size: 1.25rem; line-height: 30px; resize: vertical; min-height: 92px; color: var(--note-ink); padding: 0; }
+.postit textarea:focus-visible { outline-offset: 6px; }
+.postit .meta { font-size: .78rem; font-weight: 600; opacity: .75; }
+.roster { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px 14px; }
+.roster button { width: 100%; display: flex; align-items: center; gap: 8px; text-align: left; border: 0; background: none; padding: 4px 0; cursor: pointer; font-family: var(--font-hand); font-size: 1.15rem; color: var(--note-ink); }
+.roster .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--c); flex: none; }
+.roster .done { margin-left: auto; font-size: .9rem; }
+.roster button[aria-current="true"] { text-decoration: underline wavy; }
+.swatches { display: flex; gap: 6px; margin: 4px 0 8px; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; background: var(--c); cursor: pointer; }
+.swatch[aria-pressed="true"] { border-color: var(--note-ink); box-shadow: 0 0 0 2px var(--note); }
+.match-grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-family: var(--font-hand); font-size: 1.25rem; margin: 0; }
+.match-grid dt { font-weight: 700; }
+.match-grid dd { margin: 0; }
+pre.brief { white-space: pre-wrap; font-family: var(--font-hand); font-size: 1.15rem; line-height: 1.4; margin: 0; }
+
+/* Marker tray dock */
+.tray { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(var(--frame), color-mix(in srgb, var(--frame) 70%, #000)); box-shadow: 0 -4px 14px rgba(0,0,0,.15); z-index: 20; }
+.tray-in { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; gap: 10px; overflow-x: auto; }
+.marker { flex: none; display: flex; align-items: center; height: 46px; border: 0; padding: 0 16px 0 0; border-radius: 6px 23px 23px 6px; background: #f4f4f2; color: #222; font-weight: 800; font-size: .9rem; cursor: pointer; box-shadow: 0 2px 3px rgba(0,0,0,.25); transition: transform .2s; }
+.marker::before { content: ''; width: 26px; height: 100%; border-radius: 6px 0 0 6px; background: var(--c); margin-right: 10px; }
+.marker[aria-selected="true"] { transform: translateY(-8px); }
+.tray .sep { flex: 1; }
+.tray .act { flex: none; height: 40px; border-radius: 8px; border: 0; background: rgba(255,255,255,.85); color: #222; font-weight: 700; padding: 0 14px; cursor: pointer; font-size: .85rem; }
+.toast { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%) rotate(-1deg); background: var(--note); color: var(--note-ink); font-family: var(--font-hand); font-weight: 700; font-size: 1.2rem; padding: 8px 16px; box-shadow: var(--shadow); z-index: 30; }
+@media (max-width: 600px) { .marker { padding-right: 12px; font-size: .82rem; } .marker::before { width: 16px; margin-right: 8px; } .tray .act.opt { display: none; } .magnet { width: 36px; height: 36px; margin: -18px 0 0 -18px; font-size: .88rem; } .magnet .tag { top: 37px; font-size: .82rem; } }
+@media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
+</style>
+
+<header class="top">
+  <div class="brand">스쿼드 메이커<small>자석 전술판</small></div>
+  <input class="team-name" id="teamName" aria-label="팀 이름" value="">
+  <span class="spacer"></span>
+  <button class="ghost" id="themeBtn" type="button">칠판 모드</button>
+  <button class="ghost" type="button">도움말</button>
+</header>
+
+<main class="wrap">
+  <section class="board" aria-label="전술판">
+    <div class="board-head" id="boardHead"></div>
+    <div class="pitch" id="pitch">
+      <svg class="lines" viewBox="0 0 68 100" preserveAspectRatio="none" aria-hidden="true">
+        <rect x="2" y="2" width="64" height="96" rx=".6"/><line x1="2" y1="50" x2="66" y2="50"/><circle cx="34" cy="50" r="8"/>
+        <rect x="16" y="2" width="36" height="15"/><rect x="25" y="2" width="18" height="6"/><path d="M27 17 A8 8 0 0 0 41 17"/>
+        <rect x="16" y="83" width="36" height="15"/><rect x="25" y="92" width="18" height="6"/><path d="M27 83 A8 8 0 0 1 41 83"/>
+      </svg>
+      <svg class="arrows" id="arrows" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <marker id="hr" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L6 3L0 6z" style="fill:var(--red)"/></marker>
+          <marker id="hb" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L6 3L0 6z" style="fill:var(--blue)"/></marker>
+        </defs>
+        <g id="arrowG"></g>
+      </svg>
+    </div>
+    <div id="boardFoot"></div>
+  </section>
+  <aside class="notes" id="notes" aria-live="polite"></aside>
+</main>
+
+<nav class="tray" aria-label="화면 전환">
+  <div class="tray-in" role="tablist" id="tray">
+    <button class="marker" role="tab" data-app="squad" style="--c:#2563c9">스쿼드</button>
+    <button class="marker" role="tab" data-app="pattern" style="--c:#d8433a">전술 패턴</button>
+    <button class="marker" role="tab" data-app="strategy" style="--c:#1f2a30">매치 전략</button>
+    <span class="sep"></span>
+    <button class="act opt" type="button" data-act="img">이미지 저장</button>
+    <button class="act" type="button" data-act="share">공유</button>
+  </div>
+</nav>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* squad-maker UX concept shared core — same data and behavior for all 3 concepts.
+   Coordinates: x 0..100 (left→right), y 0..100 (opponent goal top → own goal bottom). */
+const SM = (() => {
+  const TEAM = { name: 'FC 한강 유나이티드', mode: '9vs9' };
+  const MODES = ['5vs5', '6vs6', '7vs7', '8vs8', '9vs9', '10vs10', '11vs11'];
+  const FORMATIONS = ['3-3-2', '3-2-3', '4-3-1', '2-4-2', '3-4-1'];
+  const PLAYERS = [
+    { id: 1, num: 1,  name: '김도윤', role: 'GK', color: '#e0583c' },
+    { id: 2, num: 2,  name: '박지훈', role: 'DF', color: '#2f6fd6' },
+    { id: 3, num: 4,  name: '이서준', role: 'DF', color: '#2f6fd6' },
+    { id: 4, num: 5,  name: '최민재', role: 'DF', color: '#2f6fd6' },
+    { id: 5, num: 7,  name: '정우진', role: 'MF', color: '#2f6fd6' },
+    { id: 6, num: 6,  name: '강하늘', role: 'MF', color: '#2f6fd6' },
+    { id: 7, num: 8,  name: '윤시우', role: 'MF', color: '#2f6fd6' },
+    { id: 8, num: 11, name: '한결',   role: 'FW', color: '#e8b730' },
+    { id: 9, num: 9,  name: '오태양', role: 'FW', color: '#e8b730' },
+  ];
+  const SQUAD_LABEL = { basic: '기본', attack: '공격', defense: '수비' };
+
+  function layout(formation) {
+    const rows = formation.split('-').map(Number);
+    const pos = { 1: { x: 50, y: 92 } };
+    let id = 2;
+    rows.forEach((n, r) => {
+      const y = rows.length === 1 ? 50 : 74 - (r * (74 - 22)) / (rows.length - 1);
+      for (let i = 0; i < n; i++) {
+        const x = n === 1 ? 50 : 16 + (i * 68) / (n - 1);
+        pos[id++] = { x: Math.round(x), y: Math.round(y) };
+      }
+    });
+    return pos;
+  }
+  function roleFor(formation, id) {
+    if (id === 1) return 'GK';
+    const rows = formation.split('-').map(Number);
+    let c = 2;
+    for (let r = 0; r < rows.length; r++) {
+      if (id < c + rows[r]) return r === 0 ? 'DF' : r === rows.length - 1 ? 'FW' : 'MF';
+      c += rows[r];
+    }
+    return 'MF';
+  }
+
+  const squads = {
+    basic:   { formation: '3-3-2', pos: layout('3-3-2'),
+               teamNote: '라인 간격 15m 유지. 볼을 잃으면 5초 즉시 압박, 실패하면 3-3-2 블록으로 복귀.',
+               notes: { 1: '골킥은 짧게, 2번·5번 쪽으로 시작', 6: '빌드업 때 센터백 사이로 내려와 3-1 형태 만들기', 8: '상대 센터백 뒷공간 침투, 오프사이드 라인 계속 확인' } },
+    attack:  { formation: '3-2-3', pos: layout('3-2-3'),
+               teamNote: '측면 폭을 최대로. 크로스는 니어·파 포스트에 한 명씩.',
+               notes: { 2: '왼쪽 오버래핑 적극 가담', 9: '파 포스트 쇄도' } },
+    defense: { formation: '4-3-1', pos: layout('4-3-1'),
+               teamNote: '하프라인 아래 블록. 중앙 차단 우선, 측면은 허용.',
+               notes: { 6: '상대 10번 전담 마크' } },
+  };
+
+  const pattern = {
+    name: '왼쪽 측면 오버래핑',
+    start: { ...layout('3-3-2') },
+    startBall: 6,
+    steps: [
+      { label: '6 → 7 횡패스, 2번 전진', moves: { 2: { x: 10, y: 50 }, 5: { x: 22, y: 40 } }, ball: 5 },
+      { label: '7 → 2 스루패스, 11번 니어 침투', moves: { 2: { x: 9, y: 26 }, 8: { x: 34, y: 14 }, 5: { x: 30, y: 34 } }, ball: 2 },
+      { label: '2번 컷백 크로스, 9번 파 포스트', moves: { 9: { x: 62, y: 12 }, 8: { x: 40, y: 10 } }, ball: 9 },
+    ],
+  };
+  function patternKeyframes() {
+    const frames = [{ pos: { ...pattern.start }, ball: pattern.startBall }];
+    pattern.steps.forEach((s) => {
+      const prev = frames[frames.length - 1];
+      frames.push({ pos: { ...prev.pos, ...s.moves }, ball: s.ball });
+    });
+    return frames;
+  }
+  const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+  /* frame(step, t): positions while animating from keyframe step → step+1 */
+  function frame(step, t) {
+    const k = patternKeyframes();
+    const a = k[step], b = k[Math.min(step + 1, k.length - 1)];
+    const e = ease(Math.max(0, Math.min(1, t)));
+    const pos = {};
+    for (const id in a.pos) pos[id] = { x: a.pos[id].x + (b.pos[id].x - a.pos[id].x) * e, y: a.pos[id].y + (b.pos[id].y - a.pos[id].y) * e };
+    const ba = a.pos[a.ball], bb = b.pos[b.ball];
+    const ball = { x: ba.x + (bb.x - ba.x) * e + 2.4, y: ba.y + (bb.y - ba.y) * e - 2.4 };
+    return { pos, ball };
+  }
+  /* arrows for step index s (0-based step being edited): run arrows + pass arrow */
+  function arrows(s) {
+    const k = patternKeyframes();
+    const a = k[s], b = k[s + 1];
+    if (!b) return [];
+    const out = [];
+    for (const id in pattern.steps[s].moves) out.push({ kind: 'run', id: +id, from: a.pos[id], to: b.pos[id] });
+    if (a.ball !== b.ball) out.push({ kind: 'pass', from: a.pos[a.ball], to: b.pos[b.ball] });
+    return out;
+  }
+
+  const match = { opponent: '강서 FC', date: '10월 12일 (일) 09:00', venue: '잠실 보조구장', memo: '상대는 4-4 라인 수비가 강함. 측면 오버래핑으로 수적 우위를 만든다.' };
+
+  function shareText(sq) {
+    const s = squads[sq];
+    const lines = [`[${TEAM.name}] ${SQUAD_LABEL[sq]} 스쿼드 · ${TEAM.mode} · ${s.formation}`, `vs ${match.opponent} · ${match.date}`, '', `■ 팀 지침`, s.teamNote, '', '■ 선수별'];
+    PLAYERS.forEach((p) => { if (s.notes[p.id]) lines.push(`${p.num} ${p.name}: ${s.notes[p.id]}`); });
+    return lines.join('\n');
+  }
+
+  /* Pointer drag inside a container. map(clientX, clientY) → {x,y} in 0..100 coords. */
+  function draggable(el, map, { onMove, onEnd, onTap } = {}) {
+    let start = null, moved = false;
+    el.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      start = { x: e.clientX, y: e.clientY }; moved = false;
+      el.setPointerCapture(e.pointerId);
+    });
+    el.addEventListener('pointermove', (e) => {
+      if (!start) return;
+      if (!moved && Math.hypot(e.clientX - start.x, e.clientY - start.y) < 4) return;
+      moved = true; el.classList.add('dragging');
+      const p = map(e.clientX, e.clientY);
+      onMove && onMove({ x: Math.max(3, Math.min(97, p.x)), y: Math.max(3, Math.min(97, p.y)) });
+    });
+    const end = () => {
+      if (!start) return;
+      el.classList.remove('dragging');
+      if (moved) onEnd && onEnd(); else onTap && onTap();
+      start = null;
+    };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTap && onTap(); } });
+  }
+
+  async function copy(text) {
+    try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
+  }
+  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  return { TEAM, MODES, FORMATIONS, PLAYERS, SQUAD_LABEL, squads, layout, roleFor, pattern, patternKeyframes, frame, arrows, match, shareText, draggable, copy, reduced };
+})();
+
+</script>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const st = { app: 'squad', squad: 'basic', sel: null, step: 0, playing: false };
+const COLORS = ['#2563c9', '#d8433a', '#e8b730', '#2f8a5b', '#7a4cc2', '#1f2a30'];
+$('#teamName').value = SM.TEAM.name;
+const pitch = $('#pitch');
+const toPct = (cx, cy) => { const r = pitch.getBoundingClientRect(); return { x: (cx - r.left) / r.width * 100, y: (cy - r.top) / r.height * 100 }; };
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 1800); }
+const P = (id) => SM.PLAYERS.find((p) => p.id === +id);
+
+function head() {
+  const s = SM.squads[st.squad];
+  if (st.app === 'pattern') {
+    $('#boardHead').innerHTML = `<span class="squad" aria-selected="true" style="cursor:default">${SM.pattern.name}</span><span class="modes"><button class="mode" aria-pressed="false">◀ 이전 패턴</button><button class="mode" aria-pressed="false">다음 패턴 ▶</button><button class="mode" aria-pressed="true">+ 새 패턴</button></span>`;
+    return;
+  }
+  $('#boardHead').innerHTML = `<div class="squads" role="tablist">${Object.keys(SM.SQUAD_LABEL).map((k) => `<button class="squad" role="tab" aria-selected="${k === st.squad}" data-sq="${k}">${SM.SQUAD_LABEL[k]}</button>`).join('')}</div>
+    <select class="chip-select" id="form" aria-label="포메이션">${SM.FORMATIONS.map((f) => `<option${f === s.formation ? ' selected' : ''}>${f}</option>`).join('')}</select>
+    <div class="modes" role="group" aria-label="인원">${SM.MODES.map((m) => `<button class="mode" aria-pressed="${m === SM.TEAM.mode}">${m}</button>`).join('')}</div>`;
+  $('#boardHead').querySelectorAll('[data-sq]').forEach((b) => (b.onclick = () => { st.squad = b.dataset.sq; st.sel = null; render(); }));
+  $('#form').onchange = (e) => { s.formation = e.target.value; s.pos = SM.layout(s.formation); render(); toast(`${s.formation}로 다시 붙였어요`); };
+}
+
+function magnets(posMap, ball) {
+  pitch.querySelectorAll('.magnet,.ball').forEach((n) => n.remove());
+  SM.PLAYERS.forEach((p) => {
+    const b = document.createElement('button');
+    b.className = 'magnet' + (st.sel === p.id ? ' sel' : '');
+    b.style.setProperty('--c', p.color);
+    b.style.left = posMap[p.id].x + '%'; b.style.top = posMap[p.id].y + '%';
+    b.innerHTML = `${p.num}<span class="tag">${p.name}</span>`;
+    b.setAttribute('aria-label', `${p.num}번 ${p.name}`);
+    b.dataset.id = p.id;
+    pitch.appendChild(b);
+    if (st.app === 'squad') {
+      SM.draggable(b, toPct, {
+        onMove: (q) => { SM.squads[st.squad].pos[p.id] = q; b.style.left = q.x + '%'; b.style.top = q.y + '%'; },
+        onEnd: () => toast(`${p.name} 위치 이동`),
+        onTap: () => { st.sel = st.sel === p.id ? null : p.id; render(); },
+      });
+    } else b.tabIndex = -1;
+  });
+  if (ball) { const bl = document.createElement('div'); bl.className = 'ball'; bl.style.left = ball.x + '%'; bl.style.top = ball.y + '%'; pitch.appendChild(bl); }
+}
+
+function drawArrows(step) {
+  const g = $('#arrowG');
+  g.innerHTML = SM.arrows(step).map((a) => {
+    const mx = (a.from.x + a.to.x) / 2 + (a.kind === 'run' ? -4 : 0), my = (a.from.y + a.to.y) / 2;
+    const d = a.kind === 'run' ? `M${a.from.x} ${a.from.y} Q${mx} ${my} ${a.to.x} ${a.to.y}` : `M${a.from.x} ${a.from.y} L${a.to.x} ${a.to.y}`;
+    return `<path class="${a.kind === 'run' ? 'arrow-run' : 'arrow-pass'} draw" d="${d}" marker-end="url(#${a.kind === 'run' ? 'hr' : 'hb'})" vector-effect="non-scaling-stroke" style="stroke-width:${a.kind === 'run' ? 3 : 2.5}px"/>`;
+  }).join('');
+}
+
+function notesSquad() {
+  const s = SM.squads[st.squad];
+  const done = SM.PLAYERS.filter((p) => s.notes[p.id]).length;
+  const sel = st.sel && P(st.sel);
+  let html = `<article class="postit"><h2>${SM.SQUAD_LABEL[st.squad]} 스쿼드 · 팀 전체에게</h2><label class="meta" for="teamNote">모두가 보는 메모</label><textarea id="teamNote">${s.teamNote}</textarea></article>`;
+  if (sel) {
+    html += `<article class="postit pink"><h2>${sel.num}번 ${sel.name}에게</h2><div class="meta">${SM.roleFor(s.formation, sel.id)} · 자석 색</div>
+      <div class="swatches">${COLORS.map((c) => `<button class="swatch" style="--c:${c}" aria-label="색 ${c}" aria-pressed="${c === sel.color}" data-c="${c}"></button>`).join('')}</div>
+      <textarea id="pNote" aria-label="${sel.name} 개별 지침" placeholder="${sel.name}에게만 전할 말">${s.notes[sel.id] || ''}</textarea></article>`;
+  }
+  html += `<article class="postit"><h2>개별 지침 <span class="meta">${done}/${SM.PLAYERS.length} 작성</span></h2><ul class="roster">${SM.PLAYERS.map((p) => `<li><button data-pid="${p.id}" aria-current="${st.sel === p.id}" style="--c:${p.color}"><span class="dot"></span>${p.num} ${p.name}<span class="done">${s.notes[p.id] ? '✓' : ''}</span></button></li>`).join('')}</ul></article>`;
+  $('#notes').innerHTML = html;
+  $('#teamNote').oninput = (e) => (s.teamNote = e.target.value);
+  if (sel) {
+    $('#pNote').oninput = (e) => (s.notes[sel.id] = e.target.value);
+    $('#notes').querySelectorAll('[data-c]').forEach((b) => (b.onclick = () => { sel.color = b.dataset.c; render(); }));
+  }
+  $('#notes').querySelectorAll('[data-pid]').forEach((b) => (b.onclick = () => { st.sel = +b.dataset.pid; render(); }));
+}
+
+function notesPattern() {
+  const steps = SM.pattern.steps;
+  $('#notes').innerHTML = `<article class="postit"><h2>${st.step + 1}단계</h2><p style="font-family:var(--font-hand);font-size:1.35rem;margin:0">${steps[st.step].label}</p></article>
+    <article class="postit pink"><h2>이렇게 그려요</h2><p style="margin:0;font-size:.9rem">자석을 끌어 <b style="color:var(--red)">빨간 점선</b>(움직임)을, 공을 끌어 <b style="color:var(--blue)">파란 선</b>(패스)을 그립니다. 화살표를 누르면 지워져요.</p></article>
+    <article class="postit"><h2>내보내기</h2><div style="display:flex;flex-wrap:wrap;gap:8px"><button class="pill solid" type="button">이 패턴 GIF</button><button class="pill" type="button">전체 패턴 GIF</button></div></article>`;
+}
+
+function notesStrategy() {
+  const m = SM.match;
+  $('#notes').innerHTML = `<article class="postit"><h2>다음 경기</h2><dl class="match-grid"><dt>상대</dt><dd>${m.opponent}</dd><dt>일시</dt><dd>${m.date}</dd><dt>장소</dt><dd>${m.venue}</dd></dl></article>
+    <article class="postit pink"><h2>감독 메모</h2><textarea id="memo" aria-label="감독 메모">${m.memo}</textarea></article>
+    <article class="postit"><h2>단톡방에 보낼 지침서</h2><pre class="brief">${SM.shareText(st.squad)}</pre><div style="margin-top:10px"><button class="pill solid" id="copyBrief" type="button">복사하기</button></div></article>`;
+  $('#copyBrief').onclick = async () => toast((await SM.copy(SM.shareText(st.squad))) ? '복사했어요' : '복사가 막혀 있어요. 직접 선택해 주세요');
+}
+
+function foot() {
+  if (st.app === 'pattern') {
+    $('#boardFoot').innerHTML = `<div class="steps">${SM.pattern.steps.map((_, i) => `<button class="step-dot" aria-current="${i === st.step}" data-step="${i}" aria-label="${i + 1}단계">${i + 1}</button>`).join('')}<button class="step-dot" aria-label="단계 추가">+</button><button class="pill solid" id="play" type="button">${st.playing ? '멈춤' : '▶ 재생'}</button></div>`;
+    $('#boardFoot').querySelectorAll('[data-step]').forEach((b) => (b.onclick = () => { st.step = +b.dataset.step; st.playing = false; render(); }));
+    $('#play').onclick = togglePlay;
+  } else if (st.app === 'squad') {
+    $('#boardFoot').innerHTML = `<p class="hint">자석을 끌어서 옮기고, 눌러서 지침을 적어요</p>`;
+  } else $('#boardFoot').innerHTML = `<p class="hint">이 배치가 지침서에 들어갑니다</p>`;
+}
+
+let raf;
+function togglePlay() {
+  st.playing = !st.playing; foot();
+  if (!st.playing) { cancelAnimationFrame(raf); render(); return; }
+  $('#arrowG').innerHTML = '';
+  const dur = SM.reduced() ? 1 : 1100, n = SM.pattern.steps.length; let t0 = null;
+  const tick = (ts) => {
+    if (!st.playing) return;
+    t0 ??= ts; const el = (ts - t0) / dur; const s = Math.floor(el) % (n + 1);
+    const f = s < n ? SM.frame(s, el % 1) : SM.frame(n - 1, 1);
+    magnets(f.pos, f.ball); raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+}
+
+function render() {
+  document.querySelectorAll('.marker').forEach((m) => m.setAttribute('aria-selected', m.dataset.app === st.app));
+  head(); foot();
+  if (st.app === 'pattern') {
+    const f = SM.frame(st.step, 0); magnets(f.pos, f.ball); drawArrows(st.step); notesPattern();
+  } else {
+    $('#arrowG').innerHTML = '';
+    magnets(SM.squads[st.squad].pos);
+    st.app === 'squad' ? notesSquad() : notesStrategy();
+  }
+}
+document.querySelectorAll('.marker').forEach((m) => (m.onclick = () => { st.app = m.dataset.app; st.playing = false; cancelAnimationFrame(raf); render(); }));
+$('#tray').querySelector('[data-act="share"]').onclick = async () => toast((await SM.copy(SM.shareText(st.squad))) ? '공유 텍스트를 복사했어요' : '복사가 막혀 있어요');
+$('#tray').querySelector('[data-act="img"]').onclick = () => toast('시안에서는 저장하지 않아요');
+$('#themeBtn').onclick = () => {
+  const dark = document.documentElement.dataset.theme === 'dark' || (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+  $('#themeBtn').textContent = dark ? '칠판 모드' : '화이트보드 모드';
+};
+if (matchMedia('(prefers-color-scheme: dark)').matches) $('#themeBtn').textContent = '화이트보드 모드';
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && st.sel) { st.sel = null; render(); } });
+render();
+</script>
+
+</body>
+</html>

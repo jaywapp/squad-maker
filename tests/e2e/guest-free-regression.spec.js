@@ -152,6 +152,7 @@ test.describe('Guest 무료 회귀 계약', () => {
     await page.click('#addPlayerBtn');
     await expect(page.locator('#field .player')).toHaveCount(4);
     await page.setInputFiles('#sqFileInput', savedPath);
+    await page.locator('.dlg [data-r="1"]').click();
     await expect(page.locator('#teamName')).toHaveValue('FC 회귀');
     await expect(page.locator('#field .player')).toHaveCount(3);
   });

@@ -1,0 +1,39 @@
+const { test, expect } = require('@playwright/test');
+
+test('Android bundled page exports real PNG and GIF with external web requests blocked', async ({ page }) => {
+  const requests = [];
+  await page.route('**/*', route => {
+    const url = route.request().url();
+    if (url.startsWith('http://127.0.0.1:4317/')) return route.continue();
+    requests.push(url);
+    return route.abort('blockedbyclient');
+  });
+  await page.goto('/.work/android-web/index.html');
+  await page.evaluate(() => window.SquadMakerContract.ready());
+  expect(await page.evaluate(() => window.SquadMakerContract.getState().ready)).toBe(true);
+  const initial = await page.evaluate(() => window.SquadMakerContract.getState().snapshot);
+  expect(await page.evaluate(() => window.SquadMakerContract.getState().platform.native)).toBe(false);
+  const pngDownload = page.waitForEvent('download');
+  expect((await page.evaluate(() => window.SquadMakerContract.run('export-png'))).status).toBe('success');
+  const png = await pngDownload;
+  const pngStream = await png.createReadStream();
+  const pngParts = [];
+  for await (const bytes of pngStream) pngParts.push(bytes);
+  const pngBytes = Buffer.concat(pngParts);
+  expect(pngBytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))).toBe(true);
+  expect(pngBytes.readUInt32BE(16)).toBeGreaterThan(0);
+  const gifDownload = page.waitForEvent('download');
+  expect((await page.evaluate(() => window.SquadMakerContract.run('export-gif'))).status).toBe('success');
+  const gif = await gifDownload;
+  const gifStream = await gif.createReadStream();
+  const gifParts = [];
+  for await (const bytes of gifStream) gifParts.push(bytes);
+  const gifBytes = Buffer.concat(gifParts);
+  expect(gifBytes.subarray(0, 6).toString()).toBe('GIF89a');
+  expect(gifBytes.length).toBeGreaterThan(100);
+  expect(await page.evaluate(() => window.SquadMakerContract.getState().snapshot)).toEqual(initial);
+  expect(await page.evaluate(() => window.SquadMakerContract.getState().export.busy)).toBe(false);
+  expect(requests).toEqual([]);
+  const response = await page.request.get('/.work/android-web/bundle-manifest.json');
+  expect((await response.json()).analytics).toBe('disabled');
+});
