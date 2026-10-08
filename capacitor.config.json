@@ -2,6 +2,7 @@
   "appId": "com.jaywapp.squadmaker.preview",
   "appName": "스쿼드 메이커 Preview",
   "webDir": ".work/android-web",
+  "backgroundColor": "#141a16",
   "loggingBehavior": "none",
   "server": { "androidScheme": "https", "hostname": "localhost" },
   "android": { "allowMixedContent": false, "webContentsDebuggingEnabled": false }

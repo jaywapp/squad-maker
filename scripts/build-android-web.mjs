@@ -12,8 +12,14 @@ html = html
   .replace(/<link[^>]+fonts\.googleapis\.com[^>]*>\s*/g, '')
   .replaceAll('https://html2canvas.hertzen.com/dist/html2canvas.min.js', 'vendor/html2canvas.min.js')
   .replaceAll('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js', 'vendor/gif.js')
-  .replaceAll('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js', 'vendor/gif.worker.js')
-  .replace('<script>', '<script src="app/platform-native.js"></script>\n<script>window.SQUAD_MAKER_ANALYTICS_ID = "";</script>\n<script>');
+  .replaceAll('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js', 'vendor/gif.worker.js');
+let nativeAdapterInserted = false;
+html = html.replace(/<!--[\s\S]*?-->|<script>/g, (token) => {
+  if (token !== '<script>' || nativeAdapterInserted) return token;
+  nativeAdapterInserted = true;
+  return '<script src="app/platform-native.js"></script>\n<script>window.SQUAD_MAKER_ANALYTICS_ID = "";</script>\n<script>';
+});
+if (!nativeAdapterInserted) throw new Error('Original app script missing from Android bundle');
 if (/https:\/\/(?:html2canvas\.hertzen\.com|cdnjs\.cloudflare\.com)/.test(html)) throw new Error('Remote export asset remains in Android bundle');
 await fs.writeFile(path.join(output, 'index.html'), html);
 for (const file of ['html2canvas.min.js', 'gif.js', 'gif.worker.js']) {
