@@ -20,6 +20,7 @@
 | 2026-10-08 전체 PR 병합·자동 배포 중단·기존 작업 보존 | [분석](pr-cleanup-20261008-analysis.md), [설계](pr-cleanup-20261008-design.md), [실행](pr-cleanup-20261008-tasks.md) |
 | 런 라인 브랜딩 적용·자동 검증·실기기 대기 | [분석](brand-run-line-20261008-analysis.md), [설계](brand-run-line-20261008-design.md), [작업·검증](brand-run-line-20261008-tasks.md) |
 | 런 라인 최종 커밋 검증·Draft PR·T7 준비(최신) | [분석](brand-run-line-pr-20261008-analysis.md), [설계](brand-run-line-pr-20261008-design.md), [실행](brand-run-line-pr-20261008-tasks.md), [T7 체크리스트](brand-run-line-pr-20261008-t7.md) |
+| 런 라인 로컬 서명 APK·Preview 업데이트 준비(최신) | [분석](brand-run-line-apk-20261008-analysis.md), [설계](brand-run-line-apk-20261008-design.md), [실행](brand-run-line-apk-20261008-tasks.md), [사용자 백업·설치 안내](brand-run-line-apk-20261008-install.md) |
 
 ## 유지하는 근거와 운영 참고
 

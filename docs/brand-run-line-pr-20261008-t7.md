@@ -1,17 +1,17 @@
 # T7 Run Line 실기기 검증 체크리스트
 
-2026-10-08 현재 실제 연결 Android 기기 없음. **아래 10개 모두 미검증**이며 향후 절차다. Chromium의 Capacitor mock과 APK 리소스 검사는 실기기 확인을 대신하지 않는다.
+2026-10-08 현재 실제 연결 Android 기기 없음. **아래 10개 모두 미검증**이며 향후 절차다. Chromium의 Capacitor mock과 APK 리소스 검사는 실기기 확인을 대신하지 않는다. 후속 사용자 지시로 기존 키의 로컬 서명 APK만 준비한다. 최신 버전·파일·비교 결과와 사용자 직접 설치 절차는 [APK 실행 기록](brand-run-line-apk-20261008-tasks.md)과 [백업·설치 안내](brand-run-line-apk-20261008-install.md)를 따른다.
 
 ## 실행 전 조건
 
 | 조건 | 현재 확인 | 향후 확인/진행 조건 |
 |---|---|---|
 | 기기/OS/런처 | 미확인, adb 연결 0대 | 모델·Android 버전/API·런처·테마 아이콘 지원·화면 크기 기록 |
-| 서명 방식 | 기존 Release의 RSA3072/v2/v3 공개 인증서 확인, 이번 APK unsigned | 기존 Preview 키 재사용 방식 결정 및 향후 서명 실행 지시 필요, 키·비밀값 출력/생성 금지 |
+| 서명 방식 | 기존 키 접근/이전 인증서 일치 확인·후속 로컬 서명 승인 | 실제 서명 APK 결과는 최신 APK 기록 참조. 휴대폰 설치는 사용자 직접 진행, 키·비밀값 출력/생성 금지 |
 | 서명 호환 | 실기기 설치 앱 인증서 미확인 | 설치 앱 APK의 공개 인증서 SHA256을 검증 대상과 비교; 불일치이면 중단 |
-| 앱 버전 | 소스 package com.jaywapp.squadmaker.preview, code1001/name0.1.0-preview.1 | 기존 설치 versionCode 확인; 더 높은 버전이면 downgrade하지 않고 결정 요청 |
+| 앱 버전 | 새 source package com.jaywapp.squadmaker.preview, code1002/name0.1.0-preview.2, 이전Preview1001 | 기존 설치 versionCode 확인; 더 높은 버전이면 downgrade하지 않고 결정 요청 |
 | 데이터 유지 | 실기기 미검증 | 합성 선수/전술 fixture와 기존 보관함 수·선택·저장 상태를 기록/백업 후 업데이트 전후 비교; 개인정보는 공유 증거에서 제외 |
-| 설치/배포 권한 | 이번 작업에서 금지 | 향후 명시적 T7 실행 승인 후에만 서명/설치. 공개 배포와 main 병합은 별도 승인 |
+| 설치/배포 권한 | 로컬 서명 APK만 승인. 이 세션의 휴대폰/AVD 설치·공개 배포 금지 | 사용자 직접 백업·설치·결과 기록. 추가 에뮬레이터 설치/데이터 삭제는 먼저 알리고 진행하지 않음. 공개 배포와 main 병합은 별도 승인 |
 
 기존 공개 인증서 SHA256: `d5f7ede86e1020419ccb6a7a97fa3b8072ee6522ac878787641f19d5c33771b6`. 이는 [이전 Release 기록](a-preview-release-20261007-tasks.md)의 값으로, 현재 실기기 호환성이 확인됐다는 뜻은 아니다.
 

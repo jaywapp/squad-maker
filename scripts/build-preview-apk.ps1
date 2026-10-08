@@ -17,7 +17,10 @@ $unsigned = Join-Path $repo 'android\app\build\outputs\apk\release\app-release-u
 $artifacts = Join-Path $repo '.work\artifacts'
 New-Item -ItemType Directory -Path $artifacts -Force | Out-Null
 $aligned = Join-Path $artifacts 'squad-maker-aligned-unsigned.apk'
-$apk = Join-Path $artifacts 'squad-maker-0.1.0-preview.1.apk'
+$appGradle = Get-Content -LiteralPath (Join-Path $repo 'android\app\build.gradle') -Raw
+$versionMatch = [regex]::Match($appGradle, '(?m)^\s*versionName\s+"([A-Za-z0-9][A-Za-z0-9.-]*)"\s*$')
+if (-not $versionMatch.Success) { throw 'A safe versionName is required in the Android app Gradle file.' }
+$apk = Join-Path $artifacts ('squad-maker-' + $versionMatch.Groups[1].Value + '.apk')
 Push-Location $repo
 try {
     & node (Join-Path $repo 'scripts\build-android-web.mjs')
