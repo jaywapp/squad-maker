@@ -18,6 +18,7 @@
 | 문서 전수 분류·이동·참조 검증 결과 | [정리 기록](documentation-audit.md) |
 | A UI 통합 APK 및 Release 검증 | [분석](a-preview-release-20261007-analysis.md), [설계](a-preview-release-20261007-design.md), [실행](a-preview-release-20261007-tasks.md) |
 | 2026-10-08 전체 PR 병합·자동 배포 중단·기존 작업 보존 | [분석](pr-cleanup-20261008-analysis.md), [설계](pr-cleanup-20261008-design.md), [실행](pr-cleanup-20261008-tasks.md) |
+| main push 자동 서명 APK와 GitHub Release 준비 | [분석](main-apk-release-20261009-analysis.md), [설계](main-apk-release-20261009-design.md), [작업계획](main-apk-release-20261009-tasks.md) |
 
 ## 유지하는 근거와 운영 참고
 

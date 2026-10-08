@@ -1,0 +1,15 @@
+// Override only the CI APK version; local builds retain the checked-in base version.
+gradle.beforeProject { project ->
+    project.plugins.withId('com.android.application') {
+        project.extensions.getByName('androidComponents').finalizeDsl { androidDsl ->
+            def code = project.findProperty('squadVersionCode')?.toString()
+            def name = project.findProperty('squadVersionName')?.toString()
+            if (!code || !(code ==~ /[1-9][0-9]*/) || code.toBigInteger() > 2100000000 ||
+                    !name || !(name ==~ /[A-Za-z0-9][A-Za-z0-9._-]{0,180}/)) {
+                throw new GradleException('Valid squadVersionCode and squadVersionName are required')
+            }
+            androidDsl.defaultConfig.versionCode = code.toInteger()
+            androidDsl.defaultConfig.versionName = name
+        }
+    }
+}
