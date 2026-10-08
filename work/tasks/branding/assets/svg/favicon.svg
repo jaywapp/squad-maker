@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- 브라우저 탭 아이콘: 피치 녹색 둥근 사각 + 소형 심볼 -->
+  <rect width="32" height="32" rx="7" fill="#2b5e3f"/>
+  <svg x="3" y="3" width="26" height="26" viewBox="14 14 72 72">
+  <circle cx="31" cy="72" r="12" fill="#b8e986"/>
+  <path d="M48 62C78 58 38 36 76 25" fill="none" stroke="#e8ede8" stroke-width="9" stroke-linecap="round"/>
+  <path d="M63.9 20.2L76 25L68.4 35.5" fill="none" stroke="#e8ede8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</svg>
