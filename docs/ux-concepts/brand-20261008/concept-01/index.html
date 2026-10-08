@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>런 라인 브랜드 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #141a16;
+    --surface: #1c241e;
+    --line: #2c3830;
+    --pitch: #2b5e3f;
+    --chalk: #e8ede8;
+    --muted: #a3b2a8;      /* 7.6:1 on --bg */
+    --faint: #8b9a90;      /* 5.9:1 on --bg */
+    --lime: #b8e986;
+    --lime-ink: #1a2412;
+    --font: 'IBM Plex Sans KR', 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif;
+    --num: 'Oswald', 'Bahnschrift', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+    --r: 12px;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--chalk);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.65;
+  }
+  .wrap { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+  @media (min-width: 768px) { .wrap { padding: 0 32px; } }
+
+  h1, h2, h3 { margin: 0; font-weight: 600; line-height: 1.25; text-wrap: balance; }
+  h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); letter-spacing: -0.01em; }
+  h3 { font-size: 1.05rem; }
+  p { margin: 0; max-width: 62ch; }
+  .lead { color: var(--muted); }
+  .note { color: var(--faint); font-size: 0.875rem; }
+  .en { font-family: var(--num); font-weight: 600; letter-spacing: 0.04em; }
+
+  section { padding: 72px 0; border-top: 1px solid var(--line); }
+  @media (min-width: 768px) { section { padding: 104px 0; } }
+  .sec-head { display: grid; gap: 12px; margin-bottom: 40px; }
+
+  /* Hero */
+  .hero { padding: 48px 0 72px; border-top: 0; }
+  .hero-grid { display: grid; gap: 40px; align-items: center; }
+  @media (min-width: 900px) { .hero-grid { grid-template-columns: 1.1fr 0.9fr; gap: 64px; } }
+  .hero h1 { display: grid; gap: 4px; }
+  .hero h1 .en { font-size: clamp(3rem, 2rem + 5vw, 5.5rem); line-height: 1; letter-spacing: 0.02em; }
+  .hero h1 .ko { font-size: 1.25rem; color: var(--muted); font-weight: 500; }
+  .hero .idea { font-size: 1.125rem; margin-top: 28px; max-width: 34em; }
+  .hero .idea + p { margin-top: 14px; }
+  .hero-mark {
+    background: var(--pitch);
+    border-radius: 20px;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    max-width: 420px;
+    width: 100%;
+    justify-self: center;
+  }
+  .hero-mark svg { width: 62%; height: auto; }
+
+  /* Header mocks */
+  .mock-grid { display: grid; gap: 28px; }
+  @media (min-width: 900px) { .mock-grid { grid-template-columns: 360px 1fr; align-items: start; } }
+  .mock-col { display: grid; gap: 20px; }
+  .mock {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .mock.mobile { width: 100%; max-width: 360px; }
+  .appbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 0 16px; height: 56px;
+    border-bottom: 1px solid var(--line);
+  }
+  .mock.desktop .appbar { height: 64px; padding: 0 24px; }
+  .brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
+  .brand svg { flex: none; display: block; }
+  .brand .wm { font-family: var(--num); font-weight: 600; letter-spacing: 0.05em; line-height: 1; white-space: nowrap; }
+  .brand .title { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .appbar .actions { display: flex; gap: 8px; align-items: center; }
+  .chip {
+    font: 500 0.875rem/1 var(--font); color: var(--chalk);
+    border: 1px solid var(--line); background: var(--surface);
+    border-radius: 999px; padding: 9px 14px; white-space: nowrap;
+  }
+  .chip.primary { background: var(--lime); color: var(--lime-ink); border-color: var(--lime); font-weight: 600; }
+  .pitch-strip { height: 92px; background: var(--pitch); position: relative; }
+  .pitch-strip svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .cap { margin-top: 10px; }
+  .cap strong { font-weight: 600; }
+
+  /* Icon */
+  .icon-grid { display: grid; gap: 48px; }
+  .store { display: grid; gap: 24px; align-items: start; }
+  @media (min-width: 900px) { .store { grid-template-columns: auto 1fr; gap: 56px; } }
+  .store-img { width: 240px; height: 240px; display: block; border-radius: 4px; }
+  .masks { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-end; }
+  .mask-item { display: grid; gap: 10px; justify-items: center; }
+  .mask-item svg { width: 132px; height: 132px; display: block; overflow: visible; }
+  .guides { display: none; }
+  .canvas-on .guides { display: inline; }
+  .canvas-on .clipped { clip-path: none; }
+  .outside { display: none; }
+  .canvas-on .outside { display: inline; opacity: 0.35; }
+  .btn {
+    font: 600 0.9375rem/1 var(--font);
+    color: var(--chalk); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 0 18px; min-height: 44px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: background-color 160ms ease, transform 120ms ease;
+  }
+  .btn:hover { background: #253027; }
+  .btn:active { transform: translateY(1px); }
+  .btn[aria-pressed="true"] { background: var(--chalk); color: var(--bg); border-color: var(--chalk); }
+  :focus-visible { outline: 2px solid #f4f8f4; outline-offset: 3px; }
+
+  .homes { display: grid; gap: 20px; }
+  @media (min-width: 768px) { .homes { grid-template-columns: 1fr 1fr; } }
+  .home { border-radius: var(--r); padding: 28px 24px; display: grid; gap: 24px; }
+  .home.dark { background: #0e1310; border: 1px solid var(--line); color: #e3e8e3; }
+  .home.light { background: #e4e8e1; color: #1d241f; }
+  .launcher { display: flex; gap: 28px; align-items: flex-start; }
+  .app { display: grid; justify-items: center; gap: 6px; width: 76px; text-align: center; font-size: 0.75rem; line-height: 1.3; }
+  .app svg { display: block; }
+  .ghost-app { width: 48px; height: 48px; border-radius: 50%; }
+  .home.dark .ghost-app { background: #26302a; }
+  .home.light .ghost-app { background: #c5ccc3; }
+  .row { display: flex; align-items: center; gap: 14px; font-size: 0.9375rem; padding-top: 18px; border-top: 1px solid currentColor; border-top-color: rgba(127, 140, 130, 0.35); }
+  .row .sub { margin-left: auto; font-size: 0.8125rem; opacity: 0.8; }
+  .label-sm { font-size: 0.8125rem; opacity: 0.85; }
+
+  .mono { display: flex; flex-wrap: wrap; gap: 20px; }
+  .mono-tile { border-radius: var(--r); padding: 24px; display: grid; gap: 14px; justify-items: center; min-width: 160px; }
+  .mono-tile.l { background: #eef3ea; color: #1d241f; }
+  .mono-tile.d { background: #101511; color: #e3e8e3; border: 1px solid var(--line); }
+
+  /* Splash */
+  .splash-grid { display: grid; gap: 32px; }
+  @media (min-width: 900px) { .splash-grid { grid-template-columns: auto auto 1fr; gap: 40px; align-items: start; } }
+  .phone-wrap { display: grid; gap: 14px; justify-items: start; }
+  .phone {
+    width: 300px; max-width: 100%;
+    aspect-ratio: 360 / 780;
+    background: var(--bg);
+    border: 8px solid #2a322c;
+    border-radius: 34px;
+    overflow: hidden;
+    position: relative;
+    display: grid; place-items: center;
+  }
+  .phone iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+  .sys-icon { width: 66.67%; aspect-ratio: 1; display: block; }
+  .timeline { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+  .timeline li { display: grid; grid-template-columns: 96px 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .timeline li:first-child { border-top: 1px solid var(--line); }
+  .timeline .ms { font-family: var(--num); font-weight: 500; color: var(--lime); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+
+  /* Spec */
+  .spec { display: grid; gap: 40px; }
+  @media (min-width: 900px) { .spec { grid-template-columns: 1fr 1fr; gap: 56px; } }
+  .swatches { display: grid; gap: 10px; }
+  .sw { display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center; }
+  .sw i { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line); display: block; }
+  .sw code { font-family: var(--num); font-weight: 500; letter-spacing: 0.04em; color: var(--muted); }
+  .sw span small { display: block; color: var(--faint); font-size: 0.8125rem; }
+  dl.facts { margin: 0; display: grid; gap: 18px; }
+  dl.facts dt { font-weight: 600; }
+  dl.facts dd { margin: 4px 0 0; color: var(--muted); }
+  .clear { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+
+  footer { padding: 40px 0 64px; border-top: 1px solid var(--line); color: var(--faint); font-size: 0.875rem; }
+
+/* 좁은 화면 넘침 수정(리드 렌더 검토): 1열 그리드 트랙이 넓은 데스크톱 목업 폭으로 늘어나지 않게 */
+@media (max-width: 899px) { [class*="grid"], [class*="-col"] { grid-template-columns: minmax(0, 1fr); } [class*="grid"] > *, [class*="-col"] > * { min-width: 0; } .mock:not(.mobile) { overflow-x: auto; } .cap, .note { overflow-wrap: anywhere; } }
+</style>
+</head>
+<body>
+
+<!-- Shared mark geometry (100-unit design grid). -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="sym" viewBox="17 17 67 67">
+      <circle cx="33" cy="70" r="11" fill="#b8e986"/>
+      <path d="M48 62 C78 58 38 36 76 25" pathLength="100" fill="none" stroke="#e8ede8" stroke-width="6" stroke-linecap="round" stroke-dasharray="7.3 23.6"/>
+      <path d="M65.8 20.9 L76 25 L69.6 33.9" fill="none" stroke="#e8ede8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sym-s" viewBox="14 14 72 72">
+      <circle cx="31" cy="72" r="12" fill="#b8e986"/>
+      <path d="M48 62 C78 58 38 36 76 25" fill="none" stroke="#e8ede8" stroke-width="9" stroke-linecap="round"/>
+      <path d="M63.9 20.2 L76 25 L68.4 35.5" fill="none" stroke="#e8ede8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <g id="fg-g" transform="translate(54 54) scale(0.78) translate(-50.5 -49.5)">
+      <circle cx="33" cy="70" r="11" fill="#b8e986"/>
+      <path d="M48 62 C78 58 38 36 76 25" pathLength="100" fill="none" stroke="#e8ede8" stroke-width="6" stroke-linecap="round" stroke-dasharray="7.3 23.6"/>
+      <path d="M65.8 20.9 L76 25 L69.6 33.9" fill="none" stroke="#e8ede8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="fg-s-g" transform="translate(54 54) scale(0.74) translate(-50 -50)">
+      <circle cx="31" cy="72" r="12" fill="#b8e986"/>
+      <path d="M48 62 C78 58 38 36 76 25" fill="none" stroke="#e8ede8" stroke-width="9" stroke-linecap="round"/>
+      <path d="M63.9 20.2 L76 25 L68.4 35.5" fill="none" stroke="#e8ede8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="mono-g" transform="translate(54 54) scale(0.78) translate(-50.5 -49.5)" fill="none" stroke="currentColor">
+      <circle cx="33" cy="70" r="11" fill="currentColor" stroke="none"/>
+      <path d="M48 62 C78 58 38 36 76 25" pathLength="100" stroke-width="6" stroke-linecap="round" stroke-dasharray="7.3 23.6"/>
+      <path d="M65.8 20.9 L76 25 L69.6 33.9" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <clipPath id="c-circle"><circle cx="54" cy="54" r="36"/></clipPath>
+    <clipPath id="c-squircle"><path d="M54 18 C82 18 90 26 90 54 C90 82 82 90 54 90 C26 90 18 82 18 54 C18 26 26 18 54 18 Z"/></clipPath>
+    <clipPath id="c-round"><rect x="18" y="18" width="72" height="72" rx="15"/></clipPath>
+  </defs>
+</svg>
+
+<main>
+  <div class="wrap">
+    <header class="hero">
+      <div class="hero-grid">
+        <div>
+          <h1>
+            <span class="en">RUN LINE</span>
+            <span class="ko">시안 01, 런 라인</span>
+          </h1>
+          <p class="idea">스쿼드 메이커에서 가장 자주 하는 일은 선수 한 명의 약속된 움직임을 긋는 것입니다. 그래서 마크는 그 한 동작입니다. 선수 토큰 하나와, 거기서 출발하는 점선 런 라인 하나.</p>
+          <p class="lead">전술판에서 점선 화살표는 공 없이 뛰는 움직임을 뜻합니다. 코치가 매일 그리는 기호를 그대로 앱의 얼굴로 씁니다.</p>
+        </div>
+        <div class="hero-mark">
+          <svg viewBox="0 0 100 100" role="img" aria-label="런 라인 심볼, 라임색 선수 토큰과 점선 화살표"><use href="#sym" width="100" height="100"/></svg>
+        </div>
+      </div>
+    </header>
+
+    <section aria-labelledby="h-header">
+      <div class="sec-head">
+        <h2 id="h-header">헤더 로고</h2>
+        <p class="lead">32px 이하에서는 점선 사이 간격이 1px 아래로 줄어 뭉개집니다. 그래서 헤더는 실선 소형 심볼을 씁니다. 한글 병기는 높이 48px 이상 로고에서만 합니다.</p>
+      </div>
+
+      <div class="mock-grid">
+        <div class="mock-col">
+          <div>
+            <div class="mock mobile">
+              <div class="appbar">
+                <div class="brand">
+                  <svg width="26" height="26" role="img" aria-label="스쿼드 메이커"><use href="#sym-s"/></svg>
+                  <span class="wm" style="font-size:19px">SQUAD MAKER</span>
+                </div>
+                <div class="actions"><span class="chip primary">공유</span></div>
+              </div>
+              <div class="pitch-strip" aria-hidden="true">
+                <svg viewBox="0 0 360 92" preserveAspectRatio="none"><line x1="0" y1="46" x2="360" y2="46" stroke="#e8ede8" stroke-opacity=".35" stroke-width="1.5"/><circle cx="180" cy="46" r="28" fill="none" stroke="#e8ede8" stroke-opacity=".35" stroke-width="1.5"/></svg>
+              </div>
+            </div>
+            <p class="note cap"><strong>모바일 360px, 가로형.</strong> 심볼 26px, 워드마크 19px.</p>
+          </div>
+          <div>
+            <div class="mock mobile">
+              <div class="appbar">
+                <div class="brand">
+                  <svg width="28" height="28" role="img" aria-label="스쿼드 메이커"><use href="#sym-s"/></svg>
+                  <span class="title">토요일 4-4-2</span>
+                </div>
+                <div class="actions"><span class="chip">저장</span><span class="chip primary">공유</span></div>
+              </div>
+              <div class="pitch-strip" aria-hidden="true">
+                <svg viewBox="0 0 360 92" preserveAspectRatio="none"><line x1="0" y1="46" x2="360" y2="46" stroke="#e8ede8" stroke-opacity=".35" stroke-width="1.5"/><circle cx="180" cy="46" r="28" fill="none" stroke="#e8ede8" stroke-opacity=".35" stroke-width="1.5"/></svg>
+              </div>
+            </div>
+            <p class="note cap"><strong>모바일 360px, 심볼 단독.</strong> 버튼이 많은 편집 화면에서 28px 심볼과 화면 제목.</p>
+          </div>
+        </div>
+
+        <div class="mock-col">
+          <div>
+            <div class="mock desktop">
+              <div class="appbar">
+                <div class="brand">
+                  <svg width="32" height="32" role="img" aria-label="스쿼드 메이커"><use href="#sym-s"/></svg>
+                  <span class="wm" style="font-size:23px">SQUAD MAKER</span>
+                </div>
+                <div class="actions"><span class="chip">전술 패턴</span><span class="chip">저장</span><span class="chip primary">공유</span></div>
+              </div>
+              <div class="pitch-strip" aria-hidden="true" style="height:120px">
+                <svg viewBox="0 0 700 120" preserveAspectRatio="none"><line x1="350" y1="0" x2="350" y2="120" stroke="#e8ede8" stroke-opacity=".35" stroke-width="1.5"/><circle cx="350" cy="60" r="34" fill="none" stroke="#e8ede8" stroke-opacity=".35" stroke-width="1.5"/></svg>
+              </div>
+            </div>
+            <p class="note cap"><strong>데스크톱, 가로형.</strong> 심볼 32px, 워드마크 23px.</p>
+          </div>
+          <div>
+            <div class="mock desktop">
+              <div class="appbar">
+                <div class="brand">
+                  <svg width="30" height="30" role="img" aria-label="스쿼드 메이커"><use href="#sym-s"/></svg>
+                  <span class="title">토요일 4-4-2</span>
+                </div>
+                <div class="actions"><span class="chip">저장</span><span class="chip primary">공유</span></div>
+              </div>
+            </div>
+            <p class="note cap"><strong>데스크톱, 심볼 단독.</strong> 전술을 편집하는 동안 화면 제목을 앞세울 때.</p>
+          </div>
+          <div>
+            <div class="mock desktop" style="padding:32px 24px; display:flex; flex-wrap:wrap; gap:32px; align-items:center">
+              <div class="brand" style="gap:14px">
+                <svg width="56" height="56" role="img" aria-label="스쿼드 메이커"><use href="#sym"/></svg>
+                <span style="display:grid; gap:7px">
+                  <span class="wm" style="font-size:30px">SQUAD MAKER</span>
+                  <span style="font-size:13px; letter-spacing:0.32em; color:var(--muted); line-height:1">스쿼드 메이커</span>
+                </span>
+              </div>
+            </div>
+            <p class="note cap"><strong>큰 로고, 한글 병기.</strong> 점선 심볼 56px. 스토어 그래픽, 공유 이미지 워터마크, 소개 페이지용.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-icon">
+      <div class="sec-head">
+        <h2 id="h-icon">앱 아이콘</h2>
+        <p class="lead">배경은 피치 녹색 한 장, 전경은 선수 토큰과 런 라인입니다. 라임 토큰은 녹색 위에서 5.3:1, 초크 선은 6.4:1 대비입니다.</p>
+      </div>
+
+      <div class="icon-grid">
+        <div class="store">
+          <div>
+            <svg class="store-img" viewBox="0 0 512 512" role="img" aria-label="Play 스토어 아이콘 512 풀블리드">
+              <rect width="512" height="512" fill="#2b5e3f"/>
+              <g transform="scale(7.1111) translate(-18 -18)"><use href="#fg-g"/></g>
+            </svg>
+            <p class="note cap"><strong>Play 스토어 512.</strong> 풀블리드, 모서리는 스토어가 깎습니다. 240px로 축소 표시.</p>
+          </div>
+          <div style="display:grid; gap:20px">
+            <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between">
+              <h3>적응형 아이콘 마스크</h3>
+              <button class="btn" id="canvasToggle" type="button" aria-pressed="false">108dp 캔버스와 안전 영역 보기</button>
+            </div>
+            <div class="masks" id="masks">
+              <div class="mask-item">
+                <svg viewBox="18 18 72 72" role="img" aria-label="원형 마스크">
+                  <g class="outside"><rect width="108" height="108" fill="#2b5e3f"/><use href="#fg-g"/></g>
+                  <g class="clipped" clip-path="url(#c-circle)"><rect width="108" height="108" fill="#2b5e3f"/><use href="#fg-g"/></g>
+                  <g class="guides" fill="none" stroke-width="0.6">
+                    <rect x="0.3" y="0.3" width="107.4" height="107.4" stroke="#8b9a90"/>
+                    <circle cx="54" cy="54" r="36" stroke="#e8ede8"/>
+                    <circle cx="54" cy="54" r="33" stroke="#b8e986" stroke-dasharray="2 2"/>
+                  </g>
+                </svg>
+                <span class="note">원형</span>
+              </div>
+              <div class="mask-item">
+                <svg viewBox="18 18 72 72" role="img" aria-label="스쿼클 마스크">
+                  <g class="outside"><rect width="108" height="108" fill="#2b5e3f"/><use href="#fg-g"/></g>
+                  <g class="clipped" clip-path="url(#c-squircle)"><rect width="108" height="108" fill="#2b5e3f"/><use href="#fg-g"/></g>
+                  <g class="guides" fill="none" stroke-width="0.6">
+                    <rect x="0.3" y="0.3" width="107.4" height="107.4" stroke="#8b9a90"/>
+                    <path d="M54 18 C82 18 90 26 90 54 C90 82 82 90 54 90 C26 90 18 82 18 54 C18 26 26 18 54 18 Z" stroke="#e8ede8"/>
+                    <circle cx="54" cy="54" r="33" stroke="#b8e986" stroke-dasharray="2 2"/>
+                  </g>
+                </svg>
+                <span class="note">스쿼클</span>
+              </div>
+              <div class="mask-item">
+                <svg viewBox="18 18 72 72" role="img" aria-label="둥근 사각 마스크">
+                  <g class="outside"><rect width="108" height="108" fill="#2b5e3f"/><use href="#fg-g"/></g>
+                  <g class="clipped" clip-path="url(#c-round)"><rect width="108" height="108" fill="#2b5e3f"/><use href="#fg-g"/></g>
+                  <g class="guides" fill="none" stroke-width="0.6">
+                    <rect x="0.3" y="0.3" width="107.4" height="107.4" stroke="#8b9a90"/>
+                    <rect x="18" y="18" width="72" height="72" rx="15" stroke="#e8ede8"/>
+                    <circle cx="54" cy="54" r="33" stroke="#b8e986" stroke-dasharray="2 2"/>
+                  </g>
+                </svg>
+                <span class="note">둥근 사각</span>
+              </div>
+            </div>
+            <p class="note" id="canvasNote">마스크 안쪽 72dp만 보입니다. 버튼을 누르면 108dp 전체 캔버스, 마스크 윤곽(흰 선), 지름 66dp 안전 영역(라임 점선)이 나타납니다.</p>
+          </div>
+        </div>
+
+        <div style="display:grid; gap:16px">
+          <h3>홈 화면과 작은 크기</h3>
+          <div class="homes">
+            <div class="home dark">
+              <div class="launcher">
+                <div class="app"><span class="ghost-app" aria-hidden="true"></span><span>캘린더</span></div>
+                <div class="app">
+                  <svg width="48" height="48" viewBox="18 18 72 72" role="img" aria-label="스쿼드 메이커 아이콘 48dp"><g clip-path="url(#c-circle)"><rect width="108" height="108" fill="#2b5e3f"/><use href="#fg-g"/></g></svg>
+                  <span>스쿼드 메이커</span>
+                </div>
+                <div class="app"><span class="ghost-app" aria-hidden="true"></span><span>메시지</span></div>
+              </div>
+              <div class="row">
+                <svg width="24" height="24" viewBox="18 18 72 72" role="img" aria-label="스쿼드 메이커 아이콘 24dp"><g clip-path="url(#c-circle)"><rect width="108" height="108" fill="#2b5e3f"/><use href="#fg-s-g"/></g></svg>
+                <span>스쿼드 메이커</span><span class="sub">알림 허용</span>
+              </div>
+              <span class="label-sm">어두운 배경. 위 48dp, 아래 설정 목록 24dp.</span>
+            </div>
+            <div class="home light">
+              <div class="launcher">
+                <div class="app"><span class="ghost-app" aria-hidden="true"></span><span>캘린더</span></div>
+                <div class="app">
+                  <svg width="48" height="48" viewBox="18 18 72 72" role="img" aria-label="스쿼드 메이커 아이콘 48dp"><g clip-path="url(#c-squircle)"><rect width="108" height="108" fill="#2b5e3f"/><use href="#fg-g"/></g></svg>
+                  <span>스쿼드 메이커</span>
+                </div>
+                <div class="app"><span class="ghost-app" aria-hidden="true"></span><span>메시지</span></div>
+              </div>
+              <div class="row">
+                <svg width="24" height="24" viewBox="18 18 72 72" role="img" aria-label="스쿼드 메이커 아이콘 24dp"><g clip-path="url(#c-squircle)"><rect width="108" height="108" fill="#2b5e3f"/><use href="#fg-s-g"/></g></svg>
+                <span>스쿼드 메이커</span><span class="sub">알림 허용</span>
+              </div>
+              <span class="label-sm">밝은 배경. 24dp에서는 실선 소형 마크로 바꿉니다.</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; gap:16px">
+          <h3>단색 테마 아이콘 (Android 13)</h3>
+          <div class="mono">
+            <div class="mono-tile l">
+              <svg width="64" height="64" viewBox="18 18 72 72" role="img" aria-label="단색 아이콘, 밝은 테마"><g clip-path="url(#c-circle)"><rect width="108" height="108" fill="#cfe3c9"/><g style="color:#1f3d29"><use href="#mono-g"/></g></g></svg>
+              <span class="label-sm">밝은 테마</span>
+            </div>
+            <div class="mono-tile d">
+              <svg width="64" height="64" viewBox="18 18 72 72" role="img" aria-label="단색 아이콘, 어두운 테마"><g clip-path="url(#c-circle)"><rect width="108" height="108" fill="#24342a"/><g style="color:#c4e0bd"><use href="#mono-g"/></g></g></svg>
+              <span class="label-sm">어두운 테마</span>
+            </div>
+            <p class="note" style="align-self:center; max-width:36ch">색이 하나로 합쳐져도 토큰(점)과 런(점선 화살표)의 형태 차이만으로 읽힙니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-splash">
+      <div class="sec-head">
+        <h2 id="h-splash">시작 스플래시</h2>
+        <p class="lead">시스템 스플래시가 아이콘을 띄우고, 같은 배경 위에서 앱이 런 라인을 직접 긋습니다. 저장소 준비를 기다리는 1.4초 동안의 한 장면입니다.</p>
+      </div>
+      <div class="splash-grid">
+        <div class="phone-wrap">
+          <div class="phone" aria-label="1단계 시스템 스플래시 미리보기" role="img">
+            <svg class="sys-icon" viewBox="0 0 108 108" aria-hidden="true">
+              <g clip-path="url(#c-circle)"><rect width="108" height="108" fill="#2b5e3f"/><use href="#fg-g"/></g>
+            </svg>
+          </div>
+          <p class="note"><strong>1단계, 시스템 스플래시.</strong> 배경 #141a16, 아이콘 240dp 중 160dp 원만 보임.</p>
+        </div>
+        <div class="phone-wrap">
+          <div class="phone">
+            <iframe id="splashFrame" src="splash.html" title="2단계 앱 내 모션 인트로"></iframe>
+          </div>
+          <button class="btn" id="replay" type="button">다시 보기</button>
+        </div>
+        <div style="display:grid; gap:16px">
+          <h3>2단계, 앱 내 모션 1400ms</h3>
+          <ol class="timeline">
+            <li><span class="ms">0-260</span><span>선수 토큰이 점에서 제 크기로 빠르게 자리 잡습니다.</span></li>
+            <li><span class="ms">180-780</span><span>점선 런 라인이 토큰에서 출발해 끝까지 그어집니다.</span></li>
+            <li><span class="ms">740-920</span><span>화살촉이 끝점에서 딱 맞물립니다.</span></li>
+            <li><span class="ms">900-1400</span><span>마크가 왼쪽으로 비켜서고 워드마크가 그 뒤에서 나옵니다. 정지.</span></li>
+          </ol>
+          <p class="note">탭하면 건너뜁니다. 동작 줄이기 설정에서는 마지막 정지 로고만 보입니다. CSS 애니메이션만 써서 GIF 프레임을 그대로 뽑을 수 있습니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-spec">
+      <div class="sec-head">
+        <h2 id="h-spec">사양</h2>
+      </div>
+      <div class="spec">
+        <div class="swatches">
+          <div class="sw"><i style="background:#b8e986"></i><span>라임, 선수 토큰<small>마크 안의 유일한 강조색</small></span><code>#B8E986</code></div>
+          <div class="sw"><i style="background:#e8ede8"></i><span>초크, 런 라인과 워드마크</span><code>#E8EDE8</code></div>
+          <div class="sw"><i style="background:#2b5e3f"></i><span>피치, 아이콘 배경</span><code>#2B5E3F</code></div>
+          <div class="sw"><i style="background:#141a16"></i><span>나이트, 헤더와 스플래시 배경</span><code>#141A16</code></div>
+          <div class="sw"><i style="background:#1c241e"></i><span>표면</span><code>#1C241E</code></div>
+        </div>
+        <dl class="facts">
+          <div><dt>서체</dt><dd>워드마크 Oswald 600, 자간 0.04em에서 0.05em. 한글 병기 IBM Plex Sans KR 500, 자간 0.32em. 최종 번들에서는 워드마크를 아웃라인 패스로 바꿉니다.</dd></div>
+          <div><dt>최소 크기</dt><dd>점선 심볼 40px 이상. 16px에서 39px은 실선 소형 심볼. 가로형 로고 높이 24px 이상. 한글 병기 로고 높이 48px 이상.</dd></div>
+          <div><dt>여백</dt><dd>
+            사방으로 선수 토큰 지름(심볼 높이의 약 1/3)만큼 비웁니다.
+            <div class="clear">
+              <svg width="132" height="132" viewBox="-22 -22 111 111" role="img" aria-label="여백 기준 도해">
+                <rect x="-22" y="-22" width="111" height="111" fill="none" stroke="#8b9a90" stroke-dasharray="3 3" stroke-width="1"/>
+                <rect x="0" y="0" width="67" height="67" fill="none" stroke="#2c3830" stroke-width="1"/>
+                <svg x="0" y="0" width="67" height="67"><use href="#sym"/></svg>
+              </svg>
+              <span class="note">점선 테두리 = 여백 한계</span>
+            </div>
+          </dd></div>
+        </dl>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">스쿼드 메이커 브랜드 시안 01, 런 라인. 운영 코드 적용 전 비교용입니다.</div>
+</footer>
+
+<script>
+  (function () {
+    var toggle = document.getElementById('canvasToggle');
+    var masks = document.getElementById('masks');
+    toggle.addEventListener('click', function () {
+      var on = toggle.getAttribute('aria-pressed') !== 'true';
+      toggle.setAttribute('aria-pressed', String(on));
+      masks.classList.toggle('canvas-on', on);
+      masks.querySelectorAll('svg').forEach(function (svg) {
+        svg.setAttribute('viewBox', on ? '0 0 108 108' : '18 18 72 72');
+      });
+    });
+    var frame = document.getElementById('splashFrame');
+    document.getElementById('replay').addEventListener('click', function () {
+      frame.src = 'splash.html?r=' + Date.now();
+    });
+  })();
+</script>
+</body>
+</html>

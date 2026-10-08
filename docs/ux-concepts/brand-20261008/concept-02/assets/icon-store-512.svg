@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Squad Maker concept-02: Play Store icon, 512x512 full bleed (the store applies its own corner mask).
+       Same composition as the adaptive icon, scaled from the 108 canvas. -->
+  <rect width="512" height="512" fill="#141a16"/>
+  <g transform="scale(4.7407)">
+    <g fill="#e8ede8">
+      <circle cx="54" cy="30" r="4.6"/>
+      <circle cx="66" cy="30" r="4.6"/>
+      <circle cx="42" cy="42" r="4.6"/>
+      <circle cx="66" cy="66" r="4.6"/>
+      <circle cx="42" cy="78" r="4.6"/>
+      <circle cx="54" cy="78" r="4.6"/>
+    </g>
+    <circle cx="54" cy="54" r="4.6" fill="#b8e986"/>
+  </g>
+</svg>

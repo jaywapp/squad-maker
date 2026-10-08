@@ -17,6 +17,7 @@
 | 현재 C-03·native 저장/내보내기 계약 v2 | [UI 계약 v2](ui-state-save-export-contract-v2.md), [Claude 요청문](a-android-preview-20261007-claude-request.md), [Android 결정](android-preview-architecture.md) |
 | 문서 전수 분류·이동·참조 검증 결과 | [정리 기록](documentation-audit.md) |
 | A UI 통합 APK 및 Release 검증 | [분석](a-preview-release-20261007-analysis.md), [설계](a-preview-release-20261007-design.md), [실행](a-preview-release-20261007-tasks.md) |
+| 브랜딩(앱 아이콘·좌상단 로고·스플래시) 시안 3종과 A 런 라인 적용 요청 | [시안](ux-concepts/brand-20261008/README.md), [적용 패키지](../work/tasks/branding/README.md) |
 
 
 ## 유지하는 근거와 운영 참고

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>스쿼드 메이커 시작 화면</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Zilla+Slab:wght@700&display=swap" rel="stylesheet">
+<style>
+/*
+  Concept 03 Chalk Pitch: in-app motion intro.
+  Total 1500 ms. CSS animations only (no rAF, no SMIL, no timers) so document.getAnimations()
+  can freeze any frame. Every animated element exists at load.
+  Timeline (ms):
+     60 -  480  touchline draws
+    380 -  620  halfway line draws out from the centre
+    520 -  900  centre circle draws (two 270 degree arcs, overlapped)
+    900 - 1140  circle splits along the halfway line into the S
+   1040 - 1420  pitch shrinks into the icon position, tile fills green (1080 - 1340)
+   1080 - 1260  lime centre spot lands
+   1160 - 1500  wordmark is chalked in from left to right
+  Default (non-animated) styles equal the final frame, so reduced motion shows the end state.
+*/
+:root {
+  --bg: #141a16;
+  --pitch: #2b5e3f;
+  --chalk: #e8ede8;
+  --lime: #b8e986;
+  --muted: #8fa096;
+  --ease-draw: cubic-bezier(.65, 0, .35, 1);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--chalk);
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.mark-wrap {
+  width: 36vmin;
+  height: 36vmin;
+  margin-bottom: -2vmin;
+  animation: shrink 380ms var(--ease-out) 1040ms both;
+  will-change: transform;
+}
+.mark { display: block; width: 100%; height: 100%; overflow: visible; }
+
+.chalk { fill: none; stroke: var(--chalk); }
+.touch {
+  stroke-width: 2.4;
+  stroke-dasharray: 1 2;
+  animation: draw 420ms var(--ease-draw) 60ms both;
+}
+.half {
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: grow-x 240ms var(--ease-out) 380ms both;
+}
+.s-top, .s-bot {
+  stroke-width: 4.2;
+  stroke-linecap: round;
+  stroke-dasharray: 1 2;
+}
+.s-top { animation: draw-fade 340ms var(--ease-draw) 520ms both, split-top 240ms var(--ease-out) 900ms both; }
+.s-bot { animation: draw-fade 340ms var(--ease-draw) 560ms both, split-bot 240ms var(--ease-out) 900ms both; }
+.spot {
+  fill: var(--lime);
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: land 180ms var(--ease-out) 1080ms both;
+}
+.tile {
+  fill: var(--pitch);
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: tile-in 260ms var(--ease-out) 1080ms both;
+}
+
+.word {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: chalk-in 340ms var(--ease-out) 1160ms both;
+}
+.ko {
+  font-family: 'Do Hyeon', 'Black Han Sans', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+  font-size: 9vmin;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+}
+.en {
+  font-family: 'Zilla Slab', 'Rockwell', 'Roboto Slab', serif;
+  font-weight: 700;
+  font-size: 3.2vmin;
+  letter-spacing: 0.28em;
+  margin-right: -0.28em;
+  color: var(--muted);
+  margin-top: 0.8vmin;
+}
+
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes draw-fade {
+  0% { stroke-dashoffset: 1; opacity: 0; }
+  6% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+@keyframes grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes split-top { from { transform: translateY(9px); } to { transform: translateY(0); } }
+@keyframes split-bot { from { transform: translateY(-9px); } to { transform: translateY(0); } }
+@keyframes land { from { transform: scale(0); } to { transform: scale(1); } }
+@keyframes tile-in { from { opacity: 0; transform: scale(1.18); } to { opacity: 1; transform: scale(1); } }
+@keyframes shrink {
+  from { transform: translateY(6.6vmin) scale(2.1); }
+  to { transform: none; }
+}
+@keyframes chalk-in {
+  from { clip-path: inset(0 100% 0 0); opacity: 0; transform: translateY(1.2vmin); }
+  to { clip-path: inset(0 0 0 0); opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; }
+}
+</style>
+</head>
+<body>
+<main class="lockup" aria-label="스쿼드 메이커">
+  <div class="mark-wrap">
+    <svg class="mark" viewBox="0 0 108 108" aria-hidden="true">
+      <rect class="tile" x="18" y="18" width="72" height="72" rx="17"/>
+      <rect class="chalk touch" x="36" y="29" width="36" height="50" rx="5" pathLength="1"/>
+      <line class="chalk half" x1="36" y1="54" x2="72" y2="54"/>
+      <path class="chalk s-top" d="M63 45 A9 9 0 1 0 54 54" pathLength="1"/>
+      <path class="chalk s-bot" d="M54 54 A9 9 0 1 1 45 63" pathLength="1"/>
+      <circle class="spot" cx="54" cy="54" r="3.2"/>
+    </svg>
+  </div>
+  <div class="word">
+    <span class="ko">스쿼드 메이커</span>
+    <span class="en" lang="en">SQUAD MAKER</span>
+  </div>
+</main>
+</body>
+</html>

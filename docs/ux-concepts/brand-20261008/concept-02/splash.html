@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>스쿼드 메이커 인트로</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Sans+KR:wght@600&display=swap" rel="stylesheet">
+<style>
+/* Concept-02 Formation Dots: in-app motion intro.
+   CSS animations only (no rAF, no SMIL, no timers). Every animated element exists at load.
+   Default (un-animated) styles ARE the final logo state, so reduced motion and finish() land correctly.
+   Timeline (ms): 0-200 dots appear scattered / 80-880 staggered glide into a wide formation /
+   760-960 selected dot turns lime + ring pulse to 1180 / 900-1240 formation compacts /
+   920-1300 mark rises / 1040-1420 wordmark wipes in / 1140-1460 Korean line fades in. */
+:root {
+  --night: #141a16;
+  --pitch: #2b5e3f;
+  --chalk: #e8ede8;
+  --lime: #b8e986;
+  --muted: #8fa096;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+}
+html, body { margin: 0; height: 100%; background: var(--night); }
+body { overflow: hidden; }
+
+.intro {
+  --u: min(1vw, 0.5vh);
+  position: relative;
+  height: 100%;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: var(--night);
+  -webkit-tap-highlight-color: transparent;
+  cursor: default;
+}
+.lockup { display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 6); }
+.mk-svg { display: block; height: calc(var(--u) * 40); width: calc(var(--u) * 24); overflow: visible; }
+.d { fill: var(--chalk); }
+.d.sel { fill: var(--lime); }
+.ring { fill: none; stroke: var(--lime); stroke-width: 1.2; opacity: 0; transform-box: fill-box; transform-origin: center; vector-effect: non-scaling-stroke; }
+.wm { display: flex; flex-direction: column; align-items: center; }
+.wm-en {
+  font-family: 'Archivo', 'Arial', sans-serif;
+  font-weight: 800; font-stretch: 112%;
+  font-size: calc(var(--u) * 7); line-height: 1;
+  letter-spacing: 0.04em; color: var(--chalk);
+  white-space: nowrap;
+  margin-right: -0.04em; /* optical: cancel trailing tracking */
+}
+.wm-ko {
+  margin-top: calc(var(--u) * 1.8);
+  font-family: 'IBM Plex Sans KR', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  font-weight: 600; font-size: calc(var(--u) * 3.4); line-height: 1.2;
+  letter-spacing: 0.24em; margin-right: -0.24em; color: var(--muted);
+}
+
+@keyframes sm-appear { from { opacity: 0; } }
+@keyframes sm-glide { from { transform: translate(var(--sx), var(--sy)); } }
+@keyframes sm-compact { from { transform: translate(var(--x), var(--y)); } }
+@keyframes sm-light { from { fill: var(--chalk); } }
+@keyframes sm-pulse { from { opacity: 0.9; transform: scale(1); } to { opacity: 0; transform: scale(3.4); } }
+@keyframes sm-rise { from { transform: translateY(calc(var(--u) * 9.5)); } }
+@keyframes sm-wipe { from { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateY(calc(var(--u) * 1.2)); } }
+@keyframes sm-fade { from { opacity: 0; transform: translateY(calc(var(--u) * 0.8)); } }
+
+.d { animation: sm-appear 200ms ease-out both, sm-glide 520ms var(--ease-out) calc(80ms + var(--i) * 45ms) both; }
+.d.sel { animation: sm-appear 200ms ease-out both, sm-glide 520ms var(--ease-out) calc(80ms + var(--i) * 45ms) both, sm-light 200ms ease-out 760ms both; }
+.sp { animation: sm-compact 340ms var(--ease-io) 900ms both; }
+.ring { animation: sm-pulse 420ms var(--ease-out) 760ms forwards; }
+.mk { animation: sm-rise 380ms var(--ease-out) 920ms both; }
+.wm-en { animation: sm-wipe 380ms var(--ease-out) 1040ms both; }
+.wm-ko { animation: sm-fade 320ms ease-out 1140ms both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .intro *, .intro *::before, .intro *::after { animation: none !important; }
+}
+</style>
+</head>
+<body>
+<main class="intro" id="intro" role="img" aria-label="스쿼드 메이커">
+  <div class="lockup" aria-hidden="true">
+    <div class="mk">
+      <svg class="mk-svg" viewBox="36 24 36 60">
+        <circle class="ring" cx="54" cy="54" r="4.6"/>
+        <!-- order of --i: back line first, strikers last -->
+        <g class="sp" style="--x:0px;--y:-10.8px"><circle class="d" style="--i:5;--sx:-30px;--sy:30px" cx="54" cy="30" r="4.6"/></g>
+        <g class="sp" style="--x:5.4px;--y:-10.8px"><circle class="d" style="--i:6;--sx:26px;--sy:44px" cx="66" cy="30" r="4.6"/></g>
+        <g class="sp" style="--x:-5.4px;--y:-5.4px"><circle class="d" style="--i:4;--sx:34px;--sy:-20px" cx="42" cy="42" r="4.6"/></g>
+        <g class="sp" style="--x:0px;--y:0px"><circle class="d sel" style="--i:3;--sx:-36px;--sy:22px" cx="54" cy="54" r="4.6"/></g>
+        <g class="sp" style="--x:5.4px;--y:5.4px"><circle class="d" style="--i:2;--sx:-30px;--sy:-38px" cx="66" cy="66" r="4.6"/></g>
+        <g class="sp" style="--x:-5.4px;--y:10.8px"><circle class="d" style="--i:0;--sx:36px;--sy:-30px" cx="42" cy="78" r="4.6"/></g>
+        <g class="sp" style="--x:0px;--y:10.8px"><circle class="d" style="--i:1;--sx:30px;--sy:-46px" cx="54" cy="78" r="4.6"/></g>
+      </svg>
+    </div>
+    <div class="wm">
+      <span class="wm-en">SQUAD MAKER</span>
+      <span class="wm-ko">스쿼드 메이커</span>
+    </div>
+  </div>
+</main>
+<script>
+  // Tap to skip: jump every running animation to its end state (no frame driving).
+  document.getElementById('intro').addEventListener('click', function () {
+    document.getAnimations().forEach(function (a) { a.finish(); });
+  });
+</script>
+</body>
+</html>

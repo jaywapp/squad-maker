@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108">
+  <!-- Concept 03 Chalk Pitch: adaptive icon foreground layer.
+       108 x 108 canvas, all content inside the 66-unit safe circle centred at (54,54).
+       Touchline corner reach: 30.8 + half stroke 1.2 = 32.0 < 33. -->
+  <g fill="none" stroke="#e8ede8">
+    <rect x="36" y="29" width="36" height="50" rx="5" stroke-width="2.4"/>
+    <line x1="36" y1="54" x2="72" y2="54" stroke-width="2.4"/>
+    <!-- S monogram: the centre circle split along the halfway line into two 270 degree arcs -->
+    <path d="M63 45 A9 9 0 1 0 54 54 A9 9 0 1 1 45 63" stroke-width="4.2" stroke-linecap="round"/>
+  </g>
+  <circle cx="54" cy="54" r="3.2" fill="#b8e986"/>
+</svg>

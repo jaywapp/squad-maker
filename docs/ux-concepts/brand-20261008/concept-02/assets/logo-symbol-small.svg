@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Squad Maker concept-02: small symbol tuned for 16 to 28px.
+       Same seven-dot S, but heavier dots (r 2.1 of 24) and a squashed row step (4.5)
+       so every gap stays at least 1.8px at 24px. -->
+  <g fill="#e8ede8">
+    <circle cx="12" cy="3" r="2.1"/>
+    <circle cx="18" cy="3" r="2.1"/>
+    <circle cx="6" cy="7.5" r="2.1"/>
+    <circle cx="18" cy="16.5" r="2.1"/>
+    <circle cx="6" cy="21" r="2.1"/>
+    <circle cx="12" cy="21" r="2.1"/>
+  </g>
+  <circle cx="12" cy="12" r="2.1" fill="#b8e986"/>
+</svg>

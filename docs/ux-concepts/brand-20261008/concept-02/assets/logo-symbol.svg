@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 24 36 60" width="36" height="60">
+  <!-- Squad Maker concept-02: standard symbol. Use at 32px height and above.
+       Below 32px switch to logo-symbol-small.svg. -->
+  <g fill="#e8ede8">
+    <circle cx="54" cy="30" r="4.6"/>
+    <circle cx="66" cy="30" r="4.6"/>
+    <circle cx="42" cy="42" r="4.6"/>
+    <circle cx="66" cy="66" r="4.6"/>
+    <circle cx="42" cy="78" r="4.6"/>
+    <circle cx="54" cy="78" r="4.6"/>
+  </g>
+  <circle cx="54" cy="54" r="4.6" fill="#b8e986"/>
+</svg>

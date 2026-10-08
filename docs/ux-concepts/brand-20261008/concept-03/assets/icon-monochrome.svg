@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108">
+  <!-- Concept 03 Chalk Pitch: Android 13 themed icon (monochrome) layer. Single colour, system tints it.
+       The centre spot becomes a slightly larger node so it still reads without the lime accent. -->
+  <g fill="none" stroke="#000000">
+    <rect x="36" y="29" width="36" height="50" rx="5" stroke-width="2.6"/>
+    <line x1="36" y1="54" x2="72" y2="54" stroke-width="2.6"/>
+    <path d="M63 45 A9 9 0 1 0 54 54 A9 9 0 1 1 45 63" stroke-width="4.4" stroke-linecap="round"/>
+  </g>
+  <circle cx="54" cy="54" r="3.9" fill="#000000"/>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 232 40" width="232" height="40">
+  <!-- Squad Maker concept-02: horizontal lockup (standard symbol + wordmark).
+       Wordmark is live text in Archivo ExtraBold (800), width 112, tracking 0.04em.
+       PRODUCTION: convert the <text> to outlined paths before bundling into the Android app,
+       because the app bundle does not ship Google Fonts. -->
+  <g transform="translate(0 2) scale(0.6) translate(-36 -24)">
+    <g fill="#e8ede8">
+      <circle cx="54" cy="30" r="4.6"/>
+      <circle cx="66" cy="30" r="4.6"/>
+      <circle cx="42" cy="42" r="4.6"/>
+      <circle cx="66" cy="66" r="4.6"/>
+      <circle cx="42" cy="78" r="4.6"/>
+      <circle cx="54" cy="78" r="4.6"/>
+    </g>
+    <circle cx="54" cy="54" r="4.6" fill="#b8e986"/>
+  </g>
+  <text x="33" y="28.4" textLength="196" lengthAdjust="spacing" fill="#e8ede8"
+        font-family="Archivo, 'Arial', sans-serif" font-weight="800" font-size="23"
+        style="font-stretch:112%;font-variation-settings:'wdth' 112">SQUAD MAKER</text>
+</svg>

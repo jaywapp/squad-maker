@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Concept 03 Chalk Pitch: 24 px optimised symbol. Touchline and halfway line are dropped,
+       the S monogram is thickened and the lime centre spot is kept. -->
+  <rect width="24" height="24" rx="5.5" fill="#2b5e3f"/>
+  <path d="M16 8 A4 4 0 1 0 12 12 A4 4 0 1 1 8 16" fill="none" stroke="#e8ede8" stroke-width="2.6" stroke-linecap="round"/>
+  <circle cx="12" cy="12" r="1.8" fill="#b8e986"/>
+</svg>

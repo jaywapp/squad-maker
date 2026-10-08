@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Concept 03 Chalk Pitch: Play Store icon, 512 x 512, full bleed (the store applies its own mask). -->
+  <rect width="512" height="512" fill="#2b5e3f"/>
+  <g transform="translate(256 256) scale(6.4) translate(-54 -54)">
+    <g fill="none" stroke="#e8ede8">
+      <rect x="36" y="29" width="36" height="50" rx="5" stroke-width="2.2"/>
+      <line x1="36" y1="54" x2="72" y2="54" stroke-width="2.2"/>
+      <path d="M63 45 A9 9 0 1 0 54 54 A9 9 0 1 1 45 63" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <circle cx="54" cy="54" r="3.1" fill="#b8e986"/>
+  </g>
+</svg>

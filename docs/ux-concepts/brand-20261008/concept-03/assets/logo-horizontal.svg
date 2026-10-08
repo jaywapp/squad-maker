@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 214 56" width="214" height="56">
+  <!-- Concept 03 Chalk Pitch: horizontal lockup (symbol + Korean-first wordmark).
+       The wordmark uses <text> with Google Fonts "Do Hyeon" (Korean) and "Zilla Slab" (English), both OFL.
+       Production (Android bundle has no Google Fonts) must convert both text runs to outlined paths. -->
+  <rect x="0" y="4" width="48" height="48" rx="11" fill="#2b5e3f"/>
+  <g fill="none" stroke="#e8ede8" transform="translate(0 4)">
+    <rect x="11" y="6" width="26" height="36" rx="3.5" stroke-width="1.9"/>
+    <line x1="11" y1="24" x2="37" y2="24" stroke-width="1.9"/>
+    <path d="M30.2 17.8 A6.2 6.2 0 1 0 24 24 A6.2 6.2 0 1 1 17.8 30.2" stroke-width="3.3" stroke-linecap="round"/>
+  </g>
+  <circle cx="24" cy="28" r="2.4" fill="#b8e986"/>
+  <text x="60" y="31" fill="#e8ede8" font-family="'Do Hyeon', 'Black Han Sans', 'Malgun Gothic', sans-serif" font-size="27">스쿼드 메이커</text>
+  <text x="61" y="48" fill="#8fa096" font-family="'Zilla Slab', 'Rockwell', 'Roboto Slab', serif" font-weight="700" font-size="10.5" letter-spacing="2.9">SQUAD MAKER</text>
+</svg>
