@@ -1,0 +1,128 @@
+name: Main APK release
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'app/**'
+      - 'android/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'package*.json'
+      - 'capacitor.config.json'
+      - '.github/workflows/release-apk.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: main-apk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+
+  unsigned-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Ensure Android build tools
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"'
+      - run: npm ci
+      - run: npm run android:sync
+      - name: Plan version from complete source history
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          node scripts/apk-release-metadata.mjs plan --gradle android/app/build.gradle --sha "$SOURCE_SHA" --count "$(git rev-list --count HEAD)" --repository "$GITHUB_REPOSITORY" --out .work/apk-release/unsigned/release-plan.json
+      - name: Build versioned unsigned release and lint
+        run: |
+          VERSION_CODE=$(node -p "require('./.work/apk-release/unsigned/release-plan.json').versionCode")
+          VERSION_NAME=$(node -p "require('./.work/apk-release/unsigned/release-plan.json').versionName")
+          cd android
+          chmod +x gradlew
+          ./gradlew -I ../scripts/ci-apk-version.gradle -PsquadVersionCode="$VERSION_CODE" -PsquadVersionName="$VERSION_NAME" :app:assembleRelease :app:lintRelease --console=plain --no-daemon
+          cp app/build/outputs/apk/release/app-release-unsigned.apk ../.work/apk-release/unsigned/app-release-unsigned.apk
+      - name: Verify unsigned APK identity
+        run: node scripts/apk-release-metadata.mjs inspect-unsigned --plan .work/apk-release/unsigned/release-plan.json --apk .work/apk-release/unsigned/app-release-unsigned.apk --sdk "$ANDROID_HOME"
+      - name: Preserve unsigned inputs
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: unsigned-apk-${{ github.sha }}
+          path: |
+            .work/apk-release/unsigned/app-release-unsigned.apk
+            .work/apk-release/unsigned/release-plan.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+      - name: Preserve lint evidence
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: apk-lint-${{ github.sha }}
+          path: android/app/build/reports/lint-results-release.*
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    needs: [regression, unsigned-android]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'jaywapp/squad-maker'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Ensure Android build tools
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;36.0.0"'
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: unsigned-apk-${{ github.sha }}
+          path: .work/apk-release/unsigned
+      - name: Sign with the existing Preview certificate
+        shell: pwsh
+        env:
+          SQUAD_PREVIEW_KEYSTORE_BASE64: ${{ secrets.SQUAD_PREVIEW_KEYSTORE_BASE64 }}
+          SQUAD_PREVIEW_STORE_PASSWORD: ${{ secrets.SQUAD_PREVIEW_STORE_PASSWORD }}
+          SQUAD_PREVIEW_KEY_ALIAS: ${{ secrets.SQUAD_PREVIEW_KEY_ALIAS }}
+          SQUAD_PREVIEW_KEY_PASSWORD: ${{ secrets.SQUAD_PREVIEW_KEY_PASSWORD }}
+        run: ./scripts/sign-release-apk.ps1 -UnsignedApk .work/apk-release/unsigned/app-release-unsigned.apk -PlanFile .work/apk-release/unsigned/release-plan.json -OutputDirectory .work/apk-release/signed
+      - name: Publish only after release assets pass redownload verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/publish-apk-release.mjs --artifact-dir .work/apk-release/signed
