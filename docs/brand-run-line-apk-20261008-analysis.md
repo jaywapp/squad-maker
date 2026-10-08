@@ -19,3 +19,7 @@ package/name/storage schema/앱 동작/Run Line 자산·웹/UI·광고는 변경
 휴대폰 모델/OS/런처/실제 설치 APK는 미확인이다. adb 연결0대. SDK의 기존 AVD 목록은 확인했으나 새 APK 에뮬레이터 설치는 추가 설치에 해당해 실행하지 않는다. 기존 에뮬레이터 결과는 이번 서명 APK의 검증으로 사용하지 않는다. T7 모든 실기기 항목과 이번 APK의 에뮬레이터 실행/업데이트 후 실제 데이터 보존은 미검증이다. 알려진 이전 Preview와의 package/certificate/버전 조건이 맞아도 휴대폰 데이터 보존을 완료로 표시하지 않는다.
 
 서명 불일치·키 접근 실패·설치된 버전이 더 높음·오류가 확인되면 삭제/clear/downgrade로 우회하지 않고 정확한 단계만 알린다. 사용자 직접 설치 외 휴대폰 설치·공개 Release·main 병합·branch 삭제·force push·자동 배포 재개는 금지다.
+
+## 실제 결과와 후속 기록
+
+기존 키만으로 로컬 서명 APK 생성/검증이 완료됐다. source=a736c49853c0fff382e8bcf2a00c00f515dcc8b3, package/cert 이전Preview 동일, 1002/0.1.0-preview.2·min24/target36·v2/v3 검증 성공, 기존credential record/키 무변경·신규 저장0. 실제 APK정보/수동 절차는 install, 검증 결과는 tasks 및 PR #47을 따른다. 이 결과 기록의 docs 커밋은 APK source/bytes를 바꾸지 않는다. 실기기·이번APK 에뮬레이터 실행·설치후 데이터 유지·T7은 미검증, 직접 설치/Release/main병합은 수행하지 않았다.

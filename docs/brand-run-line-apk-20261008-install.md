@@ -2,6 +2,20 @@
 
 사용자 직접 설치용이다. APK 생성/서명 검증과 휴대폰 검증은 구분한다. 실제 source SHA·APK SHA256·버전·공개 인증서 비교 결과는 PR #47과 로컬 `.work/branding-apk-20261008/build-verification.json`에서 확인한다.
 
+
+## 준비된 APK의 실제 정보
+
+| 항목 | 검증 결과 |
+|---|---|
+| 파일 | `.work/artifacts/squad-maker-0.1.0-preview.2.apk` (이 브랜치 작업 트리의 로컬 파일) |
+| APK SHA256 | `7cb3a80c886a31f4faa0c1ce82a630e9f03c53bdee3571e45c981e23d47cc018` |
+| 빌드 source SHA | `a736c49853c0fff382e8bcf2a00c00f515dcc8b3` |
+| package/version | `com.jaywapp.squadmaker.preview`, `0.1.0-preview.2` / code1002 |
+| 인증서 SHA256 | `d5f7ede86e1020419ccb6a7a97fa3b8072ee6522ac878787641f19d5c33771b6` (이전 Preview와 동일) |
+| 서명/SDK | 기존Preview RSA3072/v2/v3, min API24(Android7.0)/target36 |
+| 이전Preview와 비교 | 동일package/인증서, code1001→1002로 업데이트 조건 일치. 휴대폰 실제 설치 앱/데이터 유지는 미검증 |
+
+이 정보/완료 기록을 추가한 후속 문서 커밋은 APK의 실제 빌드 source와 구분한다. APK 파일이나 제품 코드를 바꾸지 않았다.
 ## 설치 전 백업
 
 1. 기존 Preview에서 저장 상태가 완료인지 확인한다. 오류/blocked가 있으면 설치를 멈추고 상태를 기록한다.

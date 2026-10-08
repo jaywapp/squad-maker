@@ -20,3 +20,7 @@ orchestrator: Codex. 요청은 설치용 파일 준비다. 휴대폰이나 AVD�
 Android allowBackup=false이므로 자동 클라우드 백업을 기대하지 않는다. 팀/보관 목록의 전술 파일마다 명시적 `.sq` 백업을 하고 화면으로 목록/선택/보관 수를 기록한다. `.sq` 하나는 현재 전술의 선수·기본/공격/수비·패턴 원본이며 전체 library의 팀/파일 메타데이터 일괄 백업은 아니다. PNG/GIF/링크만으로 편집 원본 백업을 대신하지 않는다.
 
 사용자는 APK를 휴대폰에 복사한 후 기존 앱을 삭제하지 않고 OS의 업데이트로 설치한다. 선택적으로 `adb install -r`을 사용할 수 있지만 이 세션은 실행하지 않는다. 설치 취소·서명 충돌·downgrade 오류는 중단하며 uninstall/clear/-d를 사용하지 않는다. 실제 데이터 유지·홈/스플래시·탭·재진입은 사람의 결과로만 완료 처리한다. [서명 공식 문서](https://developer.android.com/studio/publish/app-signing), [adb 공식 문서](https://developer.android.com/tools/adb)를 따른다.
+
+## 실제 결과와 후속 기록
+
+기존 키만으로 로컬 서명 APK 생성/검증이 완료됐다. source=a736c49853c0fff382e8bcf2a00c00f515dcc8b3, package/cert 이전Preview 동일, 1002/0.1.0-preview.2·min24/target36·v2/v3 검증 성공, 기존credential record/키 무변경·신규 저장0. 실제 APK정보/수동 절차는 install, 검증 결과는 tasks 및 PR #47을 따른다. 이 결과 기록의 docs 커밋은 APK source/bytes를 바꾸지 않는다. 실기기·이번APK 에뮬레이터 실행·설치후 데이터 유지·T7은 미검증, 직접 설치/Release/main병합은 수행하지 않았다.
