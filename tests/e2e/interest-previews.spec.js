@@ -70,7 +70,11 @@ test.describe('출시 전 기능 미리보기', () => {
     await page.click('#interestModal button:has-text("닫기")');
     // 패턴 모드의 진입점은 pattern_controls로 구분된다
     await page.click('.app-tab[data-app="pattern"]');
-    await page.click('#patternUI button:has-text("고급 영상 (준비 중)")');
+    await expect(page.locator('.interest-section .interest-chip')).toHaveCount(3);
+    await expect(page.locator('.interest-section')).toBeHidden();
+    await expect(page.locator('.pattern-release-group')).toBeVisible();
+    await expect(page.locator('.pattern-release-group .interest-chip')).toHaveCount(1);
+    await page.click('.pattern-release-group button:has-text("고급 영상 (준비 중)")');
     await expect
       .poll(() => events.filter(e => e.name === 'advanced_export_previewed').length)
       .toBe(2);
@@ -86,6 +90,7 @@ test.describe('출시 전 기능 미리보기', () => {
     await page.goto('/index.html#s=' + encodeSnap(fixture));
     await expect(page.locator('body')).toHaveClass(/viewer-mode/);
     await expect(page.locator('.interest-section')).toBeHidden();
+    await expect(page.locator('.pattern-release-group')).toBeHidden();
   });
 
   test('인터뷰 참여 링크는 mailto이며 이메일을 분석 이벤트로 보내지 않는다', async ({ page }) => {

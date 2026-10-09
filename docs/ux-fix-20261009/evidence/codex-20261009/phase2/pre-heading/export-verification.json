@@ -1,0 +1,593 @@
+{
+  "date": "2026-10-10",
+  "sourceSha256": "2558442d8c45ab702109abd693814760d4f4bf0f561b9a6f58238e1f36ecbdb2",
+  "snapshot": {
+    "v": 1,
+    "team": "QA 테스트 클럽",
+    "mode": "9v9",
+    "squad": "basic",
+    "roster": [
+      {
+        "id": 1,
+        "name": "골키퍼이름가독성",
+        "color": "#E53935"
+      },
+      {
+        "id": 2,
+        "name": "수비1",
+        "color": "#1E88E5"
+      },
+      {
+        "id": 3,
+        "name": "수비2",
+        "color": "#1E88E5"
+      },
+      {
+        "id": 4,
+        "name": "수비3",
+        "color": "#1E88E5"
+      },
+      {
+        "id": 5,
+        "name": "미드필더긴이름확인",
+        "color": "#FFD600"
+      },
+      {
+        "id": 6,
+        "name": "미드2",
+        "color": "#1E88E5"
+      },
+      {
+        "id": 7,
+        "name": "미드3",
+        "color": "#1E88E5"
+      },
+      {
+        "id": 8,
+        "name": "공격1",
+        "color": "#1E88E5"
+      },
+      {
+        "id": 9,
+        "name": "공격2",
+        "color": "#1E88E5"
+      }
+    ],
+    "squads": {
+      "basic": {
+        "f": "3-3-2",
+        "pos": {
+          "1": {
+            "x": 240,
+            "y": 622
+          },
+          "2": {
+            "x": 130,
+            "y": 510
+          },
+          "3": {
+            "x": 240,
+            "y": 510
+          },
+          "4": {
+            "x": 350,
+            "y": 510
+          },
+          "5": {
+            "x": 130,
+            "y": 385
+          },
+          "6": {
+            "x": 240,
+            "y": 385
+          },
+          "7": {
+            "x": 350,
+            "y": 385
+          },
+          "8": {
+            "x": 167,
+            "y": 240
+          },
+          "9": {
+            "x": 313,
+            "y": 240
+          }
+        },
+        "tn": "",
+        "pn": {}
+      },
+      "attack": {
+        "f": "3-2-3",
+        "pos": {
+          "1": {
+            "x": 240,
+            "y": 622
+          },
+          "2": {
+            "x": 130,
+            "y": 510
+          },
+          "3": {
+            "x": 240,
+            "y": 510
+          },
+          "4": {
+            "x": 350,
+            "y": 510
+          },
+          "5": {
+            "x": 167,
+            "y": 385
+          },
+          "6": {
+            "x": 313,
+            "y": 385
+          },
+          "7": {
+            "x": 130,
+            "y": 240
+          },
+          "8": {
+            "x": 240,
+            "y": 240
+          },
+          "9": {
+            "x": 350,
+            "y": 240
+          }
+        },
+        "tn": "",
+        "pn": {}
+      },
+      "defense": {
+        "f": "4-3-1",
+        "pos": {
+          "1": {
+            "x": 240,
+            "y": 622
+          },
+          "2": {
+            "x": 108,
+            "y": 510
+          },
+          "3": {
+            "x": 196,
+            "y": 510
+          },
+          "4": {
+            "x": 284,
+            "y": 510
+          },
+          "5": {
+            "x": 372,
+            "y": 510
+          },
+          "6": {
+            "x": 130,
+            "y": 380
+          },
+          "7": {
+            "x": 240,
+            "y": 380
+          },
+          "8": {
+            "x": 350,
+            "y": 380
+          },
+          "9": {
+            "x": 240,
+            "y": 230
+          }
+        },
+        "tn": "",
+        "pn": {}
+      }
+    },
+    "pat": [
+      {
+        "n": "측면 전개",
+        "bs": {
+          "x": 240,
+          "y": 330
+        },
+        "s": [
+          {
+            "m": {
+              "5": {
+                "x": 120,
+                "y": 280
+              }
+            },
+            "b": {
+              "x": 200,
+              "y": 260
+            }
+          },
+          {
+            "m": {
+              "8": {
+                "x": 310,
+                "y": 160
+              }
+            },
+            "b": null
+          }
+        ]
+      }
+    ]
+  },
+  "previewText": [
+    {
+      "text": "3",
+      "font": "bold 24.918px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 240,
+      "y": 510,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 18.99997420787811
+    },
+    {
+      "text": "수비2",
+      "font": "600 15.7377px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 240,
+      "y": 548.1639344262295,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 11.99999574971199
+    },
+    {
+      "text": "4",
+      "font": "bold 24.918px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 350,
+      "y": 510,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 18.99997420787811
+    },
+    {
+      "text": "수비3",
+      "font": "600 15.7377px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 350,
+      "y": 548.1639344262295,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 11.99999574971199
+    },
+    {
+      "text": "5",
+      "font": "bold 24.918px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 130,
+      "y": 385,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 18.99997420787811
+    },
+    {
+      "text": "미드필더긴이…",
+      "font": "600 15.7377px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 130,
+      "y": 423.1639344262295,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 11.99999574971199
+    },
+    {
+      "text": "6",
+      "font": "bold 24.918px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 240,
+      "y": 385,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 18.99997420787811
+    },
+    {
+      "text": "미드2",
+      "font": "600 15.7377px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 240,
+      "y": 423.1639344262295,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 11.99999574971199
+    },
+    {
+      "text": "7",
+      "font": "bold 24.918px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 350,
+      "y": 385,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 18.99997420787811
+    },
+    {
+      "text": "미드3",
+      "font": "600 15.7377px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 350,
+      "y": 423.1639344262295,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 11.99999574971199
+    },
+    {
+      "text": "8",
+      "font": "bold 24.918px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 167,
+      "y": 240,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 18.99997420787811
+    },
+    {
+      "text": "공격1",
+      "font": "600 15.7377px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 167,
+      "y": 278.1639344262295,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 11.99999574971199
+    },
+    {
+      "text": "9",
+      "font": "bold 24.918px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 313,
+      "y": 240,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 18.99997420787811
+    },
+    {
+      "text": "공격2",
+      "font": "600 15.7377px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 313,
+      "y": 278.1639344262295,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 11.99999574971199
+    },
+    {
+      "text": "단계 1/2",
+      "font": "bold 13px \"Segoe UI\", sans-serif",
+      "color": "#ffffff",
+      "x": 19,
+      "y": 24,
+      "attached": true,
+      "canvasId": "patternCanvas",
+      "width": 1098,
+      "height": 1510,
+      "displaySize": 9.912499586741129
+    }
+  ],
+  "exportedText": [
+    {
+      "text": "3",
+      "font": "bold 19px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 240,
+      "y": 510,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 19
+    },
+    {
+      "text": "수비2",
+      "font": "600 12px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 240,
+      "y": 543.1,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 12
+    },
+    {
+      "text": "4",
+      "font": "bold 19px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 350,
+      "y": 510,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 19
+    },
+    {
+      "text": "수비3",
+      "font": "600 12px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 350,
+      "y": 543.1,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 12
+    },
+    {
+      "text": "5",
+      "font": "bold 19px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 120,
+      "y": 280,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 19
+    },
+    {
+      "text": "미드필더긴이…",
+      "font": "600 12px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 120,
+      "y": 313.1,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 12
+    },
+    {
+      "text": "6",
+      "font": "bold 19px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 240,
+      "y": 385,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 19
+    },
+    {
+      "text": "미드2",
+      "font": "600 12px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 240,
+      "y": 418.1,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 12
+    },
+    {
+      "text": "7",
+      "font": "bold 19px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 350,
+      "y": 385,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 19
+    },
+    {
+      "text": "미드3",
+      "font": "600 12px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 350,
+      "y": 418.1,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 12
+    },
+    {
+      "text": "8",
+      "font": "bold 19px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 310,
+      "y": 160,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 19
+    },
+    {
+      "text": "공격1",
+      "font": "600 12px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 310,
+      "y": 193.1,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 12
+    },
+    {
+      "text": "9",
+      "font": "bold 19px Oswald, Bahnschrift, \"Arial Narrow\", \"Roboto Condensed\", sans-serif",
+      "color": "#141a16",
+      "x": 313,
+      "y": 240,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 19
+    },
+    {
+      "text": "공격2",
+      "font": "600 12px \"IBM Plex Sans KR\", \"Noto Sans KR\", \"Malgun Gothic\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+      "color": "#ffffff",
+      "x": 313,
+      "y": 273.1,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 12
+    },
+    {
+      "text": "단계 2/2",
+      "font": "bold 13px \"Segoe UI\", sans-serif",
+      "color": "#ffffff",
+      "x": 19,
+      "y": 24,
+      "attached": false,
+      "canvasId": "",
+      "width": 480,
+      "height": 660,
+      "displaySize": 13
+    }
+  ],
+  "errors": [],
+  "gif": {
+    "sha256": "9ea8af008d5b9af3f9bb4a5588bef735bcd9a860697a2e4d28f7fb0153ba9b58",
+    "bytes": 2389880,
+    "header": "GIF89a",
+    "width": 480,
+    "height": 660
+  },
+  "exportBusy": false
+}

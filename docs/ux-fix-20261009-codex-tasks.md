@@ -8,9 +8,9 @@ orchestrator: Codex. 사용자의 2026-10-09 직접 인계에 따라 모든 owne
 | F-00 | Codex | Codex | gpt-6.1-sol | medium | SETUP | baseline | .work 및 포트 독립 테스트 보완 | npm ci, unit→desktop→mobile workers1 실제 기준선 | 완료 |
 | R-00 | Codex | Codex `/root/ux_risk_review` | gpt-6.1-sol | high | SETUP | parallel-read | 읽기만 | 원본 지시·code/contract·test selectors의 구현 위험 검토 | 완료 |
 | F-01~F-07 | Codex | Codex `/root/ux_implementation` | gpt-6.1-sol | high | F-00 | implementation-sequential | index.html, 필요한 기존 tests | 원본 F01~07 같은 Repro·데이터 보호 | 완료 |
-| V-01/V-02/R-01/H-01 | Codex | Codex | gpt-6.1-sol | high | F-07 | verification-sequential | 신규 regression, evidence, 이슈/실행 기록 | unit→desktop→mobile, bundle·모바일 실측·Lighthouse·독립 리뷰 | 검증 완료, 로컬 checkpoint/PR 확인 준비 |
-| P2-01~P2-04 | Codex | Codex | gpt-6.1-sol | high | phase1 검증/로컬 checkpoint | implementation-sequential | index.html, 필요한 기존 tests | 원본 P2 목표, analytics/undo/save/real GIF | 대기 |
-| V-03/H-02 | Codex | Codex | gpt-6.1-sol | high | P2-04 | verification-sequential | 신규 regression/evidence/이슈·실행 기록 | 전체 회귀·같은 viewport·독립 리뷰·로컬 checkpoint | 대기 |
+| V-01/V-02/R-01/H-01 | Codex | Codex | gpt-6.1-sol | high | F-07 | verification-sequential | 신규 regression, evidence, 이슈/실행 기록 | unit→desktop→mobile, bundle·모바일 실측·Lighthouse·독립 리뷰 | 완료, 로컬 b3b6f64 / PR 확인 대기 |
+| P2-01~P2-04 | Codex | Codex `/root/ux_implementation` | gpt-6.1-sol | high | phase1 검증/로컬 checkpoint | implementation-sequential | index.html, 필요한 기존 tests | 원본 P2 목표, analytics/undo/save/real GIF | 완료 |
+| V-03/H-02 | Codex | Codex | gpt-6.1-sol | high | P2-04 | verification-sequential | 신규 regression/evidence/이슈·실행 기록 | 전체 회귀·같은 viewport·독립 리뷰·로컬 checkpoint | 최종 검증 완료, 로컬 checkpoint 준비 |
 | P3-01 | Codex | Codex `/root/ux_concepts` | gpt-6.1-sol | high | SETUP | concepts-independent | docs/ux-concepts/ux-fix-20261009/만 | 세 방향·같은 내용·4 viewport·a11y·실행 가능 | 완료 |
 | P3-02 | Codex | Codex | gpt-6.1-sol | high | P3-01 검증 | decision | 분석/계획만 | 실제3종을 제시해 사용자 선택 기록 | 선택 대기 |
 | HANDOFF | Codex | Codex | gpt-6.1-sol | medium | V-03, P3 제시 | approval | 로컬 PR 초안/최종보고 | 정확한 SHA·검증·미검증·push/PR 확인·main 미병합 | 대기 |
@@ -27,3 +27,8 @@ orchestrator: Codex. 사용자의 2026-10-09 직접 인계에 따라 모든 owne
 - P3-02: 갤러리 `http://127.0.0.1:4320/index.html`와 구조별 실행 페이지를 제시하고 사용자 선택 질문을 요청했다. 선택 전 운영 구조 변경은 하지 않는다.
 - Phase1 최종 index SHA-256 `4944ad97b65b7a0579ea1df754a15664552c91bc97ad632c6becf625730f7c58`: unit128, bundle 성공, desktop107, mobile106/기존skip1. 기준선195회 유지+새UX9개×2프로젝트=18회 추가다. 동일한 코드로 순차 전체 재실행했다.
 - 1280/1366/768/390(DPR3/touch) 실제 캡처·실측, Lighthouse mobile100/label mismatch 통과, 실제 저장 완료 칩과 역할 태그 대비 측정 완료. detector 잔여 text-occlusion은1px/clip0 aria-live 알림 오탐으로 확인했고 기존 디자인 advisory·3단계 긴 설정 열은 보존했다. 자세한 실행/실패/제약은 [검증 기록](ux-fix-20261009-codex-report.md)에 있다.
+- H-01 로컬 checkpoint `b3b6f6421c60a9ca2cd8292de0cb42b1f23e6648`. push/PR/main 병합은 하지 않았다. 바로 같은 브랜치에서2단계 구현을 시작했다.
+- 2단계 신규 회귀는 별도 `tests/e2e/ux-pattern-20261009.spec.js`에 작성하고 독립 테스트 품질 리뷰를 반영했다. 자동 저장을 강제 저장으로 가리지 않고 두 저장키의 읽기전용 원본 보호, DPR 과대 렌더 상한, 전체 스냅샷 undo 범위와 경계의 최근 실제 이동을 검사한다.
+- P2 독립 리뷰3지적(패턴 칩 부모 숨김/기존3개 계약, roundRect 없는 단일패턴/GIF, 중첩확인창 Tab)을 보완했고 최종 도움말 h2→h4 누락도 h3로 교정했다. 내용·시각값·hit/data/native/API/이벤트/배포 설정은 보존했다.
+- 2026-10-10 최종 index SHA-256 `5741074cae5bdb0c3d7c9f865ec24447c32a44f8258245ef8afa11779fc09a5b`: unit128, bundle 성공, desktop113, mobile112/기존skip1. 기존195+신규30회=225통과. 제목 교정 후 같은 코드로 전체를 새로 실행했다.
+- 같은 최종 코드의 실제 GIF480×660/2,389,880bytes와두프레임/12px 이름,4viewport 실측, Lighthouse390×844×3 Accessibility100/label pass, detector제목·contrast·tiny·width transition 미검출을 기록했다. 잔여디자인warning/advisory와desktop31px 기존3칩은 [검증 기록](ux-fix-20261009-codex-report.md)에 명시한다.

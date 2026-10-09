@@ -26,7 +26,7 @@ test.describe('베타 운영 UI', () => {
     await expect(modal).toBeVisible();
     await expect(modal).toContainText('스쿼드 짜기');
     await expect(modal).toContainText('공유하기');
-    await modal.locator('button:has-text("닫기")').click();
+    await modal.getByRole('button', { name: '도움말 닫기', exact: true }).click();
     await expect(modal).toBeHidden();
   });
 

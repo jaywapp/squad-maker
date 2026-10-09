@@ -68,3 +68,16 @@
 | UX-031 | False positive | detector는 재검출. `기기에 저장됨`은1×1px clip0 aria-live 알림. 실제 `저장됨`칩은390 DPR3에서보이며탭과겹침없음([실측](evidence/codex-20261009/phase1/status-tags.json)) |
 
 정상 제보 POST·실기기·카카오/OS 공유 실사용·스크린리더 실사용·200% 확대는 계속 미검증이다. `.sq` 저장 재시작·읽기전용 데이터 보호·실제 PNG/GIF 인코딩은 자동 회귀에서 검증했지만2단계 캔버스 새 GIF 프레임은 아직 미검증이다.
+
+## Codex 최종 재검증 (2026-10-10)
+
+현재 최종 source SHA-256 `5741074cae5bdb0c3d7c9f865ec24447c32a44f8258245ef8afa11779fc09a5b`. 단위128·desktop113·mobile112/기존skip1·웹bundle·Lighthouse mobile100을 동일 코드로 새로 실행했다. [최종 검증/범위](../ux-fix-20261009-codex-report.md), [화면 실측](evidence/codex-20261009/phase2/verification.json), [GIF/렌더](evidence/codex-20261009/phase2/export-verification.json)가 최신 기준이다.
+
+| ID | 최종 상태 | 추가 근거 |
+|---|---|---|
+| UX-001~014,019~029 | Resolved | 1단계 회귀 유지,2단계 캔버스12px/토큰36px/DPR상한/APIfallback·화면라임/패널7버튼·단일시트헤더/Tab/Esc·키보드8/32 자동저장/전체undo/재시작·단계방향·뷰어두키 보호 검증 |
+| UX-015~018 | Deferred | 검증된 콘셉트3종 제시 완료, 사용자 선택 전 운영 구조 보존 |
+| UX-030 | Partial / Deferred | width transition/작은본문 제거, 새 skipped-heading 교정. uppercase·그림자/테두리·줄무늬는 기존디자인, 긴 설정 열은3단계 |
+| UX-031 | False positive | 저장1px aria-live만detector가림, 실제저장칩390 DPR3 겹침없음 |
+
+실제 GIF 첫/1.5초 프레임은 최종 코드에서 생성·직접 확인해 이전 미검증을 해제했다. 최종 mobile/touch 기본화면44px 미만0, 기존 desktop 준비 중3칩31px는 남아 있다. 실기기·실제공유·스크린리더·200% 확대·정상제보 POST·Run Line PR47통합·APK검증은 이번에 미검증이다. 원본 점검과 보완 전 수치는 역사 기록으로 유지한다.

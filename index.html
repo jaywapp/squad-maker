@@ -322,7 +322,7 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
 .share-actions { display:flex; gap:8px; flex-wrap:wrap; }
 
 /* ── 출시 전 기능 미리보기 (수요 측정 — Task 0.3) ── */
-.interest-section {
+.interest-section, .pattern-release-group {
   width:100%; max-width:480px;
   display:flex; align-items:center; gap:8px; flex-wrap:wrap;
   padding:10px 12px;
@@ -570,7 +570,7 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   color:var(--accent); font-weight:700; font-size:0.85rem;
   border-bottom:1px solid var(--surface); padding-bottom:4px; margin-bottom:8px;
 }
-.tactic-player-title { color:var(--warn); font-weight:700; font-size:0.82rem; margin:10px 0 3px; }
+.tactic-player-title { color:var(--ink); font-weight:700; font-size:0.82rem; margin:10px 0 3px; }
 .tactic-line { color:var(--ink2); font-size:0.8rem; line-height:1.7; padding-left:12px; }
 .tactic-line::before { content:'· '; color:var(--faint); }
 .tactic-tag {
@@ -704,7 +704,7 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   display:flex; flex-direction:column; gap:16px;
 }
 .help-box h3 { font-size:1.05rem; font-weight:700; }
-.help-box h4 {
+#helpModal .help-section h3 {
   font-size:0.85rem; font-weight:700; color:var(--accent);
   margin-bottom:4px;
 }
@@ -763,7 +763,7 @@ body {
   column-gap: 8px; row-gap: 10px;
   padding: 10px 12px calc(32px + env(safe-area-inset-bottom, 0px));
 }
-body > :where(:not(.toast, #ctxMenu, .arrow-pop, .dlg-backdrop, .ui-backdrop, .ui-sheet, #playerViewModal, #shareModal, #interestModal, #helpModal, #feedbackModal, #gifProgress)) { grid-column: 1 / -1; justify-self: center; width: 100%; }
+body > :where(:not(.toast, #ctxMenu, .pattern-more-menu, .arrow-pop, .dlg-backdrop, .ui-backdrop, .ui-sheet, #playerViewModal, #shareModal, #interestModal, #helpModal, #feedbackModal, #gifProgress)) { grid-column: 1 / -1; justify-self: center; width: 100%; }
 [hidden] { display: none !important; }
 body > script, body > input[type="file"] { display: none; }
 button, input, select, textarea { font-family: inherit; }
@@ -871,7 +871,7 @@ main { width: 100%; }
   .pane-field > .formation-bar { justify-self: end; }
 }
 .pane-side { max-width: 560px; }
-.team-setup, .notes-wrap, #patternUI, #strategyUI, .interest-section, #viewerBar, .controls { max-width: 560px; }
+.team-setup, .notes-wrap, #patternUI, #strategyUI, .interest-section, .pattern-release-group, #viewerBar, .controls { max-width: 560px; }
 /* 피치: 폭과 화면 높이 중 작은 쪽에 맞춰 선수 트레이와 함께 보이게 한다 (480/660 = 0.7273) */
 #fieldWrapper {
   justify-self: center; max-width: 100%;
@@ -965,12 +965,23 @@ body.mode-pattern .player-actions, body.mode-strategy .player-actions, .viewer-m
 .play-btn { flex: 1 0 116px; }
 .step-edit .btn { flex: 1 1 auto; }
 .pattern-export { justify-content: flex-start; }
+.pattern-more-menu { position: fixed; z-index: 2200; width: max-content; max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); overflow-y: auto; padding: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+.pattern-more-menu .ctx-btn { min-width: 180px; }
+.pattern-more-menu .ctx-btn.danger { color: var(--danger-ink); }
+.pattern-step-summary { display: none; list-style: none; font-size: 0.875rem; color: var(--ink2); line-height: 1.6; }
+.pattern-step-summary li + li { margin-top: 6px; }
+body.mode-pattern .pattern-step-summary { display: block; }
+.pattern-release-group { display: none; }
+body.mode-pattern .pattern-release-group { display: flex; }
+body.mode-pattern .general-video-upcoming { display: none; }
+.squad-summary .formation-badge { background: var(--chalk); color: var(--chalk-ink); }
 
 /* ── 내보내기·공유 ── */
 .export-panel {
   width: 100%; max-width: 560px; display: grid; gap: 14px;
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px;
 }
+.viewer-mode .export-panel:not(.as-sheet) { display: none; }
 body.mode-strategy .export-panel:not(.as-sheet) { display: none; }
 body.mode-pattern .export-panel .exp-png { display: none; }
 .export-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -1012,6 +1023,10 @@ body.platform-native .native-only { display: inline-flex !important; }
 .export-panel.as-sheet .export-head { position: sticky; top: -16px; margin: -16px -16px 0; padding: 12px 12px 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border); z-index: 1; }
 .export-panel.as-sheet .export-close { display: inline-flex; }
 body.ui-sheet-open { overflow: hidden; }
+body.ui-modal-open { overflow: hidden; }
+#shareModal, #helpModal, #feedbackModal { align-items: flex-end; padding: 0; overflow: hidden; z-index: 2100; background: rgba(4,8,6,0.66); }
+.legacy-sheet-panel { padding: 0; gap: 0; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.legacy-sheet-panel .ui-sheet-head { flex-shrink: 0; }
 
 /* 전술 목록 */
 .lib-label { font-size: 0.875rem; font-weight: 700; color: var(--ink2); }
@@ -1148,6 +1163,8 @@ body.ui-busy { cursor: progress; }
   body.mode-pattern #fieldWrapper { width: min(600px, calc((100dvh - 150px) * 0.7273)); }
   body.mode-strategy .layout { grid-template-columns: minmax(0, 640px); }
   .ui-sheet { align-items: center; }
+  #shareModal, #helpModal, #feedbackModal { align-items: center; }
+  .legacy-sheet-panel { border-radius: var(--radius-lg); }
   .ui-sheet-panel { border-radius: var(--radius-lg); max-height: 84vh; }
   .export-panel.as-sheet { top: 50%; bottom: auto; transform: translateY(-50%); max-height: 84vh; border-radius: var(--radius-lg); }
 }
@@ -1199,6 +1216,7 @@ body.ui-busy { cursor: progress; }
   <span class="vb-title" id="vbTitle"></span>
   <button class="btn btn-blue" onclick="importSharedSquad()">내 스쿼드로 가져오기</button>
   <button class="btn btn-slate" onclick="openMySquad()">내 스쿼드 열기</button>
+  <button class="btn-primary" type="button" id="viewerExportBtn" aria-haspopup="dialog" aria-controls="exportPanel">내보내기·공유</button>
 </div>
 
 <!-- 앱 모드 탭 -->
@@ -1245,8 +1263,9 @@ body.ui-busy { cursor: progress; }
 <!-- 필드 -->
 <div id="fieldWrapper">
   <div id="field" role="region" aria-label="축구 필드, 선수를 드래그해 위치를 조정하세요"></div>
-  <canvas id="patternCanvas" width="480" height="660" aria-label="전술 패턴 캔버스, 선수를 드래그해 이동 경로를 그리세요"></canvas>
+  <canvas id="patternCanvas" width="480" height="660" tabindex="-1" aria-describedby="patternStepSummary" aria-label="전술 패턴 캔버스, 선수를 드래그해 이동 경로를 그리세요"></canvas>
 </div>
+<ol class="pattern-step-summary" id="patternStepSummary" aria-label="패턴 단계 요약"></ol>
 
 <p class="hint editor-only" id="hintText">탭: 선수 도구 · 끌기: 이동</p>
 
@@ -1265,6 +1284,7 @@ body.ui-busy { cursor: progress; }
   </div>
 </div>
 
+<p class="sr-only" id="playerMoveStatus" role="status" aria-live="polite"></p>
 </div><!-- /pane-field -->
 <div class="pane-side">
 
@@ -1292,8 +1312,7 @@ body.ui-busy { cursor: progress; }
       <span id="patternCounter">1 / 1</span>
       <button aria-label="다음 패턴" onclick="nextPattern()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></svg></button>
     </div>
-    <button class="btn btn-slate editor-only" onclick="addPattern()">+ 추가<span class="sr-only"> 패턴</span></button>
-    <button class="btn btn-red editor-only"  onclick="deletePattern()">삭제<span class="sr-only"> 패턴</span></button>
+    <button class="icon-btn editor-only" type="button" id="patternMoreBtn" aria-label="패턴 더보기" aria-haspopup="menu" aria-controls="patternMoreMenu" aria-expanded="false" onclick="togglePatternMore(event)"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
   </div>
   <!-- 2) 단계 이동과 재생: 좁은 화면에서도 한 줄로 고정 -->
   <div class="pattern-bar step-bar" role="group" aria-label="단계 이동과 미리보기">
@@ -1302,19 +1321,11 @@ body.ui-busy { cursor: progress; }
       <span id="stepCounter">단계 1 / 1</span>
       <button aria-label="다음 단계" onclick="nextStep()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></svg></button>
     </div>
-    <button class="btn btn-green play-btn" id="playBtn" onclick="togglePlay()">미리보기</button>
+    <button class="btn btn-slate play-btn" id="playBtn" onclick="togglePlay()">미리보기</button>
   </div>
   <!-- 3) 단계 편집 -->
   <div class="pattern-bar step-edit editor-only" role="group" aria-label="단계 편집">
     <button class="btn btn-slate" onclick="addStep()">+ 단계</button>
-    <button class="btn btn-slate" onclick="clearCurrentStep()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>단계 초기화</button>
-    <button class="btn btn-red"   onclick="deleteStep()">단계 삭제</button>
-  </div>
-  <!-- 4) 움직임 GIF -->
-  <div class="controls pattern-export" role="group" aria-label="움직임 GIF">
-    <button class="btn btn-amber"  id="gifBtn"    onclick="exportGif(false)">GIF 저장</button>
-    <button class="btn btn-purple" id="gifAllBtn" onclick="exportGif(true)">전체 패턴 GIF</button>
-    <button class="interest-chip editor-only" onclick="openInterestPreview('export', 'pattern_controls')">고급 영상 (준비 중)</button>
   </div>
 </div>
 
@@ -1350,7 +1361,7 @@ body.ui-busy { cursor: progress; }
 </div>
 
 <!-- 내보내기·공유: 평소에는 카드, 헤더 버튼으로 열면 시트. 결과물(이미지·GIF)·링크·편집 원본 백업을 나눠 표시 -->
-<section class="export-panel editor-only" id="exportPanel" role="region" aria-label="공유 및 파일" tabindex="-1">
+<section class="export-panel" id="exportPanel" role="region" aria-label="공유 및 파일" tabindex="-1">
   <div class="export-head">
     <h2 class="export-title" id="exportTitle">내보내기·공유</h2>
     <button type="button" class="icon-btn export-close" id="exportCloseBtn" aria-label="내보내기·공유 닫기"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
@@ -1373,14 +1384,14 @@ body.ui-busy { cursor: progress; }
       <button class="btn btn-slate native-only" type="button" data-ui-export="export-gif" data-ui-destination="share">GIF 공유</button>
     </div>
   </div>
-  <div class="export-group exp-link">
+  <div class="export-group exp-link editor-only">
     <h3>링크·텍스트</h3>
     <p>받는 사람은 읽기 전용 화면으로 열고, 그 사람의 데이터는 바뀌지 않습니다.</p>
     <div class="export-actions">
       <button class="btn btn-slate" onclick="openShare()">단톡방 공유 텍스트 생성</button>
     </div>
   </div>
-  <div class="export-group exp-backup">
+  <div class="export-group exp-backup editor-only">
     <h3>백업 (.sq)</h3>
     <p>다시 편집할 수 있는 원본 파일입니다. 앱 삭제나 기기 변경에 대비해 따로 보관하세요. 이미지·GIF로는 복원할 수 없습니다.</p>
     <div class="export-actions">
@@ -1396,8 +1407,12 @@ body.ui-busy { cursor: progress; }
 <div class="interest-section app-squad-only editor-only" role="group" aria-label="출시 준비 중 기능">
   <span class="interest-label">출시 준비 중</span>
   <button class="interest-chip" onclick="openInterestPreview('cloud', 'share_toolbar')">클라우드에 팀 저장</button>
-  <button class="interest-chip" onclick="openInterestPreview('export', 'share_toolbar')">고급 영상 내보내기</button>
+  <button class="interest-chip general-video-upcoming" onclick="openInterestPreview('export', 'share_toolbar')">고급 영상 내보내기</button>
   <button class="interest-chip" onclick="openInterestPreview('briefing', 'share_toolbar')">선수별 브리핑</button>
+</div>
+<div class="pattern-release-group editor-only" role="group" aria-label="움직임 패턴 출시 준비 중 기능">
+  <span class="interest-label">출시 준비 중</span>
+  <button class="interest-chip pattern-upcoming" onclick="openInterestPreview('export', 'pattern_controls')">고급 영상 (준비 중)</button>
 </div>
 
 <!-- 매치 전략 -->
@@ -1425,7 +1440,7 @@ body.ui-busy { cursor: progress; }
   </div>
   <div class="strategy-card" style="padding:12px 16px;">
     <div class="generate-row">
-      <button class="btn btn-green" style="flex:1;" onclick="generateManual()">전술 지침서 생성</button>
+      <button class="btn btn-slate" style="flex:1;" onclick="generateManual()">전술 지침서 생성</button>
     </div>
   </div>
   <div class="strategy-card" id="manualCard" style="display:none;">
@@ -1473,14 +1488,24 @@ body.ui-busy { cursor: progress; }
 </div>
 
 <!-- 공유 모달 -->
-<div id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
-  <div class="share-box">
-    <h3 id="shareModalTitle">단톡방 공유 텍스트</h3>
+<div class="pattern-more-menu editor-only" id="patternMoreMenu" role="menu" aria-label="패턴 편집" hidden>
+  <button class="ctx-btn" role="menuitem" type="button" onclick="runPatternAction('add')">+ 추가 패턴</button>
+  <button class="ctx-btn danger" role="menuitem" type="button" onclick="runPatternAction('delete')">패턴 삭제</button>
+  <div class="ctx-divider" role="separator"></div>
+  <button class="ctx-btn danger" role="menuitem" type="button" onclick="runPatternAction('clear-step')">단계 초기화</button>
+  <button class="ctx-btn danger" role="menuitem" type="button" onclick="runPatternAction('delete-step')">단계 삭제</button>
+</div>
+<div class="ui-sheet" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+  <div class="share-box ui-sheet-panel legacy-sheet-panel">
+    <div class="ui-sheet-head">
+      <h2 id="shareModalTitle">단톡방 공유 텍스트</h2>
+      <button class="icon-btn" type="button" id="shareCloseBtn" aria-label="공유 닫기" onclick="closeShare()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
+    </div>
+    <div class="ui-sheet-body">
     <div class="share-text" id="shareText"></div>
     <div class="share-actions">
       <button class="btn btn-green" onclick="copyShareText()">텍스트 복사</button>
-      <button class="btn btn-slate" onclick="saveShareTxt()">파일 저장</button>
-      <button class="btn btn-slate" onclick="closeShare()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6l-12 12M6 6l12 12"/></svg>닫기</button>
+      <button class="btn btn-slate" onclick="saveShareTxt()">텍스트 파일로 받기</button>
     </div>
     <div class="share-divider"></div>
     <div class="share-link-section">
@@ -1489,6 +1514,7 @@ body.ui-busy { cursor: progress; }
         <div class="share-url-box" id="shareUrlBox" onclick="this.select()"></div>
         <button class="btn btn-blue" style="white-space:nowrap;" onclick="copyShareUrl()">링크 복사</button>
       </div>
+    </div>
     </div>
   </div>
 </div>
@@ -1552,12 +1578,16 @@ body.ui-busy { cursor: progress; }
 </div>
 
 <!-- 도움말 모달 -->
-<div id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
-  <div class="help-box">
-    <h3 id="helpTitle" tabindex="-1">스쿼드 메이커 사용 안내</h3>
+<div class="ui-sheet" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="help-box ui-sheet-panel legacy-sheet-panel">
+    <div class="ui-sheet-head">
+      <h2 id="helpTitle" tabindex="-1">스쿼드 메이커 사용 안내</h2>
+      <button class="icon-btn" type="button" id="helpCloseBtn" aria-label="도움말 닫기" onclick="closeHelp()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
+    </div>
+    <div class="ui-sheet-body">
 
     <div class="help-section">
-      <h4>배치: 스쿼드 짜기</h4>
+      <h3>배치: 스쿼드 짜기</h3>
       <ol>
         <li>위쪽 <b>배치 / 움직임 패턴 / 매치 전략</b> 탭에서 <b>배치</b>를 고릅니다.</li>
         <li><b>인원</b>과 <b>포메이션</b>을 고릅니다. 인원을 바꾸면 이름·배치·지침·움직임 패턴이 초기화되므로 확인창을 먼저 읽어 주세요.</li>
@@ -1568,7 +1598,7 @@ body.ui-busy { cursor: progress; }
     </div>
 
     <div class="help-section">
-      <h4>지침 적기</h4>
+      <h3>지침 적기</h3>
       <ul>
         <li><b>기본 / 공격 / 수비</b>마다 전체 지침과 <b>선수별 지침</b>을 적을 수 있습니다. 선수 도구의 <b>지침</b>을 누르면 해당 선수 입력으로 이동합니다.</li>
         <li><b>선수 시점 보기</b> 버튼이나 선수 메뉴에서 선수 기준 위치와 지침을 봅니다.</li>
@@ -1576,7 +1606,7 @@ body.ui-busy { cursor: progress; }
     </div>
 
     <div class="help-section">
-      <h4>움직임 패턴과 매치 전략</h4>
+      <h3>움직임 패턴과 매치 전략</h3>
       <ul>
         <li><b>움직임 패턴</b>에서 선수·공을 끌어 경로를 그리고 <b>+ 단계</b>로 이어 갑니다. <b>미리보기</b>로 순서대로 재생합니다.</li>
         <li><b>매치 전략</b>에서 상대팀과 경기 정보를 적고 <b>전술 지침서 생성</b>으로 전달할 내용을 만듭니다.</li>
@@ -1584,7 +1614,7 @@ body.ui-busy { cursor: progress; }
     </div>
 
     <div class="help-section">
-      <h4>공유하기</h4>
+      <h3>공유하기</h3>
       <ul>
         <li>위쪽 <b>내보내기·공유</b>를 누르면 이미지·GIF·링크·텍스트·백업을 고르는 시트가 열립니다.</li>
         <li><b>단톡방 공유 텍스트 생성</b>으로 메신저에 붙여 넣을 요약과 링크를 만듭니다.</li>
@@ -1593,7 +1623,7 @@ body.ui-busy { cursor: progress; }
     </div>
 
     <div class="help-section">
-      <h4>전술 목록과 저장</h4>
+      <h3>전술 목록과 저장</h3>
       <ul>
         <li>위쪽 <b>전술 목록</b>에서 팀과 전술을 고르고 새 전술을 만들거나 이름을 바꿀 수 있습니다.</li>
         <li>보관된 전술의 변경 내용은 <b>자동 저장</b>됩니다. 저장 실패나 중단 안내가 나오면 <b>다시 저장</b>하거나 백업을 받아 두세요.</li>
@@ -1610,16 +1640,18 @@ body.ui-busy { cursor: progress; }
       </div>
     </div>
 
-    <div class="help-actions">
-      <button class="btn btn-slate" onclick="closeHelp()">닫기</button>
     </div>
   </div>
 </div>
 
 <!-- 제보 모달 -->
-<div id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
-  <div class="help-box">
-    <h3 id="feedbackTitle">제보</h3>
+<div class="ui-sheet" id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+  <div class="help-box ui-sheet-panel legacy-sheet-panel">
+    <div class="ui-sheet-head">
+      <h2 id="feedbackTitle">제보</h2>
+      <button class="icon-btn" type="button" id="feedbackCloseBtn" aria-label="제보 닫기" onclick="closeFeedback()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
+    </div>
+    <div class="ui-sheet-body">
     <p class="help-section">오류나 개선 의견을 보내면 이 프로젝트의 GitHub Issue로 등록됩니다. 연락처와 진단 정보는 선택 사항입니다.</p>
     <form id="feedbackForm" class="feedback-form" onsubmit="submitFeedback(event)">
       <div class="feedback-field">
@@ -1648,9 +1680,9 @@ body.ui-busy { cursor: progress; }
       <div class="help-actions">
         <button class="btn btn-green" id="feedbackSubmit" type="submit">제보 보내기</button>
         <button class="btn btn-slate" id="feedbackRetryBtn" type="button" onclick="prepareFeedbackCaptcha()" hidden>다시 시도</button>
-        <button class="btn btn-slate" type="button" onclick="closeFeedback()">닫기</button>
       </div>
     </form>
+    </div>
   </div>
 </div>
 
@@ -1923,6 +1955,7 @@ document.querySelectorAll('[role="tablist"]').forEach(initTablistKeyboard);
 
 function setAppMode(mode) {
   if (mode === appMode) return;
+  hidePatternMore();
   if (appMode === 'squad') saveCurrentNotes();
   appMode = mode;
 
@@ -2429,12 +2462,14 @@ let inertedElements = [];
 
 function getModalFocusables(modal) {
   return [...modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
-    .filter(el => !el.disabled && getComputedStyle(el).display !== 'none');
+    .filter(el => el.tabIndex >= 0 && !el.disabled && !el.hidden && !el.closest('[aria-hidden="true"], [inert]')
+      && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden');
 }
 
 function activateModal(modal, initialSelector) {
   modal._prevFocus = document.activeElement;
   activeModal = modal;
+  document.body.classList.add('ui-modal-open');
   inertedElements = [...document.body.children].filter(el =>
     el !== modal && el.id !== '_toast' && !['SCRIPT','STYLE'].includes(el.tagName));
   inertedElements.forEach(el => { el.setAttribute('inert', ''); });
@@ -2448,12 +2483,13 @@ function deactivateModal(modal) {
   inertedElements.forEach(el => { el.removeAttribute('inert'); });
   inertedElements = [];
   activeModal = null;
+  document.body.classList.remove('ui-modal-open');
   if (modal._prevFocus && typeof modal._prevFocus.focus === 'function') modal._prevFocus.focus();
   modal._prevFocus = null;
 }
 
 document.addEventListener('keydown', e => {
-  if (!activeModal || e.key !== 'Tab') return;
+  if (!activeModal || e.key !== 'Tab' || document.querySelector('.dlg-backdrop')) return;
   const focusables = getModalFocusables(activeModal);
   if (!focusables.length) return;
   const current = focusables.indexOf(document.activeElement);
@@ -2535,6 +2571,7 @@ function renderPlayers() {
         selectPlayerForEdit(p.id);
       });
       el.addEventListener('keydown', e => {
+        if (movePlayerWithKeyboard(e, p.id)) return;
         if (e.key !== 'Enter' && e.key !== ' ') return;
         e.preventDefault(); e.stopPropagation();
         selectPlayerForEdit(p.id);
@@ -2558,6 +2595,31 @@ function selectPlayerForEdit(id) {
   name.title = `${num}. ${selectedPlayer.name}`;
   bar.classList.add('visible');
   publishContractState();
+}
+
+function movePlayerWithKeyboard(event, id) {
+  const directions = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+  const direction = directions[event.key];
+  if (!direction || event.ctrlKey || event.altKey || event.metaKey || event.target !== event.currentTarget || viewerMode || appMode !== 'squad'
+      || activeModal || _safetyPending || _libraryPending || _exportKind
+      || document.querySelector('.dlg-backdrop') || document.body.classList.contains('ui-sheet-open')) return false;
+  event.preventDefault(); event.stopPropagation();
+  const current = squads[currentSquad].positions[id];
+  if (!current) return true;
+  const distance = event.shiftKey ? 32 : 8;
+  const x = Math.max(26, Math.min(FIELD_W - 26, current.x + direction[0] * distance));
+  const y = Math.max(26, Math.min(FIELD_H - 26, current.y + direction[1] * distance));
+  if (x === current.x && y === current.y) return true;
+  captureUndo();
+  squads[currentSquad].positions[id] = { x, y };
+  event.currentTarget.style.left = x + 'px';
+  event.currentTarget.style.top = y + 'px';
+  selectPlayerForEdit(id);
+  autoSave();
+  const player = roster.find(item => item.id === id);
+  document.getElementById('playerMoveStatus').textContent = `${player?.name || '선수'}, 왼쪽에서 ${Math.round(x / FIELD_W * 100)}%, 위에서 ${Math.round(y / FIELD_H * 100)}%`;
+  event.currentTarget.focus({ preventScroll: true });
+  return true;
 }
 
 function clearSelectedPlayer() {
@@ -2860,6 +2922,51 @@ function saveImage(destination = 'save') {
 // ═══════════════════════════════════════════════════════════════
 // TACTICAL PATTERNS — 패턴/단계 관리
 // ═══════════════════════════════════════════════════════════════
+function hidePatternMore(restoreFocus = false) {
+  const menu = document.getElementById('patternMoreMenu');
+  menu.hidden = true;
+  const button = document.getElementById('patternMoreBtn');
+  button.setAttribute('aria-expanded', 'false');
+  if (restoreFocus) button.focus({ preventScroll: true });
+}
+
+function togglePatternMore(event) {
+  event?.stopPropagation();
+  if (viewerMode) return;
+  const menu = document.getElementById('patternMoreMenu');
+  if (!menu.hidden) { hidePatternMore(true); return; }
+  hideCtxMenu(); hideArrowPopover();
+  const button = document.getElementById('patternMoreBtn');
+  const rect = button.getBoundingClientRect();
+  menu.hidden = false;
+  button.setAttribute('aria-expanded', 'true');
+  menu.style.left = Math.max(8, Math.min(rect.right - menu.offsetWidth, innerWidth - menu.offsetWidth - 8)) + 'px';
+  menu.style.top = Math.max(8, Math.min(rect.bottom + 4, innerHeight - menu.offsetHeight - 8)) + 'px';
+  menu.querySelector('button').focus({ preventScroll: true });
+}
+
+function runPatternAction(action) {
+  hidePatternMore(true);
+  if (action === 'add') addPattern();
+  else if (action === 'delete') return deletePattern();
+  else if (action === 'clear-step') return clearCurrentStep();
+  else if (action === 'delete-step') return deleteStep();
+}
+
+document.addEventListener('click', event => {
+  if (!event.target.closest('#patternMoreMenu, #patternMoreBtn')) hidePatternMore();
+});
+document.getElementById('patternMoreMenu').addEventListener('keydown', event => {
+  if (event.key === 'Tab') { hidePatternMore(true); return; }
+  if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const buttons = [...event.currentTarget.querySelectorAll('button')];
+  const index = buttons.indexOf(document.activeElement);
+  const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1
+    : (index + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length;
+  buttons[next].focus();
+});
+
 function currentPattern() { return patterns[currentPatternIdx]; }
 function currentStep() { return currentPattern().steps[currentStepIdx]; }
 
@@ -2870,6 +2977,31 @@ function updatePatternUI() {
   document.getElementById('patternNameView').textContent = pat.name;
   document.getElementById('patternCounter').textContent = `${currentPatternIdx+1} / ${patterns.length}`;
   updatePlaybackStep();
+  updatePatternSummary();
+}
+
+function updatePatternSummary() {
+  const pattern = currentPattern();
+  const direction = (from, to) => {
+    const dx = to.x - from.x, dy = to.y - from.y;
+    const horizontal = Math.abs(dx) < 4 ? '' : dx > 0 ? '오른쪽' : '왼쪽';
+    const vertical = Math.abs(dy) < 4 ? '' : dy > 0 ? '아래' : '위';
+    return horizontal || vertical ? `${[horizontal, vertical].filter(Boolean).join(' ')}${vertical ? '로' : '으로'} 이동` : '자리 유지';
+  };
+  const descriptions = pattern.steps.map((step, index) => {
+    const base = positionsAfter(pattern, index);
+    const moves = Object.entries(step.moves).map(([id, move]) => {
+      const player = roster.find(item => String(item.id) === id);
+      return player && base[id] ? `${player.name} → ${direction(base[id], { x: move.toX, y: move.toY })}` : '';
+    }).filter(Boolean);
+    if (step.ball) moves.push(`공 → ${direction(ballPosAfter(pattern, index), { x: step.ball.toX, y: step.ball.toY })}`);
+    return `단계 ${index + 1}: ${moves.length ? moves.join(', ') : '지정한 이동 경로 없음'}`;
+  });
+  const list = document.getElementById('patternStepSummary');
+  const signature = descriptions.join('\n');
+  if (list.dataset.summary === signature) return;
+  list.dataset.summary = signature;
+  list.replaceChildren(...descriptions.map(text => { const item = document.createElement('li'); item.textContent = text; return item; }));
 }
 
 function updatePlaybackStep() {
@@ -2888,8 +3020,10 @@ function addPattern() {
   stopAnimation(); updatePatternUI(); renderPatternFrame(0); autoSave();
 }
 
-function deletePattern() {
+async function deletePattern() {
+  if (viewerMode) return;
   if (patterns.length === 1) { showToast('패턴이 1개이면 삭제할 수 없습니다.'); return; }
+  if (!await uiConfirm('현재 움직임 패턴과 모든 단계를 삭제할까요? 이 세션에서 최근 변경 한 번을 되돌릴 수 있습니다.', { confirmLabel: '패턴 삭제', tone: 'danger' })) return;
   captureUndo();
   const name = currentPattern().name;
   patterns.splice(currentPatternIdx, 1);
@@ -2926,9 +3060,11 @@ function addStep() {
   stopAnimation(); updatePatternUI(); renderPatternFrame(0); autoSave();
 }
 
-function deleteStep() {
+async function deleteStep() {
+  if (viewerMode) return;
   const pat = currentPattern();
   if (pat.steps.length === 1) { showToast('단계가 1개이면 삭제할 수 없습니다.'); return; }
+  if (!await uiConfirm('현재 단계의 선수·공 경로를 삭제할까요? 이 세션에서 최근 변경 한 번을 되돌릴 수 있습니다.', { confirmLabel: '단계 삭제', tone: 'danger' })) return;
   captureUndo();
   const deletedStep = currentStepIdx + 1;
   pat.steps.splice(currentStepIdx, 1);
@@ -2951,12 +3087,14 @@ function nextStep() {
   publishContractState();
 }
 
-function clearCurrentStep() {
+async function clearCurrentStep() {
+  if (viewerMode) return;
   const step = currentStep();
   if (!Object.keys(step.moves).length && !step.ball) {
     showToast('현재 단계에 초기화할 경로가 없습니다.');
     return;
   }
+  if (!await uiConfirm('현재 단계의 선수·공 경로를 초기화할까요? 이 세션에서 최근 변경 한 번을 되돌릴 수 있습니다.', { confirmLabel: '단계 초기화', tone: 'danger' })) return;
   captureUndo();
   currentStep().moves = {};
   currentStep().ball = null;
@@ -3034,21 +3172,61 @@ function canvasField(ctx) {
   L(194,12,92,8);L(194,12,2,10);L(284,12,2,10);
 }
 
+function canvasRoundedRect(ctx, x, y, width, height, radius) {
+  if (typeof ctx.roundRect === 'function') { ctx.roundRect(x, y, width, height, radius); return; }
+  const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + width - r, y);
+  ctx.arcTo(x + width, y, x + width, y + r, r);
+  ctx.lineTo(x + width, y + height - r);
+  ctx.arcTo(x + width, y + height, x + width - r, y + height, r);
+  ctx.lineTo(x + r, y + height);
+  ctx.arcTo(x, y + height, x, y + height - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
 function canvasPlayer(ctx, color, name, num, x, y) {
+  const css = getComputedStyle(document.documentElement);
+  const scale = ctx.canvas.isConnected && ctx.canvas.clientWidth > 0 ? ctx.canvas.clientWidth / FIELD_W : 1;
+  const inverse = 1 / scale;
+  const radius = Math.max(PLAYER_R, 18 * inverse);
+  const nameSize = 12 * inverse;
+  const numberSize = Math.max(radius * 0.84, 19 * inverse);
+  const font = css.getPropertyValue('--font').trim() || 'sans-serif';
+  const numFont = css.getPropertyValue('--num').trim() || 'sans-serif';
   ctx.save();
   ctx.shadowColor = 'rgba(0,0,0,0.55)';
   ctx.shadowBlur = 8;
-  ctx.beginPath(); ctx.arc(x, y, PLAYER_R, 0, Math.PI*2);
+  ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI*2);
   ctx.fillStyle = color; ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 2.5; ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 2.5 * inverse; ctx.stroke();
   ctx.shadowBlur = 0;
-  ctx.fillStyle = 'white';
-  ctx.font = 'bold 13px Segoe UI, sans-serif';
+  ctx.fillStyle = playerNumberInk(color);
+  ctx.font = `700 ${numberSize}px ${numFont}`;
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(String(num), x, y);
-  ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 5;
-  ctx.font = 'bold 10px Segoe UI, sans-serif';
-  ctx.fillText(name.slice(0, 7), x, y + 32);
+  ctx.font = `600 ${nameSize}px ${font}`;
+  const maxTextWidth = 84 * inverse;
+  let label = String(name);
+  if (ctx.measureText(label).width > maxTextWidth) {
+    const letters = [...label];
+    while (letters.length && ctx.measureText(letters.join('') + '…').width > maxTextWidth) letters.pop();
+    label = letters.join('') + '…';
+  }
+  const width = ctx.measureText(label).width + 12 * inverse;
+  const height = nameSize * 1.35;
+  const nearGoal = y > 590;
+  const nearEdge = nearGoal && x > 360;
+  const labelX = Math.max(width / 2 + 3 * inverse, Math.min(FIELD_W - width / 2 - 3 * inverse,
+    nearGoal ? x + (nearEdge ? -1 : 1) * (radius + 4 * inverse + width / 2) : x));
+  const labelY = Math.max(height / 2, Math.min(FIELD_H - height / 2,
+    nearGoal ? y : y + radius + 3 * inverse + height / 2));
+  ctx.fillStyle = 'rgba(8,13,10,0.82)';
+  ctx.beginPath(); canvasRoundedRect(ctx, labelX - width / 2, labelY - height / 2, width, height, height / 2); ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(label, labelX, labelY);
   ctx.restore();
 }
 
@@ -3094,7 +3272,7 @@ function canvasLabel(ctx, text) {
   const w = ctx.measureText(text).width + 18;
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
   ctx.beginPath();
-  ctx.roundRect(10, 10, w, 28, 6);
+  canvasRoundedRect(ctx, 10, 10, w, 28, 6);
   ctx.fill();
   ctx.fillStyle = 'white';
   ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
@@ -3143,6 +3321,7 @@ function renderStepFrame(ctx, pat, stepIdx, t, label) {
 
 // 에디터/기존 호출부용 래퍼 — 현재 패턴·단계를 그린다
 function renderPatternFrame(t) {
+  updatePatternSummary();
   const pat = currentPattern();
   const label = pat.steps.length > 1 ? `단계 ${currentStepIdx+1}/${pat.steps.length}` : null;
   renderStepFrame(pCtx, pat, currentStepIdx, t || 0, label);
@@ -3888,6 +4067,8 @@ document.getElementById('shareModal').addEventListener('click', e => {
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  if (document.querySelector('.dlg-backdrop')) return;
+  if (window.SquadUi?.closeTopLayer()) { e.preventDefault(); e.stopImmediatePropagation(); return; }
   if (document.getElementById('feedbackModal').classList.contains('visible')) { closeFeedback(); return; }
   if (document.getElementById('helpModal').classList.contains('visible')) { closeHelp(); return; }
   if (document.getElementById('interestModal').classList.contains('visible')) { closeInterestPreview(); return; }
@@ -5059,8 +5240,7 @@ _readyPromise = (async () => {
   backdrop.className = 'ui-backdrop';
   backdrop.hidden = true;
   document.body.appendChild(backdrop);
-  const focusables = root => [...root.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
-    .filter(el => !el.disabled && !el.hidden && el.getClientRects().length);
+  const focusables = root => getModalFocusables(root);
   function pushLayer(layer) {
     layer.opener = document.activeElement;
     layer.scrollY = window.scrollY;
@@ -5104,6 +5284,7 @@ _readyPromise = (async () => {
   }
   backdrop.addEventListener('click', () => closeExport());
   $('exportOpenBtn').addEventListener('click', openExport);
+  $('viewerExportBtn').addEventListener('click', openExport);
   $('exportCloseBtn').addEventListener('click', closeExport);
   // 링크·텍스트는 기존 공유 창을 연다. 시트를 먼저 닫아 창이 겹치지 않게 한다.
   exportPanel.addEventListener('click', event => {
@@ -5385,8 +5566,8 @@ _readyPromise = (async () => {
     if (!layer || document.querySelector('.dlg-backdrop')) return;
     if (event.key === 'Escape') {
       event.preventDefault();
-      if (layer === libraryLayer && !$('libForm').hidden) { hideLibForm(); setLibStatus(''); return; }
-      layer.close();
+      event.stopImmediatePropagation();
+      closeTopLayer();
       return;
     }
     if (event.key !== 'Tab') return;
@@ -5407,6 +5588,14 @@ _readyPromise = (async () => {
 
   // ── Android 뒤로가기: 열린 레이어 하나만 닫고 처리 여부 반환 (선택은 유지) ──
   function closeTopLayer() {
+    const confirmation = document.querySelector('.dlg-backdrop [data-r="0"]');
+    if (confirmation) { confirmation.click(); return true; }
+    if (activeModal) {
+      const close = { shareModal: closeShare, helpModal: closeHelp, feedbackModal: closeFeedback,
+        playerViewModal: closePlayerView, interestModal: closeInterestPreview }[activeModal.id];
+      if (close) { close(); return true; }
+    }
+    if (!$('patternMoreMenu').hidden) { hidePatternMore(true); return true; }
     const menu = $('ctxMenu');
     if (menu && menu.classList.contains('visible')) { hideCtxMenu(); return true; }
     const arrowPop = document.querySelector('.arrow-pop');

@@ -48,7 +48,7 @@ test.describe('분석 활성 상태 payload 계약', () => {
     await page.goto('/index.html');
     await page.fill('#teamName', 'FC 회귀');
     await page.click('button:has-text("단톡방 공유 텍스트 생성")');
-    await page.click('.share-actions button:has-text("닫기")');
+    await page.click('#shareCloseBtn');
     await page.click('.interest-section button:has-text("선수별 브리핑")');
     await page.click('#interestModal button:has-text("닫기")');
 

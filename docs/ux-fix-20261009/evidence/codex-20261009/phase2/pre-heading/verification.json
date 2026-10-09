@@ -1,0 +1,475 @@
+{
+  "stage": "phase2",
+  "date": "2026-10-10",
+  "verifiedAtUtc": "2026-10-09T15:06:33.347Z",
+  "sourceSha256": "2558442d8c45ab702109abd693814760d4f4bf0f561b9a6f58238e1f36ecbdb2",
+  "offlineFonts": true,
+  "results": [
+    {
+      "label": "1280",
+      "options": {
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        }
+      },
+      "metrics": {
+        "overflow": -15,
+        "colorScheme": "dark",
+        "wordBreak": "keep-all",
+        "smallTargets": [
+          {
+            "text": "클라우드에 팀 저장",
+            "x": 867.234375,
+            "y": 2173.5,
+            "width": 121.046875,
+            "height": 31,
+            "right": 988.28125,
+            "bottom": 2204.5
+          },
+          {
+            "text": "고급 영상 내보내기",
+            "x": 996.28125,
+            "y": 2173.5,
+            "width": 121.046875,
+            "height": 31,
+            "right": 1117.328125,
+            "bottom": 2204.5
+          },
+          {
+            "text": "선수별 브리핑",
+            "x": 790.59375,
+            "y": 2212.5,
+            "width": 95.609375,
+            "height": 31,
+            "right": 886.203125,
+            "bottom": 2243.5
+          }
+        ],
+        "saveChip": {
+          "x": 656.75,
+          "y": 79.5,
+          "width": 42.5625,
+          "height": 21,
+          "right": 699.3125,
+          "bottom": 100.5
+        },
+        "saveChipOverlapsTabs": false,
+        "hint": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "tray": {
+          "x": 473.59375,
+          "y": 188,
+          "width": 280,
+          "height": 176,
+          "right": 753.59375,
+          "bottom": 364
+        },
+        "playerNames": [
+          {
+            "visible": "1\n      GK",
+            "accessible": "1 GK, 선수 편집"
+          },
+          {
+            "visible": "2\n      수비1",
+            "accessible": "2 수비1, 선수 편집"
+          },
+          {
+            "visible": "3\n      수비2",
+            "accessible": "3 수비2, 선수 편집"
+          },
+          {
+            "visible": "4\n      수비3",
+            "accessible": "4 수비3, 선수 편집"
+          },
+          {
+            "visible": "5\n      미드1",
+            "accessible": "5 미드1, 선수 편집"
+          },
+          {
+            "visible": "6\n      미드2",
+            "accessible": "6 미드2, 선수 편집"
+          },
+          {
+            "visible": "7\n      미드3",
+            "accessible": "7 미드3, 선수 편집"
+          },
+          {
+            "visible": "8\n      공격1",
+            "accessible": "8 공격1, 선수 편집"
+          },
+          {
+            "visible": "9\n      공격2",
+            "accessible": "9 공격2, 선수 편집"
+          }
+        ],
+        "emDashes": false,
+        "headerX": 20,
+        "exportSheet": {
+          "width": 560,
+          "x": 352.5,
+          "scrollWidth": 558,
+          "clientWidth": 558
+        },
+        "toast": {
+          "width": 386.390625,
+          "x": 439.3046875
+        },
+        "headerXAfter": 20,
+        "pattern": {
+          "width": 473,
+          "backingWidth": 473,
+          "dpr": 1
+        }
+      },
+      "errors": [],
+      "offlineAssets": []
+    },
+    {
+      "label": "1366",
+      "options": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        }
+      },
+      "metrics": {
+        "overflow": -15,
+        "colorScheme": "dark",
+        "wordBreak": "keep-all",
+        "smallTargets": [
+          {
+            "text": "클라우드에 팀 저장",
+            "x": 898.59375,
+            "y": 2173.5,
+            "width": 121.046875,
+            "height": 31,
+            "right": 1019.640625,
+            "bottom": 2204.5
+          },
+          {
+            "text": "고급 영상 내보내기",
+            "x": 1027.640625,
+            "y": 2173.5,
+            "width": 121.046875,
+            "height": 31,
+            "right": 1148.6875,
+            "bottom": 2204.5
+          },
+          {
+            "text": "선수별 브리핑",
+            "x": 821.953125,
+            "y": 2212.5,
+            "width": 95.609375,
+            "height": 31,
+            "right": 917.5625,
+            "bottom": 2243.5
+          }
+        ],
+        "saveChip": {
+          "x": 699.75,
+          "y": 79.5,
+          "width": 42.5625,
+          "height": 21,
+          "right": 742.3125,
+          "bottom": 100.5
+        },
+        "saveChipOverlapsTabs": false,
+        "hint": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "tray": {
+          "x": 504.953125,
+          "y": 188,
+          "width": 280,
+          "height": 176,
+          "right": 784.953125,
+          "bottom": 364
+        },
+        "playerNames": [
+          {
+            "visible": "1\n      GK",
+            "accessible": "1 GK, 선수 편집"
+          },
+          {
+            "visible": "2\n      수비1",
+            "accessible": "2 수비1, 선수 편집"
+          },
+          {
+            "visible": "3\n      수비2",
+            "accessible": "3 수비2, 선수 편집"
+          },
+          {
+            "visible": "4\n      수비3",
+            "accessible": "4 수비3, 선수 편집"
+          },
+          {
+            "visible": "5\n      미드1",
+            "accessible": "5 미드1, 선수 편집"
+          },
+          {
+            "visible": "6\n      미드2",
+            "accessible": "6 미드2, 선수 편집"
+          },
+          {
+            "visible": "7\n      미드3",
+            "accessible": "7 미드3, 선수 편집"
+          },
+          {
+            "visible": "8\n      공격1",
+            "accessible": "8 공격1, 선수 편집"
+          },
+          {
+            "visible": "9\n      공격2",
+            "accessible": "9 공격2, 선수 편집"
+          }
+        ],
+        "emDashes": false,
+        "headerX": 63,
+        "exportSheet": {
+          "width": 560,
+          "x": 395.5,
+          "scrollWidth": 558,
+          "clientWidth": 558
+        },
+        "toast": {
+          "width": 386.390625,
+          "x": 482.3046875
+        },
+        "headerXAfter": 63,
+        "pattern": {
+          "width": 449,
+          "backingWidth": 449,
+          "dpr": 1
+        }
+      },
+      "errors": [],
+      "offlineAssets": []
+    },
+    {
+      "label": "768",
+      "options": {
+        "userAgent": "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.55 Mobile Safari/537.36",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "screen": {
+          "width": 393,
+          "height": 851
+        },
+        "deviceScaleFactor": 3,
+        "isMobile": true,
+        "hasTouch": true,
+        "defaultBrowserType": "chromium"
+      },
+      "metrics": {
+        "overflow": 0,
+        "colorScheme": "dark",
+        "wordBreak": "keep-all",
+        "smallTargets": [],
+        "saveChip": {
+          "x": 555.75,
+          "y": 83.5,
+          "width": 42.5625,
+          "height": 21,
+          "right": 598.3125,
+          "bottom": 104.5
+        },
+        "saveChipOverlapsTabs": false,
+        "hint": {
+          "x": 104,
+          "y": 916,
+          "width": 560,
+          "height": 19.5,
+          "right": 664,
+          "bottom": 935.5
+        },
+        "tray": {
+          "x": 104,
+          "y": 922.5,
+          "width": 560,
+          "height": 93.5,
+          "right": 664,
+          "bottom": 1016
+        },
+        "playerNames": [
+          {
+            "visible": "1\n      GK",
+            "accessible": "1 GK, 선수 편집"
+          },
+          {
+            "visible": "2\n      수비1",
+            "accessible": "2 수비1, 선수 편집"
+          },
+          {
+            "visible": "3\n      수비2",
+            "accessible": "3 수비2, 선수 편집"
+          },
+          {
+            "visible": "4\n      수비3",
+            "accessible": "4 수비3, 선수 편집"
+          },
+          {
+            "visible": "5\n      미드1",
+            "accessible": "5 미드1, 선수 편집"
+          },
+          {
+            "visible": "6\n      미드2",
+            "accessible": "6 미드2, 선수 편집"
+          },
+          {
+            "visible": "7\n      미드3",
+            "accessible": "7 미드3, 선수 편집"
+          },
+          {
+            "visible": "8\n      공격1",
+            "accessible": "8 공격1, 선수 편집"
+          },
+          {
+            "visible": "9\n      공격2",
+            "accessible": "9 공격2, 선수 편집"
+          }
+        ],
+        "emDashes": false,
+        "headerX": 12,
+        "exportSheet": {
+          "width": 560,
+          "x": 104,
+          "scrollWidth": 558,
+          "clientWidth": 558
+        },
+        "toast": {
+          "width": 384,
+          "x": 192
+        },
+        "headerXAfter": 12,
+        "pattern": {
+          "width": 480,
+          "backingWidth": 1440,
+          "dpr": 3
+        }
+      },
+      "errors": [],
+      "offlineAssets": []
+    },
+    {
+      "label": "390",
+      "options": {
+        "userAgent": "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.55 Mobile Safari/537.36",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "screen": {
+          "width": 393,
+          "height": 851
+        },
+        "deviceScaleFactor": 3,
+        "isMobile": true,
+        "hasTouch": true,
+        "defaultBrowserType": "chromium"
+      },
+      "metrics": {
+        "overflow": 0,
+        "colorScheme": "dark",
+        "wordBreak": "keep-all",
+        "smallTargets": [],
+        "saveChip": {
+          "x": 222.234375,
+          "y": 83.5,
+          "width": 42.5625,
+          "height": 21,
+          "right": 264.796875,
+          "bottom": 104.5
+        },
+        "saveChipOverlapsTabs": false,
+        "hint": {
+          "x": 12,
+          "y": 748,
+          "width": 366,
+          "height": 19.5,
+          "right": 378,
+          "bottom": 767.5
+        },
+        "tray": {
+          "x": 8,
+          "y": 742.5,
+          "width": 374,
+          "height": 93.5,
+          "right": 382,
+          "bottom": 836
+        },
+        "playerNames": [
+          {
+            "visible": "1\n      GK",
+            "accessible": "1 GK, 선수 편집"
+          },
+          {
+            "visible": "2\n      수비1",
+            "accessible": "2 수비1, 선수 편집"
+          },
+          {
+            "visible": "3\n      수비2",
+            "accessible": "3 수비2, 선수 편집"
+          },
+          {
+            "visible": "4\n      수비3",
+            "accessible": "4 수비3, 선수 편집"
+          },
+          {
+            "visible": "5\n      미드1",
+            "accessible": "5 미드1, 선수 편집"
+          },
+          {
+            "visible": "6\n      미드2",
+            "accessible": "6 미드2, 선수 편집"
+          },
+          {
+            "visible": "7\n      미드3",
+            "accessible": "7 미드3, 선수 편집"
+          },
+          {
+            "visible": "8\n      공격1",
+            "accessible": "8 공격1, 선수 편집"
+          },
+          {
+            "visible": "9\n      공격2",
+            "accessible": "9 공격2, 선수 편집"
+          }
+        ],
+        "emDashes": false,
+        "headerX": 12,
+        "exportSheet": {
+          "width": 390,
+          "x": 0,
+          "scrollWidth": 388,
+          "clientWidth": 388
+        },
+        "toast": {
+          "width": 195,
+          "x": 97.5
+        },
+        "headerXAfter": 12,
+        "pattern": {
+          "width": 366,
+          "backingWidth": 1098,
+          "dpr": 3
+        }
+      },
+      "errors": [],
+      "offlineAssets": []
+    }
+  ]
+}
