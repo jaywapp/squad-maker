@@ -20,6 +20,7 @@
 | 2026-10-08 전체 PR 병합·자동 배포 중단·기존 작업 보존 | [분석](pr-cleanup-20261008-analysis.md), [설계](pr-cleanup-20261008-design.md), [실행](pr-cleanup-20261008-tasks.md) |
 | main push 자동 서명 APK와 GitHub Release 준비 | [분석](main-apk-release-20261009-analysis.md), [설계](main-apk-release-20261009-design.md), [작업계획](main-apk-release-20261009-tasks.md) |
 | 2026-10-09 UX/UI 점검 결과와 개선 작업 지시서(1단계 작은 수정 → 2단계 패턴 화면 → 3단계 콘셉트 3종) | [분석](ux-fix-20261009-analysis.md), [설계](ux-fix-20261009-design.md), [작업 지시서](ux-fix-20261009-tasks.md) |
+| 2026-10-09 UX 개선 Codex 전체 인계와 실행 기록 | [분석](ux-fix-20261009-codex-analysis.md), [설계](ux-fix-20261009-codex-design.md), [작업계획](ux-fix-20261009-codex-tasks.md), [검증 기록](ux-fix-20261009-codex-report.md) |
 
 ## 유지하는 근거와 운영 참고
 

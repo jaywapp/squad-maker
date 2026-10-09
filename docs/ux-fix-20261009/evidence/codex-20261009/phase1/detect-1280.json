@@ -1,0 +1,52 @@
+[
+  {
+    "antipattern": "gpt-thin-border-wide-shadow",
+    "name": "Hairline border with wide shadow",
+    "description": "A hairline border paired with a wide, diffuse shadow is a recurring generated-UI signature. Commit to one — a defined edge or a soft elevation — rather than both at once.",
+    "severity": "advisory",
+    "category": "slop",
+    "file": "http://127.0.0.1:4319/index.html",
+    "line": 0,
+    "snippet": "1px border + 24px shadow blur"
+  },
+  {
+    "antipattern": "all-caps-body",
+    "name": "All-caps body text",
+    "description": "Long passages in uppercase are hard to read. We recognize words by shape (ascenders and descenders), which all-caps removes. Reserve uppercase for short labels and headings.",
+    "severity": "warning",
+    "category": "quality",
+    "file": "http://127.0.0.1:4319/index.html",
+    "line": 0,
+    "snippet": "text-transform: uppercase on 34 chars of body text"
+  },
+  {
+    "antipattern": "gpt-thin-border-wide-shadow",
+    "name": "Hairline border with wide shadow",
+    "description": "A hairline border paired with a wide, diffuse shadow is a recurring generated-UI signature. Commit to one — a defined edge or a soft elevation — rather than both at once.",
+    "severity": "advisory",
+    "category": "slop",
+    "file": "http://127.0.0.1:4319/index.html",
+    "line": 0,
+    "snippet": "1px border + 40px shadow blur"
+  },
+  {
+    "antipattern": "first-viewport-column-overflow",
+    "name": "One column stretches the first viewport",
+    "description": "A multi-column opening section lets one column run far past the fold while its sibling fits in a single viewport, so the short column floats in dead space and the fold falls deep inside one section. Balance the columns, cap the tall one, or let the long content flow below the opening row.",
+    "severity": "warning",
+    "category": "quality",
+    "file": "http://127.0.0.1:4319/index.html",
+    "line": 0,
+    "snippet": "div.layout opens the page with one column running 266% of the viewport tall while a sibling fits in 78% — the fold falls deep inside the section"
+  },
+  {
+    "antipattern": "repeating-stripes-gradient",
+    "name": "Repeating-gradient stripes",
+    "description": "Repeating-gradient stripes used as surface decoration are a recurring generated-UI signature. Reach for a deliberate texture or leave the surface plain.",
+    "severity": "advisory",
+    "category": "slop",
+    "file": "http://127.0.0.1:4319/index.html",
+    "line": 0,
+    "snippet": "repeating-gradient decorative stripes"
+  }
+]

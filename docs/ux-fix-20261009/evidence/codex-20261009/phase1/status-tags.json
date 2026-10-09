@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-09",
+  "viewport": "390x844x3 mobile touch",
+  "saved": {
+    "statusText": "기기에 저장됨",
+    "statusClip": "rect(0px, 0px, 0px, 0px)",
+    "statusSize": [
+      1,
+      1
+    ],
+    "live": "polite",
+    "visibleChipText": "저장됨",
+    "chip": {
+      "x": 204.15625,
+      "y": 83.5,
+      "width": 60.640625,
+      "height": 21
+    },
+    "chipOverlapsTab": false
+  },
+  "tags": [
+    {
+      "text": "GK",
+      "color": "rgb(255, 157, 157)",
+      "background": "rgb(51, 32, 31)",
+      "ratio": 7.725294992985674
+    },
+    {
+      "text": "수비",
+      "color": "rgb(184, 233, 134)",
+      "background": "rgb(31, 51, 32)",
+      "ratio": 9.685307704383213
+    },
+    {
+      "text": "수비",
+      "color": "rgb(184, 233, 134)",
+      "background": "rgb(31, 51, 32)",
+      "ratio": 9.685307704383213
+    },
+    {
+      "text": "수비",
+      "color": "rgb(184, 233, 134)",
+      "background": "rgb(31, 51, 32)",
+      "ratio": 9.685307704383213
+    },
+    {
+      "text": "미드필더",
+      "color": "rgb(232, 237, 232)",
+      "background": "rgb(35, 45, 38)",
+      "ratio": 12.008397310207618
+    },
+    {
+      "text": "미드필더",
+      "color": "rgb(232, 237, 232)",
+      "background": "rgb(35, 45, 38)",
+      "ratio": 12.008397310207618
+    },
+    {
+      "text": "미드필더",
+      "color": "rgb(232, 237, 232)",
+      "background": "rgb(35, 45, 38)",
+      "ratio": 12.008397310207618
+    },
+    {
+      "text": "공격",
+      "color": "rgb(240, 180, 41)",
+      "background": "rgb(51, 42, 26)",
+      "ratio": 7.576738210673476
+    },
+    {
+      "text": "공격",
+      "color": "rgb(240, 180, 41)",
+      "background": "rgb(51, 42, 26)",
+      "ratio": 7.576738210673476
+    }
+  ],
+  "allTagsPass": true
+}

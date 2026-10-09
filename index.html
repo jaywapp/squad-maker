@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>스쿼드 메이커 — 축구 포메이션 & 전술 공유</title>
+<title>스쿼드 메이커, 축구 포메이션 & 전술 공유</title>
 <meta name="description" content="축구 스쿼드를 직접 만들고 팀원과 공유하세요. 포메이션 설정, 선수 배치, 전술 지침을 손쉽게 작성하고 링크로 공유할 수 있습니다.">
 <!-- Open Graph -->
 <meta property="og:type"        content="website">
-<meta property="og:title"       content="스쿼드 메이커 — 축구 포메이션 & 전술 공유">
+<meta property="og:title"       content="스쿼드 메이커, 축구 포메이션 & 전술 공유">
 <meta property="og:description" content="축구 스쿼드를 직접 만들고 팀원과 공유하세요. 포메이션 설정, 선수 배치, 전술 지침을 손쉽게 작성하고 링크로 공유할 수 있습니다.">
   <meta property="og:url"         content="https://squad-maker.vercel.app/">
   <meta property="og:image"       content="https://squad-maker.vercel.app/og-image.png">
 <meta property="og:locale"      content="ko_KR">
 <!-- Twitter Card -->
 <meta name="twitter:card"        content="summary_large_image">
-<meta name="twitter:title"       content="스쿼드 메이커 — 축구 포메이션 & 전술 공유">
+<meta name="twitter:title"       content="스쿼드 메이커, 축구 포메이션 & 전술 공유">
 <meta name="twitter:description" content="포메이션 설정, 선수 배치, 전술 지침을 만들고 링크로 공유하세요.">
   <meta name="twitter:image"       content="https://squad-maker.vercel.app/og-image.png">
 <!-- Favicon (SVG 인라인) -->
@@ -25,6 +25,7 @@
 <style>
 /* ── 전술 보드 팔레트 ── */
 :root {
+  color-scheme: dark;
   --bg: #141a16;          /* 차콜 그린-블랙 */
   --surface: #1c241e;     /* 보드 카드 */
   --surface2: #232d26;
@@ -41,6 +42,8 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { scrollbar-gutter: stable; }
+html.platform-native { scrollbar-gutter: auto; }
 
 body {
   background: var(--bg);
@@ -127,7 +130,7 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
   transition: background 0.15s, color 0.15s; white-space: nowrap; text-align: center;
 }
 .mode-pill:not(:last-child) { border-right: 1px solid var(--border); }
-.mode-pill.active { background: var(--accent); color: var(--accent-ink); }
+.mode-pill.active { background: var(--chalk); color: var(--chalk-ink); font-weight: 700; }
 
 /* ── 포메이션 셀렉트 ── */
 .formation-select {
@@ -233,9 +236,11 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
   position:fixed; background:var(--surface); border:1px solid var(--border);
   border-radius:10px; padding:10px; z-index:1000; display:none;
   box-shadow:0 8px 24px rgba(0,0,0,0.6); min-width:168px;
+  width:max-content; max-width:calc(100vw - 16px); max-height:calc(100dvh - 16px); overflow-y:auto;
 }
 #ctxMenu.visible { display:block; }
-.ctx-label { font-size:0.72rem; color:var(--muted); margin-bottom:8px; font-weight:600; }
+.ctx-player { font-size:1rem; font-weight:700; color:var(--ink); margin-bottom:8px; max-width:236px; overflow-wrap:anywhere; }
+.ctx-label { font-size:0.875rem; color:var(--muted); margin-bottom:8px; font-weight:600; }
 .color-palette { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
 .swatch {
   width:24px; height:24px; border-radius:50%; cursor:pointer;
@@ -349,7 +354,7 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
 .interest-desc li { margin-left:18px; }
 .interest-price { font-size:0.8rem; color:var(--accent); font-weight:700; }
 .interest-actions { display:flex; gap:8px; flex-wrap:wrap; }
-.interest-note { font-size:0.7rem; color:var(--faint); line-height:1.6; }
+.interest-note { font-size:0.875rem; color:var(--faint); line-height:1.6; }
 .interest-note a { color:var(--accent); }
 
 /* ── 선수 시점 모달 ── */
@@ -416,7 +421,7 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
 .pv-info { flex:1; display:flex; flex-direction:column; gap:8px; }
 .pv-zone-badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.72rem; font-weight:700; background:#4d7ea8; color:white; }
 .pv-note-block { display:flex; flex-direction:column; gap:4px; }
-.pv-note-label { font-size:0.7rem; color:var(--faint); font-weight:600; }
+.pv-note-label { font-size:0.75rem; color:var(--faint); font-weight:600; }
 .pv-note-text  { font-size:0.8rem; color:var(--ink2); line-height:1.6; white-space:pre-wrap; }
 .pv-note-empty { font-size:0.78rem; color:var(--border); font-style:italic; }
 
@@ -520,7 +525,7 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
 #gifProgress.visible { display:flex; }
 #gifProgress p { color:white; font-weight:600; font-size:1rem; }
 #gifProgressBar { width:240px; height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
-#gifProgressFill { height:100%; background:var(--accent); border-radius:4px; transition:width 0.1s; }
+#gifProgressFill { width:100%; height:100%; background:var(--accent); border-radius:4px; transform-origin:left; transition:transform 0.1s; }
 
 /* ── 매치 전략 탭 ── */
 #strategyUI { width:100%; max-width:480px; display:none; flex-direction:column; gap:12px; }
@@ -569,12 +574,12 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 .tactic-line { color:var(--ink2); font-size:0.8rem; line-height:1.7; padding-left:12px; }
 .tactic-line::before { content:'· '; color:var(--faint); }
 .tactic-tag {
-  display:inline-block; background:var(--faint); color:var(--accent);
-  border-radius:10px; padding:1px 8px; font-size:0.72rem; font-weight:600; margin-left:4px;
+  display:inline-block; background:var(--surface2); color:var(--ink);
+  border-radius:10px; padding:1px 8px; font-size:0.75rem; font-weight:600; margin-left:4px;
 }
 .tactic-tag.green { background:#1f3320; color:var(--accent); }
 .tactic-tag.amber { background:#332a1a; color:var(--warn); }
-.tactic-tag.red   { background:#33201f; color:var(--danger); }
+.tactic-tag.red   { background:#33201f; color:var(--danger-ink); }
 
 /* ── 화살표 삭제 팝오버 ── */
 .arrow-pop {
@@ -600,6 +605,7 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   display:flex; flex-direction:column; gap:16px;
 }
 .dlg p { font-size:0.9rem; line-height:1.6; white-space:pre-wrap; }
+.dlg-title { font-size:1.0625rem; font-weight:700; color:var(--ink); }
 .dlg-actions { display:flex; gap:8px; justify-content:flex-end; }
 
 /* ── 토스트 알림 ── */
@@ -752,15 +758,15 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 
 body {
   font-family: var(--font); font-size: 1rem; line-height: 1.5;
+  word-break: keep-all; overflow-wrap: anywhere;
   display: grid; grid-template-columns: minmax(0, 1fr) auto; align-content: start; align-items: center;
   column-gap: 8px; row-gap: 10px;
   padding: 10px 12px calc(32px + env(safe-area-inset-bottom, 0px));
 }
-body > * { grid-column: 1 / -1; justify-self: center; width: 100%; }
+body > :where(:not(.toast, #ctxMenu, .arrow-pop, .dlg-backdrop, .ui-backdrop, .ui-sheet, #playerViewModal, #shareModal, #interestModal, #helpModal, #feedbackModal, #gifProgress)) { grid-column: 1 / -1; justify-self: center; width: 100%; }
 [hidden] { display: none !important; }
 body > script, body > input[type="file"] { display: none; }
 button, input, select, textarea { font-family: inherit; }
-button, .app-tab, .squad-tab { word-break: keep-all; }  /* 한글은 단어 단위로만 줄바꿈 (큰 글자 대비) */
 
 /* 아이콘: Tabler Icons(MIT) 경로를 인라인으로 사용 */
 .ui-icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
@@ -888,7 +894,7 @@ body.mode-pattern #fieldWrapper { width: min(100%, 480px, calc((100dvh - 236px) 
   width: var(--hit); height: var(--hit); transform: translate(-50%, -50%); border-radius: 50%;
 }
 #field .player-circle {
-  width: var(--c); height: var(--c); font-family: var(--num); font-size: calc(var(--c) * 0.42); font-weight: 600;
+  width: var(--c); height: var(--c); font-family: var(--num); font-size: max(calc(var(--c) * 0.42), calc(19px * var(--fi))); font-weight: 700;
   border-width: calc(2.5px * var(--fi)); position: relative;
 }
 #field .player-name {
@@ -906,6 +912,7 @@ body.mode-pattern #fieldWrapper { width: min(100%, 480px, calc((100dvh - 236px) 
   padding: calc(3px * var(--fi)) calc(6px * var(--fi)) !important; border-radius: calc(8px * var(--fi)) !important;
   margin-top: calc(3px * var(--fi)) !important; background: #0b120e !important; position: relative;
 }
+#field .player-name-count { font-size: calc(12px * var(--fi)); line-height: 1.35; color: #fff; background: rgba(8, 13, 10, 0.82); border-radius: 999px; padding: 0 calc(6px * var(--fi)); margin-top: calc(3px * var(--fi)); white-space: nowrap; }
 /* 골라인 근처(골키퍼) 이름표는 토큰 옆에 두어 골라인과 겹치지 않게 */
 #field .player.near-goal .player-name, #field .player.near-goal input {
   position: absolute; left: calc(100% + 4px * var(--fi)); top: calc(var(--c) / 2); transform: translateY(-50%); margin-top: 0 !important;
@@ -930,6 +937,8 @@ body.mode-pattern .player-actions, body.mode-strategy .player-actions, .viewer-m
 .btn:hover { opacity: 1; filter: brightness(1.12); transform: none; }
 .btn-slate, .btn-blue, .btn-amber, .btn-purple { color: var(--ink); }
 .btn-red { color: var(--danger-ink); border-color: var(--danger); }
+#addPlayerBtn:disabled { opacity: 1; background: var(--surface); color: var(--muted); border-color: var(--border); filter: none; }
+.add-player-hint { flex-basis: 100%; font-size: 0.875rem; color: var(--ink2); text-align: center; }
 .team-name-input, .pattern-name-input, .notes-textarea, .player-note-input, .strategy-input, .pv-selector { font-size: 1rem; }
 .team-name-input, .pattern-name-input { min-height: var(--tap); border-radius: var(--radius); min-width: 0; }
 .team-name-input { width: 100%; flex: 1 1 140px; }
@@ -949,7 +958,7 @@ body.mode-pattern .player-actions, body.mode-strategy .player-actions, .viewer-m
 .pattern-name-input { flex: 1 1 150px; }
 .pattern-name-view { flex: 1 1 150px; font-weight: 700; font-size: 1rem; }
 .pattern-nav { min-height: var(--tap); padding: 0 4px; border-radius: var(--radius); }
-.pattern-nav button { min-width: var(--tap); min-height: var(--tap); font-size: 1rem; color: var(--ink2); }
+.pattern-nav button { min-width: var(--tap); min-height: var(--tap); font-size: 1rem; color: var(--ink2); display: inline-flex; align-items: center; justify-content: center; }
 .pattern-nav span { font-size: 0.9375rem; font-family: var(--num); letter-spacing: 0.03em; }
 .step-bar { flex-wrap: wrap; order: -1; }  /* 단계 이동·재생을 피치 바로 아래 첫 줄에 */
 .step-nav { flex: 1 1 200px; justify-content: space-between; min-width: 0; }
@@ -979,7 +988,8 @@ body.platform-native .native-only { display: inline-flex !important; }
 .export-status { font-size: 0.9375rem; min-height: 1.5em; color: var(--ink); }
 .export-status:empty { min-height: 0; }
 .export-status[data-tone="error"] { color: var(--danger-ink); }
-.export-status[data-tone="ok"] { color: var(--accent); }
+.export-status[data-tone="success"] { color: var(--accent); }
+.export-status[data-tone="neutral"] { color: var(--ink2); }
 
 /* ── 시트(전술 목록·내보내기) ── */
 .ui-backdrop { position: fixed; inset: 0; background: rgba(4, 8, 6, 0.66); z-index: 2090; }
@@ -997,7 +1007,7 @@ body.platform-native .native-only { display: inline-flex !important; }
 .ui-sheet-body { overflow-y: auto; padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 12px; overscroll-behavior: contain; }
 .export-panel.as-sheet {
   position: fixed; left: 0; right: 0; bottom: 0; margin: 0 auto; z-index: 2100;
-  overflow-y: auto; overscroll-behavior: contain; padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto; overscroll-behavior: contain; gap: 10px; padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
 }
 .export-panel.as-sheet .export-head { position: sticky; top: -16px; margin: -16px -16px 0; padding: 12px 12px 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border); z-index: 1; }
 .export-panel.as-sheet .export-close { display: inline-flex; }
@@ -1052,12 +1062,14 @@ body.ui-booting #fieldWrapper::after {
 body.ui-busy { cursor: progress; }
 
 /* ── 기타 다듬기 ── */
-.toast { font-size: 0.9375rem; max-width: calc(100vw - 24px); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); border-radius: 12px; padding: 10px 16px; }
+.toast { font-size: 0.9375rem; width: auto; max-width: min(560px, calc(100vw - 24px)); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); border-radius: 12px; padding: 10px 16px; }
 .toast-action { min-height: 44px; }
 .dlg { max-width: 380px; }
 .dlg p { font-size: 1rem; }
 .dlg .btn { min-width: 88px; }
-.swatch { width: 36px; height: 36px; }
+.color-palette { display: grid; grid-template-columns: repeat(5, 44px); gap: 4px; }
+.swatch { width: 44px; height: 44px; }
+.swatch:hover, .swatch.active { transform: none; }
 .ctx-btn { min-height: 44px; font-size: 0.9375rem; }
 .interest-section { opacity: 0.92; }
 .interest-label { font-size: 0.75rem; }
@@ -1123,11 +1135,13 @@ body.ui-busy { cursor: progress; }
   .pane-field > .empty-file { grid-area: empty; }
   .pane-field > #fieldWrapper, .pane-field #fieldWrapper { grid-area: pitch; max-width: none; width: min(560px, calc((100vh - 236px) * 0.7273)); width: min(560px, calc((100dvh - 236px) * 0.7273)); }
   .pane-field > .hint { grid-area: hint; }
+  body.mode-squad .pane-field > .hint { display: none; }
   .pane-field > .player-actions { grid-area: tools; align-self: start; }
   .player-actions { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; }
   .player-actions:not(.visible) > :not(.pa-empty) { display: none; }
   .player-actions:not(.visible) > .pa-empty { display: block; }
   .pa-tools { grid-template-columns: 1fr 1fr; }
+  .player-actions-name { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .pa-close-label { display: none; }
   body.mode-pattern .pane-field { grid-template-areas: "pitch" "hint"; grid-template-columns: auto; }
   body.mode-pattern .pane-field > .player-actions { display: none; }
@@ -1230,14 +1244,14 @@ body.ui-busy { cursor: progress; }
 
 <!-- 필드 -->
 <div id="fieldWrapper">
-  <div id="field" role="region" aria-label="축구 필드 — 선수를 드래그해 위치를 조정하세요"></div>
-  <canvas id="patternCanvas" width="480" height="660" aria-label="전술 패턴 캔버스 — 선수를 드래그해 이동 경로를 그리세요"></canvas>
+  <div id="field" role="region" aria-label="축구 필드, 선수를 드래그해 위치를 조정하세요"></div>
+  <canvas id="patternCanvas" width="480" height="660" aria-label="전술 패턴 캔버스, 선수를 드래그해 이동 경로를 그리세요"></canvas>
 </div>
 
-<p class="hint editor-only" id="hintText">드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭/롱프레스: 색상·삭제</p>
+<p class="hint editor-only" id="hintText">탭: 선수 도구 · 끌기: 이동</p>
 
 <div class="player-actions editor-only" id="playerActions" role="toolbar" aria-label="선택한 선수 작업">
-  <p class="pa-empty">선수를 누르면 이름·색상·지침 도구가 열립니다. 끌면 자리만 옮겨집니다.</p>
+  <p class="pa-empty">선수를 누르면 이름·색상·지침 도구가 열립니다. 끌어 원하는 자리로 옮기면 해당 선수가 선택됩니다.</p>
   <div class="pa-head">
     <span class="player-actions-name" id="playerActionsName"></span>
     <span class="pa-squad" id="playerActionsSquad"></span>
@@ -1245,7 +1259,7 @@ body.ui-busy { cursor: progress; }
   </div>
   <div class="pa-tools">
     <button class="btn btn-slate" onclick="renameSelectedPlayer()">이름</button>
-    <button class="btn btn-slate" aria-label="색상·더보기" onclick="openSelectedPlayerMenu()">색상</button>
+    <button class="btn btn-slate" aria-label="색상·더보기" onclick="openSelectedPlayerMenu(event)">색상</button>
     <button class="btn btn-slate" onclick="focusSelectedPlayerNote()">지침</button>
     <button class="btn btn-red" onclick="removeSelectedPlayer()">삭제</button>
   </div>
@@ -1274,9 +1288,9 @@ body.ui-busy { cursor: progress; }
     <input class="pattern-name-input editor-only" id="patternName" placeholder="패턴 이름..." maxlength="20" enterkeyhint="done" onchange="renameCurrentPattern()" />
     <span id="patternNameView" class="viewer-only pattern-name-view"></span>
     <div class="pattern-nav">
-      <button aria-label="이전 패턴" onclick="prevPattern()">◀</button>
+      <button aria-label="이전 패턴" onclick="prevPattern()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M15 6l-6 6l6 6"/></svg></button>
       <span id="patternCounter">1 / 1</span>
-      <button aria-label="다음 패턴" onclick="nextPattern()">▶</button>
+      <button aria-label="다음 패턴" onclick="nextPattern()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></svg></button>
     </div>
     <button class="btn btn-slate editor-only" onclick="addPattern()">+ 추가<span class="sr-only"> 패턴</span></button>
     <button class="btn btn-red editor-only"  onclick="deletePattern()">삭제<span class="sr-only"> 패턴</span></button>
@@ -1284,16 +1298,16 @@ body.ui-busy { cursor: progress; }
   <!-- 2) 단계 이동과 재생: 좁은 화면에서도 한 줄로 고정 -->
   <div class="pattern-bar step-bar" role="group" aria-label="단계 이동과 미리보기">
     <div class="pattern-nav step-nav">
-      <button aria-label="이전 단계" onclick="prevStep()">◀</button>
+      <button aria-label="이전 단계" onclick="prevStep()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M15 6l-6 6l6 6"/></svg></button>
       <span id="stepCounter">단계 1 / 1</span>
-      <button aria-label="다음 단계" onclick="nextStep()">▶</button>
+      <button aria-label="다음 단계" onclick="nextStep()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></svg></button>
     </div>
     <button class="btn btn-green play-btn" id="playBtn" onclick="togglePlay()">미리보기</button>
   </div>
   <!-- 3) 단계 편집 -->
   <div class="pattern-bar step-edit editor-only" role="group" aria-label="단계 편집">
     <button class="btn btn-slate" onclick="addStep()">+ 단계</button>
-    <button class="btn btn-slate" onclick="clearCurrentStep()">↺ 단계 초기화</button>
+    <button class="btn btn-slate" onclick="clearCurrentStep()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>단계 초기화</button>
     <button class="btn btn-red"   onclick="deleteStep()">단계 삭제</button>
   </div>
   <!-- 4) 움직임 GIF -->
@@ -1306,14 +1320,15 @@ body.ui-busy { cursor: progress; }
 
 <!-- 선수 컨트롤 -->
 <div class="controls app-squad-only editor-only" role="toolbar" aria-label="선수 조작">
-  <button class="btn btn-slate" id="addPlayerBtn" onclick="addPlayer()">+ 선수 추가</button>
+  <button class="btn btn-slate" id="addPlayerBtn" aria-describedby="addPlayerHint" onclick="addPlayer()">+ 선수 추가</button>
   <button class="btn btn-slate" onclick="openPlayerView(null)">선수 시점 보기</button>
+  <p class="add-player-hint" id="addPlayerHint" hidden></p>
 </div>
 
 <!-- 지침 입력 -->
 <div class="notes-wrap app-squad-only" id="notesWrap">
   <div class="notes-card">
-    <div class="notes-card-title" id="teamNoteLabel">기본 스쿼드 — 전체 지침</div>
+    <div class="notes-card-title" id="teamNoteLabel">기본 스쿼드 전체 지침</div>
     <label for="teamNote" class="sr-only">팀 전체 지침</label>
     <textarea class="notes-textarea" id="teamNote"
       placeholder="팀 전체에게 전달할 전술 지침..."
@@ -1370,12 +1385,12 @@ body.ui-busy { cursor: progress; }
     <p>다시 편집할 수 있는 원본 파일입니다. 앱 삭제나 기기 변경에 대비해 따로 보관하세요. 이미지·GIF로는 복원할 수 없습니다.</p>
     <div class="export-actions">
       <button class="btn btn-slate" onclick="saveSquadFile()">백업 파일 저장 (.sq)</button>
-      <button class="btn btn-slate" onclick="document.getElementById('sqFileInput').click()">백업에서 복원</button>
+      <button class="btn btn-slate" onclick="chooseSquadFile()">백업에서 복원</button>
     </div>
   </div>
   <p class="export-status" id="exportStatus" role="status" aria-live="polite"></p>
 </section>
-<input type="file" id="sqFileInput" accept=".sq" style="display:none" aria-hidden="true" onchange="loadSquadFile(event)">
+<input type="file" id="sqFileInput" accept=".sq" style="display:none" aria-hidden="true" onchange="loadSquadFile(event)" oncancel="showRestoreCancelled()">
 
 <!-- 출시 전 기능 미리보기 — 수요 측정 전용, 기존 무료 기능에 제한 없음 (Task 0.3) -->
 <div class="interest-section app-squad-only editor-only" role="group" aria-label="출시 준비 중 기능">
@@ -1440,7 +1455,7 @@ body.ui-busy { cursor: progress; }
         </div>
         <div id="pvSubtitle" style="font-size:12px;color:#aaa;margin-top:4px;"></div>
       </div>
-      <button class="btn btn-slate" aria-label="닫기" onclick="closePlayerView()" style="margin-left:auto;padding:4px 10px;font-size:13px;">✕</button>
+      <button class="btn btn-slate" aria-label="닫기" onclick="closePlayerView()" style="margin-left:auto;padding:4px 10px;font-size:13px;"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
     </div>
     <div id="pvCards"></div>
   </div>
@@ -1448,6 +1463,7 @@ body.ui-busy { cursor: progress; }
 
 <!-- 컨텍스트 메뉴 -->
 <div id="ctxMenu" role="menu" aria-label="선수 메뉴">
+  <div class="ctx-player" id="ctxPlayerLabel" role="presentation"></div>
   <div class="ctx-label" role="presentation">색상</div>
   <div class="color-palette" id="colorPalette" role="group" aria-label="색상 선택"></div>
   <div class="ctx-divider" role="separator"></div>
@@ -1464,7 +1480,7 @@ body.ui-busy { cursor: progress; }
     <div class="share-actions">
       <button class="btn btn-green" onclick="copyShareText()">텍스트 복사</button>
       <button class="btn btn-slate" onclick="saveShareTxt()">파일 저장</button>
-      <button class="btn btn-slate" onclick="closeShare()">✕ 닫기</button>
+      <button class="btn btn-slate" onclick="closeShare()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6l-12 12M6 6l12 12"/></svg>닫기</button>
     </div>
     <div class="share-divider"></div>
     <div class="share-link-section">
@@ -1538,39 +1554,51 @@ body.ui-busy { cursor: progress; }
 <!-- 도움말 모달 -->
 <div id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
   <div class="help-box">
-    <h3 id="helpTitle">스쿼드 메이커 사용 안내</h3>
+    <h3 id="helpTitle" tabindex="-1">스쿼드 메이커 사용 안내</h3>
 
     <div class="help-section">
-      <h4>1. 스쿼드 짜기</h4>
+      <h4>배치: 스쿼드 짜기</h4>
       <ol>
-        <li>위쪽 <b>스쿼드 / 전술 패턴 / 매치 전략</b> 탭에서 <b>스쿼드</b>를 고릅니다.</li>
+        <li>위쪽 <b>배치 / 움직임 패턴 / 매치 전략</b> 탭에서 <b>배치</b>를 고릅니다.</li>
+        <li><b>인원</b>과 <b>포메이션</b>을 고릅니다. 인원을 바꾸면 이름·배치·지침·움직임 패턴이 초기화되므로 확인창을 먼저 읽어 주세요.</li>
         <li><b>포메이션</b>을 선택하면 선수들이 기본 위치로 배치됩니다.</li>
-        <li>선수를 <b>손가락으로 끌어(드래그)</b> 원하는 자리로 옮깁니다.</li>
-        <li>이름을 바꾸려면 선수를 <b>더블클릭</b>(모바일은 <b>길게 누르기</b>) 하세요.</li>
+        <li>선수를 <b>탭하거나 클릭</b>하면 선수 도구가 열립니다. 모바일에서는 화면 하단 도구의 <b>이름 / 색상 / 지침 / 삭제</b>를 사용하세요.</li>
+        <li>선수를 <b>끌어</b> 원하는 자리로 옮기면 그 선수가 선택됩니다. 데스크톱의 더블클릭은 이름 편집, 우클릭과 모바일 길게 누르기는 선수 메뉴입니다.</li>
       </ol>
     </div>
 
     <div class="help-section">
-      <h4>2. 지침 적기</h4>
+      <h4>지침 적기</h4>
       <ul>
-        <li>필드 아래 <b>전술 지침</b>에 팀 전체·선수별 메모를 적을 수 있습니다.</li>
-        <li>선수를 길게 눌러 <b>선수 시점 보기</b>를 열면 그 선수 기준으로 위치와 지침을 봅니다.</li>
+        <li><b>기본 / 공격 / 수비</b>마다 전체 지침과 <b>선수별 지침</b>을 적을 수 있습니다. 선수 도구의 <b>지침</b>을 누르면 해당 선수 입력으로 이동합니다.</li>
+        <li><b>선수 시점 보기</b> 버튼이나 선수 메뉴에서 선수 기준 위치와 지침을 봅니다.</li>
       </ul>
     </div>
 
     <div class="help-section">
-      <h4>3. 공유하기</h4>
+      <h4>움직임 패턴과 매치 전략</h4>
       <ul>
-        <li><b>단톡방 공유 텍스트 생성</b> — 카카오톡에 붙여넣을 수 있는 요약 + 링크를 만듭니다.</li>
+        <li><b>움직임 패턴</b>에서 선수·공을 끌어 경로를 그리고 <b>+ 단계</b>로 이어 갑니다. <b>미리보기</b>로 순서대로 재생합니다.</li>
+        <li><b>매치 전략</b>에서 상대팀과 경기 정보를 적고 <b>전술 지침서 생성</b>으로 전달할 내용을 만듭니다.</li>
+      </ul>
+    </div>
+
+    <div class="help-section">
+      <h4>공유하기</h4>
+      <ul>
+        <li>위쪽 <b>내보내기·공유</b>를 누르면 이미지·GIF·링크·텍스트·백업을 고르는 시트가 열립니다.</li>
+        <li><b>단톡방 공유 텍스트 생성</b>으로 메신저에 붙여 넣을 요약과 링크를 만듭니다.</li>
         <li>받은 사람이 링크를 열면 <b>읽기 전용 화면</b>으로 보이며, 그 사람의 데이터는 건드리지 않습니다.</li>
       </ul>
     </div>
 
     <div class="help-section">
-      <h4>4. 저장</h4>
+      <h4>전술 목록과 저장</h4>
       <ul>
-        <li>작업 내용은 <b>자동 저장</b>되어 새로고침해도 유지됩니다.</li>
-        <li><b>파일 저장</b>으로 백업(.sq 파일)을 내려받고, <b>파일 불러오기</b>로 되돌릴 수 있습니다.</li>
+        <li>위쪽 <b>전술 목록</b>에서 팀과 전술을 고르고 새 전술을 만들거나 이름을 바꿀 수 있습니다.</li>
+        <li>보관된 전술의 변경 내용은 <b>자동 저장</b>됩니다. 저장 실패나 중단 안내가 나오면 <b>다시 저장</b>하거나 백업을 받아 두세요.</li>
+        <li><b>백업 파일 저장 (.sq)</b>으로 편집 가능한 원본을 받고, <b>백업에서 복원</b>으로 가져옵니다. 복원은 현재 전술을 교체하므로 확인창을 읽어 주세요.</li>
+        <li>이미지와 GIF는 전달용 결과물입니다. 편집 데이터 복원에는 .sq 백업 파일이 필요합니다.</li>
       </ul>
     </div>
 
@@ -1619,6 +1647,7 @@ body.ui-busy { cursor: progress; }
       <p id="feedbackStatus" class="feedback-status" role="status" aria-live="polite"></p>
       <div class="help-actions">
         <button class="btn btn-green" id="feedbackSubmit" type="submit">제보 보내기</button>
+        <button class="btn btn-slate" id="feedbackRetryBtn" type="button" onclick="prepareFeedbackCaptcha()" hidden>다시 시도</button>
         <button class="btn btn-slate" type="button" onclick="closeFeedback()">닫기</button>
       </div>
     </form>
@@ -1628,7 +1657,7 @@ body.ui-busy { cursor: progress; }
 <!-- GIF 진행 오버레이 -->
 <div id="gifProgress" role="status">
   <p id="gifProgressText">GIF 생성 중...</p>
-  <div id="gifProgressBar"><div id="gifProgressFill" style="width:0%"></div></div>
+  <div id="gifProgressBar" role="progressbar" aria-labelledby="gifProgressText" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="gifProgressFill" style="transform:scaleX(0)"></div></div>
 </div>
 
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -1640,6 +1669,7 @@ body.ui-busy { cursor: progress; }
 // ═══════════════════════════════════════════════════════════════
 // #43A047(녹색)은 필드 배경(#2b5e3f)과 동계열이라 대비가 낮음 → #00C853(라임)으로 교체
 const COLORS = ['#E53935','#1E88E5','#00C853','#FB8C00','#8E24AA','#00ACC1','#F06292','#FFD600','#546E7A','#ffffff'];
+const COLOR_NAMES = { '#e53935': '빨강', '#1e88e5': '파랑', '#00c853': '초록', '#fb8c00': '주황', '#8e24aa': '보라', '#00acc1': '청록', '#f06292': '분홍', '#ffd600': '노랑', '#546e7a': '회청', '#ffffff': '흰색' };
 const FIELD_W = 480, FIELD_H = 660;
 
 // 베타 운영: 버전 표기와 같은 출처의 Vercel 제보 API.
@@ -1865,8 +1895,8 @@ function updateHint(mode) {
       : '선수·공 드래그: 이동 경로 &nbsp;|&nbsp; 공 살짝 끌기: 시작 위치 &nbsp;|&nbsp; 화살표 클릭/우클릭: 삭제';
   } else {
     hint.innerHTML = isCoarsePointer
-      ? '드래그: 위치 이동 &nbsp;|&nbsp; 길게 누르기: 이름·색상·삭제 메뉴'
-      : '드래그: 위치 이동 &nbsp;|&nbsp; 더블클릭: 이름 수정 &nbsp;|&nbsp; 우클릭: 색상·삭제';
+      ? '탭: 선수 도구 · 끌기: 이동'
+      : '클릭: 선수 도구 · 끌기: 이동';
   }
 }
 
@@ -1965,7 +1995,7 @@ function defaultRoster(modeKey, formKey) {
 function buildModePills() {
   document.getElementById('modePills').innerHTML =
     Object.entries(MODES_CONFIG).map(([k, c]) =>
-      `<button class="mode-pill${k===currentMode?' active':''}" onclick="onModeChange('${k}')">${c.label}</button>`
+      `<button class="mode-pill${k===currentMode?' active':''}" aria-pressed="${k === currentMode}" onclick="onModeChange('${k}')">${c.label}</button>`
     ).join('');
 }
 
@@ -1976,7 +2006,7 @@ function onModeChange(k) {
   return protectedChange('change-mode',
     '인원수를 변경하면 선수 이름·색상, 기본/공격/수비 배치와 지침, 모든 전술 패턴이 초기화됩니다.\n현재 세션에서 최근 변경 한 번을 되돌릴 수 있습니다. 계속할까요?',
     () => { stopAnimation(); clearSelectedPlayer(); currentMode = k; initAllSquads(); },
-    '인원수를 변경하고 저장했습니다.');
+    '인원수를 변경하고 저장했습니다.', { confirmLabel: `${MODES_CONFIG[k].label}로 바꾸기`, tone: 'danger' });
 }
 
 function initAllSquads() {
@@ -2029,11 +2059,11 @@ function saveCurrentNotes() {
 function renderViewerBar() {
   const team = document.getElementById('teamName').value.trim();
   document.getElementById('vbTitle').textContent =
-    team ? `${team} — 공유받은 전술` : '공유받은 전술';
+    team ? `${team}, 공유받은 전술` : '공유받은 전술';
 }
 
 function importSharedSquad() {
-  uiConfirm('공유받은 전술을 내 스쿼드로 가져올까요?\n기존 내 스쿼드는 덮어써집니다.', '가져오기').then(async ok => {
+  uiConfirm('공유받은 전술을 내 스쿼드로 가져올까요?\n기존 내 스쿼드는 덮어써집니다.', { confirmLabel: '내 스쿼드로 가져오기', tone: 'danger' }).then(async ok => {
     if (!ok) return;
     try {
       const shared = buildStateSnap();
@@ -2068,7 +2098,7 @@ function renderViewerNotes() {
   wrap.innerHTML = `
     ${teamNote ? `
     <div class="notes-card">
-      <div class="notes-card-title">${escHtml(meta.label)} — 전체 지침</div>
+      <div class="notes-card-title">${escHtml(meta.label)} 전체 지침</div>
       <div class="viewer-note-text">${escHtml(teamNote)}</div>
     </div>` : ''}
     ${rows.length ? `
@@ -2106,7 +2136,7 @@ function refreshUI() {
     + (viewerMode ? ` · ${squads[currentSquad].formation}` : '');
   badge.className = `squad-badge ${currentSquad}`;
   const noteLabel = document.getElementById('teamNoteLabel');
-  if (noteLabel) noteLabel.textContent = `${meta.label} — 전체 지침`; // 뷰어 모드에서는 읽기 카드로 대체되어 없음
+  if (noteLabel) noteLabel.textContent = `${meta.label} 전체 지침`; // 뷰어 모드에서는 읽기 카드로 대체되어 없음
 
   renderPlayers();
   renderNotesPanel();
@@ -2175,7 +2205,7 @@ function onFormationChange() {
     autoSave();
   };
   if (isCustomized) {
-    uiConfirm('포메이션을 변경하면 현재 스쿼드의 커스텀 배치가 기본 배치로 초기화됩니다.\n계속할까요?', '변경')
+    uiConfirm('포메이션을 변경하면 현재 스쿼드의 커스텀 배치가 기본 배치로 초기화됩니다.\n계속할까요?', { confirmLabel: `${form}로 바꾸기`, tone: 'danger' })
       .then(ok => {
         if (ok) apply();
         else document.getElementById('formationSelect').value = cur.formation;
@@ -2195,7 +2225,7 @@ function resetLayout() {
       squads[target].positions = Object.fromEntries(roster.map(r => [r.id, defaults[r.id] || { x: 240, y: 330 }]));
       refreshUI();
     },
-    '현재 스쿼드 배치를 초기화하고 저장했습니다.');
+    '현재 스쿼드 배치를 초기화하고 저장했습니다.', { confirmLabel: '배치 초기화', tone: 'danger' });
 }
 
 function updateAddPlayerBtn() {
@@ -2205,6 +2235,8 @@ function updateAddPlayerBtn() {
   const atMax = roster.length >= max;
   btn.disabled = atMax;
   btn.title = atMax ? `${MODES_CONFIG[currentMode].label} 모드는 최대 ${max}명입니다` : '';
+  const hint = document.getElementById('addPlayerHint');
+  if (hint) { hint.textContent = atMax ? `${max}명 모두 배치됨` : ''; hint.hidden = !atMax; }
 }
 
 function addPlayer() {
@@ -2228,16 +2260,22 @@ function addPlayer() {
 
 // 네이티브 confirm 대체 — Promise<boolean>
 // 키보드: Escape 취소, Tab 포커스 트랩, 닫힌 뒤 트리거 요소로 포커스 복귀
-function uiConfirm(msg, okLabel) {
+let confirmSequence = 0;
+function uiConfirm(msg, options = {}) {
   return new Promise(resolve => {
+    const confirmLabel = options.confirmLabel || '계속하기';
+    const sequence = ++confirmSequence;
+    const titleId = `_confirmTitle_${sequence}`;
+    const descriptionId = `_confirmDescription_${sequence}`;
     const prevFocus = document.activeElement;
     const wrap = document.createElement('div');
     wrap.className = 'dlg-backdrop';
-    wrap.innerHTML = `<div class="dlg" role="alertdialog" aria-modal="true" aria-label="변경 확인">
-      <p>${escHtml(msg)}</p>
+    wrap.innerHTML = `<div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="${titleId}" aria-describedby="${descriptionId}">
+      <h2 class="dlg-title" id="${titleId}">${escHtml(confirmLabel)}</h2>
+      <p id="${descriptionId}">${escHtml(msg)}</p>
       <div class="dlg-actions">
         <button class="btn btn-slate" data-r="0">취소</button>
-        <button class="btn btn-green" data-r="1">${escHtml(okLabel || '확인')}</button>
+        <button class="btn ${options.tone === 'danger' ? 'btn-red' : 'btn-green'}" data-r="1">${escHtml(confirmLabel)}</button>
       </div></div>`;
     const done = result => {
       document.removeEventListener('keydown', onKey, true);
@@ -2266,7 +2304,7 @@ function uiConfirm(msg, okLabel) {
       else if (e.target === wrap) done(false);
     });
     document.body.appendChild(wrap);
-    wrap.querySelector('[data-r="1"]').focus();
+    wrap.querySelector('[data-r="0"]').focus();
   });
 }
 
@@ -2320,12 +2358,12 @@ async function restoreUndo() {
 }
 
 let _safetyPending = false;
-async function protectedChange(operation, message, apply, successMessage) {
+async function protectedChange(operation, message, apply, successMessage, confirmOptions) {
   if (viewerMode) return contractResult(operation, 'error', 'read-only');
   if (_safetyPending || _exportKind) return contractResult(operation, 'busy', 'busy');
   _safetyPending = true;
   try {
-    if (!await uiConfirm(message, '변경')) return contractResult(operation, 'cancelled');
+    if (!await uiConfirm(message, confirmOptions)) return contractResult(operation, 'cancelled');
     setLibraryBusy(true);
     const before = captureRuntime(), previousUndo = lastUndo;
     const wasBlocked = _storageReadBlocked;
@@ -2448,6 +2486,32 @@ function drawHtmlField() {
 // ═══════════════════════════════════════════════════════════════
 // PLAYER RENDERING
 // ═══════════════════════════════════════════════════════════════
+function playerNumberInk(color) {
+  const css = getComputedStyle(document.documentElement);
+  const darkInk = css.getPropertyValue('--chalk-ink').trim() || '#141a16';
+  const channels = hex => {
+    let value = String(hex).replace(/^#/, '');
+    if (value.length === 3 || value.length === 4) value = [...value].map(char => char + char).join('');
+    if (!/^[0-9a-f]{6}([0-9a-f]{2})?$/i.test(value)) return null;
+    return [0, 2, 4].map(index => parseInt(value.slice(index, index + 2), 16))
+      .concat(value.length === 8 ? parseInt(value.slice(6), 16) / 255 : 1);
+  };
+  const background = channels(color);
+  if (!background) return '#ffffff';
+  const pitch = channels(css.getPropertyValue('--pitch').trim()) || [43, 94, 63, 1];
+  const luminance = rgb => rgb.slice(0, 3).map(value => {
+    const channel = value / 255;
+    return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+  }).reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+  const backgroundLuminance = luminance(background.map((value, index) => index < 3
+    ? value * background[3] + pitch[index] * (1 - background[3]) : value));
+  const contrast = foreground => {
+    const value = luminance(foreground);
+    return (Math.max(value, backgroundLuminance) + 0.05) / (Math.min(value, backgroundLuminance) + 0.05);
+  };
+  return contrast(channels(darkInk) || [20, 26, 22, 1]) > contrast([255, 255, 255, 1]) ? darkInk : '#ffffff';
+}
+
 function renderPlayers() {
   const f = document.getElementById('field');
   f.querySelectorAll('.player').forEach(e => e.remove());
@@ -2458,12 +2522,12 @@ function renderPlayers() {
     el.tabIndex = viewerMode ? -1 : 0;
     el.setAttribute('role', viewerMode ? 'img' : 'button');
     el.setAttribute('aria-label', viewerMode
-      ? `${i + 1}번 ${p.name}`
-      : `${i + 1}번 ${p.name} 선수 편집`);
+      ? `${i + 1} ${p.name}`
+      : `${i + 1} ${p.name}, 선수 편집`);
     el.style.left = p.x + 'px';
     el.style.top  = p.y + 'px';
     el.innerHTML = `
-      <div class="player-circle" style="background:${p.color};">${i+1}</div>
+      <div class="player-circle" style="background:${p.color};color:${playerNumberInk(p.color)};">${i+1}</div>
       <div class="player-name">${escHtml(p.name)}</div>`;
     if (!viewerMode) {
       el.addEventListener('click', e => {
@@ -2489,7 +2553,9 @@ function selectPlayerForEdit(id) {
   const bar = document.getElementById('playerActions');
   if (!selectedPlayer || !bar) return;
   const num = roster.findIndex(r => r.id === id) + 1;
-  document.getElementById('playerActionsName').textContent = `${num}. ${selectedPlayer.name}`;
+  const name = document.getElementById('playerActionsName');
+  name.textContent = `${num}. ${selectedPlayer.name}`;
+  name.title = `${num}. ${selectedPlayer.name}`;
   bar.classList.add('visible');
   publishContractState();
 }
@@ -2509,7 +2575,8 @@ function renameSelectedPlayer() {
   if (el && player) startInlineEdit(el, player);
 }
 
-function openSelectedPlayerMenu() {
+function openSelectedPlayerMenu(event) {
+  event?.stopPropagation();
   if (!selectedPlayer) return;
   const bar = document.getElementById('playerActions');
   const rect = bar.getBoundingClientRect();
@@ -2554,10 +2621,20 @@ function startInlineEdit(playerEl, player) {
   const original = player.name;
   const input = document.createElement('input');
   input.type = 'text'; input.value = original; input.maxLength = 12;
+  input.setAttribute('aria-label', '선수 이름');
   input.style.cssText = `width:64px;font-size:0.65rem;font-weight:600;text-align:center;
     background:rgba(0,0,0,0.7);color:white;border:1px solid var(--accent);border-radius:4px;
     padding:1px 4px;outline:none;margin-top:3px;font-family:inherit;`;
   nameEl.replaceWith(input);
+  const counter = document.createElement('span');
+  counter.className = 'player-name-count';
+  counter.id = `playerNameCount_${player.id}`;
+  counter.setAttribute('aria-live', 'polite');
+  input.setAttribute('aria-describedby', counter.id);
+  const updateCount = () => { counter.textContent = `${input.value.length}/12`; };
+  updateCount();
+  input.after(counter);
+  input.addEventListener('input', updateCount);
   input.select(); input.focus();
   const commit = () => {
     const newName = input.value.trim().slice(0,12) || original;
@@ -2657,24 +2734,33 @@ document.addEventListener('touchcancel', cancelPlayerTouch);
 document.addEventListener('touchend', e => {
   if (dragState?.touchId != null && !Array.from(e.changedTouches).some(touch => touch.identifier === dragState.touchId)) return;
   clearTimeout(lpTimer);
-  if (dragState) { dragState.el.classList.remove('dragging'); dragState = null; autoSave(); }
+  if (dragState) {
+    const completed = dragState;
+    completed.el.classList.remove('dragging');
+    dragState = null;
+    const position = squads[currentSquad].positions[completed.id];
+    if (completed.touchId != null && position && (position.x !== completed.px || position.y !== completed.py)) selectPlayerForEdit(completed.id);
+    autoSave();
+  }
 });
 
 // ═══════════════════════════════════════════════════════════════
 // CONTEXT MENU
 // ═══════════════════════════════════════════════════════════════
 function showCtxMenu(x, y, player) {
-  selectedPlayer = player;
+  selectPlayerForEdit(player.id);
+  const num = roster.findIndex(r => r.id === player.id) + 1;
+  document.getElementById('ctxPlayerLabel').textContent = `${num}. ${player.name}`;
   document.getElementById('colorPalette').innerHTML = COLORS.map(c =>
     `<button type="button" class="swatch${c===player.color?' active':''}"
-         aria-label="선수 색상 ${c}"
+         aria-label="선수 색상 ${COLOR_NAMES[c.toLowerCase()]}"
          style="background:${c};${c==='#ffffff'?'border-color:var(--faint);':''}"
          onclick="ctxColor('${c}')"></button>`
   ).join('');
   const m = document.getElementById('ctxMenu');
-  m.style.left = Math.min(x, innerWidth-180)+'px';
-  m.style.top  = Math.min(y, innerHeight-180)+'px';
   m.classList.add('visible');
+  m.style.left = Math.max(8, Math.min(x, innerWidth - m.offsetWidth - 8)) + 'px';
+  m.style.top = Math.max(8, Math.min(y, innerHeight - m.offsetHeight - 8)) + 'px';
 }
 function hideCtxMenu() { document.getElementById('ctxMenu').classList.remove('visible'); }
 document.addEventListener('click', e => { if (!e.target.closest('#ctxMenu')) hideCtxMenu(); });
@@ -2783,7 +2869,16 @@ function updatePatternUI() {
   document.getElementById('patternName').value = pat.name;
   document.getElementById('patternNameView').textContent = pat.name;
   document.getElementById('patternCounter').textContent = `${currentPatternIdx+1} / ${patterns.length}`;
-  document.getElementById('stepCounter').textContent = `단계 ${currentStepIdx+1} / ${pat.steps.length}`;
+  updatePlaybackStep();
+}
+
+function updatePlaybackStep() {
+  const total = currentPattern().steps.length;
+  const label = isPlaying
+    ? `재생 중 ${animStep + 1}/${total}` : `단계 ${currentStepIdx + 1} / ${total}`;
+  const counter = document.getElementById('stepCounter');
+  if (counter.textContent !== label) counter.textContent = label;
+  document.querySelectorAll('.step-nav button').forEach(button => { if (button.disabled !== isPlaying) button.disabled = isPlaying; });
 }
 
 function addPattern() {
@@ -3283,6 +3378,7 @@ function startAnimation() {
   animStart = null;
   animStep = 0;
   document.getElementById('playBtn').textContent = '일시정지';
+  updatePlaybackStep();
   animRaf = requestAnimationFrame(animTick);
 }
 
@@ -3290,6 +3386,7 @@ function stopAnimation() {
   if (animRaf) { cancelAnimationFrame(animRaf); animRaf = null; }
   isPlaying = false;
   document.getElementById('playBtn').textContent = '미리보기';
+  updatePlaybackStep();
   if (appMode === 'pattern') renderPatternFrame(0);
 }
 
@@ -3299,6 +3396,7 @@ function animTick(ts) {
   const pat = currentPattern();
   const t = (ts - animStart) / STEP_MS;
   const label = pat.steps.length > 1 ? `단계 ${animStep+1}/${pat.steps.length}` : null;
+  updatePlaybackStep();
   renderStepFrame(pCtx, pat, animStep, Math.min(t, 1), label);
   if (t < 1) {
     animRaf = requestAnimationFrame(animTick);
@@ -3373,7 +3471,7 @@ async function exportGif(allPatterns, destination = 'save') {
     let doneFrames = 0;
 
     function stepLabel(pat, si) {
-      if (allPatterns) return `${pat.name} — ${si+1}/${pat.steps.length}`;
+      if (allPatterns) return `${pat.name}, ${si+1}/${pat.steps.length}`;
       return pat.steps.length > 1 ? `단계 ${si+1}/${pat.steps.length}` : null;
     }
 
@@ -3425,7 +3523,9 @@ async function exportGif(allPatterns, destination = 'save') {
 
 function setProgress(ratio, text) {
   document.getElementById('gifProgressText').textContent = text;
-  document.getElementById('gifProgressFill').style.width = Math.round(ratio * 100) + '%';
+  const percent = Math.round(Math.max(0, Math.min(1, ratio)) * 100);
+  document.getElementById('gifProgressFill').style.transform = `scaleX(${percent / 100})`;
+  document.getElementById('gifProgressBar').setAttribute('aria-valuenow', String(percent));
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -3636,9 +3736,9 @@ function buildPlainText(opponent, dateStr, formation, modeLabel, style, teamLine
   const sep = '─'.repeat(40);
   let t = `⚽ 전술 지침서\n${sep}\n`;
   t += `상대: ${opponent}  |  일시: ${dateStr}\n포메이션: ${modeLabel} ${formation} (${style})\n${sep}\n`;
-  t += `▶ 팀 전체 전달사항\n`;
+  t += `팀 전체 전달사항\n`;
   teamLines.forEach(l => t += `  • ${l}\n`);
-  t += `\n▶ 개별 선수 지침\n`;
+  t += `\n개별 선수 지침\n`;
   playerSections.forEach(s => {
     t += `\n[${s.num}] ${s.player.name} (${s.role})\n`;
     s.lines.forEach(l => t += `  • ${l}\n`);
@@ -3650,7 +3750,7 @@ function copyManual() {
   if (!lastManualText) return;
   navigator.clipboard.writeText(lastManualText)
     .then(() => showToast('클립보드에 복사되었습니다.'))
-    .catch(() => showToast('복사 실패 — 브라우저 권한을 확인하세요'));
+    .catch(() => showToast('복사하지 못했습니다. 브라우저 권한을 확인하세요.'));
 }
 
 function saveManualTxt() {
@@ -3788,6 +3888,7 @@ document.getElementById('shareModal').addEventListener('click', e => {
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  if (document.getElementById('feedbackModal').classList.contains('visible')) { closeFeedback(); return; }
   if (document.getElementById('helpModal').classList.contains('visible')) { closeHelp(); return; }
   if (document.getElementById('interestModal').classList.contains('visible')) { closeInterestPreview(); return; }
   if (document.getElementById('shareModal').classList.contains('visible')) { closeShare(); return; }
@@ -3797,8 +3898,8 @@ document.addEventListener('keydown', e => {
 
 function copyShareText() {
   navigator.clipboard.writeText(lastShareText)
-    .then(() => showToast('복사됨 — 단톡방에 붙여넣기 하세요'))
-    .catch(() => showToast('복사 실패 — 브라우저 권한을 확인하세요'));
+    .then(() => showToast('복사했습니다. 단톡방에 붙여 넣으세요.'))
+    .catch(() => showToast('복사하지 못했습니다. 브라우저 권한을 확인하세요.'));
 }
 function saveShareTxt() {
   const teamName = document.getElementById('teamName').value.trim() || '전술공유';
@@ -3855,12 +3956,12 @@ function copyShareUrl() {
   track('share_link_created', { kind: 'public_url' });
   trackOutput();
   navigator.clipboard.writeText(url)
-    .then(() => showToast('링크 복사됨 — 공유받은 사람은 열람 화면을 보게 됩니다'))
+    .then(() => showToast('링크를 복사했습니다. 받는 사람은 열람 화면을 보게 됩니다.'))
     .catch(() => {
       const box = document.getElementById('shareUrlBox');
       box.focus();
       document.execCommand('selectAll');
-      showToast('자동 복사 실패 — 링크를 직접 선택해 복사해주세요');
+      showToast('자동 복사하지 못했습니다. 링크를 직접 선택해 복사해 주세요.');
     });
 }
 
@@ -3915,7 +4016,7 @@ function openInterestPreview(key, source) {
   });
   document.getElementById('interestPrice').textContent = f.price;
   document.getElementById('interestMail').href =
-    'mailto:jaywapp16@gmail.com?subject=' + encodeURIComponent(`[스쿼드 메이커] 코치 인터뷰 참여 — ${f.title}`);
+    'mailto:jaywapp16@gmail.com?subject=' + encodeURIComponent(`[스쿼드 메이커] 코치 인터뷰 참여, ${f.title}`);
   const modal = document.getElementById('interestModal');
   modal.classList.add('visible');
   activateModal(modal, '.interest-actions button');
@@ -3937,7 +4038,7 @@ document.getElementById('interestModal').addEventListener('click', e => {
 function openHelp() {
   const modal = document.getElementById('helpModal');
   modal.classList.add('visible');
-  activateModal(modal, '.help-box .help-actions:last-child button');
+  activateModal(modal, '#helpTitle');
 }
 
 function closeHelp() {
@@ -3983,6 +4084,18 @@ function copyDiagnostics() {
 let feedbackStartedAt = 0;
 let feedbackCaptchaToken = '';
 let feedbackWidgetId = null;
+let feedbackReady = false;
+let feedbackPreparing = false;
+let feedbackSending = false;
+let feedbackScriptPromise = null;
+
+function setFeedbackAvailability(ready, retry = false) {
+  feedbackReady = ready;
+  const submit = document.getElementById('feedbackSubmit');
+  submit.disabled = !ready || feedbackSending;
+  submit.setAttribute('aria-disabled', String(submit.disabled));
+  document.getElementById('feedbackRetryBtn').hidden = !retry;
+}
 
 function setFeedbackStatus(message, kind) {
   const status = document.getElementById('feedbackStatus');
@@ -3991,44 +4104,51 @@ function setFeedbackStatus(message, kind) {
 }
 
 async function prepareFeedbackCaptcha() {
+  if (feedbackPreparing) return;
+  feedbackPreparing = true;
+  feedbackCaptchaToken = '';
+  setFeedbackAvailability(false);
+  setFeedbackStatus('');
   const container = document.getElementById('feedbackCaptcha');
   container.textContent = '스팸 방지 확인을 불러오는 중입니다.';
   try {
+    if (feedbackWidgetId !== null && typeof window.turnstile?.remove === 'function') window.turnstile.remove(feedbackWidgetId);
+    feedbackWidgetId = null;
     const response = await fetch(FEEDBACK_ENDPOINT, { headers: { Accept: 'application/json' } });
     const config = await response.json();
     if (!response.ok || !config.turnstileSiteKey) throw new Error('captcha_unavailable');
 
     if (!window.turnstile) {
-      await new Promise((resolve, reject) => {
-        const existing = document.querySelector('script[data-feedback-turnstile]');
-        if (existing) {
-          existing.addEventListener('load', resolve, { once:true });
-          existing.addEventListener('error', reject, { once:true });
-          return;
-        }
+      if (!feedbackScriptPromise) feedbackScriptPromise = new Promise((resolve, reject) => {
+        document.querySelector('script[data-feedback-turnstile]')?.remove();
         const script = document.createElement('script');
         script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
         script.async = true;
         script.defer = true;
         script.dataset.feedbackTurnstile = 'true';
         script.addEventListener('load', resolve, { once:true });
-        script.addEventListener('error', reject, { once:true });
+        script.addEventListener('error', () => { script.remove(); reject(new Error('captcha_unavailable')); }, { once:true });
         document.head.appendChild(script);
       });
+      try { await feedbackScriptPromise; }
+      finally { feedbackScriptPromise = null; }
+      if (!window.turnstile) throw new Error('captcha_unavailable');
     }
 
     container.textContent = '';
+    setFeedbackAvailability(true);
     feedbackWidgetId = window.turnstile.render(container, {
       sitekey: config.turnstileSiteKey,
       theme: 'dark',
-      callback: token => { feedbackCaptchaToken = token; setFeedbackStatus(''); },
-      'expired-callback': () => { feedbackCaptchaToken = ''; setFeedbackStatus('스팸 방지 확인이 만료되었습니다. 다시 확인해 주세요.', 'error'); },
-      'error-callback': () => { feedbackCaptchaToken = ''; setFeedbackStatus('스팸 방지 확인을 완료하지 못했습니다.', 'error'); },
+      callback: token => { feedbackCaptchaToken = token; setFeedbackAvailability(true); setFeedbackStatus(''); },
+      'expired-callback': () => { feedbackCaptchaToken = ''; setFeedbackAvailability(false, true); setFeedbackStatus('스팸 방지 확인이 만료되었습니다. 다시 확인해 주세요.', 'error'); },
+      'error-callback': () => { feedbackCaptchaToken = ''; setFeedbackAvailability(false, true); setFeedbackStatus('스팸 방지 확인을 완료하지 못했습니다.', 'error'); },
     });
   } catch {
     container.textContent = '';
+    setFeedbackAvailability(false, true);
     setFeedbackStatus('제보 창구를 준비하지 못했습니다. 잠시 후 다시 시도해 주세요.', 'error');
-  }
+  } finally { feedbackPreparing = false; }
 }
 
 function openFeedback() {
@@ -4052,8 +4172,8 @@ function closeFeedback() {
 
 async function submitFeedback(event) {
   event.preventDefault();
+  if (!feedbackReady || feedbackSending) return;
   const form = event.currentTarget;
-  const submit = document.getElementById('feedbackSubmit');
   const title = document.getElementById('feedbackSubject').value.trim();
   const description = document.getElementById('feedbackDescription').value.trim();
   if (!title || !description) {
@@ -4065,7 +4185,8 @@ async function submitFeedback(event) {
     return;
   }
 
-  submit.disabled = true;
+  feedbackSending = true;
+  setFeedbackAvailability(feedbackReady);
   setFeedbackStatus('제보를 보내는 중입니다.');
   try {
     const includeDiagnostics = document.getElementById('feedbackDiagnostics').checked;
@@ -4094,7 +4215,8 @@ async function submitFeedback(event) {
   } catch (error) {
     setFeedbackStatus(error.message || '제보를 보내지 못했습니다. 입력 내용은 유지되니 다시 시도해 주세요.', 'error');
   } finally {
-    submit.disabled = false;
+    feedbackSending = false;
+    setFeedbackAvailability(feedbackReady, !feedbackReady);
   }
 }
 
@@ -4164,9 +4286,25 @@ async function saveSquadFile(destination = 'save') {
   finally { setExportBusy(null); }
 }
 
+function setRestoreStatus(text = '', tone = 'neutral') {
+  const status = document.getElementById('exportStatus');
+  status.textContent = text;
+  status.dataset.tone = tone;
+}
+
+function chooseSquadFile() {
+  setRestoreStatus();
+  document.getElementById('sqFileInput').click();
+}
+
+function showRestoreCancelled() {
+  setRestoreStatus('복원을 취소했습니다. 기존 전술은 유지됩니다.');
+}
+
 function loadSquadFile(event) {
   const file = event.target.files[0];
-  if (!file) return;
+  if (!file) { showRestoreCancelled(); return; }
+  setRestoreStatus();
   const reader = new FileReader();
   reader.onload = async e => {
     try {
@@ -4188,6 +4326,7 @@ function loadSquadFile(event) {
 }
 
 function importSnapshot(input) {
+  setRestoreStatus();
   let state;
   try { state = normalizeSnapshot(input); }
   catch (error) {
@@ -4198,7 +4337,7 @@ function importSnapshot(input) {
   }
   return protectedChange('import-snapshot',
     '파일을 가져오면 현재 이름·세 스쿼드 배치·지침·전술 패턴을 교체합니다.\n즉시 저장하며, 현재 세션에서 최근 변경 한 번을 되돌릴 수 있습니다. 계속할까요?',
-    () => { clearSelectedPlayer(); applyState(state); }, '파일을 복원하고 저장했습니다.');
+    () => { clearSelectedPlayer(); applyState(state); }, '파일을 복원하고 저장했습니다.', { confirmLabel: '백업으로 바꾸기', tone: 'danger' });
 }
 
 function normalizeSnapshot(input) {
@@ -4626,7 +4765,7 @@ async function runLibraryCommand(operation, payload) {
   setLibraryBusy(true);
   try {
     if (['delete-file', 'delete-team'].includes(operation) &&
-        !await uiConfirm('보관된 전술을 삭제할까요? 삭제하면 저장 공간을 다시 사용할 수 있습니다.\n이 세션에서 최근 삭제 한 번을 되돌릴 수 있습니다.', '삭제')) {
+        !await uiConfirm('보관된 전술을 삭제할까요? 삭제하면 저장 공간을 다시 사용할 수 있습니다.\n이 세션에서 최근 삭제 한 번을 되돌릴 수 있습니다.', { confirmLabel: operation === 'delete-team' ? '팀 삭제' : '전술 삭제', tone: 'danger' })) {
       return contractResult(operation, 'cancelled');
     }
     if (_storageReadBlocked) return contractResult(operation, 'error', 'storage-read-blocked');
@@ -4881,6 +5020,7 @@ _readyPromise = (async () => {
     const native = Boolean(s.platform?.native);
     const platformChanged = body.classList.contains('platform-native') !== native;
     body.classList.toggle('platform-native', native);
+    document.documentElement.classList.toggle('platform-native', native);
     if (platformChanged) { applyFieldScale(); syncFieldScale(); }
     body.classList.toggle('has-selection', !readOnly && appMode === 'squad' && $('playerActions').classList.contains('visible'));
 
@@ -4974,7 +5114,7 @@ _readyPromise = (async () => {
   function setExportStatus(text, tone) {
     const el = $('exportStatus');
     el.textContent = text;
-    el.dataset.tone = tone || '';
+    el.dataset.tone = tone === 'ok' ? 'success' : tone || 'neutral';
   }
   exportPanel.querySelectorAll('[data-ui-export]').forEach(button => {
     button.addEventListener('click', () => {
@@ -5216,14 +5356,22 @@ _readyPromise = (async () => {
     if (!button) return;
     const action = button.dataset.uiAction;
     if (action === 'backup') contract.run('export-sq');
-    else if (action === 'restore') $('sqFileInput').click();
+    else if (action === 'restore') chooseSquadFile();
     else if (action === 'new-file') openLibrary({ create: true });
   });
 
   // ── 결과 표시 ─────────────────────────────────────────────────
   document.addEventListener('squad-maker:result', event => {
     const result = event.detail || {};
-    if (OP_KIND[result.operation] && result.status !== 'busy') {
+    if (result.operation === 'import-snapshot') {
+      if (result.status === 'success') setExportStatus('백업을 복원하고 저장했습니다.', 'success');
+      else if (result.status === 'cancelled') setExportStatus('복원을 취소했습니다. 기존 전술은 유지됩니다.', 'neutral');
+      else setExportStatus(result.code === 'invalid-input'
+        ? '파일 데이터가 올바르지 않습니다. 기존 전술은 유지됩니다.'
+        : result.code === 'unsupported-version' ? '지원하지 않는 .sq 버전입니다. 기존 전술은 유지됩니다.'
+        : result.code === 'file-read-failed' ? '파일을 읽지 못했습니다. 기존 전술은 유지됩니다. 다시 선택해 주세요.'
+        : codeText(result.code), 'error');
+    } else if (OP_KIND[result.operation] && result.status !== 'busy') {
       const [text, tone] = exportMessage(result);
       setExportStatus(text, tone);
     } else if (OP_KIND[result.operation] && result.status === 'busy') {
