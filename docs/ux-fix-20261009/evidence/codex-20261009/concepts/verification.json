@@ -1,0 +1,533 @@
+{
+  "date": "2026-10-09",
+  "results": [
+    {
+      "concept": "01",
+      "label": "1280",
+      "viewport": [
+        1280,
+        800
+      ],
+      "overflow": 0,
+      "pitch": {
+        "x": 243.453125,
+        "y": 199,
+        "width": 429.09375,
+        "height": 590,
+        "right": 672.546875,
+        "bottom": 789
+      },
+      "tools": {
+        "x": 872,
+        "y": 356,
+        "width": 298,
+        "height": 360,
+        "right": 1170,
+        "bottom": 716
+      },
+      "settings": {
+        "x": 851,
+        "y": 97,
+        "width": 340,
+        "height": 724.59375,
+        "right": 1191,
+        "bottom": 821.59375
+      },
+      "smallTargets": [],
+      "selectedName": "미드3",
+      "modalChecks": {
+        "named": true,
+        "focusInside": true,
+        "escapeClosed": true,
+        "focusReturned": true
+      },
+      "errors": [
+        "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      ]
+    },
+    {
+      "concept": "01",
+      "label": "1920",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "overflow": 0,
+      "pitch": {
+        "x": 645,
+        "y": 199,
+        "width": 510,
+        "height": 701.25,
+        "right": 1155,
+        "bottom": 900.25
+      },
+      "tools": {
+        "x": 1467,
+        "y": 356,
+        "width": 298,
+        "height": 360,
+        "right": 1765,
+        "bottom": 716
+      },
+      "settings": {
+        "x": 1446,
+        "y": 97,
+        "width": 340,
+        "height": 724.59375,
+        "right": 1786,
+        "bottom": 821.59375
+      },
+      "smallTargets": [],
+      "selectedName": "미드3",
+      "modalChecks": {
+        "named": true,
+        "focusInside": true,
+        "escapeClosed": true,
+        "focusReturned": true
+      },
+      "errors": [
+        "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      ]
+    },
+    {
+      "concept": "01",
+      "label": "390",
+      "viewport": [
+        390,
+        844
+      ],
+      "overflow": 0,
+      "pitch": {
+        "x": 12,
+        "y": 175,
+        "width": 366,
+        "height": 503.25,
+        "right": 378,
+        "bottom": 678.25
+      },
+      "tools": {
+        "x": 29,
+        "y": 709.25,
+        "width": 332,
+        "height": 341,
+        "right": 361,
+        "bottom": 1050.25
+      },
+      "settings": {
+        "x": 12,
+        "y": 692.25,
+        "width": 366,
+        "height": 661.59375,
+        "right": 378,
+        "bottom": 1353.84375
+      },
+      "smallTargets": [],
+      "selectedName": "미드3",
+      "modalChecks": {
+        "named": true,
+        "focusInside": true,
+        "escapeClosed": true,
+        "focusReturned": true
+      },
+      "errors": [
+        "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      ]
+    },
+    {
+      "concept": "01",
+      "label": "844x390",
+      "viewport": [
+        844,
+        390
+      ],
+      "overflow": 0,
+      "pitch": {
+        "x": 96.5,
+        "y": 121,
+        "width": 363,
+        "height": 264,
+        "right": 459.5,
+        "bottom": 385
+      },
+      "tools": {
+        "x": 569,
+        "y": 84,
+        "width": 250,
+        "height": 305,
+        "right": 819,
+        "bottom": 389
+      },
+      "settings": {
+        "x": 556,
+        "y": 71,
+        "width": 276,
+        "height": 310,
+        "right": 832,
+        "bottom": 381
+      },
+      "smallTargets": [],
+      "selectedName": "미드3",
+      "modalChecks": {
+        "named": true,
+        "focusInside": true,
+        "escapeClosed": true,
+        "focusReturned": true
+      },
+      "errors": [
+        "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      ]
+    },
+    {
+      "concept": "02",
+      "label": "1280",
+      "viewport": [
+        1280,
+        800
+      ],
+      "overflow": 0,
+      "pitch": {
+        "x": 242.53125,
+        "y": 175,
+        "width": 450.921875,
+        "height": 620.015625,
+        "right": 693.453125,
+        "bottom": 795.015625
+      },
+      "tools": {
+        "x": 957,
+        "y": 163,
+        "width": 278,
+        "height": 332,
+        "right": 1235,
+        "bottom": 495
+      },
+      "settings": {
+        "x": 936,
+        "y": 97,
+        "width": 320,
+        "height": 1172.59375,
+        "right": 1256,
+        "bottom": 1269.59375
+      },
+      "smallTargets": [],
+      "selectedName": "미드3",
+      "modalChecks": {
+        "named": true,
+        "focusInside": true,
+        "escapeClosed": true,
+        "focusReturned": true
+      },
+      "errors": [
+        "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      ]
+    },
+    {
+      "concept": "02",
+      "label": "1920",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "overflow": 0,
+      "pitch": {
+        "x": 463,
+        "y": 175,
+        "width": 650,
+        "height": 893.75,
+        "right": 1113,
+        "bottom": 1068.75
+      },
+      "tools": {
+        "x": 1387,
+        "y": 163,
+        "width": 278,
+        "height": 332,
+        "right": 1665,
+        "bottom": 495
+      },
+      "settings": {
+        "x": 1366,
+        "y": 97,
+        "width": 320,
+        "height": 1172.59375,
+        "right": 1686,
+        "bottom": 1269.59375
+      },
+      "smallTargets": [],
+      "selectedName": "미드3",
+      "modalChecks": {
+        "named": true,
+        "focusInside": true,
+        "escapeClosed": true,
+        "focusReturned": true
+      },
+      "errors": [
+        "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      ]
+    },
+    {
+      "concept": "02",
+      "label": "390",
+      "viewport": [
+        390,
+        844
+      ],
+      "overflow": 0,
+      "pitch": {
+        "x": 72,
+        "y": 187,
+        "width": 294,
+        "height": 404.25,
+        "right": 366,
+        "bottom": 591.25
+      },
+      "tools": {
+        "x": 29,
+        "y": 739.25,
+        "width": 332,
+        "height": 306,
+        "right": 361,
+        "bottom": 1045.25
+      },
+      "settings": {
+        "x": 12,
+        "y": 656.25,
+        "width": 366,
+        "height": 490.59375,
+        "right": 378,
+        "bottom": 1146.84375
+      },
+      "smallTargets": [],
+      "selectedName": "미드3",
+      "modalChecks": {
+        "named": true,
+        "focusInside": true,
+        "escapeClosed": true,
+        "focusReturned": true
+      },
+      "errors": [
+        "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      ]
+    },
+    {
+      "concept": "02",
+      "label": "844x390",
+      "viewport": [
+        844,
+        390
+      ],
+      "overflow": 0,
+      "pitch": {
+        "x": 110.125,
+        "y": 121,
+        "width": 365.75,
+        "height": 266,
+        "right": 475.875,
+        "bottom": 387
+      },
+      "tools": {
+        "x": 597,
+        "y": 138,
+        "width": 222,
+        "height": 211,
+        "right": 819,
+        "bottom": 349
+      },
+      "settings": {
+        "x": 584,
+        "y": 71,
+        "width": 248,
+        "height": 291,
+        "right": 832,
+        "bottom": 362
+      },
+      "smallTargets": [],
+      "selectedName": "미드3",
+      "modalChecks": {
+        "named": true,
+        "focusInside": true,
+        "escapeClosed": true,
+        "focusReturned": true
+      },
+      "errors": [
+        "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      ]
+    },
+    {
+      "concept": "03",
+      "label": "1280",
+      "viewport": [
+        1280,
+        800
+      ],
+      "overflow": 0,
+      "pitch": {
+        "x": 226.453125,
+        "y": 278,
+        "width": 429.09375,
+        "height": 590,
+        "right": 655.546875,
+        "bottom": 868
+      },
+      "tools": {
+        "x": 886,
+        "y": 404,
+        "width": 370,
+        "height": 383,
+        "right": 1256,
+        "bottom": 787
+      },
+      "settings": {
+        "x": 886,
+        "y": 805,
+        "width": 370,
+        "height": 162,
+        "right": 1256,
+        "bottom": 967
+      },
+      "smallTargets": [],
+      "selectedName": "미드3",
+      "modalChecks": {
+        "named": true,
+        "focusInside": true,
+        "escapeClosed": true,
+        "focusReturned": true
+      },
+      "errors": [
+        "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      ]
+    },
+    {
+      "concept": "03",
+      "label": "1920",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "overflow": 0,
+      "pitch": {
+        "x": 506,
+        "y": 278,
+        "width": 510,
+        "height": 701.25,
+        "right": 1016,
+        "bottom": 979.25
+      },
+      "tools": {
+        "x": 1206,
+        "y": 404,
+        "width": 370,
+        "height": 383,
+        "right": 1576,
+        "bottom": 787
+      },
+      "settings": {
+        "x": 1206,
+        "y": 805,
+        "width": 370,
+        "height": 162,
+        "right": 1576,
+        "bottom": 967
+      },
+      "smallTargets": [],
+      "selectedName": "미드3",
+      "modalChecks": {
+        "named": true,
+        "focusInside": true,
+        "escapeClosed": true,
+        "focusReturned": true
+      },
+      "errors": [
+        "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      ]
+    },
+    {
+      "concept": "03",
+      "label": "390",
+      "viewport": [
+        390,
+        844
+      ],
+      "overflow": 0,
+      "pitch": {
+        "x": 25,
+        "y": 272,
+        "width": 340,
+        "height": 467.5,
+        "right": 365,
+        "bottom": 739.5
+      },
+      "tools": {
+        "x": 12,
+        "y": 837.5,
+        "width": 366,
+        "height": 375,
+        "right": 378,
+        "bottom": 1212.5
+      },
+      "settings": {
+        "x": 12,
+        "y": 1226.5,
+        "width": 366,
+        "height": 82,
+        "right": 378,
+        "bottom": 1308.5
+      },
+      "smallTargets": [],
+      "selectedName": "미드3",
+      "modalChecks": {
+        "named": true,
+        "focusInside": true,
+        "escapeClosed": true,
+        "focusReturned": true
+      },
+      "errors": [
+        "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      ]
+    },
+    {
+      "concept": "03",
+      "label": "844x390",
+      "viewport": [
+        844,
+        390
+      ],
+      "overflow": 0,
+      "pitch": {
+        "x": 140.3125,
+        "y": 186,
+        "width": 287.375,
+        "height": 209,
+        "right": 427.6875,
+        "bottom": 395
+      },
+      "tools": {
+        "x": 568,
+        "y": 71,
+        "width": 264,
+        "height": 274,
+        "right": 832,
+        "bottom": 345
+      },
+      "settings": {
+        "x": 568,
+        "y": 353,
+        "width": 264,
+        "height": 66,
+        "right": 832,
+        "bottom": 419
+      },
+      "smallTargets": [],
+      "selectedName": "미드3",
+      "modalChecks": {
+        "named": true,
+        "focusInside": true,
+        "escapeClosed": true,
+        "focusReturned": true
+      },
+      "errors": [
+        "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      ]
+    }
+  ]
+}
