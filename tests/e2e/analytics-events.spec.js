@@ -54,7 +54,7 @@ test.describe('분석 이벤트 계약', () => {
     const events = collectAnalytics(page);
     await page.goto('/index.html');
     await page.click('button:has-text("단톡방 공유 텍스트 생성")');
-    await page.click('.share-actions button:has-text("✕ 닫기")');
+    await page.click('#shareCloseBtn');
     await page.click('button:has-text("단톡방 공유 텍스트 생성")');
     await expect
       .poll(() => events.filter(e => e.name === 'share_link_created').length, { timeout: 5_000 })

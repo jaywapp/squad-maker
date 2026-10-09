@@ -81,10 +81,11 @@ test.describe('Guest 무료 회귀 계약', () => {
     await seedLocalStorage(page, fixture);
     await page.goto('/index.html');
     await page.click('.app-tab[data-app="pattern"]');
-    await page.click('#patternUI button:has-text("+ 추가")');
+    await page.click('#patternMoreBtn');
+    await page.click('#patternMoreMenu button:has-text("+ 추가 패턴")');
     await expect(page.locator('#patternCounter')).toHaveText('2 / 2');
     const downloadPromise = page.waitForEvent('download', { timeout: 90_000 });
-    await page.click('#gifBtn');
+    await page.click('#exportPanel button[data-ui-export="export-gif"]:not([data-ui-all]):not([data-ui-destination])');
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toMatch(/\.gif$/);
     // 진행 오버레이가 닫혀야 한다
@@ -97,7 +98,7 @@ test.describe('Guest 무료 회귀 계약', () => {
     await page.goto('/index.html');
     await page.click('.app-tab[data-app="pattern"]');
     const downloadPromise = page.waitForEvent('download', { timeout: 120_000 });
-    await page.click('#gifAllBtn');
+    await page.click('#exportPanel button[data-ui-export="export-gif"][data-ui-all="true"]');
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toBe('전체패턴.gif');
   });

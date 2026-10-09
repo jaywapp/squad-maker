@@ -1,10 +1,11 @@
 const { test, expect } = require('@playwright/test');
 
-test('Android bundled page exports real PNG and GIF with external web requests blocked', async ({ page }) => {
+test('Android bundled page exports real PNG and GIF with external web requests blocked', async ({ page, baseURL }) => {
   const requests = [];
+  const localOrigin = new URL(baseURL).origin;
   await page.route('**/*', route => {
     const url = route.request().url();
-    if (url.startsWith('http://127.0.0.1:4317/')) return route.continue();
+    if (new URL(url).origin === localOrigin) return route.continue();
     requests.push(url);
     return route.abort('blockedbyclient');
   });
