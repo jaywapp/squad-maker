@@ -38,7 +38,7 @@ async function boot(page, options = {}) {
     };
     window.SquadPlatform = {
       native: Boolean(native),
-      publicShareBase: 'https://squad-maker.vercel.app/',
+      publicShareBase: 'https://jaywapp.github.io/squad-maker/',
       showTestAd: async () => ({ status: 'unsupported' }),
       storage: {
         async getItem(key) {
@@ -390,7 +390,8 @@ for (const outcome of ['cancelled', 'error']) {
     const shared = await run(page, 'share-url');
     expectSuccess(shared, 'share-url');
     expect(shared.completion).toBe('url-created');
-    expect(new URL(shared.url).origin).toBe('https://squad-maker.vercel.app');
+    expect(new URL(shared.url).origin).toBe('https://jaywapp.github.io');
+    expect(new URL(shared.url).pathname).toBe('/squad-maker/');
     expect(JSON.parse(Buffer.from(shared.url.split('#s=')[1], 'base64url').toString())).toEqual(before.snapshot);
   });
 }

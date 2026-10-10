@@ -4,5 +4,6 @@
   "webDir": ".work/android-web",
   "loggingBehavior": "none",
   "server": { "androidScheme": "https", "hostname": "localhost" },
-  "android": { "allowMixedContent": false, "webContentsDebuggingEnabled": false }
+  "android": { "allowMixedContent": false, "webContentsDebuggingEnabled": false },
+  "backgroundColor": "#141a16"
 }

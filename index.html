@@ -9,16 +9,16 @@
 <meta property="og:type"        content="website">
 <meta property="og:title"       content="스쿼드 메이커, 축구 포메이션 & 전술 공유">
 <meta property="og:description" content="축구 스쿼드를 직접 만들고 팀원과 공유하세요. 포메이션 설정, 선수 배치, 전술 지침을 손쉽게 작성하고 링크로 공유할 수 있습니다.">
-  <meta property="og:url"         content="https://squad-maker.vercel.app/">
-  <meta property="og:image"       content="https://squad-maker.vercel.app/og-image.png">
+  <meta property="og:url"         content="https://jaywapp.github.io/squad-maker/">
+  <meta property="og:image"       content="https://jaywapp.github.io/squad-maker/og-image.png">
 <meta property="og:locale"      content="ko_KR">
 <!-- Twitter Card -->
 <meta name="twitter:card"        content="summary_large_image">
 <meta name="twitter:title"       content="스쿼드 메이커, 축구 포메이션 & 전술 공유">
 <meta name="twitter:description" content="포메이션 설정, 선수 배치, 전술 지침을 만들고 링크로 공유하세요.">
-  <meta name="twitter:image"       content="https://squad-maker.vercel.app/og-image.png">
-<!-- Favicon (SVG 인라인) -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%232b5e3f'/><text y='24' x='4' font-size='22'>⚽</text></svg>">
+  <meta name="twitter:image"       content="https://jaywapp.github.io/squad-maker/og-image.png">
+<!-- Run Line favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%20width%3D%2232%22%20height%3D%2232%22%3E%20%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%232b5e3f%22%2F%3E%20%3Csvg%20x%3D%223%22%20y%3D%223%22%20width%3D%2226%22%20height%3D%2226%22%20viewBox%3D%2214%2014%2072%2072%22%3E%20%3Ccircle%20cx%3D%2231%22%20cy%3D%2272%22%20r%3D%2212%22%20fill%3D%22%23b8e986%22%2F%3E%20%3Cpath%20d%3D%22M48%2062C78%2058%2038%2036%2076%2025%22%20fill%3D%22none%22%20stroke%3D%22%23e8ede8%22%20stroke-width%3D%229%22%20stroke-linecap%3D%22round%22%2F%3E%20%3Cpath%20d%3D%22M63.9%2020.2L76%2025L68.4%2035.5%22%20fill%3D%22none%22%20stroke%3D%22%23e8ede8%22%20stroke-width%3D%229%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%20%3C%2Fsvg%3E%20%3C%2Fsvg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%232b5e3f'/><text y='24' x='4' font-size='22'>⚽</text></svg>">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
@@ -778,7 +778,7 @@ button, input, select, textarea { font-family: inherit; }
 .wordmark { grid-column: 1; justify-self: start; width: auto; font-size: 1.05rem; letter-spacing: 0.12em; }
 .wordmark .wm-sub { font-family: var(--font); font-size: 0.75rem; letter-spacing: 0.2em; }
 .topbar { grid-column: 2; justify-self: end; width: auto; max-width: none; margin: 0; padding: 0; gap: 6px; }
-.topbar-version { margin-right: 4px; font-size: 0.75rem; color: var(--faint); }
+.topbar-version { margin-right: 4px; font-size: 0.75rem; color: var(--faint); max-width: 18rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .topbar-btn { min-height: 44px; padding: 0 14px; font-size: 0.875rem; }
 
 .file-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
@@ -903,7 +903,7 @@ body.mode-pattern #fieldWrapper { width: min(100%, 480px, calc((100dvh - 236px) 
 #field .player-name {
   font-size: calc(12px * var(--fi)); line-height: 1.35; font-weight: 600; color: #fff; text-shadow: none;
   background: rgba(8, 13, 10, 0.82); border-radius: 999px; padding: 0 calc(6px * var(--fi));
-  margin-top: calc(3px * var(--fi)); max-width: calc(84px * var(--fi)); position: relative;  /* 4명 간격(88)에서도 이웃과 겹치지 않게. 전체 이름은 선택 트레이에 표시 */
+  margin-top: calc(3px * var(--fi)); max-width: min(calc(84px * var(--fi)), var(--name-space, calc(84px * var(--fi)))); position: relative;  /* 4명 간격(88)에서도 이웃과 겹치지 않게. 전체 이름은 선택 트레이에 표시 */
 }
 #field .player.selected .player-circle, #field .player:focus-visible .player-circle {
   outline: calc(3px * var(--fi)) solid var(--accent); outline-offset: calc(3px * var(--fi));
@@ -1267,11 +1267,131 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
   @media (min-width: 1024px) { .export-panel.as-sheet { animation: none; } }
 }
 
+
+/* Compact landscape preserves names in the selected tools and accessible player labels. */
+.player-compact-name { display: none; }
+@media (max-width: 1023px) and (max-height: 480px) and (orientation: landscape) {
+  body.pitch-horizontal #field { overflow: visible; }
+  body.pitch-horizontal #field::before { border-radius: inherit; }
+  body.pitch-horizontal #field .player-name { display: none; }
+  body.pitch-horizontal #field .player-compact-name { display: block; }
+  body.pitch-horizontal #playerActions .pa-head #playerActionsName { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; max-width: none; }
+  body.pitch-horizontal .pa-squad { display: none; }
+}
+@media (max-width: 1023px) and (max-height: 748px) and (orientation: portrait) {
+  body.mode-squad #playerActions.visible { position: static; inset: auto; width: 100%; margin: 0; box-shadow: none; }
+  body.mode-squad #playerActionsName { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+  body.mode-squad.has-selection { padding-bottom: max(8px, env(safe-area-inset-bottom, 0px)); }
+  body.mode-squad #field { overflow: visible; }
+  body.mode-squad #field::before { border-radius: inherit; }
+}
+
 </style>
 </head>
 <body class="mode-squad">
 
-<h1 class="wordmark">SQUAD MAKER<span class="wm-sub">전술 보드</span></h1>
+<div id="brandIntro" class="brand-intro" role="img" aria-label="스쿼드 메이커" hidden>
+  <div class="bi-lockup">
+    <svg class="bi-mark" viewBox="17 17 67 67" aria-hidden="true">
+      <defs>
+        <mask id="biRunReveal" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+          <path class="bi-reveal" d="M44 62.5 L48 62 C78 58 38 36 76 25 L79.8 23.9" pathLength="100"
+                fill="none" stroke="#fff" stroke-width="14" stroke-dasharray="100 100"/>
+        </mask>
+      </defs>
+      <circle class="bi-dot" cx="33" cy="70" r="11" fill="#b8e986"/>
+      <g mask="url(#biRunReveal)">
+        <path d="M48 62C49.47 61.8 50.78 61.56 51.93 61.28M60.14 52.92C60.11 51.67 59.88 50.34 59.6 48.96M59.16 36.24C59.61 35.09 60.28 33.95 61.24 32.85M72.19 26.23C73.37 25.81 74.63 25.4 76 25" fill="none" stroke="#e8ede8" stroke-width="6" stroke-linecap="round"/>
+      </g>
+      <path class="bi-head" d="M65.8 20.9 L76 25 L69.6 33.9" fill="none" stroke="#e8ede8"
+            stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="bi-word">
+      <svg class="bi-en" viewBox="108 28 274 42" aria-hidden="true"><path d="M121.69 68.51L121.69 68.51Q118.46 68.51 116.3 67.24Q114.14 65.98 113.04 63.42Q111.94 60.87 111.77 56.91L111.77 56.91L117.9 55.81Q117.98 58.11 118.35 59.65Q118.72 61.19 119.47 61.95Q120.23 62.71 121.35 62.71L121.35 62.71Q122.73 62.71 123.23 61.79Q123.72 60.87 123.72 59.67L123.72 59.67Q123.72 57.33 122.67 55.74Q121.61 54.15 119.88 52.54L119.88 52.54L116.26 49.19Q114.32 47.44 113.09 45.23Q111.86 43.02 111.86 39.8L111.86 39.8Q111.86 35.2 114.38 32.74Q116.9 30.28 121.31 30.28L121.31 30.28Q123.94 30.28 125.62 31.2Q127.3 32.12 128.23 33.66Q129.16 35.2 129.53 37.02Q129.89 38.84 129.98 40.63L129.98 40.63L123.9 41.6Q123.81 39.89 123.62 38.61Q123.42 37.32 122.84 36.58Q122.26 35.85 121.09 35.85L121.09 35.85Q119.84 35.85 119.23 36.84Q118.63 37.82 118.63 39.02L118.63 39.02Q118.63 41 119.47 42.26Q120.31 43.53 121.78 44.91L121.78 44.91L125.32 48.22Q127.52 50.24 129.1 52.84Q130.67 55.44 130.67 59.26L130.67 59.26Q130.67 61.88 129.55 64Q128.43 66.11 126.42 67.31Q124.41 68.51 121.69 68.51ZM155.06 70.67L153.59 75.36Q152.6 74.85 151.3 73.8Q150.01 72.74 148.76 71.33Q147.51 69.93 146.64 68.46L146.64 68.46Q146.47 68.51 146.28 68.51Q146.08 68.51 145.87 68.51L145.87 68.51Q142.03 68.51 139.78 67.03Q137.54 65.56 136.57 62.83Q135.6 60.09 135.6 56.27L135.6 56.27L135.6 42.38Q135.6 38.56 136.57 35.85Q137.54 33.13 139.78 31.71Q142.03 30.28 145.87 30.28L145.87 30.28Q149.75 30.28 152.02 31.73Q154.28 33.18 155.25 35.87Q156.22 38.56 156.22 42.38L156.22 42.38L156.22 56.27Q156.22 58.94 155.77 61.08Q155.32 63.22 154.28 64.78Q153.25 66.34 151.52 67.26L151.52 67.26Q152.08 67.91 152.69 68.55Q153.29 69.2 153.89 69.75Q154.5 70.3 155.06 70.67L155.06 70.67ZM145.87 63.03L145.87 63.03Q147.25 63.03 147.89 62.37Q148.54 61.7 148.76 60.57Q148.97 59.44 148.97 58.16L148.97 58.16L148.97 40.54Q148.97 39.25 148.76 38.15Q148.54 37.04 147.89 36.38Q147.25 35.71 145.87 35.71L145.87 35.71Q144.53 35.71 143.88 36.38Q143.23 37.04 143.04 38.15Q142.85 39.25 142.85 40.54L142.85 40.54L142.85 58.16Q142.85 59.44 143.04 60.57Q143.23 61.7 143.88 62.37Q144.53 63.03 145.87 63.03ZM172.5 68.51L172.5 68.51Q168.53 68.51 166.33 67.06Q164.13 65.61 163.24 62.87Q162.36 60.13 162.36 56.22L162.36 56.22L162.36 30.74L169.39 30.74L169.39 57.28Q169.39 58.66 169.59 60Q169.78 61.33 170.45 62.16Q171.12 62.99 172.5 62.99L172.5 62.99Q173.92 62.99 174.59 62.16Q175.26 61.33 175.43 60Q175.61 58.66 175.61 57.28L175.61 57.28L175.61 30.74L182.64 30.74L182.64 56.22Q182.64 60.13 181.75 62.87Q180.87 65.61 178.67 67.06Q176.47 68.51 172.5 68.51ZM193.95 68L187.26 68L194.04 30.74L201.94 30.74L208.67 68L202.06 68L200.81 59.81L195.29 59.81L193.95 68ZM198.01 40.12L195.94 55.17L200.12 55.17L198.01 40.12ZM222.61 68L213.89 68L213.89 30.74L222.44 30.74Q226.88 30.74 229.37 31.96Q231.85 33.18 232.88 35.78Q233.92 38.38 233.92 42.42L233.92 42.42L233.92 55.99Q233.92 60.13 232.88 62.8Q231.85 65.47 229.41 66.73Q226.97 68 222.61 68L222.61 68ZM221.01 36.08L221.01 62.71L222.53 62.71Q224.51 62.71 225.35 62.04Q226.19 61.38 226.41 60.06Q226.62 58.75 226.62 56.82L226.62 56.82L226.62 41.46Q226.62 39.53 226.34 38.35Q226.06 37.18 225.22 36.63Q224.38 36.08 222.48 36.08L222.48 36.08L221.01 36.08ZM257.88 68L252.66 68L253.26 30.74L260.81 30.74L265.13 54.25L269.75 30.74L277.04 30.74L277.64 68L272.47 68L271.9 42.75L267.46 68L263.02 68L258.35 42.56L257.88 68ZM289.43 68L282.74 68L289.52 30.74L297.41 30.74L304.15 68L297.54 68L296.29 59.81L290.77 59.81L289.43 68ZM293.49 40.12L291.42 55.17L295.6 55.17L293.49 40.12ZM316.49 68L309.37 68L309.37 30.74L316.49 30.74L316.49 46.47L322.79 30.74L329.7 30.74L323.14 47.48L330.17 68L323.01 68L317.62 51.3L316.49 53.42L316.49 68ZM350.2 68L334.88 68L334.88 30.74L350.12 30.74L350.12 35.98L342 35.98L342 45.87L348.26 45.87L348.26 51.16L342 51.16L342 62.85L350.2 62.85L350.2 68ZM362.59 68L355.47 68L355.47 30.74L364.54 30.74Q368.07 30.74 370.6 31.59Q373.12 32.44 374.48 34.6Q375.84 36.77 375.84 40.58L375.84 40.58Q375.84 42.88 375.48 44.66Q375.11 46.43 374.18 47.74Q373.25 49.05 371.57 49.83L371.57 49.83L376.4 68L369.11 68L365.1 51.12L362.59 51.12L362.59 68ZM362.59 35.89L362.59 46.61L364.67 46.61Q366.39 46.61 367.38 46.01Q368.38 45.41 368.79 44.2Q369.2 42.98 369.2 41.18L369.2 41.18Q369.2 38.61 368.31 37.25Q367.43 35.89 365.01 35.89L365.01 35.89L362.59 35.89Z" fill="#e8ede8"/></svg>
+      <span class="bi-ko" aria-hidden="true">스쿼드 메이커</span>
+    </div>
+  </div>
+</div>
+<style>
+  .brand-intro {
+    --m: clamp(56px, 18vmin, 220px); --F: calc(var(--m) * 0.42); --gap: calc(var(--m) * 0.2); --ww: calc(var(--F) * 6.4);
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    position: fixed; inset: 0; z-index: 4000; background: #141a16;
+    display: grid; place-items: center; overflow: hidden;
+    transition: opacity 220ms ease-out;
+  }
+  .brand-intro[hidden] { display: none; }
+  .brand-intro.is-leaving { opacity: 0; pointer-events: none; }
+  .bi-lockup { display: flex; align-items: center; gap: var(--gap); }
+  .bi-mark { width: var(--m); height: var(--m); display: block; overflow: visible; animation: bi-shift 500ms 900ms var(--ease-out) both; }
+  .bi-dot { transform-box: fill-box; transform-origin: center; animation: bi-pop 260ms 0ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .bi-reveal { stroke-dashoffset: 0; animation: bi-draw 600ms 180ms cubic-bezier(0.45, 0, 0.2, 1) both; }
+  .bi-head { transform-box: view-box; transform-origin: 76px 25px; animation: bi-snap 180ms 740ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .bi-word { width: var(--ww); display: flex; flex-direction: column; gap: calc(var(--F) * 0.18); animation: bi-word-in 440ms 960ms var(--ease-out) both; }
+  .bi-en { height: calc(var(--F) * 0.92); width: auto; display: block; }
+  .bi-ko { font-family: 'IBM Plex Sans KR', 'Noto Sans KR', 'Malgun Gothic', sans-serif; font-weight: 500;
+    font-size: calc(var(--F) * 0.42); line-height: 1; letter-spacing: 0.32em; color: #8fa096; white-space: nowrap; }
+  @keyframes bi-pop { 0% { transform: scale(0.2); opacity: 0; } 45% { opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+  @keyframes bi-draw { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+  @keyframes bi-snap { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes bi-shift { from { transform: translateX(calc((var(--ww) + var(--gap)) / 2)); } to { transform: translateX(0); } }
+  @keyframes bi-word-in { from { opacity: 0; transform: translateX(calc(var(--F) * -0.5)); clip-path: inset(0 100% 0 0); }
+                          to { opacity: 1; transform: translateX(0); clip-path: inset(0 0 0 0); } }
+  @media (prefers-reduced-motion: reduce) {
+    .bi-mark, .bi-dot, .bi-reveal, .bi-head, .bi-word { animation: none; }
+    .brand-intro { transition: none; }
+  }
+</style>
+<script data-brand-intro>
+(() => {
+  const intro = document.getElementById('brandIntro');
+  // 네이티브 앱에서만 보인다 (웹 공유 링크 열람자·브라우저 사용자는 바로 화면을 본다).
+  // Capacitor 네이티브 브리지는 페이지 스크립트보다 먼저 주입되므로 window.Capacitor로 판단한다.
+  // (platform-native.js는 이 시점에 아직 로드되지 않았다. 아래 <script data-brand-intro> 참고)
+  const cap = window.Capacitor;
+  const native = Boolean(cap && typeof cap.isNativePlatform === 'function' && cap.isNativePlatform());
+  if (!intro || !native) { if (intro) intro.remove(); return; }
+  intro.hidden = false;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const MOTION_MS = reduce ? 400 : 1400;           // 동작 줄이기: 정지 로고를 짧게만 보여 줌
+  const MAX_MS = 6000;                              // 저장소 준비가 늦어도 6초 뒤에는 닫는다(앱의 부팅 잠금 표시가 이어받음)
+  let motionDone = false, ready = false, closed = false;
+  const close = () => {
+    if (closed) return; closed = true;
+    intro.classList.add('is-leaving');
+    setTimeout(() => intro.remove(), reduce ? 0 : 240);
+  };
+  const tryClose = () => { if (motionDone && ready) close(); };
+  setTimeout(() => { motionDone = true; tryClose(); }, MOTION_MS);
+  setTimeout(close, MAX_MS);
+  // 탭하면 모션을 끝 상태로 건너뛴다 (닫기는 준비 완료를 기다림)
+  intro.addEventListener('pointerdown', () => {
+    intro.getAnimations({ subtree: true }).forEach(a => a.finish());
+    motionDone = true; tryClose();
+  });
+  const waitReady = () => window.SquadMakerContract
+    ? window.SquadMakerContract.ready().then(() => { ready = true; tryClose(); }, () => { ready = true; tryClose(); })
+    : setTimeout(waitReady, 50);
+  waitReady();
+})();
+</script>
+
+<h1 class="wordmark">
+  <svg class="wordmark-logo" viewBox="0 0 384 100" role="img" aria-label="스쿼드 메이커">
+    <svg x="0" y="0" width="100" height="100" viewBox="14 14 72 72">
+      <circle cx="31" cy="72" r="12" fill="#b8e986"/>
+      <path d="M48 62C78 58 38 36 76 25" fill="none" stroke="#e8ede8" stroke-width="9" stroke-linecap="round"/>
+      <path d="M63.9 20.2L76 25L68.4 35.5" fill="none" stroke="#e8ede8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <path d="M121.69 68.51L121.69 68.51Q118.46 68.51 116.3 67.24Q114.14 65.98 113.04 63.42Q111.94 60.87 111.77 56.91L111.77 56.91L117.9 55.81Q117.98 58.11 118.35 59.65Q118.72 61.19 119.47 61.95Q120.23 62.71 121.35 62.71L121.35 62.71Q122.73 62.71 123.23 61.79Q123.72 60.87 123.72 59.67L123.72 59.67Q123.72 57.33 122.67 55.74Q121.61 54.15 119.88 52.54L119.88 52.54L116.26 49.19Q114.32 47.44 113.09 45.23Q111.86 43.02 111.86 39.8L111.86 39.8Q111.86 35.2 114.38 32.74Q116.9 30.28 121.31 30.28L121.31 30.28Q123.94 30.28 125.62 31.2Q127.3 32.12 128.23 33.66Q129.16 35.2 129.53 37.02Q129.89 38.84 129.98 40.63L129.98 40.63L123.9 41.6Q123.81 39.89 123.62 38.61Q123.42 37.32 122.84 36.58Q122.26 35.85 121.09 35.85L121.09 35.85Q119.84 35.85 119.23 36.84Q118.63 37.82 118.63 39.02L118.63 39.02Q118.63 41 119.47 42.26Q120.31 43.53 121.78 44.91L121.78 44.91L125.32 48.22Q127.52 50.24 129.1 52.84Q130.67 55.44 130.67 59.26L130.67 59.26Q130.67 61.88 129.55 64Q128.43 66.11 126.42 67.31Q124.41 68.51 121.69 68.51ZM155.06 70.67L153.59 75.36Q152.6 74.85 151.3 73.8Q150.01 72.74 148.76 71.33Q147.51 69.93 146.64 68.46L146.64 68.46Q146.47 68.51 146.28 68.51Q146.08 68.51 145.87 68.51L145.87 68.51Q142.03 68.51 139.78 67.03Q137.54 65.56 136.57 62.83Q135.6 60.09 135.6 56.27L135.6 56.27L135.6 42.38Q135.6 38.56 136.57 35.85Q137.54 33.13 139.78 31.71Q142.03 30.28 145.87 30.28L145.87 30.28Q149.75 30.28 152.02 31.73Q154.28 33.18 155.25 35.87Q156.22 38.56 156.22 42.38L156.22 42.38L156.22 56.27Q156.22 58.94 155.77 61.08Q155.32 63.22 154.28 64.78Q153.25 66.34 151.52 67.26L151.52 67.26Q152.08 67.91 152.69 68.55Q153.29 69.2 153.89 69.75Q154.5 70.3 155.06 70.67L155.06 70.67ZM145.87 63.03L145.87 63.03Q147.25 63.03 147.89 62.37Q148.54 61.7 148.76 60.57Q148.97 59.44 148.97 58.16L148.97 58.16L148.97 40.54Q148.97 39.25 148.76 38.15Q148.54 37.04 147.89 36.38Q147.25 35.71 145.87 35.71L145.87 35.71Q144.53 35.71 143.88 36.38Q143.23 37.04 143.04 38.15Q142.85 39.25 142.85 40.54L142.85 40.54L142.85 58.16Q142.85 59.44 143.04 60.57Q143.23 61.7 143.88 62.37Q144.53 63.03 145.87 63.03ZM172.5 68.51L172.5 68.51Q168.53 68.51 166.33 67.06Q164.13 65.61 163.24 62.87Q162.36 60.13 162.36 56.22L162.36 56.22L162.36 30.74L169.39 30.74L169.39 57.28Q169.39 58.66 169.59 60Q169.78 61.33 170.45 62.16Q171.12 62.99 172.5 62.99L172.5 62.99Q173.92 62.99 174.59 62.16Q175.26 61.33 175.43 60Q175.61 58.66 175.61 57.28L175.61 57.28L175.61 30.74L182.64 30.74L182.64 56.22Q182.64 60.13 181.75 62.87Q180.87 65.61 178.67 67.06Q176.47 68.51 172.5 68.51ZM193.95 68L187.26 68L194.04 30.74L201.94 30.74L208.67 68L202.06 68L200.81 59.81L195.29 59.81L193.95 68ZM198.01 40.12L195.94 55.17L200.12 55.17L198.01 40.12ZM222.61 68L213.89 68L213.89 30.74L222.44 30.74Q226.88 30.74 229.37 31.96Q231.85 33.18 232.88 35.78Q233.92 38.38 233.92 42.42L233.92 42.42L233.92 55.99Q233.92 60.13 232.88 62.8Q231.85 65.47 229.41 66.73Q226.97 68 222.61 68L222.61 68ZM221.01 36.08L221.01 62.71L222.53 62.71Q224.51 62.71 225.35 62.04Q226.19 61.38 226.41 60.06Q226.62 58.75 226.62 56.82L226.62 56.82L226.62 41.46Q226.62 39.53 226.34 38.35Q226.06 37.18 225.22 36.63Q224.38 36.08 222.48 36.08L222.48 36.08L221.01 36.08ZM257.88 68L252.66 68L253.26 30.74L260.81 30.74L265.13 54.25L269.75 30.74L277.04 30.74L277.64 68L272.47 68L271.9 42.75L267.46 68L263.02 68L258.35 42.56L257.88 68ZM289.43 68L282.74 68L289.52 30.74L297.41 30.74L304.15 68L297.54 68L296.29 59.81L290.77 59.81L289.43 68ZM293.49 40.12L291.42 55.17L295.6 55.17L293.49 40.12ZM316.49 68L309.37 68L309.37 30.74L316.49 30.74L316.49 46.47L322.79 30.74L329.7 30.74L323.14 47.48L330.17 68L323.01 68L317.62 51.3L316.49 53.42L316.49 68ZM350.2 68L334.88 68L334.88 30.74L350.12 30.74L350.12 35.98L342 35.98L342 45.87L348.26 45.87L348.26 51.16L342 51.16L342 62.85L350.2 62.85L350.2 68ZM362.59 68L355.47 68L355.47 30.74L364.54 30.74Q368.07 30.74 370.6 31.59Q373.12 32.44 374.48 34.6Q375.84 36.77 375.84 40.58L375.84 40.58Q375.84 42.88 375.48 44.66Q375.11 46.43 374.18 47.74Q373.25 49.05 371.57 49.83L371.57 49.83L376.4 68L369.11 68L365.1 51.12L362.59 51.12L362.59 68ZM362.59 35.89L362.59 46.61L364.67 46.61Q366.39 46.61 367.38 46.01Q368.38 45.41 368.79 44.2Q369.2 42.98 369.2 41.18L369.2 41.18Q369.2 38.61 368.31 37.25Q367.43 35.89 365.01 35.89L365.01 35.89L362.59 35.89Z" fill="#e8ede8"/>
+  </svg>
+</h1>
+<style>
+  /* 기존 .wordmark 글꼴 규칙을 덮는다 (A UI CSS 블록 뒤에 둘 것) */
+  .wordmark { display: flex; align-items: center; line-height: 0; letter-spacing: 0; }
+  .wordmark-logo { height: 28px; width: auto; display: block; }
+  @media (min-width: 1024px) { .wordmark-logo { height: 32px; } }
+</style>
 
 <!-- 상단 유틸리티 바: 도움말·제보·버전 (편집·뷰어 공통) -->
 <div class="topbar" role="toolbar" aria-label="도움말 및 제보">
@@ -1359,7 +1479,7 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
 
 <!-- 필드 -->
 <div id="fieldWrapper">
-  <div id="field" role="region" aria-label="축구 필드, 선수를 드래그해 위치를 조정하세요"></div>
+  <div id="field" role="region" aria-label="축구 필드. 선수를 끌어 위치를 조정하세요. 작은 가로 화면에서는 번호로 선택하고 선수 도구에서 전체 이름을 확인하세요."></div>
   <canvas id="patternCanvas" width="480" height="660" tabindex="-1" aria-describedby="patternStepSummary" aria-label="전술 패턴 캔버스, 선수를 드래그해 이동 경로를 그리세요"></canvas>
 </div>
 <p class="hint editor-only" id="hintText">탭: 선수 도구 · 끌기: 이동</p>
@@ -1688,7 +1808,7 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
         <li>위쪽 <b>배치 / 움직임 패턴 / 매치 전략</b> 탭에서 <b>배치</b>를 고릅니다.</li>
         <li><b>인원</b>과 <b>포메이션</b>을 고릅니다. 인원을 바꾸면 이름·배치·지침·움직임 패턴이 초기화되므로 확인창을 먼저 읽어 주세요.</li>
         <li><b>포메이션</b>을 선택하면 선수들이 기본 위치로 배치됩니다.</li>
-        <li>선수를 <b>탭하거나 클릭</b>하면 선수 도구가 열립니다. 모바일에서는 화면 하단 도구의 <b>이름 / 색상 / 지침 / 삭제</b>를 사용하세요.</li>
+        <li>선수를 <b>탭하거나 클릭</b>하면 선수 도구가 열립니다. 모바일에서는 선수 도구의 <b>이름 / 색상 / 지침 / 삭제</b>를 사용하세요. 작은 가로 화면은 번호 중심으로 표시하며 선택한 선수의 전체 이름을 도구에서 확인합니다.</li>
         <li>선수를 <b>끌어</b> 원하는 자리로 옮기면 그 선수가 선택됩니다. 데스크톱의 더블클릭은 이름 편집, 우클릭과 모바일 길게 누르기는 선수 메뉴입니다.</li>
       </ol>
     </div>
@@ -1728,6 +1848,11 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
       </ul>
     </div>
 
+    <div class="help-section">
+      <h3>앱 정보</h3>
+      <p id="helpAppVersion" aria-live="polite"></p>
+    </div>
+
     <div class="help-report">
       <p><b>잘 안 되거나 이상한가요?</b> 아래 버튼으로 알려 주세요. 어떤 화면에서 무엇을 하려다 문제가 생겼는지 적어 주시면 큰 도움이 됩니다.</p>
       <div class="help-actions">
@@ -1748,7 +1873,7 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
       <button class="icon-btn" type="button" id="feedbackCloseBtn" aria-label="제보 닫기" onclick="closeFeedback()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
     </div>
     <div class="ui-sheet-body">
-    <p class="help-section">오류나 개선 의견을 보내면 이 프로젝트의 GitHub Issue로 등록됩니다. 연락처와 진단 정보는 선택 사항입니다.</p>
+    <p class="help-section">제보는 공개 GitHub Issue로 등록됩니다. 제목·내용과 선택한 연락처·진단 정보를 다른 사람도 볼 수 있습니다. 비밀번호나 개인 연락처처럼 공개하면 안 되는 정보는 적지 마세요.</p>
     <form id="feedbackForm" class="feedback-form" onsubmit="submitFeedback(event)">
       <div class="feedback-field">
         <label for="feedbackSubject">제목 <span aria-hidden="true">*</span></label>
@@ -1791,6 +1916,7 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
 <script src="app/local-library.js"></script>
+<script src="app/feedback-client.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
 // CONSTANTS
@@ -1802,8 +1928,9 @@ const FIELD_W = 480, FIELD_H = 660;
 const EXPORT_HEADER_H = 72;
 
 // 베타 운영: 버전 표기와 같은 출처의 Vercel 제보 API.
-const APP_VERSION = 'beta 1 (2026-07-21)';
-const FEEDBACK_ENDPOINT = '/api/feedback';
+const NATIVE_PLATFORM = Boolean(window.SquadPlatform?.native);
+let APP_VERSION = NATIVE_PLATFORM ? 'Android Preview (버전 확인 중)' : '웹 개발본';
+const feedbackClient = window.SquadFeedbackClient.createClient({ native: NATIVE_PLATFORM });
 
 const MODES_CONFIG = {
   '5v5':  { label:'5vs5',  max:5,  formations:{
@@ -2661,7 +2788,7 @@ function renderPlayers() {
     el.style.top  = p.y + 'px';
     el.innerHTML = `
       <div class="player-circle" style="background:${p.color};color:${playerNumberInk(p.color)};">${i+1}</div>
-      <div class="player-name">${escHtml(p.name)}</div>`;
+      <div class="player-name">${escHtml(p.name)}</div><span class="player-compact-name sr-only">${escHtml(p.name)}</span>`;
     if (!viewerMode) {
       el.addEventListener('click', e => {
         e.stopPropagation();
@@ -2871,18 +2998,19 @@ document.addEventListener('mouseup', () => {
 // 롱프레스(500ms) → 컨텍스트 메뉴. iOS Safari는 터치에서 contextmenu를 발생시키지 않음.
 let lpTimer = null;
 function cancelPlayerTouch(options = {}) {
+  const { rollback = true, save = false } = options;
   clearTimeout(lpTimer); lpTimer = null;
   if (!dragState) return;
   const previous = dragState;
   dragState = null;
   previous.el.classList.remove('dragging');
-  if (options.rollback) {
+  if (rollback) {
     squads[currentSquad].positions[previous.id] = { x: previous.px, y: previous.py };
     previous.el.style.left = previous.px + 'px';
     previous.el.style.top = previous.py + 'px';
   }
   const position = squads[currentSquad].positions[previous.id];
-  if (options.save !== false && position && (position.x !== previous.px || position.y !== previous.py)) autoSave();
+  if (save && position && (position.x !== previous.px || position.y !== previous.py)) autoSave();
   resumePlayerDragSave();
 }
 fieldEl.addEventListener('touchstart', e => {
@@ -2920,7 +3048,10 @@ document.addEventListener('touchmove', e => {
   dragState.el.style.top  = y+'px';
   e.preventDefault();
 }, { passive: false });
-document.addEventListener('touchcancel', cancelPlayerTouch);
+document.addEventListener('touchcancel', () => cancelPlayerTouch({ rollback: true, save: false }));
+document.addEventListener('touchstart', e => {
+  if (dragState?.touchId != null && e.touches.length !== 1) cancelPlayerTouch({ rollback: true, save: false });
+}, { passive: true });
 document.addEventListener('touchend', e => {
   if (dragState?.touchId != null && !Array.from(e.changedTouches).some(touch => touch.identifier === dragState.touchId)) return;
   clearTimeout(lpTimer);
@@ -4299,10 +4430,10 @@ function numCircle(n) {
 let lastShareText = '';
 
 function openShare() {
+  const url = generateShareURL();
+  if (!url) { showToast('공유 링크를 만들지 못했습니다. 전술은 그대로 보존됩니다. 다시 시도해 주세요.'); return; }
   lastShareText = buildShareText();
   document.getElementById('shareText').textContent = lastShareText;
-  // Generate share URL
-  const url = generateShareURL();
   document.getElementById('shareUrlBox').textContent = url;
   const modal = document.getElementById('shareModal');
   modal.classList.add('visible');
@@ -4373,7 +4504,7 @@ function shareBaseURL() {
 
 function generateShareURL() {
   const enc = encodeState();
-  if (!enc) return location.href;
+  if (!enc) return '';
   return shareBaseURL() + '#s=' + enc;
 }
 
@@ -4388,6 +4519,7 @@ function loadFromURL() {
 
 function copyShareUrl() {
   const url = generateShareURL();
+  if (!url) { showToast('공유 링크를 만들지 못했습니다. 전술은 그대로 보존됩니다. 다시 시도해 주세요.'); return; }
   track('share_link_created', { kind: 'public_url' });
   trackOutput();
   navigator.clipboard.writeText(url)
@@ -4549,9 +4681,7 @@ async function prepareFeedbackCaptcha() {
   try {
     if (feedbackWidgetId !== null && typeof window.turnstile?.remove === 'function') window.turnstile.remove(feedbackWidgetId);
     feedbackWidgetId = null;
-    const response = await fetch(FEEDBACK_ENDPOINT, { headers: { Accept: 'application/json' } });
-    const config = await response.json();
-    if (!response.ok || !config.turnstileSiteKey) throw new Error('captcha_unavailable');
+    const config = await feedbackClient.getConfig();
 
     if (!window.turnstile) {
       if (!feedbackScriptPromise) feedbackScriptPromise = new Promise((resolve, reject) => {
@@ -4561,8 +4691,9 @@ async function prepareFeedbackCaptcha() {
         script.async = true;
         script.defer = true;
         script.dataset.feedbackTurnstile = 'true';
-        script.addEventListener('load', resolve, { once:true });
-        script.addEventListener('error', () => { script.remove(); reject(new Error('captcha_unavailable')); }, { once:true });
+        const timer = setTimeout(() => { script.remove(); reject(new Error('스팸 방지 확인 연결이 지연되었습니다. 네트워크를 확인하고 다시 시도해 주세요.')); }, 10000);
+        script.addEventListener('load', () => { clearTimeout(timer); resolve(); }, { once:true });
+        script.addEventListener('error', () => { clearTimeout(timer); script.remove(); reject(new Error('스팸 방지 확인을 불러오지 못했습니다. 다시 시도해 주세요.')); }, { once:true });
         document.head.appendChild(script);
       });
       try { await feedbackScriptPromise; }
@@ -4571,7 +4702,7 @@ async function prepareFeedbackCaptcha() {
     }
 
     container.textContent = '';
-    setFeedbackAvailability(true);
+    setFeedbackAvailability(false);
     feedbackWidgetId = window.turnstile.render(container, {
       sitekey: config.turnstileSiteKey,
       theme: 'dark',
@@ -4579,10 +4710,10 @@ async function prepareFeedbackCaptcha() {
       'expired-callback': () => { feedbackCaptchaToken = ''; setFeedbackAvailability(false, true); setFeedbackStatus('스팸 방지 확인이 만료되었습니다. 다시 확인해 주세요.', 'error'); },
       'error-callback': () => { feedbackCaptchaToken = ''; setFeedbackAvailability(false, true); setFeedbackStatus('스팸 방지 확인을 완료하지 못했습니다.', 'error'); },
     });
-  } catch {
+  } catch (error) {
     container.textContent = '';
     setFeedbackAvailability(false, true);
-    setFeedbackStatus('제보 창구를 준비하지 못했습니다. 잠시 후 다시 시도해 주세요.', 'error');
+    setFeedbackStatus(error.message || '제보 창구를 준비하지 못했습니다. 잠시 후 다시 시도해 주세요.', 'error');
   } finally { feedbackPreparing = false; }
 }
 
@@ -4591,7 +4722,7 @@ function openFeedback() {
   feedbackStartedAt = Date.now();
   feedbackCaptchaToken = '';
   document.getElementById('feedbackMeta').textContent =
-    `대상: jaywapp/squad-maker · 분류: 제보 · 버전: ${APP_VERSION} · 플랫폼: web`;
+    `버전: ${APP_VERSION} · 플랫폼: ${feedbackClient.platform}`;
   setFeedbackStatus('');
   const modal = document.getElementById('feedbackModal');
   modal.classList.add('visible');
@@ -4620,38 +4751,33 @@ async function submitFeedback(event) {
     return;
   }
 
+  const draftFields = ['feedbackSubject', 'feedbackDescription', 'feedbackContact', 'feedbackDiagnostics', 'feedbackWebsite'];
+  const draftValue = id => { const field = document.getElementById(id); return field.type === 'checkbox' ? field.checked : field.value; };
+  const submittedDraft = draftFields.map(draftValue);
   feedbackSending = true;
   setFeedbackAvailability(feedbackReady);
   setFeedbackStatus('제보를 보내는 중입니다.');
   try {
     const includeDiagnostics = document.getElementById('feedbackDiagnostics').checked;
-    const response = await fetch(FEEDBACK_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json', Accept:'application/json' },
-      body: JSON.stringify({
-        repository: 'jaywapp/squad-maker',
-        title,
-        description,
-        contact: document.getElementById('feedbackContact').value.trim(),
-        appVersion: APP_VERSION,
-        platform: 'web',
-        diagnostics: includeDiagnostics ? { summary: buildDiagnostics() } : {},
-        turnstileToken: feedbackCaptchaToken,
-        startedAt: feedbackStartedAt,
-        website: document.getElementById('feedbackWebsite').value,
-      }),
+    const result = await feedbackClient.submit({
+      repository: 'jaywapp/squad-maker', title, description,
+      contact: document.getElementById('feedbackContact').value.trim(),
+      appVersion: APP_VERSION,
+      diagnostics: includeDiagnostics ? { summary: buildDiagnostics() } : {},
+      turnstileToken: feedbackCaptchaToken, startedAt: feedbackStartedAt,
+      website: document.getElementById('feedbackWebsite').value,
     });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || '제보를 보내지 못했습니다.');
-    setFeedbackStatus(`제보가 등록되었습니다. Issue #${result.issueNumber}`, 'success');
-    form.reset();
-    if (window.turnstile && feedbackWidgetId !== null) window.turnstile.reset(feedbackWidgetId);
-    feedbackCaptchaToken = '';
+    const sameDraft = draftFields.every((id, i) => draftValue(id) === submittedDraft[i]);
+    setFeedbackStatus(`제보가 등록되었습니다. Issue #${result.issueNumber}${sameDraft ? '' : '. 새로 수정한 입력 내용은 유지했습니다.'}`, 'success');
+    if (sameDraft) form.reset();
   } catch (error) {
     setFeedbackStatus(error.message || '제보를 보내지 못했습니다. 입력 내용은 유지되니 다시 시도해 주세요.', 'error');
   } finally {
+    feedbackCaptchaToken = '';
     feedbackSending = false;
-    setFeedbackAvailability(feedbackReady, !feedbackReady);
+    const hasWidget = window.turnstile && feedbackWidgetId !== null;
+    setFeedbackAvailability(false, !hasWidget);
+    if (hasWidget) window.turnstile.reset(feedbackWidgetId);
   }
 }
 
@@ -5066,7 +5192,12 @@ async function waitForPlayerDrag() {
 }
 
 function observeSnapshot() {
-  const json = JSON.stringify(buildStateSnap());
+  const snapshot = buildStateSnap();
+  if (dragState) {
+    const before = dragState.undoBefore.state;
+    snapshot.squads[before.squad].pos[dragState.id] = { ...before.squads[before.squad].pos[dragState.id] };
+  }
+  const json = JSON.stringify(snapshot);
   if (_observedSnapshot !== json) {
     if (_observedSnapshot !== null) _revision++;
     _observedSnapshot = json;
@@ -5332,7 +5463,21 @@ document.getElementById('teamName').addEventListener('input', autoSave);
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
-document.getElementById('appVersion').textContent = APP_VERSION;
+function renderAppVersion(info) {
+  const version = document.getElementById('appVersion');
+  version.textContent = APP_VERSION; version.title = APP_VERSION;
+  document.getElementById('helpAppVersion').textContent = info
+    ? info.name + ': ' + info.version + ' (빌드 ' + info.build + ') / ' + info.id
+    : APP_VERSION;
+  if (document.getElementById('feedbackModal').classList.contains('visible'))
+    document.getElementById('feedbackMeta').textContent = '버전: ' + APP_VERSION + ' · 플랫폼: ' + feedbackClient.platform;
+}
+renderAppVersion();
+if (NATIVE_PLATFORM && typeof window.SquadPlatform.getAppInfo === 'function') {
+  window.SquadPlatform.getAppInfo().then(info => {
+    APP_VERSION = info.version + ' (빌드 ' + info.build + ')'; renderAppVersion(info);
+  }).catch(() => { APP_VERSION = 'Android Preview (버전 미확인)'; renderAppVersion(); });
+}
 drawHtmlField();
 initAllSquads();
 _initialSnapshot = JSON.parse(JSON.stringify(buildStateSnap()));
@@ -5437,7 +5582,17 @@ _readyPromise = (async () => {
         el.classList.toggle('near-edge', nearEdge);
         const space = Math.max(1, nearEdge ? leftSpace : rightSpace).toFixed(3) + 'px';
         if (el.style.getPropertyValue('--name-space') !== space) el.style.setProperty('--name-space', space);
-      } else el.classList.toggle('near-edge', top > 590 && left > 360);
+      } else {
+        el.classList.toggle('near-edge', top > 590 && left > 360);
+        let available = Math.min(left, FIELD_W - left) * 2 - 8 * inverse;
+        if (top > 590) available = (left > 360 ? left : FIELD_W - left) - Math.max(44, 36 * inverse) / 2 - 4 * inverse;
+        else field.querySelectorAll('.player').forEach(other => {
+          if (other === el || Math.abs(parseFloat(other.style.top) - top) > 30 * inverse) return;
+          available = Math.min(available, Math.abs(parseFloat(other.style.left) - left) - 8 * inverse);
+        });
+        const space = Math.max(1, available).toFixed(3) + 'px';
+        if (el.style.getPropertyValue('--name-space') !== space) el.style.setProperty('--name-space', space);
+      }
       if (input && !input.dataset.uiReady) {
         input.dataset.uiReady = '1';
         input.enterKeyHint = 'done';
