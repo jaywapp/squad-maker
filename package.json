@@ -1,8 +1,8 @@
 {
-  "name": "squad-maker",
+  "name": "iam-headcoach",
   "private": true,
   "version": "0.0.0",
-  "description": "SQUAD MAKER — 아마추어 축구 전술 보드",
+  "description": "아이엠 헤드코치 — 아마추어 축구 전술 보드",
   "scripts": {
     "serve": "http-server -p 4317 -c-1 .",
     "test": "npm run test:unit && npm run android:bundle && playwright test",

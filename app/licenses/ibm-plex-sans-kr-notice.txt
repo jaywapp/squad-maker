@@ -1,0 +1,11 @@
+IBM Plex Sans KR — Korean brand wordmark outlines
+Copyright © 2017 IBM Corp. with Reserved Font Name "Plex".
+Licensed under the SIL Open Font License, Version 1.1.
+
+Upstream: https://github.com/IBM/plex
+Font source and license: https://github.com/google/fonts/tree/main/ofl/ibmplexsanskr
+License text: https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexsanskr/OFL.txt
+
+Approved outlined artwork is preserved in docs/branding/headcoach.
+No font binary is bundled for the wordmark. The supplied handoff does not
+record the exact source TTF version or hash; binary provenance is unverified.
