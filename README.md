@@ -6,7 +6,7 @@
 
 공개 GitHub Pages는 과거 v1 전술 수신 화면입니다. 이번 Run Line·편집 데스크·한글 브랜딩 변경은 아직 배포되지 않았습니다. 기존 Vercel 주소는 현재 이 저장소의 전술 앱을 제공하지 않으며 제보 API도 404입니다. [정식 출시 준비와 남은 결정](docs/launch-readiness-20261010-report.md)을 확인하세요.
 
-승인된 **아이엠 헤드코치 A안**은 기존 Run Line 마크·아이콘·색을 보존하고 한글 워드마크를 적용합니다. 원본과 교체 지침은 [브랜딩 인계](docs/branding/README.md), 최신 코드 적용·네이밍·검증 기록은 [이번 작업 분석](docs/korean-branding-20261010-analysis.md)을 확인하세요. 기술 이름은 `iam-headcoach`, Android 표시 이름은 `아이엠 헤드코치`로 확정했습니다. [제품용 이름 자산](assets/branding/iam-headcoach/README.md)과 안전 전환 절차를 구분하며 활성 폴더는 유지합니다.
+승인된 **아이엠 헤드코치 A안**은 기존 Run Line 마크·아이콘·색을 보존하고 한글 워드마크를 적용합니다. 원본과 교체 지침은 [브랜딩 인계](docs/branding/README.md), 최신 코드 적용·네이밍·검증 기록은 [이번 작업 분석](docs/korean-branding-20261010-analysis.md)을 확인하세요. 기술 이름은 `iam-headcoach`, 테스트 Android 표시 이름은 **아이엠 헤드코치 Preview**, 정식 브랜드는 **아이엠 헤드코치**입니다. 최신 [Preview 네이밍·폴더 전환 기준](docs/iam-headcoach-preview-20261010-analysis.md)을 따릅니다. [제품용 이름 자산](assets/branding/iam-headcoach/README.md)과 안전 전환 절차를 구분하며 활성 폴더는 유지합니다.
 
 ## 제품 방향과 구현 상태
 

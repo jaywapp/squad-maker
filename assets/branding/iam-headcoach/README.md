@@ -4,6 +4,8 @@
 
 현재 앱은 [index.html](../../../index.html)에 같은 승인 SVG와 인트로를 인라인으로 사용한다. 이 폴더는 QA 및 후속 브랜드 재사용을 위한 전달본이며, 앱의 인라인 SVG를 외부 이미지로 교체하지 않는다. 기존 [on-light QA](../../../tests/e2e/korean-branding-20261010.spec.js)는 여기의 밝은 바탕용 SVG 3개를 읽는다.
 
+테스트 Android 라벨은 **아이엠 헤드코치 Preview**이며 로고/인트로의 정식 브랜드 표기는 **아이엠 헤드코치** 그대로다. 기술명·파일명도 iam-headcoach를 유지한다. 최신 [채널·네이밍 대응표](../../../docs/iam-headcoach-preview-20261010-design.md)를 따른다.
+
 ## 원본과 파일명 대응
 
 원본 경로는 `docs/branding/headcoach/assets/`이다. 아래 SHA-256은 원본의 바이트 해시이며 제품 전달본과 동일하다.

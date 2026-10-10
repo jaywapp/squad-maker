@@ -1,5 +1,7 @@
 # 한글 브랜딩·네이밍 정리 설계
 
+> 이전 PR54 단계의 결정·검증 이력이다. 최신 사용자 지시로 테스트 Android 라벨은 **아이엠 헤드코치 Preview**, 기술명은 **iam-headcoach**, 정식 브랜드는 **아이엠 헤드코치**다. 현재 적용은 [후속 기준](iam-headcoach-preview-20261010-analysis.md)·[대응표](iam-headcoach-preview-20261010-design.md)·[폴더 전환](iam-headcoach-preview-20261010-folder-transition.md)을 따른다. 이 문서의 과거 plain Android 결정과 PR47/상표 선행 조건을 현재 gate로 적용하지 않는다.
+
 디자인 읽기: 축구·풋살 전술을 편집하는 코치용 Operate 도구. 승인된 night pitch/Run Line A안을 보존하고 한글 워드마크만 교체한다. impeccable/design-taste-frontend 보존형 preflight를 적용하며 새 콘셉트·프레임워크·폰트 의존성은 도입하지 않는다. DESIGN_VARIANCE3/MOTION_INTENSITY3/VISUAL_DENSITY7.
 
 ## 구현 계약

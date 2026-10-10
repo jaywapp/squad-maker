@@ -1,5 +1,7 @@
 # 한글 A안 적용·검증 인계
 
+> 이전 PR54 단계의 결정·검증 이력이다. 최신 사용자 지시로 테스트 Android 라벨은 **아이엠 헤드코치 Preview**, 기술명은 **iam-headcoach**, 정식 브랜드는 **아이엠 헤드코치**다. 현재 적용은 [후속 기준](iam-headcoach-preview-20261010-analysis.md)·[대응표](iam-headcoach-preview-20261010-design.md)·[폴더 전환](iam-headcoach-preview-20261010-folder-transition.md)을 따른다. 이 문서의 과거 plain Android 결정과 PR47/상표 선행 조건을 현재 gate로 적용하지 않는다.
+
 2026-10-10. PR52의 기능 기반 위에서 승인된 아이엠 헤드코치 A안을 선택 적용했다. 사용자 답변으로 기술 이름 **iam-headcoach**, Android 표시 이름 **아이엠 헤드코치**를 확정했다. 원본 저장소·다른 worktree·광고 변경은 보존한다. 이 문서의 최종 검증 집계·정확한 commit SHA·Draft PR URL은 같은 Draft PR54 본문과 로컬 naming-final 기록에서 확인한다. 아래 선행 QA는 전체 최종 검증을 대신하지 않는다.
 
 ## 확정 부분의 변경
@@ -39,7 +41,7 @@
 
 첫 단계 14deb708의 과거 선행 QA에서 기본 글자 targeted 46개 통과·확대2개 실패를 관측했고 배치 수정 후 브랜드16개 및 320px intro tap2개가 통과했다. 이 숫자는 최종 전체 E2E의 결과가 아니다. 320px desktop native facade 캡처는 [인트로](korean-branding-20261010/evidence/native-facade-intro-final-320.png)이며 물리 Android 증거가 아니다.
 
-기존 skip1은 guest-free-regression의 전체 GIF 모바일 중복 인코딩 생략이다. 데스크톱에서 해당 GIF를 실제 검증하고 모바일 PNG/GIF의 다른 경로도 기존 회귀로 검증한다. 첫 단계 14deb708의 lint4는 UnusedResources(activity_main/config/package_name/custom_url_scheme)이며 브랜딩 표시명을 바꾸는 목적에서 native scaffold를 임의 제거하지 않는다. PR52 CI에서는 AGP와 appcompat 신버전 알림2개가 더 있어6개였다. 이번 최종 실행의 실제 결과를 별도 집계하고 과거 '8개'를 그대로 재사용하지 않는다. Node NO_COLOR/FORCE_COLOR와 http-server DEP0066는 도구 경고이며 테스트 assertion/Android lint 결과와 구분한다.
+기존 skip1은 guest-free-regression의 전체 GIF 모바일 중복 인코딩 생략이다. 데스크톱에서 해당 GIF를 실제 검증하고 모바일 PNG/GIF의 다른 경로도 기존 회귀로 검증한다. 첫 단계 14deb708의 lint4는 UnusedResources(activity_main/config/package_name/custom_url_scheme)이며 브랜딩 표시명을 바꾸는 목적에서 native scaffold를 임의 제거하지 않는다. PR52 CI에서는 Gradle wrapper와 appcompat 신버전 알림2개가 더 있어6개였다. 이번 최종 실행의 실제 결과를 별도 집계하고 과거 '8개'를 그대로 재사용하지 않는다. Node NO_COLOR/FORCE_COLOR와 http-server DEP0066는 도구 경고이며 테스트 assertion/Android lint 결과와 구분한다.
 
 ## 확인 범위와 실기기 미검증
 

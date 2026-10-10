@@ -1,5 +1,7 @@
 # 한글 브랜딩·네이밍 작업 계획
 
+> 이전 PR54 단계의 결정·검증 이력이다. 최신 사용자 지시로 테스트 Android 라벨은 **아이엠 헤드코치 Preview**, 기술명은 **iam-headcoach**, 정식 브랜드는 **아이엠 헤드코치**다. 현재 적용은 [후속 기준](iam-headcoach-preview-20261010-analysis.md)·[대응표](iam-headcoach-preview-20261010-design.md)·[폴더 전환](iam-headcoach-preview-20261010-folder-transition.md)을 따른다. 이 문서의 과거 plain Android 결정과 PR47/상표 선행 조건을 현재 gate로 적용하지 않는다.
+
 orchestrator=Codex, owner=Codex. 조사·통합/리뷰 gpt-6.1-sol/high, 확정 구현/회귀 gpt-6.1-sol/medium을 기본으로 하며 이번 독립 영향/자산 감사는 복잡한 호환성 판단으로 high. 같은 파일은 순차 소유권 반환, Git은 root만 수행.
 
 | ID | 작업 | owner | model | effort | depends_on | parallel_group | files | verification | status |

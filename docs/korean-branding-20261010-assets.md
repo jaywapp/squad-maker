@@ -1,5 +1,7 @@
 # 승인 자산·출처와 현재 코드 적용 기준
 
+> 이전 PR54 단계의 결정·검증 이력이다. 최신 사용자 지시로 테스트 Android 라벨은 **아이엠 헤드코치 Preview**, 기술명은 **iam-headcoach**, 정식 브랜드는 **아이엠 헤드코치**다. 현재 적용은 [후속 기준](iam-headcoach-preview-20261010-analysis.md)·[대응표](iam-headcoach-preview-20261010-design.md)·[폴더 전환](iam-headcoach-preview-20261010-folder-transition.md)을 따른다. 이 문서의 과거 plain Android 결정과 PR47/상표 선행 조건을 현재 gate로 적용하지 않는다.
+
 승인 원본은 PR53 `d41ea68ff27061e8b1d3c3d8f9c9dca34f889c12`의 `docs/branding/headcoach` A안이다. 운영 코드 기반은 PR52 `d449d02b9f90133bda905dda90acf7a49b4277f1`이며 구 브랜치의 앱 코드는 복사하지 않았다. 원본 가이드·시안·생성 도구·라이선스 기록을 보존하고, 이 문서에 최신 코드와 다른 전제를 정정한다.
 
 ## 적용·보존

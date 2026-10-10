@@ -1,5 +1,7 @@
 # 한글 브랜딩 네이밍 대응표와 경로 전환 조건
 
+> 이전 PR54 단계의 결정·검증 이력이다. 최신 사용자 지시로 테스트 Android 라벨은 **아이엠 헤드코치 Preview**, 기술명은 **iam-headcoach**, 정식 브랜드는 **아이엠 헤드코치**다. 현재 적용은 [후속 기준](iam-headcoach-preview-20261010-analysis.md)·[대응표](iam-headcoach-preview-20261010-design.md)·[폴더 전환](iam-headcoach-preview-20261010-folder-transition.md)을 따른다. 이 문서의 과거 plain Android 결정과 PR47/상표 선행 조건을 현재 gate로 적용하지 않는다.
+
 2026-10-10, orchestrator=Codex. 이 문서는 이름 영향 감사와 향후 경로 전환 조건을 기록한다. 실제 루트 이동, GitHub 저장소·호스팅 이름 변경, 서버 재시작, 배포·서명·설치는 수행하지 않았다.
 
 ## 기준과 결정 상태

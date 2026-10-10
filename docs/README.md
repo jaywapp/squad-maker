@@ -1,6 +1,6 @@
 # 아이엠 헤드코치 문서 안내
 
-**최신 기준은 [상세 상품 기획서](product-plan.md)입니다.** 사용자 선택은 A — 피치 중심 코치형입니다. 제품 방향과 현재 웹 구현을 구분하며, 상품의 미정 수량·가격을 임의로 확정하지 않습니다.
+**상품 방향·요구사항은 [상세 상품 기획서](product-plan.md)를 참고합니다.** 해당 문서의 기준일·과거 검증은 그대로 보존하고, 현재 이름·테스트 채널·폴더 전환은 [PR54 최신 후속 기준](iam-headcoach-preview-20261010-analysis.md)을 따릅니다. 사용자 선택은 A — 피치 중심 코치형입니다. 제품 방향과 현재 웹 구현을 구분하며, 상품의 미정 수량·가격을 임의로 확정하지 않습니다.
 
 | 읽을 목적 | 문서 |
 |---|---|
@@ -24,6 +24,8 @@
 | 2026-10-10 사용자 확정① 편집 데스크 운영 적용 | [분석](editing-desk-20261010-analysis.md), [설계](editing-desk-20261010-design.md), [작업계획](editing-desk-20261010-tasks.md), [검증·인계](editing-desk-20261010-report.md) |
 | 2026-10-10 Run Line·기본 기능 정식 출시 준비(Draft, 미배포) | [분석](launch-readiness-20261010-analysis.md), [설계](launch-readiness-20261010-design.md), [작업계획](launch-readiness-20261010-tasks.md), [인계·차단 요소](launch-readiness-20261010-report.md), [출시/T7 체크리스트](launch-readiness-20261010-release-checklist.md) |
 | 2026-10-10 승인 한글 A안·네이밍 정리(별도 Draft, 미배포) | [원본 인계](branding/README.md), [분석](korean-branding-20261010-analysis.md), [설계](korean-branding-20261010-design.md), [작업계획](korean-branding-20261010-tasks.md), [네이밍·안전 전환](korean-branding-20261010-naming.md), [자산·출처](korean-branding-20261010-assets.md), [검증·출시 경계](korean-branding-20261010-report.md) |
+| 2026-10-10 PR54 후속 iam-headcoach·Android Preview 네이밍/폴더 전환 준비 | [현재 분석](iam-headcoach-preview-20261010-analysis.md), [선행 대응표·설계](iam-headcoach-preview-20261010-design.md), [작업계획](iam-headcoach-preview-20261010-tasks.md), [이름·참조 감사](iam-headcoach-preview-20261010-name-audit.md), [폴더 전환·새 세션 재개](iam-headcoach-preview-20261010-folder-transition.md) |
+
 
 ## 유지하는 근거와 운영 참고
 
