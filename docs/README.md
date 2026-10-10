@@ -26,6 +26,7 @@
 | 2026-10-10 승인 한글 A안·네이밍 정리(별도 Draft, 미배포) | [원본 인계](branding/README.md), [분석](korean-branding-20261010-analysis.md), [설계](korean-branding-20261010-design.md), [작업계획](korean-branding-20261010-tasks.md), [네이밍·안전 전환](korean-branding-20261010-naming.md), [자산·출처](korean-branding-20261010-assets.md), [검증·출시 경계](korean-branding-20261010-report.md) |
 | 2026-10-10 PR54 후속 iam-headcoach·Android Preview 네이밍/폴더 전환 준비 | [현재 분석](iam-headcoach-preview-20261010-analysis.md), [선행 대응표·설계](iam-headcoach-preview-20261010-design.md), [작업계획](iam-headcoach-preview-20261010-tasks.md), [이름·참조 감사](iam-headcoach-preview-20261010-name-audit.md), [폴더 전환·새 세션 재개](iam-headcoach-preview-20261010-folder-transition.md) |
 | 2026-10-11 PR54 로컬 Preview 서명 APK·백업/업데이트 준비 | [분석](iam-headcoach-local-preview-20261011-analysis.md), [설계](iam-headcoach-local-preview-20261011-design.md), [작업계획](iam-headcoach-local-preview-20261011-tasks.md), [백업·업데이트·T7](iam-headcoach-local-preview-20261011-install-guide.md) |
+| 2026-10-11 iam-headcoach 폴더 이동 안전 게이트 blocked·이동 미실행 | [분석](iam-headcoach-migration-20261011-analysis.md), [설계](iam-headcoach-migration-20261011-design.md), [작업계획](iam-headcoach-migration-20261011-tasks.md), [결과·복구](iam-headcoach-migration-20261011-report.md) |
 
 
 ## 유지하는 근거와 운영 참고
