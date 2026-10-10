@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 브랜드 색 (A 나이트피치 / Run Line) -->
+    <color name="brand_night">#141A16</color>
+    <color name="brand_pitch">#2B5E3F</color>
+    <color name="brand_chalk">#E8EDE8</color>
+    <color name="brand_lime">#B8E986</color>
+    <!-- 시스템 스플래시 배경 = 앱 배경, 웹 인트로와 같은 색이라 전환이 끊기지 않는다 -->
+    <color name="splash_background">#141A16</color>
+</resources>
