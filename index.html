@@ -333,6 +333,7 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
   text-transform:uppercase; letter-spacing:0.08em;
 }
 .interest-chip {
+  min-width:44px; min-height:44px;
   border:1px solid var(--border); background:var(--surface2); color:var(--ink2);
   border-radius:999px; padding:6px 12px; font-size:0.75rem; cursor:pointer;
   font-family:inherit; transition:border-color 0.15s, color 0.15s;
@@ -538,6 +539,7 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
 .strategy-field { display:flex; flex-direction:column; gap:4px; }
 .strategy-field label { font-size:0.75rem; color:var(--muted); font-weight:600; }
 .strategy-input {
+  min-height:44px;
   padding:8px 12px; border:1px solid var(--border); border-radius:8px;
   background:var(--bg); color:white; font-size:0.88rem; outline:none; font-family:inherit;
 }
@@ -619,6 +621,7 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 .toast.visible { opacity:1; }
 .toast.actionable { pointer-events:auto; }
 .toast-action {
+  min-width:44px; min-height:44px;
   border:none; background:none; color:var(--accent); cursor:pointer;
   font:inherit; font-weight:800; text-decoration:underline; text-underline-offset:3px;
 }
@@ -763,7 +766,7 @@ body {
   column-gap: 8px; row-gap: 10px;
   padding: 10px 12px calc(32px + env(safe-area-inset-bottom, 0px));
 }
-body > :where(:not(.toast, #ctxMenu, .pattern-more-menu, .arrow-pop, .dlg-backdrop, .ui-backdrop, .ui-sheet, #playerViewModal, #shareModal, #interestModal, #helpModal, #feedbackModal, #gifProgress)) { grid-column: 1 / -1; justify-self: center; width: 100%; }
+body > :where(:not(.toast, #ctxMenu, .pattern-more-menu, .arrow-pop, .dlg-backdrop, .ui-backdrop, .ui-sheet, .export-scene, #playerViewModal, #shareModal, #interestModal, #helpModal, #feedbackModal, #gifProgress)) { grid-column: 1 / -1; justify-self: center; width: 100%; }
 [hidden] { display: none !important; }
 body > script, body > input[type="file"] { display: none; }
 button, input, select, textarea { font-family: inherit; }
@@ -1172,6 +1175,92 @@ body.ui-busy { cursor: progress; }
   .btn, .btn-primary, .app-tab, .squad-tab, .formation-select, .team-name-input, .pattern-name-input, .pattern-nav, .reset-btn { min-height: 44px; }
 }
 
+/* Editing desk: one pitch column, one settings column, and a wide-screen library. */
+.editing-library { display: none; min-width: 0; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.editing-library-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.editing-library h2 { font-size: 1rem; font-weight: 700; }
+.editing-library-team { margin: 6px 0 12px; color: var(--ink2); font-size: 0.875rem; overflow-wrap: anywhere; }
+.editing-list { display: grid; gap: 8px; list-style: none; }
+.editing-file, .editing-player { width: 100%; min-height: var(--tap); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--ink); padding: 8px; text-align: left; cursor: pointer; }
+.editing-file { display: grid; gap: 3px; }
+.editing-file[aria-current="true"], .editing-player[aria-pressed="true"] { border-color: var(--chalk); background: var(--surface2); }
+.editing-file-name { font-size: 1rem; font-weight: 700; overflow-wrap: anywhere; }
+.editing-file-meta { color: var(--muted); font-size: 0.75rem; }
+.editing-lineup-title { margin: 20px 0 10px; }
+.editing-player { display: flex; align-items: center; gap: 8px; }
+.editing-player-number { flex-shrink: 0; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.9); font: 700 19px var(--num); }
+.editing-player-name { min-width: 0; font-size: 0.875rem; overflow-wrap: anywhere; }
+.editing-list-empty, .editing-library-status { color: var(--ink2); font-size: 0.875rem; }
+.editing-library-status:empty { display: none; }
+.editing-library-status[data-tone="error"] { color: var(--danger-ink); }
+@media (min-width: 1024px) {
+  body { padding-inline: max(20px, calc((100vw - 1680px) / 2)); }
+  .layout { grid-template-columns: minmax(0, 1fr) minmax(340px, 400px); gap: 24px; width: 100%; max-width: 1680px; }
+  .pane-field { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "tabs form" "empty empty" "pitch pitch" "hint hint"; justify-self: stretch; min-width: 0; }
+  .pane-field > #fieldWrapper, .pane-field #fieldWrapper { width: min(100%, 640px, calc((100dvh - 220px) * 0.7273)); }
+  body.mode-pattern .pane-field { grid-template-columns: minmax(0, 1fr); grid-template-areas: "pitch" "hint"; }
+  body.mode-pattern #fieldWrapper { width: min(100%, 640px, calc((100dvh - 150px) * 0.7273)); }
+  .pane-side { min-width: 0; max-width: none; align-self: start; }
+  .pane-side .player-actions { width: 100%; max-width: none; }
+  .mode-pills { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .mode-pill, .mode-pill:not(:last-child) { min-height: 44px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+}
+@media (min-width: 1536px) {
+  .layout { grid-template-columns: 220px minmax(0, 1fr) minmax(340px, 400px); }
+  .viewer-mode .layout { grid-template-columns: minmax(0, 1fr) minmax(340px, 400px); }
+  .editing-library { display: block; position: sticky; top: 12px; max-height: calc(100dvh - 24px); overflow-y: auto; }
+  body.mode-strategy .layout { grid-template-columns: 220px minmax(0, 640px); }
+}
+body.pitch-horizontal { padding: 6px max(8px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); gap: 6px; }
+body.pitch-horizontal .wordmark { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+body.pitch-horizontal .topbar-version { display: none; }
+body.pitch-horizontal .topbar { grid-column: 2; grid-row: 1; }
+body.pitch-horizontal .file-bar { grid-column: 1; grid-row: 1; gap: 6px; }
+body.pitch-horizontal .file-title { min-height: 44px; padding-block: 2px; }
+body.pitch-horizontal .file-title-main { font-size: 0.875rem; }
+body.pitch-horizontal .export-open { min-height: 44px; }
+body.pitch-horizontal #viewerBar { grid-column: 1; grid-row: 1; max-width: none; flex-wrap: nowrap; gap: 6px; padding: 0; border: 0; background: none; }
+body.pitch-horizontal #viewerBar .vb-title { flex: 1 1 100px; min-width: 0; font-size: 0.8125rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.pitch-horizontal #viewerBar .btn { min-height: 44px; padding: 0 8px; white-space: nowrap; }
+body.pitch-horizontal .app-tabs { grid-row: 2; max-width: 480px; justify-self: start; }
+body.pitch-horizontal .app-tab { min-height: 44px; padding-block: 4px; }
+body.pitch-horizontal .layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 12px; align-items: start; }
+body.pitch-horizontal .pane-field { position: static; max-width: none; min-width: 0; width: 100%; align-self: start; }
+body.pitch-horizontal .pane-side { max-width: none; width: 100%; min-width: 0; max-height: var(--editing-space, calc(100dvh - 112px)); overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; }
+body.pitch-horizontal #fieldWrapper { min-width: 0; max-width: 100%; aspect-ratio: 660 / 480; }
+body.pitch-horizontal #field .player { transform: translate(-50%, -50%) rotate(-90deg); }
+body.pitch-horizontal #field .player-name, body.pitch-horizontal #field .player input { position: absolute; left: calc(100% + 4px * var(--fi)); top: calc(var(--c) / 2); transform: translateY(-50%); margin-top: 0 !important; }
+body.pitch-horizontal #field .player-name { max-width: min(calc(66px * var(--fi)), var(--name-space, calc(66px * var(--fi)))); }
+body.pitch-horizontal #field .player-name, body.pitch-horizontal #field .player-name-count { pointer-events: none; }
+body.pitch-horizontal #field .player input { max-width: var(--name-space, calc(120px * var(--fi))) !important; }
+body.pitch-horizontal #field .player-name-count { position: absolute; left: calc(100% + 4px * var(--fi)); top: calc(var(--c) / 2 + 18px * var(--fi)); max-width: var(--name-space, calc(120px * var(--fi))); overflow: hidden; text-overflow: ellipsis; margin: 0; }
+body.pitch-horizontal #field .player.near-edge .player-name, body.pitch-horizontal #field .player.near-edge input { left: auto; right: calc(100% + 4px * var(--fi)); }
+body.pitch-horizontal #field .player.near-edge .player-name-count { left: auto; right: calc(100% + 4px * var(--fi)); }
+body.pitch-horizontal .hint { display: none; }
+body.pitch-horizontal .player-actions, body.pitch-horizontal .player-actions.visible { position: static; inset: auto; width: 100%; display: grid; grid-template-columns: 1fr; margin: 0; padding: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: none; }
+body.pitch-horizontal .player-actions:not(.visible) > :not(.pa-empty) { display: none; }
+body.pitch-horizontal .player-actions:not(.visible) > .pa-empty { display: block; }
+body.pitch-horizontal .player-actions .pa-head { display: flex; flex-wrap: nowrap; }
+body.pitch-horizontal .player-actions .pa-tools { display: grid; grid-template-columns: 1fr 1fr; }
+body.pitch-horizontal .player-actions .player-actions-name, body.pitch-horizontal .player-actions .pa-squad, body.pitch-horizontal .player-actions .pa-close, body.pitch-horizontal .player-actions .pa-tools .btn { grid-column: auto; grid-row: auto; }
+body.pitch-horizontal .player-actions .player-actions-name { flex: 1 1 0; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.pitch-horizontal .player-actions .pa-squad { margin-right: 0; }
+body.pitch-horizontal .player-actions .pa-close { flex-shrink: 0; width: 44px; min-width: 44px; height: 44px; min-height: 44px; padding: 0; }
+body.pitch-horizontal.has-selection { padding-bottom: max(8px, env(safe-area-inset-bottom, 0px)); }
+body.pitch-horizontal.mode-strategy .layout { grid-template-columns: minmax(0, 1fr); }
+body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: visible; }
+.export-scene { position: fixed; left: -10000px; top: 0; width: 480px; height: 732px; background: var(--pitch); color: var(--ink); font-family: var(--font); pointer-events: none; }
+.export-scene-head { height: 72px; padding: 10px 24px; background: var(--surface); display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+.export-scene-title { font-size: 22px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.export-scene-subtitle { font-size: 13px; line-height: 1.4; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.export-pitch { position: relative; width: 480px; height: 660px; transform: none !important; transform-origin: top left; background: var(--pitch); overflow: hidden; --fi: 1; --c: 44px; --hit: 48px; }
+.export-pitch::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, transparent 0, transparent 44px, rgba(0,0,0,0.07) 44px, rgba(0,0,0,0.07) 88px); }
+.export-pitch .player { width: 44px; height: 44px; min-width: 44px; display: flex; flex-direction: column; align-items: center; transform: none !important; }
+.export-pitch .player-circle { flex-shrink: 0; width: 44px; height: 44px; font: 700 19px var(--num); border-width: 2.5px; }
+.export-pitch .player-name { flex-shrink: 0; font: 600 12px/1.35 var(--font); color: #fff; text-shadow: none; background: rgba(8,13,10,0.82); border-radius: 999px; padding: 0 6px; margin-top: 3px; max-width: 84px; }
+.export-pitch .player.near-goal .player-name { position: absolute; left: calc(100% + 4px); top: 13.9px; transform: none; margin-top: 0; }
+.export-pitch .player.near-goal.near-edge .player-name { left: auto; right: calc(100% + 4px); }
+
 @media (prefers-reduced-motion: no-preference) {
   .ui-sheet:not([hidden]) .ui-sheet-panel, .export-panel.as-sheet { animation: ui-sheet-in 0.18s ease-out; }
   @keyframes ui-sheet-in { from { opacity: 0.4; transform: translateY(24px); } }
@@ -1236,6 +1325,14 @@ body.ui-busy { cursor: progress; }
   </span>
 </div>
 <div class="layout">
+<aside class="editing-library editor-only" id="editingLibrary" aria-label="전술과 선수 목록">
+  <div class="editing-library-head"><h2>전술 목록</h2><button class="icon-btn" type="button" id="editingLibraryOpenBtn" aria-label="전술 목록 관리" aria-haspopup="dialog" aria-controls="librarySheet"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 6l11 0M9 12l11 0M9 18l11 0M5 6l0 .01M5 12l0 .01M5 18l0 .01"/></svg></button></div>
+  <p class="editing-library-team" id="editingLibraryTeam"></p>
+  <ul class="editing-list" id="editingFiles" aria-label="현재 팀의 전술"></ul>
+  <h2 class="editing-lineup-title">선수 목록</h2>
+  <ul class="editing-list" id="editingLineup" aria-label="현재 전술의 선수"></ul>
+  <p class="editing-library-status" id="editingLibraryStatus" role="status" aria-live="polite"></p>
+</aside>
 <div class="pane-field">
 
 <!-- 스쿼드 탭 -->
@@ -1265,10 +1362,11 @@ body.ui-busy { cursor: progress; }
   <div id="field" role="region" aria-label="축구 필드, 선수를 드래그해 위치를 조정하세요"></div>
   <canvas id="patternCanvas" width="480" height="660" tabindex="-1" aria-describedby="patternStepSummary" aria-label="전술 패턴 캔버스, 선수를 드래그해 이동 경로를 그리세요"></canvas>
 </div>
-<ol class="pattern-step-summary" id="patternStepSummary" aria-label="패턴 단계 요약"></ol>
-
 <p class="hint editor-only" id="hintText">탭: 선수 도구 · 끌기: 이동</p>
 
+<p class="sr-only" id="playerMoveStatus" role="status" aria-live="polite"></p>
+</div><!-- /pane-field -->
+<div class="pane-side">
 <div class="player-actions editor-only" id="playerActions" role="toolbar" aria-label="선택한 선수 작업">
   <p class="pa-empty">선수를 누르면 이름·색상·지침 도구가 열립니다. 끌어 원하는 자리로 옮기면 해당 선수가 선택됩니다.</p>
   <div class="pa-head">
@@ -1284,9 +1382,7 @@ body.ui-busy { cursor: progress; }
   </div>
 </div>
 
-<p class="sr-only" id="playerMoveStatus" role="status" aria-live="polite"></p>
-</div><!-- /pane-field -->
-<div class="pane-side">
+<ol class="pattern-step-summary" id="patternStepSummary" aria-label="패턴 단계 요약"></ol>
 
 <!-- 팀 설정 -->
 <div class="team-setup app-squad-only editor-only" role="group" aria-label="팀 설정">
@@ -1703,6 +1799,7 @@ body.ui-busy { cursor: progress; }
 const COLORS = ['#E53935','#1E88E5','#00C853','#FB8C00','#8E24AA','#00ACC1','#F06292','#FFD600','#546E7A','#ffffff'];
 const COLOR_NAMES = { '#e53935': '빨강', '#1e88e5': '파랑', '#00c853': '초록', '#fb8c00': '주황', '#8e24aa': '보라', '#00acc1': '청록', '#f06292': '분홍', '#ffd600': '노랑', '#546e7a': '회청', '#ffffff': '흰색' };
 const FIELD_W = 480, FIELD_H = 660;
+const EXPORT_HEADER_H = 72;
 
 // 베타 운영: 버전 표기와 같은 출처의 Vercel 제보 API.
 const APP_VERSION = 'beta 1 (2026-07-21)';
@@ -2607,8 +2704,9 @@ function movePlayerWithKeyboard(event, id) {
   const current = squads[currentSquad].positions[id];
   if (!current) return true;
   const distance = event.shiftKey ? 32 : 8;
-  const x = Math.max(26, Math.min(FIELD_W - 26, current.x + direction[0] * distance));
-  const y = Math.max(26, Math.min(FIELD_H - 26, current.y + direction[1] * distance));
+  const delta = screenDeltaToField(direction[0] * distance, direction[1] * distance, 1);
+  const x = Math.max(26, Math.min(FIELD_W - 26, current.x + delta.x));
+  const y = Math.max(26, Math.min(FIELD_H - 26, current.y + delta.y));
   if (x === current.x && y === current.y) return true;
   captureUndo();
   squads[currentSquad].positions[id] = { x, y };
@@ -2616,10 +2714,18 @@ function movePlayerWithKeyboard(event, id) {
   event.currentTarget.style.top = y + 'px';
   selectPlayerForEdit(id);
   autoSave();
-  const player = roster.find(item => item.id === id);
-  document.getElementById('playerMoveStatus').textContent = `${player?.name || '선수'}, 왼쪽에서 ${Math.round(x / FIELD_W * 100)}%, 위에서 ${Math.round(y / FIELD_H * 100)}%`;
+  updatePlayerMoveStatus(id);
   event.currentTarget.focus({ preventScroll: true });
   return true;
+}
+
+function updatePlayerMoveStatus(id) {
+  const player = roster.find(item => item.id === id);
+  const position = squads[currentSquad].positions[id];
+  if (!player || !position) return;
+  const point = fieldToView(position.x, position.y);
+  const size = fieldViewSize();
+  document.getElementById('playerMoveStatus').textContent = `${player.name}, 왼쪽에서 ${Math.round(point.x / size.width * 100)}%, 위에서 ${Math.round(point.y / size.height * 100)}%`;
 }
 
 function clearSelectedPlayer() {
@@ -2731,32 +2837,53 @@ fieldEl.addEventListener('mousedown', e => {
   const p = getPlayers().find(p => p.id === id);
   if (!p) return;
   hideCtxMenu();
-  dragState = { id, el: pe, sx: e.clientX, sy: e.clientY, px: p.x, py: p.y, sc: getFieldScale() };
+  pausePlayerDragSave();
+  dragState = { id, el: pe, sx: e.clientX, sy: e.clientY, px: p.x, py: p.y, sc: getFieldScale(), horizontal: isHorizontalPitch(), undoBefore: captureRuntime() };
   pe.classList.add('dragging');
   e.preventDefault();
 });
 document.addEventListener('mousemove', e => {
   if (!dragState) return;
-  const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + (e.clientX - dragState.sx) / dragState.sc));
-  const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + (e.clientY - dragState.sy) / dragState.sc));
+  const delta = screenDeltaToField(e.clientX - dragState.sx, e.clientY - dragState.sy, dragState.sc, dragState.horizontal);
+  const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + delta.x));
+  const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + delta.y));
   squads[currentSquad].positions[dragState.id] = { x, y };
   dragState.el.style.left = x+'px';
   dragState.el.style.top  = y+'px';
 });
+function finishPlayerDrag(completed) {
+  const position = squads[currentSquad].positions[completed.id];
+  if (position && (position.x !== completed.px || position.y !== completed.py)) {
+    lastUndo = completed.undoBefore;
+    if (completed.touchId != null) selectPlayerForEdit(completed.id);
+    updatePlayerMoveStatus(completed.id);
+    autoSave();
+  }
+  resumePlayerDragSave();
+}
 document.addEventListener('mouseup', () => {
-  if (dragState) { dragState.el.classList.remove('dragging'); dragState = null; autoSave(); }
+  if (!dragState || dragState.touchId != null) return;
+  const completed = dragState;
+  completed.el.classList.remove('dragging'); dragState = null;
+  finishPlayerDrag(completed);
 });
 
 // 롱프레스(500ms) → 컨텍스트 메뉴. iOS Safari는 터치에서 contextmenu를 발생시키지 않음.
 let lpTimer = null;
-function cancelPlayerTouch() {
+function cancelPlayerTouch(options = {}) {
   clearTimeout(lpTimer); lpTimer = null;
   if (!dragState) return;
   const previous = dragState;
   dragState = null;
   previous.el.classList.remove('dragging');
+  if (options.rollback) {
+    squads[currentSquad].positions[previous.id] = { x: previous.px, y: previous.py };
+    previous.el.style.left = previous.px + 'px';
+    previous.el.style.top = previous.py + 'px';
+  }
   const position = squads[currentSquad].positions[previous.id];
-  if (position && (position.x !== previous.px || position.y !== previous.py)) autoSave();
+  if (options.save !== false && position && (position.x !== previous.px || position.y !== previous.py)) autoSave();
+  resumePlayerDragSave();
 }
 fieldEl.addEventListener('touchstart', e => {
   if (viewerMode) return;
@@ -2767,14 +2894,14 @@ fieldEl.addEventListener('touchstart', e => {
   const p = getPlayers().find(p => p.id === id);
   if (!p) return;
   const t = e.touches[0];
-  dragState = { id, el: pe, touchId: t.identifier, sx: t.clientX, sy: t.clientY, px: p.x, py: p.y, sc: getFieldScale() };
+  pausePlayerDragSave();
+  dragState = { id, el: pe, touchId: t.identifier, sx: t.clientX, sy: t.clientY, px: p.x, py: p.y, sc: getFieldScale(), horizontal: isHorizontalPitch(), undoBefore: captureRuntime() };
   pe.classList.add('dragging');
   clearTimeout(lpTimer);
   lpTimer = setTimeout(() => {
     if (!dragState) return;
-    dragState.el.classList.remove('dragging');
     const r = roster.find(r => r.id === dragState.id);
-    dragState = null;
+    cancelPlayerTouch({ rollback: true, save: false });
     if (r) showCtxMenu(t.clientX, t.clientY, r);
   }, 500);
   e.preventDefault();
@@ -2785,8 +2912,9 @@ document.addEventListener('touchmove', e => {
   if (!t) return;
   // 8px 이상 움직이면 드래그로 간주 → 롱프레스 취소
   if (Math.hypot(t.clientX - dragState.sx, t.clientY - dragState.sy) > 8) clearTimeout(lpTimer);
-  const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + (t.clientX - dragState.sx) / dragState.sc));
-  const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + (t.clientY - dragState.sy) / dragState.sc));
+  const delta = screenDeltaToField(t.clientX - dragState.sx, t.clientY - dragState.sy, dragState.sc, dragState.horizontal);
+  const x = Math.max(26, Math.min(FIELD_W-26, dragState.px + delta.x));
+  const y = Math.max(26, Math.min(FIELD_H-26, dragState.py + delta.y));
   squads[currentSquad].positions[dragState.id] = { x, y };
   dragState.el.style.left = x+'px';
   dragState.el.style.top  = y+'px';
@@ -2800,9 +2928,7 @@ document.addEventListener('touchend', e => {
     const completed = dragState;
     completed.el.classList.remove('dragging');
     dragState = null;
-    const position = squads[currentSquad].positions[completed.id];
-    if (completed.touchId != null && position && (position.x !== completed.px || position.y !== completed.py)) selectPlayerForEdit(completed.id);
-    autoSave();
+    finishPlayerDrag(completed);
   }
 });
 
@@ -2876,6 +3002,38 @@ function withTimeout(promise, milliseconds) {
   })]).finally(() => clearTimeout(timer));
 }
 
+function exportMetadata(pattern = null, stepIdx = null) {
+  const meta = SQUAD_META[currentSquad];
+  const team = document.getElementById('teamName').value.trim() || meta.label;
+  const subtitle = pattern
+    ? `${pattern.name} · 단계 ${(stepIdx ?? 0) + 1}/${pattern.steps.length}`
+    : `${meta.label} · ${MODES_CONFIG[currentMode].label} / ${squads[currentSquad].formation}`;
+  return { team, subtitle };
+}
+
+function createExportScene() {
+  const metadata = exportMetadata();
+  const scene = document.createElement('div'); scene.id = 'exportScene'; scene.className = 'export-scene'; scene.setAttribute('aria-hidden', 'true');
+  const header = document.createElement('div'); header.id = 'exportSceneHeader'; header.className = 'export-scene-head';
+  const title = document.createElement('div'); title.className = 'export-scene-title'; title.textContent = metadata.team;
+  const subtitle = document.createElement('div'); subtitle.className = 'export-scene-subtitle'; subtitle.textContent = metadata.subtitle;
+  header.append(title, subtitle);
+  const pitch = document.getElementById('field').cloneNode(true);
+  pitch.id = 'exportPitch'; pitch.className = 'export-pitch'; pitch.style.display = 'block'; pitch.style.transform = 'none'; pitch.style.width = FIELD_W + 'px'; pitch.style.height = FIELD_H + 'px';
+  pitch.removeAttribute('role'); pitch.removeAttribute('aria-label');
+  pitch.querySelectorAll('.player').forEach(element => element.remove());
+  getPlayers().forEach((player, index) => {
+    const element = document.createElement('div'); element.className = 'player' + (player.y > 590 ? ' near-goal' : '') + (player.y > 590 && player.x > 360 ? ' near-edge' : '');
+    element.style.left = (player.x - 22) + 'px'; element.style.top = (player.y - 22) + 'px';
+    const circle = document.createElement('div'); circle.className = 'player-circle'; circle.textContent = index + 1;
+    circle.style.background = player.color; circle.style.color = playerNumberInk(player.color);
+    const name = document.createElement('div'); name.className = 'player-name'; name.textContent = player.name;
+    element.append(circle, name); pitch.appendChild(element);
+  });
+  scene.append(header, pitch);
+  return scene;
+}
+
 function saveImage(destination = 'save') {
   if (_capturing || _exportKind || _safetyPending || activeModal) return contractResult('export-png', 'busy', 'busy');
   observeSnapshot();
@@ -2884,20 +3042,11 @@ function saveImage(destination = 'save') {
   const teamName = document.getElementById('teamName').value.trim();
   const form     = squads[currentSquad].formation;
   const meta     = SQUAD_META[currentSquad];
-  const f        = document.getElementById('field');
-  const label    = `${teamName ? teamName + ' ' : ''}${meta.icon} ${meta.label} [${form}]`;
-  const banner   = document.createElement('div');
-  banner.style.cssText = `position:absolute;top:28px;left:50%;transform:translateX(-50%);
-    background:rgba(0,0,0,0.55);color:white;font-weight:700;font-size:14px;
-    padding:5px 18px;border-radius:20px;z-index:200;white-space:nowrap;pointer-events:none;`;
-  banner.textContent = label;
-  f.appendChild(banner);
-  // 캡처 동안 스케일 해제 (transform 캡처 왜곡 회피)
-  const wrapper = document.getElementById('fieldWrapper');
-  const prevMax = wrapper.style.maxWidth, prevWidth = wrapper.style.width;
-  wrapper.style.maxWidth = '480px'; wrapper.style.width = '480px';
-  f.style.transform = 'none';
-  return withTimeout(Promise.resolve().then(() => html2canvas(f, { scale:2.5, backgroundColor:'#2b5e3f', useCORS:true, logging:false })), 30000)
+  let scene;
+  return withTimeout(Promise.resolve().then(() => {
+    scene = createExportScene(); document.body.appendChild(scene);
+    return html2canvas(scene, { scale:2.5, backgroundColor:'#2b5e3f', useCORS:true, logging:false });
+  }), 30000)
     .then(async canvas => {
       const blob = await new Promise((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error('PNG encoding failed')), 'image/png'));
       const result = await deliverExport('export-png', blob, (teamName || '스쿼드') + '_' + meta.label + '_' + form + '.png', 'image/png', destination);
@@ -2911,9 +3060,7 @@ function saveImage(destination = 'save') {
       return contractResult('export-png', 'error', 'export-failed');
     })
     .finally(() => {
-      if (banner.parentNode) f.removeChild(banner);
-      wrapper.style.maxWidth = prevMax; wrapper.style.width = prevWidth;
-      applyFieldScale();
+      scene?.remove();
       _capturing = false;
       setExportBusy(null);
     });
@@ -2983,7 +3130,8 @@ function updatePatternUI() {
 function updatePatternSummary() {
   const pattern = currentPattern();
   const direction = (from, to) => {
-    const dx = to.x - from.x, dy = to.y - from.y;
+    const start = fieldToView(from.x, from.y), end = fieldToView(to.x, to.y);
+    const dx = end.x - start.x, dy = end.y - start.y;
     const horizontal = Math.abs(dx) < 4 ? '' : dx > 0 ? '오른쪽' : '왼쪽';
     const vertical = Math.abs(dy) < 4 ? '' : dy > 0 ? '아래' : '위';
     return horizontal || vertical ? `${[horizontal, vertical].filter(Boolean).join(' ')}${vertical ? '로' : '으로'} 이동` : '자리 유지';
@@ -3133,24 +3281,82 @@ const pCtx = pCanvas.getContext('2d');
 // ═══════════════════════════════════════════════════════════════
 // FIELD SCALE — 렌더링 배율 (좌표계는 480×660 고정)
 // ═══════════════════════════════════════════════════════════════
+function isHorizontalPitch() {
+  return matchMedia('(max-width: 1023px) and (max-height: 500px) and (orientation: landscape)').matches;
+}
+
+function fieldViewSize(horizontal = isHorizontalPitch()) {
+  return horizontal ? { width: FIELD_H, height: FIELD_W } : { width: FIELD_W, height: FIELD_H };
+}
+
+function fieldToView(x, y, horizontal = isHorizontalPitch()) {
+  return horizontal ? { x: FIELD_H - y, y: x } : { x, y };
+}
+
+function viewToField(x, y, horizontal = isHorizontalPitch()) {
+  return horizontal ? { x: y, y: FIELD_H - x } : { x, y };
+}
+
+function screenDeltaToField(x, y, scale = getFieldScale(), horizontal = isHorizontalPitch()) {
+  return horizontal ? { x: y / scale, y: -x / scale } : { x: x / scale, y: y / scale };
+}
+
 function getFieldScale() {
   const w = document.getElementById('fieldWrapper').getBoundingClientRect().width;
-  return w / FIELD_W || 1;
+  return w / fieldViewSize().width || 1;
 }
 
 // 캔버스는 백킹 스토어를 s×dpr로 재설정해 확대 시에도 선명하게 유지
-function applyFieldScale() {
-  const s = getFieldScale();
-  document.getElementById('field').style.transform = `scale(${s})`;
+let _fieldScaleRaf = null;
+function scheduleFieldScale() {
+  if (dragState || _fieldScaleRaf !== null) return;
+  _fieldScaleRaf = requestAnimationFrame(() => {
+    _fieldScaleRaf = null;
+    applyFieldScale(true);
+  });
+}
+
+function applyFieldScale(settled = false) {
+  if (dragState) return;
+  const horizontal = isHorizontalPitch();
+  document.body.classList.toggle('pitch-horizontal', horizontal);
+  const wrapper = document.getElementById('fieldWrapper');
+  const size = fieldViewSize(horizontal);
+  let width;
+  if (horizontal) {
+    if (!settled) scheduleFieldScale();
+    if (appMode === 'strategy') return;
+    const bottomPadding = parseFloat(getComputedStyle(document.body).paddingBottom) || 8;
+    const availableHeight = Math.max(1, innerHeight - wrapper.getBoundingClientRect().top - bottomPadding);
+    width = Math.min(wrapper.parentElement.clientWidth, availableHeight * FIELD_H / FIELD_W);
+    wrapper.style.width = width + 'px';
+    const layoutTop = document.querySelector('.layout').getBoundingClientRect().top;
+    document.body.style.setProperty('--editing-space', Math.max(1, innerHeight - layoutTop - bottomPadding) + 'px');
+  } else {
+    wrapper.style.width = '';
+    width = wrapper.getBoundingClientRect().width;
+  }
+  const s = width / size.width || 1;
+  const transform = horizontal ? `translate(${FIELD_H * s}px, 0) rotate(90deg) scale(${s})` : `scale(${s})`;
+  const field = document.getElementById('field');
+  if (field.style.transform !== transform) field.style.transform = transform;
+  wrapper.style.setProperty('--fi', Math.max(1, 1 / s).toFixed(4));
   const dpr = window.devicePixelRatio || 1;
-  pCanvas.style.width  = (FIELD_W * s) + 'px';
-  pCanvas.style.height = (FIELD_H * s) + 'px';
-  pCanvas.width  = Math.round(FIELD_W * s * dpr);
-  pCanvas.height = Math.round(FIELD_H * s * dpr);
+  pCanvas.style.width  = (size.width * s) + 'px';
+  pCanvas.style.height = (size.height * s) + 'px';
+  pCanvas.width  = Math.round(size.width * s * dpr);
+  pCanvas.height = Math.round(size.height * s * dpr);
   pCtx.setTransform(s * dpr, 0, 0, s * dpr, 0, 0);
   if (appMode === 'pattern' && !isPlaying) renderPatternFrame(0);
 }
-window.addEventListener('resize', applyFieldScale);
+function onFieldResize() {
+  cancelPlayerTouch({ rollback: true, save: false });
+  drawState = null;
+  hideCtxMenu(); hideArrowPopover(); hidePatternMore();
+  applyFieldScale(); updatePatternSummary();
+  if (selectedPlayer && document.getElementById('playerMoveStatus').textContent) updatePlayerMoveStatus(selectedPlayer.id);
+}
+window.addEventListener('resize', onFieldResize);
 
 function canvasField(ctx) {
   ctx.fillStyle = '#2b5e3f'; ctx.fillRect(0, 0, FIELD_W, FIELD_H);
@@ -3187,9 +3393,19 @@ function canvasRoundedRect(ctx, x, y, width, height, radius) {
   ctx.closePath();
 }
 
+function canvasUsesHorizontal(ctx) {
+  return ctx.canvas === pCanvas && isHorizontalPitch();
+}
+
+function canvasPitchProjection(ctx, horizontal = canvasUsesHorizontal(ctx)) {
+  if (horizontal) { ctx.translate(FIELD_H, 0); ctx.rotate(Math.PI / 2); }
+}
+
 function canvasPlayer(ctx, color, name, num, x, y) {
   const css = getComputedStyle(document.documentElement);
-  const scale = ctx.canvas.isConnected && ctx.canvas.clientWidth > 0 ? ctx.canvas.clientWidth / FIELD_W : 1;
+  const horizontal = canvasUsesHorizontal(ctx);
+  const size = fieldViewSize(horizontal);
+  const scale = ctx.canvas.isConnected && ctx.canvas.clientWidth > 0 ? ctx.canvas.clientWidth / size.width : 1;
   const inverse = 1 / scale;
   const radius = Math.max(PLAYER_R, 18 * inverse);
   const nameSize = 12 * inverse;
@@ -3208,7 +3424,7 @@ function canvasPlayer(ctx, color, name, num, x, y) {
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(String(num), x, y);
   ctx.font = `600 ${nameSize}px ${font}`;
-  const maxTextWidth = 84 * inverse;
+  const maxTextWidth = (horizontal ? 54 : 84) * inverse;
   let label = String(name);
   if (ctx.measureText(label).width > maxTextWidth) {
     const letters = [...label];
@@ -3217,11 +3433,11 @@ function canvasPlayer(ctx, color, name, num, x, y) {
   }
   const width = ctx.measureText(label).width + 12 * inverse;
   const height = nameSize * 1.35;
-  const nearGoal = y > 590;
-  const nearEdge = nearGoal && x > 360;
-  const labelX = Math.max(width / 2 + 3 * inverse, Math.min(FIELD_W - width / 2 - 3 * inverse,
+  const nearGoal = horizontal || y > 590;
+  const nearEdge = horizontal ? x > size.width - radius - 4 * inverse - width : nearGoal && x > 360;
+  const labelX = Math.max(width / 2 + 3 * inverse, Math.min(size.width - width / 2 - 3 * inverse,
     nearGoal ? x + (nearEdge ? -1 : 1) * (radius + 4 * inverse + width / 2) : x));
-  const labelY = Math.max(height / 2, Math.min(FIELD_H - height / 2,
+  const labelY = Math.max(height / 2, Math.min(size.height - height / 2,
     nearGoal ? y : y + radius + 3 * inverse + height / 2));
   ctx.fillStyle = 'rgba(8,13,10,0.82)';
   ctx.beginPath(); canvasRoundedRect(ctx, labelX - width / 2, labelY - height / 2, width, height, height / 2); ctx.fill();
@@ -3284,8 +3500,10 @@ function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
 
 // 한 단계를 진행도 t(0~1)로 렌더링. 시작 위치는 이전 단계들의 누적 종료 위치.
 function renderStepFrame(ctx, pat, stepIdx, t, label) {
+  const horizontal = canvasUsesHorizontal(ctx);
+  ctx.save(); canvasPitchProjection(ctx, horizontal);
   canvasField(ctx);
-  if (!pat) return;
+  if (!pat) { ctx.restore(); return; }
 
   const base = positionsAfter(pat, stepIdx);
   const ballBase = ballPosAfter(pat, stepIdx);
@@ -3303,18 +3521,21 @@ function renderStepFrame(ctx, pat, stepIdx, t, label) {
   if (step.ball) {
     canvasArrow(ctx, ballBase.x, ballBase.y, step.ball.toX, step.ball.toY, '#fb923c', arrowAlpha);
   }
+  ctx.restore();
 
   players.forEach((p, i) => {
     const from = base[p.id] || { x: p.x, y: p.y };
     const move = step.moves[p.id];
     const x = move ? from.x + (move.toX - from.x) * et : from.x;
     const y = move ? from.y + (move.toY - from.y) * et : from.y;
-    canvasPlayer(ctx, p.color, p.name, i+1, x, y);
+    const point = fieldToView(x, y, horizontal);
+    canvasPlayer(ctx, p.color, p.name, i+1, point.x, point.y);
   });
 
   const bx = step.ball ? ballBase.x + (step.ball.toX - ballBase.x) * et : ballBase.x;
   const by = step.ball ? ballBase.y + (step.ball.toY - ballBase.y) * et : ballBase.y;
-  canvasBall(ctx, bx, by);
+  const ball = fieldToView(bx, by, horizontal);
+  canvasBall(ctx, ball.x, ball.y);
 
   if (label) canvasLabel(ctx, label);
 }
@@ -3326,8 +3547,10 @@ function renderPatternFrame(t) {
   const label = pat.steps.length > 1 ? `단계 ${currentStepIdx+1}/${pat.steps.length}` : null;
   renderStepFrame(pCtx, pat, currentStepIdx, t || 0, label);
   if (drawState) {
+    pCtx.save(); canvasPitchProjection(pCtx);
     canvasArrow(pCtx, drawState.fromX, drawState.fromY, drawState.curX, drawState.curY,
       drawState.kind === 'ball' ? '#fb923c' : '#facc15', 0.7);
+    pCtx.restore();
   }
 }
 
@@ -3393,10 +3616,11 @@ function snapBallTarget(x, y) {
 
 function canvasCoords(e) {
   const rect = pCanvas.getBoundingClientRect();
-  const scaleX = FIELD_W / rect.width;
-  const scaleY = FIELD_H / rect.height;
+  const size = fieldViewSize();
+  const scaleX = size.width / rect.width;
+  const scaleY = size.height / rect.height;
   const src = e.touches ? e.touches[0] : e;
-  return { x: (src.clientX - rect.left) * scaleX, y: (src.clientY - rect.top) * scaleY };
+  return viewToField((src.clientX - rect.left) * scaleX, (src.clientY - rect.top) * scaleY);
 }
 
 function beginDraw(x, y) {
@@ -3421,22 +3645,27 @@ function endDraw(x, y) {
   lastDrawEndAt = performance.now(); // 드로잉 직후의 click을 화살표 탭으로 오인하지 않기 위함
   const dist = Math.hypot(x - drawState.fromX, y - drawState.fromY);
   if (drawState.kind === 'ball') {
-    if (dist > 15) {
-      currentStep().ball = snapBallTarget(x, y);
-    } else {
-      // 살짝 끌면 공 시작 위치만 재배치
-      currentPattern().ballStart = {
-        x: Math.max(5, Math.min(FIELD_W-5, x)),
-        y: Math.max(5, Math.min(FIELD_H-5, y)),
-      };
+    const next = dist > 15 ? snapBallTarget(x, y) : {
+      x: Math.max(5, Math.min(FIELD_W-5, x)),
+      y: Math.max(5, Math.min(FIELD_H-5, y)),
+    };
+    const previous = dist > 15 ? currentStep().ball : currentPattern().ballStart;
+    if (JSON.stringify(previous) !== JSON.stringify(next)) {
+      captureUndo();
+      if (dist > 15) currentStep().ball = next;
+      else currentPattern().ballStart = next;
+      autoSave();
     }
-    autoSave();
   } else if (dist > 15) {
-    currentStep().moves[drawState.playerId] = {
+    const next = {
       toX: Math.max(5, Math.min(FIELD_W-5, x)),
       toY: Math.max(5, Math.min(FIELD_H-5, y)),
     };
-    autoSave();
+    if (JSON.stringify(currentStep().moves[drawState.playerId]) !== JSON.stringify(next)) {
+      captureUndo();
+      currentStep().moves[drawState.playerId] = next;
+      autoSave();
+    }
   }
   drawState = null;
   renderPatternFrame(0);
@@ -3601,6 +3830,37 @@ function animTick(ts) {
 // ═══════════════════════════════════════════════════════════════
 // ATTACK PATTERNS — GIF 내보내기
 // ═══════════════════════════════════════════════════════════════
+function fitCanvasText(ctx, text, maxWidth) {
+  const value = String(text);
+  if (ctx.measureText(value).width <= maxWidth) return value;
+  const letters = [...value];
+  while (letters.length && ctx.measureText(letters.join('') + '…').width > maxWidth) letters.pop();
+  return letters.join('') + '…';
+}
+
+function canvasExportHeader(ctx, pattern, stepIdx) {
+  const css = getComputedStyle(document.documentElement);
+  const font = css.getPropertyValue('--font').trim() || 'sans-serif';
+  const metadata = exportMetadata(pattern, stepIdx);
+  ctx.save();
+  ctx.fillStyle = css.getPropertyValue('--surface').trim() || '#1c241e'; ctx.fillRect(0, 0, FIELD_W, EXPORT_HEADER_H);
+  ctx.fillStyle = css.getPropertyValue('--border').trim() || '#2c3830'; ctx.fillRect(0, EXPORT_HEADER_H - 1, FIELD_W, 1);
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillStyle = css.getPropertyValue('--ink').trim() || '#e8ede8'; ctx.font = `700 22px ${font}`;
+  ctx.fillText(fitCanvasText(ctx, metadata.team, FIELD_W - 48), 24, 10);
+  ctx.fillStyle = css.getPropertyValue('--ink2').trim() || '#c4cdc5'; ctx.font = `400 13px ${font}`;
+  ctx.fillText(fitCanvasText(ctx, metadata.subtitle, FIELD_W - 48), 24, 42);
+  ctx.restore();
+}
+
+function renderExportFrame(ctx, pattern, stepIdx, t) {
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+  canvasExportHeader(ctx, pattern, stepIdx);
+  ctx.translate(0, EXPORT_HEADER_H);
+  renderStepFrame(ctx, pattern, stepIdx, t, null);
+  ctx.restore();
+}
+
 async function exportGif(allPatterns, destination = 'save') {
   if (_exportKind || _safetyPending || activeModal) return contractResult('export-gif', 'busy', 'busy');
   observeSnapshot();
@@ -3632,12 +3892,12 @@ async function exportGif(allPatterns, destination = 'save') {
       workers: 2,
       quality: 8,
       width: FIELD_W,
-      height: FIELD_H,
+      height: FIELD_H + EXPORT_HEADER_H,
       workerScript: workerUrl,
     });
 
     const off = document.createElement('canvas');
-    off.width = FIELD_W; off.height = FIELD_H;
+    off.width = FIELD_W; off.height = FIELD_H + EXPORT_HEADER_H;
     const offCtx = off.getContext('2d');
 
     const FRAMES = 30;        // 단계당 프레임 수
@@ -3649,18 +3909,12 @@ async function exportGif(allPatterns, destination = 'save') {
     const totalFrames = totalSteps * (FRAMES + HOLD_FRAMES);
     let doneFrames = 0;
 
-    function stepLabel(pat, si) {
-      if (allPatterns) return `${pat.name}, ${si+1}/${pat.steps.length}`;
-      return pat.steps.length > 1 ? `단계 ${si+1}/${pat.steps.length}` : null;
-    }
-
     for (let pi = 0; pi < patsToExport.length; pi++) {
       const pat = patsToExport[pi];
       for (let si = 0; si < pat.steps.length; si++) {
-        const label = stepLabel(pat, si);
         for (let f = 0; f <= FRAMES; f++) {
           if (Date.now() >= deadline) throw new Error('GIF rendering timed out');
-          renderStepFrame(offCtx, pat, si, f / FRAMES, label);
+          renderExportFrame(offCtx, pat, si, f / FRAMES);
           gif.addFrame(offCtx, { delay: FRAME_DELAY, copy: true });
           doneFrames++;
           setProgress(doneFrames / totalFrames * 0.7,
@@ -3668,7 +3922,7 @@ async function exportGif(allPatterns, destination = 'save') {
           await new Promise(r => setTimeout(r, 0)); // 브라우저에 양보
         }
         for (let f = 0; f < HOLD_FRAMES; f++) {
-          renderStepFrame(offCtx, pat, si, 1, label);
+          renderExportFrame(offCtx, pat, si, 1);
           gif.addFrame(offCtx, { delay: HOLD_DELAY, copy: true });
           doneFrames++;
         }
@@ -4790,6 +5044,26 @@ let _initialSnapshot = null;
 let _libraryPending = false;
 let _readyPromise = Promise.resolve();
 let _saveQueue = Promise.resolve();
+let _dragSaveDeferred = false;
+const _dragSaveWaiters = [];
+
+function pausePlayerDragSave() {
+  if (!_saveTimer) return;
+  _dragSaveDeferred = true;
+  clearTimeout(_saveTimer); _saveTimer = null;
+}
+
+function resumePlayerDragSave() {
+  if (dragState) return;
+  _dragSaveWaiters.splice(0).forEach(resolve => resolve());
+  if (!_dragSaveDeferred) return;
+  _dragSaveDeferred = false;
+  if (!_saveTimer) _saveTimer = setTimeout(flushSave, 600);
+}
+
+async function waitForPlayerDrag() {
+  while (dragState) await new Promise(resolve => _dragSaveWaiters.push(resolve));
+}
 
 function observeSnapshot() {
   const json = JSON.stringify(buildStateSnap());
@@ -4896,13 +5170,16 @@ function applyLibraryResult(result, replaceBoard = false) {
 async function flushSave() {
   clearTimeout(_saveTimer); _saveTimer = null;
   await _readyPromise;
+  await waitForPlayerDrag();
   if (viewerMode) return contractResult('retry-save', 'error', 'read-only');
   if (_storageReadBlocked) return contractResult('retry-save', 'error', 'storage-read-blocked');
   if (!_library?.getState().activeFileId) return contractResult('retry-save', 'error', 'no-active-file');
   const json = observeSnapshot(), revision = _revision;
   const pending = _saveQueue.then(async () => {
+    await waitForPlayerDrag();
     setStorageStatus('saving');
     const result = await _library.saveActive(JSON.parse(json));
+    await waitForPlayerDrag();
     if (result.status !== 'success') {
       const code = applyLibraryResult(result);
       return contractResult('retry-save', 'error', code);
@@ -4978,9 +5255,20 @@ async function runLibraryCommand(operation, payload) {
   } finally { setLibraryBusy(false); publishContractState(); }
 }
 
-window.addEventListener('pagehide', () => { if (_saveTimer && !viewerMode) flushSave(); });
+function finishInactiveGestures() {
+  const pending = Boolean(_saveTimer || _dragSaveDeferred || _dragSaveWaiters.length);
+  cancelPlayerTouch({ rollback: true, save: false });
+  resumePlayerDragSave();
+  if (drawState) {
+    drawState = null;
+    if (appMode === 'pattern') renderPatternFrame(0);
+  }
+  if (pending && !viewerMode) flushSave();
+}
+window.addEventListener('blur', finishInactiveGestures);
+window.addEventListener('pagehide', finishInactiveGestures);
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden' && _saveTimer && !viewerMode) flushSave();
+  if (document.visibilityState === 'hidden') finishInactiveGestures();
 });
 
 window.SquadMakerContract = Object.freeze({
@@ -5131,15 +5419,25 @@ _readyPromise = (async () => {
   function syncFieldScale() {
     const match = /scale\(([\d.]+)\)/.exec(field.style.transform || '');
     const scale = match ? parseFloat(match[1]) : 1;
-    const inverse = Math.min(2.4, Math.max(1, 1 / (scale || 1)));
+    const inverse = Math.max(1, 1 / (scale || 1));
     fieldWrapper.style.setProperty('--fi', inverse.toFixed(3));
   }
   function decoratePlayers() {
     field.querySelectorAll('.player').forEach(el => {
       const top = parseFloat(el.style.top), left = parseFloat(el.style.left);
       el.classList.toggle('near-goal', top > 590);
-      el.classList.toggle('near-edge', top > 590 && left > 360);
+      const point = fieldToView(left, top);
+      const inverse = parseFloat(fieldWrapper.style.getPropertyValue('--fi')) || 1;
       const input = el.querySelector('input');
+      if (isHorizontalPitch()) {
+        const radius = Math.max(44, 36 * inverse) / 2;
+        const rightSpace = FIELD_H - point.x - radius - 4 * inverse;
+        const leftSpace = point.x - radius - 4 * inverse;
+        const nearEdge = rightSpace < (input ? 120 : 66) * inverse && leftSpace > rightSpace;
+        el.classList.toggle('near-edge', nearEdge);
+        const space = Math.max(1, nearEdge ? leftSpace : rightSpace).toFixed(3) + 'px';
+        if (el.style.getPropertyValue('--name-space') !== space) el.style.setProperty('--name-space', space);
+      } else el.classList.toggle('near-edge', top > 590 && left > 360);
       if (input && !input.dataset.uiReady) {
         input.dataset.uiReady = '1';
         input.enterKeyHint = 'done';
@@ -5158,6 +5456,10 @@ _readyPromise = (async () => {
   // 짧은 터치 탭 → 공개 계약 select-player (R1: touchstart가 click을 막는 환경에서도 선택 도구가 열리게).
   // select-player는 멱등이라 브라우저가 click을 함께 보내도 결과가 같다. 끌기·길게 누르기는 기존 처리 그대로.
   let tap = null;
+  window.addEventListener('resize', () => { tap = null; });
+  window.addEventListener('blur', () => { tap = null; });
+  window.addEventListener('pagehide', () => { tap = null; });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') tap = null; });
   field.addEventListener('touchstart', event => {
     const el = event.target.closest('.player');
     if (!el || event.touches.length !== 1 || el.querySelector('input')) { tap = null; return; }
@@ -5192,6 +5494,66 @@ _readyPromise = (async () => {
     const pattern = (s.snapshot?.pat || [])[s.view?.patternIndex || 0];
     return pattern?.n || '';
   }
+  let editingFilesSignature = '', editingLineupSignature = '';
+  function renderEditingLibrary(s, lib, team) {
+    const readOnly = Boolean(s.view?.readOnly);
+    $('editingLibrary').hidden = readOnly;
+    if (readOnly) return;
+    $('editingLibraryTeam').textContent = team?.name || '팀 없음';
+    const busy = !s.ready || Boolean(s.busy?.mutation || s.export?.busy);
+    const files = (lib.items || []).filter(file => file.teamId === lib.teamId);
+    const fileSignature = JSON.stringify([files, lib.fileId, busy]);
+    if (fileSignature !== editingFilesSignature) {
+      editingFilesSignature = fileSignature;
+      const focused = document.activeElement?.closest?.('#editingFiles button')?.dataset.fileId;
+      $('editingFiles').replaceChildren(...files.map(file => {
+        const item = document.createElement('li');
+        const button = document.createElement('button');
+        button.type = 'button'; button.className = 'editing-file'; button.dataset.fileId = file.id;
+        const current = file.id === lib.fileId;
+        button.setAttribute('aria-current', String(current)); button.disabled = busy;
+        const name = document.createElement('span'); name.className = 'editing-file-name'; name.textContent = file.name;
+        const meta = document.createElement('span'); meta.className = 'editing-file-meta'; meta.textContent = current ? '현재 편집 중' : '전술 열기';
+        button.append(name, meta); button.title = file.name;
+        button.addEventListener('click', async () => {
+          if (current) return;
+          const openedId = file.id;
+          const result = await runLibrary('open-file', { id: file.id }, file.name);
+          const status = $('editingLibraryStatus');
+          status.textContent = result.status === 'success' ? `"${file.name}" 전술을 열었습니다.` : result.status === 'cancelled' ? '전술 열기를 취소했습니다.' : codeText(result.code);
+          status.dataset.tone = result.status === 'success' ? 'success' : result.status === 'cancelled' ? 'neutral' : 'error';
+          [...$('editingFiles').querySelectorAll('button')].find(item => item.dataset.fileId === openedId)?.focus({ preventScroll: true });
+        });
+        item.appendChild(button); return item;
+      }));
+      if (!files.length) { const item = document.createElement('li'); item.className = 'editing-list-empty'; item.textContent = '전술 목록에서 새 전술을 만들어 주세요.'; $('editingFiles').appendChild(item); }
+      if (focused) [...$('editingFiles').querySelectorAll('button')].find(button => button.dataset.fileId === focused)?.focus({ preventScroll: true });
+    }
+    const players = s.snapshot?.roster || [];
+    const selected = s.view?.selectedPlayerId;
+    const lineupSignature = JSON.stringify([players, selected, busy]);
+    if (lineupSignature !== editingLineupSignature) {
+      editingLineupSignature = lineupSignature;
+      const focused = document.activeElement?.closest?.('#editingLineup button')?.dataset.playerId;
+      $('editingLineup').replaceChildren(...players.map((player, index) => {
+        const item = document.createElement('li');
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'editing-player';
+        button.dataset.playerId = player.id; button.setAttribute('aria-pressed', String(player.id === selected));
+        button.title = player.name; button.disabled = busy;
+        const number = document.createElement('span'); number.className = 'editing-player-number'; number.textContent = index + 1;
+        number.style.background = player.color; number.style.color = playerNumberInk(player.color);
+        const name = document.createElement('span'); name.className = 'editing-player-name'; name.textContent = player.name;
+        button.append(number, name);
+        button.addEventListener('click', async () => {
+          const result = await contract.run('select-player', { id: player.id });
+          if (result.status === 'success') field.querySelector(`.player[data-id="${player.id}"]`)?.focus({ preventScroll: true });
+        });
+        item.appendChild(button); return item;
+      }));
+      if (focused) [...$('editingLineup').querySelectorAll('button')].find(button => button.dataset.playerId === focused)?.focus({ preventScroll: true });
+    }
+    $('editingLibraryOpenBtn').disabled = busy;
+  }
   function render() {
     const s = state;
     const readOnly = Boolean(s.view?.readOnly);
@@ -5206,6 +5568,7 @@ _readyPromise = (async () => {
     body.classList.toggle('has-selection', !readOnly && appMode === 'squad' && $('playerActions').classList.contains('visible'));
 
     const { lib, team, file } = libraryNames(s);
+    renderEditingLibrary(s, lib, team);
     const squad = SQUAD_LABEL[s.snapshot?.squad] || '기본';
     $('fileTeamName').textContent = team?.name || (lib.supported ? '팀 없음' : '이 기기');
     $('fileName').textContent = file?.name || (s.storage?.status === 'no-file' ? '보관된 전술 없음' : '전술');
@@ -5228,6 +5591,7 @@ _readyPromise = (async () => {
     if (s.export?.busy) setExportStatus(`${KIND_LABEL[s.export.kind] || '결과물'} 만드는 중입니다.`, 'busy');
     // 목록 데이터가 실제로 바뀐 경우에만 다시 그린다 (저장 상태 변화마다 다시 그리면 키보드 포커스를 잃는다)
     if (!$('librarySheet').hidden && librarySignature(lib) !== lastLibrarySignature) renderLibrary();
+    if (isHorizontalPitch()) scheduleFieldScale();
   }
   let lastLibrarySignature = '';
   function librarySignature(lib) {
@@ -5343,6 +5707,7 @@ _readyPromise = (async () => {
     return true;
   }
   $('fileTitleBtn').addEventListener('click', () => openLibrary());
+  $('editingLibraryOpenBtn').addEventListener('click', () => openLibrary());
   $('libraryCloseBtn').addEventListener('click', closeLibrary);
   librarySheet.addEventListener('click', event => { if (event.target === librarySheet) closeLibrary(); });
 

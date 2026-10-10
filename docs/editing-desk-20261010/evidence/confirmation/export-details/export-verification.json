@@ -1,0 +1,494 @@
+{
+  "stage": "confirmation",
+  "extractedAtUtc": "2026-10-10T00:25:03.071629+00:00",
+  "inputVerificationSha256": "86be4ecd70f1642fcb9a15e63f78d61dcd234e33b8311f449a10c761c481be7f",
+  "sourceIdentityFromCapture": {
+    "gitHead": "0e46f1ff418e0bb8e1ffad84074c4b344873935d",
+    "gitHeadIndexBlob": "2a1349e11c892a3c82188d5bf50531838368e868",
+    "workingTreeIndexBlob": "69ce8ab8af687eca527aecd6e153bbf6f5e6d054",
+    "sourceSha256": "482817af0dfebed4f68c640ebfb16eb67c224b2169b1bacde67de4a05c824413",
+    "sourceSha256After": "482817af0dfebed4f68c640ebfb16eb67c224b2169b1bacde67de4a05c824413",
+    "sourceUnchanged": true
+  },
+  "qaHtmlResponseHashesFromCapture": [
+    {
+      "viewport": "1280",
+      "sha256": "32f2c7c7d32d3608f59dda4fdd42f0aa0b60fd2028c77d491026e26870ddd822"
+    },
+    {
+      "viewport": "1920",
+      "sha256": "32f2c7c7d32d3608f59dda4fdd42f0aa0b60fd2028c77d491026e26870ddd822"
+    },
+    {
+      "viewport": "390",
+      "sha256": "32f2c7c7d32d3608f59dda4fdd42f0aa0b60fd2028c77d491026e26870ddd822"
+    },
+    {
+      "viewport": "844x390",
+      "sha256": "32f2c7c7d32d3608f59dda4fdd42f0aa0b60fd2028c77d491026e26870ddd822"
+    }
+  ],
+  "sampleTeam": "가나다라마바사아자차카타파하가나다라마바",
+  "png": {
+    "filename": "squad-landscape.png",
+    "sha256": "c0d1ac8edb01b28a35e6e2c99555798dfd51591dcddd7f739f7b3c5a4afd08d5",
+    "width": 1200,
+    "height": 1830,
+    "expectedDimensions": [
+      1200,
+      1830
+    ],
+    "dimensionsMatch": true,
+    "scale": 2.5,
+    "headerHeightOutputPixels": 180.0,
+    "headerHeightLogicalPixels": 72.0,
+    "players": [
+      {
+        "playerId": 1,
+        "name": "골키퍼이름가독성확인",
+        "sourceColor": "#85b8e4",
+        "logicalPosition": {
+          "x": 240,
+          "y": 622
+        },
+        "expectedOutputCenter": [
+          600.0,
+          1735.0
+        ],
+        "toleranceOutputPixels": 1.5,
+        "found": true,
+        "actual": {
+          "bbox": [
+            551,
+            1685,
+            648,
+            1784
+          ],
+          "center": [
+            599.5,
+            1734.5
+          ],
+          "area": 7347,
+          "width": 98,
+          "height": 100
+        },
+        "deltaOutputPixels": [
+          -0.5,
+          -0.5
+        ],
+        "centerWithinTolerance": true
+      },
+      {
+        "playerId": 2,
+        "name": "수비1",
+        "sourceColor": "#1E88E5",
+        "logicalPosition": {
+          "x": 130,
+          "y": 510
+        },
+        "expectedOutputCenter": [
+          325.0,
+          1455.0
+        ],
+        "toleranceOutputPixels": 1.5,
+        "found": true,
+        "actual": {
+          "bbox": [
+            276,
+            1405,
+            373,
+            1504
+          ],
+          "center": [
+            324.5,
+            1454.5
+          ],
+          "area": 7161,
+          "width": 98,
+          "height": 100
+        },
+        "deltaOutputPixels": [
+          -0.5,
+          -0.5
+        ],
+        "centerWithinTolerance": true
+      },
+      {
+        "playerId": 3,
+        "name": "수비2",
+        "sourceColor": "#1E88E5",
+        "logicalPosition": {
+          "x": 240,
+          "y": 510
+        },
+        "expectedOutputCenter": [
+          600.0,
+          1455.0
+        ],
+        "toleranceOutputPixels": 1.5,
+        "found": true,
+        "actual": {
+          "bbox": [
+            551,
+            1405,
+            648,
+            1504
+          ],
+          "center": [
+            599.5,
+            1454.5
+          ],
+          "area": 7147,
+          "width": 98,
+          "height": 100
+        },
+        "deltaOutputPixels": [
+          -0.5,
+          -0.5
+        ],
+        "centerWithinTolerance": true
+      },
+      {
+        "playerId": 4,
+        "name": "수비3",
+        "sourceColor": "#1E88E5",
+        "logicalPosition": {
+          "x": 350,
+          "y": 510
+        },
+        "expectedOutputCenter": [
+          875.0,
+          1455.0
+        ],
+        "toleranceOutputPixels": 1.5,
+        "found": true,
+        "actual": {
+          "bbox": [
+            826,
+            1405,
+            923,
+            1504
+          ],
+          "center": [
+            874.5,
+            1454.5
+          ],
+          "area": 7152,
+          "width": 98,
+          "height": 100
+        },
+        "deltaOutputPixels": [
+          -0.5,
+          -0.5
+        ],
+        "centerWithinTolerance": true
+      },
+      {
+        "playerId": 5,
+        "name": "미드필더긴이름확인",
+        "sourceColor": "#FFD600",
+        "logicalPosition": {
+          "x": 130,
+          "y": 385
+        },
+        "expectedOutputCenter": [
+          325.0,
+          1142.5
+        ],
+        "toleranceOutputPixels": 1.5,
+        "found": true,
+        "actual": {
+          "bbox": [
+            275,
+            1093,
+            374,
+            1191
+          ],
+          "center": [
+            324.5,
+            1142.0
+          ],
+          "area": 7125,
+          "width": 100,
+          "height": 99
+        },
+        "deltaOutputPixels": [
+          -0.5,
+          -0.5
+        ],
+        "centerWithinTolerance": true
+      },
+      {
+        "playerId": 6,
+        "name": "미드2",
+        "sourceColor": "#1E88E5",
+        "logicalPosition": {
+          "x": 240,
+          "y": 385
+        },
+        "expectedOutputCenter": [
+          600.0,
+          1142.5
+        ],
+        "toleranceOutputPixels": 1.5,
+        "found": true,
+        "actual": {
+          "bbox": [
+            550,
+            1093,
+            649,
+            1191
+          ],
+          "center": [
+            599.5,
+            1142.0
+          ],
+          "area": 7153,
+          "width": 100,
+          "height": 99
+        },
+        "deltaOutputPixels": [
+          -0.5,
+          -0.5
+        ],
+        "centerWithinTolerance": true
+      },
+      {
+        "playerId": 7,
+        "name": "미드3",
+        "sourceColor": "#1E88E5",
+        "logicalPosition": {
+          "x": 350,
+          "y": 385
+        },
+        "expectedOutputCenter": [
+          875.0,
+          1142.5
+        ],
+        "toleranceOutputPixels": 1.5,
+        "found": true,
+        "actual": {
+          "bbox": [
+            825,
+            1093,
+            924,
+            1191
+          ],
+          "center": [
+            874.5,
+            1142.0
+          ],
+          "area": 7247,
+          "width": 100,
+          "height": 99
+        },
+        "deltaOutputPixels": [
+          -0.5,
+          -0.5
+        ],
+        "centerWithinTolerance": true
+      },
+      {
+        "playerId": 8,
+        "name": "공격1",
+        "sourceColor": "#1E88E5",
+        "logicalPosition": {
+          "x": 167,
+          "y": 240
+        },
+        "expectedOutputCenter": [
+          417.5,
+          780.0
+        ],
+        "toleranceOutputPixels": 1.5,
+        "found": true,
+        "actual": {
+          "bbox": [
+            368,
+            730,
+            466,
+            829
+          ],
+          "center": [
+            417.0,
+            779.5
+          ],
+          "area": 6995,
+          "width": 99,
+          "height": 100
+        },
+        "deltaOutputPixels": [
+          -0.5,
+          -0.5
+        ],
+        "centerWithinTolerance": true
+      },
+      {
+        "playerId": 9,
+        "name": "공격2",
+        "sourceColor": "#1E88E5",
+        "logicalPosition": {
+          "x": 313,
+          "y": 240
+        },
+        "expectedOutputCenter": [
+          782.5,
+          780.0
+        ],
+        "toleranceOutputPixels": 1.5,
+        "found": true,
+        "actual": {
+          "bbox": [
+            733,
+            730,
+            831,
+            829
+          ],
+          "center": [
+            782.0,
+            779.5
+          ],
+          "area": 7169,
+          "width": 99,
+          "height": 100
+        },
+        "deltaOutputPixels": [
+          -0.5,
+          -0.5
+        ],
+        "centerWithinTolerance": true
+      }
+    ],
+    "allCentersWithinTolerance": true
+  },
+  "gif": {
+    "filename": "single-pattern.gif",
+    "sha256": "c684b2f017b5d1e9b760bba05337340a44155a3d2c041c2a7779b9bec8892ae5",
+    "width": 480,
+    "height": 732,
+    "frameCount": 78,
+    "expectedDimensions": [
+      480,
+      732
+    ],
+    "dimensionsMatch": true,
+    "expectedFrameCount": 78,
+    "frameCountMatches": true,
+    "delaysMilliseconds": [
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120
+    ],
+    "delaySequenceMatches": true,
+    "frames": [
+      {
+        "label": "first",
+        "index": 0,
+        "filename": "gif-first.png",
+        "sha256": "c1357637f76402cef51afce731451fa2a72b6adae74ed3266b462a1dc1d29f57",
+        "width": 480,
+        "height": 732,
+        "delayMilliseconds": 60
+      },
+      {
+        "label": "middle",
+        "index": 39,
+        "filename": "gif-middle.png",
+        "sha256": "aa3fe554f749bc72198e6bf874b9a46470da7298853ff08d60a4dbbf14279f0d",
+        "width": 480,
+        "height": 732,
+        "delayMilliseconds": 60
+      },
+      {
+        "label": "last",
+        "index": 77,
+        "filename": "gif-last.png",
+        "sha256": "3a1f1611bb4891d4e0e3551d97c54634b18af60f15cb9bf0c1aa177092bbf045",
+        "width": 480,
+        "height": 732,
+        "delayMilliseconds": 120
+      }
+    ]
+  },
+  "sourceFilesUnchanged": true,
+  "limitations": [
+    "PNG centers use exact RGB connected-component bounds and a 1.5 output-pixel tolerance.",
+    "Extracted frames are visual evidence; automatic text recognition and header-overlap checks are not claimed.",
+    "Source identities are copied from capture metadata; this extractor does not claim to validate current application code."
+  ]
+}
