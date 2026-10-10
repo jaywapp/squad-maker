@@ -1,0 +1,142 @@
+[
+  {
+    "antipattern": "gpt-thin-border-wide-shadow",
+    "name": "Hairline border with wide shadow",
+    "description": "A hairline border paired with a wide, diffuse shadow is a recurring generated-UI signature. Commit to one — a defined edge or a soft elevation — rather than both at once.",
+    "severity": "advisory",
+    "category": "slop",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "1px border + 24px shadow blur"
+  },
+  {
+    "antipattern": "gpt-thin-border-wide-shadow",
+    "name": "Hairline border with wide shadow",
+    "description": "A hairline border paired with a wide, diffuse shadow is a recurring generated-UI signature. Commit to one — a defined edge or a soft elevation — rather than both at once.",
+    "severity": "advisory",
+    "category": "slop",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "1px border + 24px shadow blur"
+  },
+  {
+    "antipattern": "gpt-thin-border-wide-shadow",
+    "name": "Hairline border with wide shadow",
+    "description": "A hairline border paired with a wide, diffuse shadow is a recurring generated-UI signature. Commit to one — a defined edge or a soft elevation — rather than both at once.",
+    "severity": "advisory",
+    "category": "slop",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "1px border + 40px shadow blur"
+  },
+  {
+    "antipattern": "all-caps-body",
+    "name": "All-caps body text",
+    "description": "Long passages in uppercase are hard to read. We recognize words by shape (ascenders and descenders), which all-caps removes. Reserve uppercase for short labels and headings.",
+    "severity": "warning",
+    "category": "quality",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "text-transform: uppercase on 34 chars of body text"
+  },
+  {
+    "antipattern": "gpt-thin-border-wide-shadow",
+    "name": "Hairline border with wide shadow",
+    "description": "A hairline border paired with a wide, diffuse shadow is a recurring generated-UI signature. Commit to one — a defined edge or a soft elevation — rather than both at once.",
+    "severity": "advisory",
+    "category": "slop",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "1px border + 40px shadow blur"
+  },
+  {
+    "antipattern": "gpt-thin-border-wide-shadow",
+    "name": "Hairline border with wide shadow",
+    "description": "A hairline border paired with a wide, diffuse shadow is a recurring generated-UI signature. Commit to one — a defined edge or a soft elevation — rather than both at once.",
+    "severity": "advisory",
+    "category": "slop",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "1px border + 40px shadow blur"
+  },
+  {
+    "antipattern": "gpt-thin-border-wide-shadow",
+    "name": "Hairline border with wide shadow",
+    "description": "A hairline border paired with a wide, diffuse shadow is a recurring generated-UI signature. Commit to one — a defined edge or a soft elevation — rather than both at once.",
+    "severity": "advisory",
+    "category": "slop",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "1px border + 40px shadow blur"
+  },
+  {
+    "antipattern": "text-occlusion",
+    "name": "Text occluded by an overlapping element",
+    "description": "Text is painted under an opaque element or a second text run, so part of it cannot be read. A decorative box, a stacked layer, or an inline element with leaked padding lands on the words instead of beside them. Give overlapping layers room, or move the text out from under the layer above it.",
+    "severity": "warning",
+    "category": "quality",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "span.wm-sub \"전술 보드\" is 67% covered by an opaque element (div)"
+  },
+  {
+    "antipattern": "text-occlusion",
+    "name": "Text occluded by an overlapping element",
+    "description": "Text is painted under an opaque element or a second text run, so part of it cannot be read. A decorative box, a stacked layer, or an inline element with leaked padding lands on the words instead of beside them. Give overlapping layers room, or move the text out from under the layer above it.",
+    "severity": "warning",
+    "category": "quality",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "span \"기기에 저장됨\" is 93% covered by an opaque element (select.formation-select.editor-only)"
+  },
+  {
+    "antipattern": "text-occlusion",
+    "name": "Text occluded by an overlapping element",
+    "description": "Text is painted under an opaque element or a second text run, so part of it cannot be read. A decorative box, a stacked layer, or an inline element with leaked padding lands on the words instead of beside them. Give overlapping layers room, or move the text out from under the layer above it.",
+    "severity": "warning",
+    "category": "quality",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "div.player-name \"GK\" is 67% covered by an opaque element (div.player-circle)"
+  },
+  {
+    "antipattern": "text-occlusion",
+    "name": "Text occluded by an overlapping element",
+    "description": "Text is painted under an opaque element or a second text run, so part of it cannot be read. A decorative box, a stacked layer, or an inline element with leaked padding lands on the words instead of beside them. Give overlapping layers room, or move the text out from under the layer above it.",
+    "severity": "warning",
+    "category": "quality",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "div.player-name \"수비1\" is 67% covered by an opaque element (div.player-circle)"
+  },
+  {
+    "antipattern": "text-occlusion",
+    "name": "Text occluded by an overlapping element",
+    "description": "Text is painted under an opaque element or a second text run, so part of it cannot be read. A decorative box, a stacked layer, or an inline element with leaked padding lands on the words instead of beside them. Give overlapping layers room, or move the text out from under the layer above it.",
+    "severity": "warning",
+    "category": "quality",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "div.player-name \"수비2\" is 67% covered by an opaque element (div.player-circle)"
+  },
+  {
+    "antipattern": "text-occlusion",
+    "name": "Text occluded by an overlapping element",
+    "description": "Text is painted under an opaque element or a second text run, so part of it cannot be read. A decorative box, a stacked layer, or an inline element with leaked padding lands on the words instead of beside them. Give overlapping layers room, or move the text out from under the layer above it.",
+    "severity": "warning",
+    "category": "quality",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "div.player-name \"수비3\" is 67% covered by an opaque element (div.player-circle)"
+  },
+  {
+    "antipattern": "repeating-stripes-gradient",
+    "name": "Repeating-gradient stripes",
+    "description": "Repeating-gradient stripes used as surface decoration are a recurring generated-UI signature. Reach for a deliberate texture or leave the surface plain.",
+    "severity": "advisory",
+    "category": "slop",
+    "file": "http://127.0.0.1:4322/index.html",
+    "line": 0,
+    "snippet": "repeating-gradient decorative stripes"
+  }
+]
