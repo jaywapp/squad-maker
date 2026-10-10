@@ -7,8 +7,8 @@
 - 기능 기준: PR52 `d449d02b9f90133bda905dda90acf7a49b4277f1`. 한글 적용 작업 트리는 이 커밋에서 분리한 `feat/korean-branding-20261010`이다.
 - 승인 자산 기준: PR53 `d41ea68ff27061e8b1d3c3d8f9c9dca34f889c12`의 아이엠 헤드코치 A안. 마크·색·아이콘·Run Line 개선·광고는 유지한다.
 - 사람에게 보이는 이름은 `아이엠 헤드코치`로 승인되었다. 공백은 한 개이며 영문 병기와 새 부제는 추가하지 않는다.
-- 기술 이름은 `iam-headcoach` 추천, `i-am-headcoach` 대안으로 **미확정**이다. npm·제품용 자산 경로·향후 로컬 폴더에 어느 이름도 확정값으로 적용하지 않는다.
-- Android 표시 이름은 `아이엠 헤드코치 Preview` 추천과 `아이엠 헤드코치` 사이에서 **미확정**이다. 런처에서 잘린다는 이유로 별도 축약명을 정하지 않는다.
+- 기술 이름은 사용자 답변으로 **iam-headcoach 확정**이다. private npm/lock root와 제품 전달 파일명에 적용한다. 향후 로컬 폴더는 `D:\station\repos\iam-headcoach`로 명명하되 이번에는 이동하지 않는다.
+- Android 표시 이름은 사용자 답변으로 **아이엠 헤드코치 확정**이다. appName/app_name/title_activity_main에서 Preview를 붙이지 않는다. 패키지·버전 계보·릴리스 채널의 Preview는 호환성/배포 구분이므로 유지한다. 런처용 축약명을 만들지 않는다.
 - 상표에 관한 사용자 참고 자료는 참고 범위로만 취급한다. 법적 사용 가능·불가, 국내외 상표 조사 완료, 등록 가능성을 결론 내리지 않는다. 참고 자료의 원문이나 사용자 제공 주소를 이 문서에 복사하지 않는다.
 
 최신 통합 계약은 [분석](korean-branding-20261010-analysis.md), [설계](korean-branding-20261010-design.md), [작업 계획](korean-branding-20261010-tasks.md)을 따른다. 아래 표는 변경 대상의 대응표이며 적용 완료를 뜻하지 않는다. 통합 이후의 실제 완료 여부는 작업 계획과 최종 diff·검증 결과로 판정한다.
@@ -26,17 +26,17 @@
 | 사람용·승인 | `[스쿼드 메이커 진단 정보]` | `[아이엠 헤드코치 진단 정보]` | 진단 payload·복사·버전 출처 유지 |
 | 사람용·승인 | README 제목 `스쿼드 메이커` | `아이엠 헤드코치` | 현재 제품 설명만 정합화. 과거 이력은 별도 분류 |
 | 사람용·승인 | package description `SQUAD MAKER — 아마추어 축구 전술 보드` | `아이엠 헤드코치 — 아마추어 축구 전술 보드` | 설명 metadata이며 기능·의존성 변경 없음 |
-| 사람용·조건부 | capacitor `appName`, Android `app_name`·`title_activity_main`: `스쿼드 메이커 Preview` | `아이엠 헤드코치 Preview` 추천 또는 `아이엠 헤드코치` | Preview 답변 전 적용 대기. appId·scheme와 분리 |
+| 사람용·확정 | capacitor `appName`, Android `app_name`·`title_activity_main`: `스쿼드 메이커 Preview` | `아이엠 헤드코치` | 사용자 확정·표시값만 반영, appId/scheme 보존 |
 | 사람용·승인 | release 표시 제목 `SQUAD MAKER Preview ${info.versionName}` | `아이엠 헤드코치 Preview ${info.versionName}` | 사용자에게 보이는 제목만. APK 파일명·tag·marker·version은 유지 |
-| 기술용·조건부 npm | package `name` 및 lockfile root/`packages[""]`의 `squad-maker` | `iam-headcoach` 추천 또는 `i-am-headcoach` | slug 답변 후 세 위치 일치. private 패키지이며 감사 범위에서 자기 이름 import는 발견하지 못함 |
-| 기술용·조건부 제품 복사본 | 공급 generic `logo-header.svg`, `wordmark.svg`, `brand-intro.snippet.html` 등 | 필요할 때만 `assets/branding/<확정 기술 이름>/`의 제품 복사본 제안 | 새 경로가 필요하다는 결정도 별도. 파일 복사 시 원본 해시·출처와 참조 연결 검증. 인라인만 사용하면 불필요한 복사본을 만들지 않음 |
+| 기술용·확정 npm | package `name` 및 lockfile root/`packages[""]`의 `squad-maker` | `iam-headcoach` | 세 위치 일치, 의존성 subtree 불변. self-name import 발견0 |
+| 기술용·확정 제품 전달본 | 공급 generic SVG6·web snippet3 | `assets/branding/iam-headcoach/iam-headcoach-*` | 승인 원본 byte-identical, on-light QA는 새 제품 경로 참조. 앱 inline/bootstrap는 유지 |
 | 자산 원본·보존 | `docs/branding/headcoach/assets/svg`, `assets/web`, `assets/png`, `assets/*/unchanged` | 같은 경로·원본 유지 | 공급 패키지와 provenance를 기술 slug에 맞춰 이동하지 않음 |
 | 자산 원본·보존 | `docs/branding/headcoach/tools` 및 기존 원본 작업 문서 | 같은 경로·원본 유지 | 변환용 구 이름 match 조건까지 치환하지 않음. 최신 적용 차이는 통합 문서에서 설명 |
 | 호환성·공개 계약 | packageID, 저장 키, globals·이벤트, API·릴리스 식별자 | 기존 값 유지 | 아래 보존 계약 참조 |
 | framework·표준 | `ic_launcher`, Android resource 키, `MainActivity`, `:app`, capacitor 생성 설정·상대 빌드 경로 | 유지 | 브랜드 문자열과 별개. generated 내용은 검증된 빌드/sync로만 재생성 |
 | framework·현재 설정 | `android/settings.gradle`에는 `rootProject.name` 없음 | 추가하지 않음 | 이름 변경만으로 새 Gradle 설정을 만들 필요 없음 |
 | 과거 이력·보존 | `docs/branding/run-line`, 과거 analysis/design/tasks, 날짜별 테스트·branch·worktree 이름 | 기존 이름 유지 | 과거 시점과 승인 근거를 보존. 현재 안내만 최신 통합 문서에 연결 |
-| 폴더·조건부 | `D:\station\repos\squad-maker` | `D:\station\repos\<확정 기술 이름>` 제안 | 실제 루트 이동 승인 없음. 경로 전환은 아래 별도 절차 |
+| 폴더·이동 분리 | `D:\station\repos\squad-maker` | 향후 `D:\station\repos\iam-headcoach` | 이름 확정, 현재 실제 루트 이동 없음. 전환 절차·범위는 별도 |
 | 타 저장소·범위 밖 | `repos/fc-squad-maker` | 유지 | 이름 일부가 같아도 독립 저장소 |
 | 별도 기존 경로·미확인 | `D:\workspace\repositories\apps\squad-maker` | 자동 변경하지 않음 | 존재만 확인. station 대상과 동일한 원격·용도인지는 미확인 |
 
@@ -66,7 +66,7 @@
 |---|---|---|
 | 호환성 | packageID, 저장 키, globals, 이벤트, endpoint·repository identity, APK 파일명·marker·CI group | 의도된 잔존. 보존 계약과 테스트에 대응하면 누락으로 보지 않음 |
 | 과거 기록·원본 | 기존 PR/branch/worktree·날짜별 문서, 공급 원본, 도구의 old-match 입력 | 의도된 이력. 원문을 새 이름으로 덮어쓰지 않고 최신 통합 문서로 연결 |
-| 변경 대기 | npm name·제품용 자산 경로·로컬 루트·Android Preview 결정 | 미확정 상태를 기록. 답변 전 구현·이동하지 않음 |
+| 경로 전환 대기 | 활성 로컬 루트 | 기술 이름은 확정. 실제 root/worktree/hub 이동은 이 작업에서 실행하지 않고 별도 전환 절차 유지 |
 | framework·업무 용어 | `.squad-tabs`, snapshot의 `squads`, Android resource 키·클래스, capacitor 파일명 | 전술 자료 구조·표준 식별자. 브랜드의 이전 이름으로 분류하지 않음 |
 | 누락 | 최종 통합 뒤 실제 사용자에게 보이는 구 워드마크, title·접근성 이름·도움말·진단 제목, 현재 README 제목 | 승인 목록 대상인데 남았으면 누락 후보. 문맥·실제 렌더·최종 diff로 확인하고 소유자에게 수정 요청 |
 
@@ -92,7 +92,7 @@
 
 | 단계 | 선행 조건·수행 범위 | 통과 증거 | 중단 기준 |
 |---|---|---|---|
-| 1. 범위 확정 | 기술 slug, source/destination 절대 경로, 로컬 이동·hub 변경 범위를 별도 승인 | 승인 기록과 대상 whitelist | 미확정 slug, destination 충돌, 타 저장소 포함 |
+| 1. 범위 확정 | 확정 기술명 iam-headcoach를 사용하고 source/destination 절대 경로·로컬 이동·hub 변경 범위를 별도 승인 | 이름 확정 답변·이동 범위 기록과 대상 whitelist | 이동 범위 미승인, destination 충돌, 타 저장소 포함 |
 | 2. 기존 상태 기록 | primary·hub·모든 linked worktree의 HEAD/branch/status/gitdir/backlink, ignored·untracked 자료와 junction 목록 기록 | 이동 전 상태 목록과 복구 가능한 보존 계획 | 사용자 변경 소유 불명, 자료 보존 불가, gitlink 차이를 설명하지 못함 |
 | 3. 사용 세션 확인 | 서버·IDE·Codex/Claude·MCP·자동화 중 대상 cwd를 실제 확인. 중지 또는 재연결 계획을 승인 범위에서 준비 | 대상 프로세스와 cwd의 확실한 연결, 재시작 계획 | cwd 미확인 프로세스를 추측으로 종료해야 하는 상황 |
 | 4. Git 경로 전환 | 서브모듈 gitfile 구조에 맞는 검증된 Git-aware 방법 선택. 내부 section/gitdir·기존 linked worktree 경로는 가능한 유지 | .gitmodules path·gitfile·core.worktree·backlink가 서로 일치 | 관련 없는 .gitmodules 변경, 기존 gitlink/HEAD 변동, dangling 연결 |
@@ -120,11 +120,11 @@
 - 원본 문서·tools·asset blobs를 새 요구에 맞춰 덮어쓰지 않는다.
 - 최신 [분석](korean-branding-20261010-analysis.md)·[설계](korean-branding-20261010-design.md)·[작업 계획](korean-branding-20261010-tasks.md)에서 PR52 기반 적용과 override 이유를 연결한다.
 - 원본 도구의 적용 앵커가 현 index와 다르면 실행하지 않고 차이를 확인한다. 승인 자산을 의미 단위로 통합하며 ready/저장/제보/공유 계약을 유지한다.
-- 제품 복사본이 필요하면 기술 이름 결정 후 별도 생성하고 원본과의 동일성·라이선스·출처를 검증한다. 원본 경로는 유지한다.
+- 확정 기술 이름의 제품 사본9개를 assets/branding/iam-headcoach에 생성했다. 원본과의 동일성·라이선스·출처는 제품 README와 naming-final 기록에서 검증하고 원본 경로를 유지한다.
 - 사용자 자료·세션 대화·원본 URL·시크릿은 문서에 복사하지 않는다. 이 문서에는 필요한 식별자와 조사 메타데이터만 기록한다.
 
 ## 이번 문서의 검증과 한계
 
-현재 작업 트리의 package/lock 계약, capacitor/Android 이름·settings, 빌드·릴리스·CI 식별자, 관련 테스트와 원본 자산 경로를 읽기 대조했다. 문서는 지정된 단일 파일만 작성하고 로컬 상대 링크와 diff를 정적 확인한다. 실행 명령의 Git 조회에는 `core.fsmonitor=false`, 셸에는 `login=false`를 사용했다.
+현재 작업 트리의 package/lock 계약, capacitor/Android 이름·settings, 빌드·릴리스·CI 식별자, 관련 테스트와 원본 자산 경로를 읽기 대조했다. 통합 문서·제품 자산·관련 QA 참조의 로컬 상대 링크와 diff를 정적 확인한다. 실행 명령의 Git 조회에는 `core.fsmonitor=false`, 셸에는 `login=false`를 사용했다.
 
-실제 루트 이동·새 npm 이름 적용·원격 rename·서버 재연결·실기기 업데이트·상표 검토는 미실행이다. 본 문서는 이후 적용의 체크 기준이며 제품 전체 테스트 통과나 배포 준비 완료를 대신하지 않는다.
+실제 루트 이동·원격 rename·서버 재연결·실기기 업데이트·상표 검토는 미실행이다. npm/Android 이름은 확정 답변대로 적용했고 이름을 반영한 새로운 소스의 검증은 PR54와 naming-final 기록을 따른다. 본 문서는 이후 적용의 체크 기준이며 제품 전체 테스트 통과나 배포 준비 완료를 대신하지 않는다.

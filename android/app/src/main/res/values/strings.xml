@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">스쿼드 메이커 Preview</string>
-    <string name="title_activity_main">스쿼드 메이커 Preview</string>
+    <string name="app_name">아이엠 헤드코치</string>
+    <string name="title_activity_main">아이엠 헤드코치</string>
     <string name="package_name">com.jaywapp.squadmaker.preview</string>
     <string name="custom_url_scheme">com.jaywapp.squadmaker.preview</string>
 </resources>

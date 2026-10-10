@@ -152,8 +152,8 @@ test('simulated 200 percent CSS text sizing keeps the header and help actions ap
 });
 
 test('supplied light-background vectors render dark lettering and the retained lime symbol', async ({ page }, testInfo) => {
-  const assetDir = path.join(__dirname, '..', '..', 'docs', 'branding', 'headcoach', 'assets', 'svg');
-  const names = ['logo-header-on-light.svg', 'logo-horizontal-on-light.svg', 'wordmark-on-light.svg'];
+  const assetDir = path.join(__dirname, '..', '..', 'assets', 'branding', 'iam-headcoach');
+  const names = ['iam-headcoach-header-on-light.svg', 'iam-headcoach-horizontal-on-light.svg', 'iam-headcoach-wordmark-on-light.svg'];
   const sources = await Promise.all(names.map(name => fs.readFile(path.join(assetDir, name), 'utf8')));
   await stubExportCdn(page);
   await page.goto('/index.html');

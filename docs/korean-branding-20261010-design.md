@@ -7,23 +7,24 @@
 - 헤더/인트로는 `docs/branding/headcoach/assets/web`의 최종 스니펫을 의미 단위로 삽입한다. XML/SVG path·색·모션을 손으로 재작성하지 않는다. PR52 ready/getAppInfo/제보/공유·storage/좌표/undo/CAS 계약을 유지한다.
 - `h1.wordmark`, `svg.wordmark-logo`, `script[data-brand-intro]` selector와 bootstrap 순서는 유지한다. 주석 예제 h1을 운영 태그로 오인하지 않는다.
 - 표시 문구는 위치별 변경 목록으로 처리하며 전체 문자열 치환은 하지 않는다. font-license/provenance와 원본 assets는 보존한다.
-- 기술 식별자는 승인 후 적용한다. 호환 식별자·원본/과거 문서·외부 URL은 그대로 남겨 분류한다.
+- 기술 식별자는 사용자 확정 답변에 따라 적용한다. 호환 식별자·원본/과거 문서·외부 URL은 그대로 남겨 분류한다.
 
-## 이름·경로 대응표 초안 (미확정은 제안)
+## 확정 이름·경로 대응표
 
 | 이전 이름/경로 | 새 이름/경로 | 상태·영향 |
 |---|---|---|
-| 표시명 스쿼드 메이커 | 아이엠 헤드코치 | A안 확정, UI/title/접근성/진단 |
-| Android 스쿼드 메이커 Preview | 아이엠 헤드코치 Preview 또는 아이엠 헤드코치 | 모순 확인, 사용자 결정 대기 |
-| package.json·lock root name squad-maker | iam-headcoach(추천) | 미확정, npm metadata/명시적 build test 참조 |
-| 승인 헤더/인트로 원본 docs/branding/headcoach/assets | 같은 원본 보존; 제품 참조용 assets/branding/iam-headcoach/ 제안 | 기술 이름 승인 후, 원본 blob/출처 보존 |
-| 제품용 logo-header/wordmark/intro generic 참조 | iam-headcoach-header.svg/iam-headcoach-wordmark.svg/iam-headcoach-intro.snippet.html 제안 | 확정 전 생성/교체하지 않음; source와별도 product-copy 역할 필요 여부 감사 |
-| D:\station\repos\squad-maker | D:\station\repos\iam-headcoach 제안 | 이번에는 이동하지 않음; hub submodule·saved projects·cwd·worktree·server 영향/전환 절차만 |
-| 작업트리 squad-maker-* | 기존 경로 보존 | 진행/과거 세션 연결을 보호; 임의 이동/삭제 없음 |
-| docs/branding/run-line·headcoach·work/tasks/branding | 원본/과거 위치 보존 | 승인 provenance·도구·라이선스·역사적 링크 |
-| Android ic_launcher 등 표준 resource | 유지 | 마크 디자인 동일, framework 표준명·참조 |
-| packageID/storage/schema/.sq/SquadMakerContract·Platform·Ui | 유지 | 업데이트/데이터/공개 UI 연동 계약 |
-| jaywapp/squad-maker·외부 공유/제보·squad-maker-latest.apk | 유지 | GitHub/운영/기존 링크; 변경 시 별도 승인 |
+| 스쿼드 메이커 웹 표시 | 아이엠 헤드코치 | A안 적용, 기존 헤더·인트로 보존 |
+| Android 스쿼드 메이커 Preview | 아이엠 헤드코치 | 사용자 확정, appName/두 표시 문자열만 변경 |
+| package.json/lock root squad-maker | iam-headcoach | 사용자 확정, private metadata3곳, 의존성 불변 |
+| 제공 SVG/snippet generic 명칭 | assets/branding/iam-headcoach/iam-headcoach-* | 최종 파일의 동일 내용 제품 전달본9개, QA·문서 참조 갱신 |
+| docs/branding/headcoach/assets | 원본 경로 보존 | 제작·승인·폰트/라이선스 출처·hash 검증 근거 |
+| D:\station\repos\squad-maker | 향후 D:\station\repos\iam-headcoach | 이름 확정, 현재 이동하지 않음·안전 전환 절차 유지 |
+| 기존 squad-maker-* worktree/과거 문서 | 기존 경로·이름 보존 | 세션·자료·과거 기록 유지 |
+| Android ic_launcher·resource ID | 유지 | 표준 참조·같은 승인 마크 |
+| packageID/키/저장키/schema/.sq/globals·events | 유지 | 설치·데이터·UI/native 계약 |
+| GitHub/host/domain/공개 APK basename | 유지 | 별도 승인·외부 계약 |
+
+새 제품 파일은 최종 원본의 byte-identical 사본이다. 디자인을 생성하거나 기존 인라인을 외부 img로 바꾸지 않는다. public 앱 동작은 동일하며 명명된 전달본과 테스트에서 검증한 SVG를 후속 작업에 재사용한다. 제품 파일 README가 원본/출처·라이선스·사용 위치를 연결한다.
 
 ## 검증·전환
 

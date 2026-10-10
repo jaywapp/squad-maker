@@ -13,7 +13,7 @@
 | assets/svg/unchanged 4개 + PNG store 1개 | PR52 Run Line 원본과 SHA256 동일. favicon/native adaptive·monochrome·legacy·splash 교체/재생성하지 않음 |
 | docs/branding/run-line + ux-concepts/brand-headcoach-20261010 | 원형 설계와 A/B 비교/제작 근거 보존. B안은 운영 적용하지 않음 |
 
-정확한 이름은 **아이엠 헤드코치**, ASCII 공백 1개, IBM Plex Sans KR Bold 700 아웃라인이다. 영문 병기·보조 부제·새 도형·색·글꼴 의존성을 만들지 않는다. Android Preview 포함 여부와 npm 기술 이름은 사용자 결정 전 미확정이다.
+정확한 이름은 **아이엠 헤드코치**, ASCII 공백 1개, IBM Plex Sans KR Bold 700 아웃라인이다. 영문 병기·보조 부제·새 도형·색·글꼴 의존성을 만들지 않는다. 2026-10-10 사용자 답변으로 기술 이름 `iam-headcoach`, Android 표시 이름 `아이엠 헤드코치`를 확정했다. Preview는 표시명에 붙이지 않고 기존 패키지/버전/릴리스 채널에 유지한다. 최종 제품 전달 파일9개는 [iam-headcoach 자산](../assets/branding/iam-headcoach/README.md)에서 원본 대응·해시를 확인한다. 원본45개와 공급 문서는 그대로다.
 
 ## 원본 문서의 전제와 이번 지시의 우선순위
 
