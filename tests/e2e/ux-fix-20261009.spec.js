@@ -85,7 +85,7 @@ test('feedback preparation failure disables submission, retries and returns focu
   });
   const opener = page.locator('.topbar').getByRole('button', { name: '제보', exact: true });
   await opener.click();
-  await expect(page.locator('#feedbackStatus')).toContainText('준비하지 못했습니다');
+  await expect(page.locator('#feedbackStatus')).toHaveText('제보 서버가 아직 연결되지 않았습니다. 입력 내용은 유지됩니다.');
   await expect(page.locator('#feedbackSubmit')).toBeDisabled();
   await expect(page.locator('#feedbackSubmit')).toHaveAttribute('aria-disabled', 'true');
   await page.locator('#feedbackRetryBtn').click();
