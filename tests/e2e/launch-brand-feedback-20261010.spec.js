@@ -137,8 +137,8 @@ test('web shows one approved accessible SVG wordmark, no snippet instructions an
   const logo = page.locator('h1.wordmark > svg.wordmark-logo');
   await expect(logo).toBeVisible();
   await expect(logo).toHaveAttribute('role', 'img');
-  await expect(logo).toHaveAttribute('aria-label', '스쿼드 메이커');
-  await expect(logo).toHaveAttribute('viewBox', '0 0 384 100');
+  await expect(logo).toHaveAttribute('aria-label', '아이엠 헤드코치');
+  await expect(logo).toHaveAttribute('viewBox', '0 0 415.4 100');
   await expect(logo.locator('path[d="M48 62C78 58 38 36 76 25"]')).toHaveCount(1);
   const text = await page.locator('body').innerText();
   for (const instruction of ['을 아래로 교체', '회귀 테스트', '표시 높이:', 'h1.wordmark 요소']) expect(text).not.toContain(instruction);
@@ -164,7 +164,7 @@ test('native APK metadata updates version, build and identity without changing t
   expect(await savedValues(page)).toEqual(saved);
 });
 
-test('a native intro tap finishes motion but cannot dismiss the overlay before storage is ready', async ({ page }) => {
+test('a native intro tap finishes motion but cannot dismiss the overlay before storage is ready', async ({ page }, testInfo) => {
   await boot(page, { native: true, holdStorage: true, waitReady: false });
   const intro = page.locator('#brandIntro');
   await expect(intro).toBeVisible();
@@ -173,6 +173,13 @@ test('a native intro tap finishes motion but cannot dismiss the overlay before s
   expect(await page.evaluate(() => window.SquadMakerContract.getState().ready)).toBe(false);
   await expect(intro).toBeVisible();
   expect(await intro.evaluate(element => element.classList.contains('is-leaving'))).toBe(false);
+  await page.setViewportSize({ width: 320, height: 780 });
+  await expect(intro).toHaveAttribute('aria-label', '아이엠 헤드코치');
+  await expect(intro.locator('.bi-ko, .bi-en, text')).toHaveCount(0);
+  const lockup = await intro.locator('.bi-lockup').boundingBox();
+  expect(lockup.x).toBeGreaterThanOrEqual(0);
+  expect(lockup.x + lockup.width).toBeLessThanOrEqual(320);
+  await intro.screenshot({ path: testInfo.outputPath('native-facade-intro-final-320.png') });
   await page.evaluate(() => window.__brandReleaseStorage());
   await ready(page);
   await page.clock.runFor(300);

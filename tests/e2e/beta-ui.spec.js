@@ -85,7 +85,7 @@ test.describe('베타 운영 UI', () => {
       expect(all).not.toContain(value);
     }
     // 쓰인 값은 허용된 진단 정보여야 한다
-    expect(writes[0]).toContain('스쿼드 메이커 진단 정보');
+    expect(writes[0]).toContain('아이엠 헤드코치 진단 정보');
     expect(writes[0]).toContain('버전:');
   });
 

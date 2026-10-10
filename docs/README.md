@@ -1,4 +1,4 @@
-# 스쿼드 메이커 문서 안내
+# 아이엠 헤드코치 문서 안내
 
 **최신 기준은 [상세 상품 기획서](product-plan.md)입니다.** 사용자 선택은 A — 피치 중심 코치형입니다. 제품 방향과 현재 웹 구현을 구분하며, 상품의 미정 수량·가격을 임의로 확정하지 않습니다.
 
@@ -23,6 +23,7 @@
 | 2026-10-09 UX 개선 Codex 전체 인계와 실행 기록 | [분석](ux-fix-20261009-codex-analysis.md), [설계](ux-fix-20261009-codex-design.md), [작업계획](ux-fix-20261009-codex-tasks.md), [검증 기록](ux-fix-20261009-codex-report.md) |
 | 2026-10-10 사용자 확정① 편집 데스크 운영 적용 | [분석](editing-desk-20261010-analysis.md), [설계](editing-desk-20261010-design.md), [작업계획](editing-desk-20261010-tasks.md), [검증·인계](editing-desk-20261010-report.md) |
 | 2026-10-10 Run Line·기본 기능 정식 출시 준비(Draft, 미배포) | [분석](launch-readiness-20261010-analysis.md), [설계](launch-readiness-20261010-design.md), [작업계획](launch-readiness-20261010-tasks.md), [인계·차단 요소](launch-readiness-20261010-report.md), [출시/T7 체크리스트](launch-readiness-20261010-release-checklist.md) |
+| 2026-10-10 승인 한글 A안·네이밍 정리(별도 Draft, 미배포) | [원본 인계](branding/README.md), [분석](korean-branding-20261010-analysis.md), [설계](korean-branding-20261010-design.md), [작업계획](korean-branding-20261010-tasks.md), [네이밍·안전 전환](korean-branding-20261010-naming.md), [자산·출처](korean-branding-20261010-assets.md), [검증·출시 경계](korean-branding-20261010-report.md) |
 
 ## 유지하는 근거와 운영 참고
 
