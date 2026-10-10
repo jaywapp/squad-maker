@@ -15,7 +15,7 @@ test.describe('베타 운영 UI', () => {
 
   test('버전이 상단에 표시된다', async ({ page }) => {
     await page.goto('/index.html');
-    await expect(page.locator('#appVersion')).toHaveText(/beta/);
+    await expect(page.locator('#appVersion')).toHaveText('웹 개발본');
   });
 
   test('도움말 모달이 열리고 닫힌다', async ({ page }) => {
@@ -42,7 +42,9 @@ test.describe('베타 운영 UI', () => {
     await expect(page.locator('#feedbackModal')).toBeVisible();
     await expect(page.locator('#feedbackSubject')).toHaveAttribute('required', '');
     await expect(page.locator('#feedbackDescription')).toHaveAttribute('required', '');
-    await expect(page.locator('#feedbackMeta')).toContainText('jaywapp/squad-maker');
+    await expect(page.locator('#feedbackMeta')).toContainText('웹 개발본');
+    await expect(page.locator('#feedbackMeta')).toContainText('플랫폼: web');
+    await expect(page.locator('#feedbackModal')).toContainText('공개 GitHub Issue');
   });
 
   // 반환값이 아니라 실제로 클립보드에 쓰이는 값을 검사한다.

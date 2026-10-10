@@ -12,8 +12,14 @@ html = html
   .replace(/<link[^>]+fonts\.googleapis\.com[^>]*>\s*/g, '')
   .replaceAll('https://html2canvas.hertzen.com/dist/html2canvas.min.js', 'vendor/html2canvas.min.js')
   .replaceAll('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js', 'vendor/gif.js')
-  .replaceAll('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js', 'vendor/gif.worker.js')
-  .replace('<script>', '<script src="app/platform-native.js"></script>\n<script>window.SQUAD_MAKER_ANALYTICS_ID = "";</script>\n<script>');
+  .replaceAll('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js', 'vendor/gif.worker.js');
+let nativeInjected = false;
+html = html.replace(/<!--[\s\S]*?-->|<script\s*>/gi, tag => {
+  if (nativeInjected || tag.startsWith('<!--')) return tag;
+  nativeInjected = true;
+  return '<script src="app/platform-native.js"></script>\n<script>window.SQUAD_MAKER_ANALYTICS_ID = "";</script>\n' + tag;
+});
+if (!nativeInjected) throw new Error('Android bootstrap script is missing');
 if (/https:\/\/(?:html2canvas\.hertzen\.com|cdnjs\.cloudflare\.com)/.test(html)) throw new Error('Remote export asset remains in Android bundle');
 await fs.writeFile(path.join(output, 'index.html'), html);
 for (const file of ['html2canvas.min.js', 'gif.js', 'gif.worker.js']) {
@@ -21,7 +27,7 @@ for (const file of ['html2canvas.min.js', 'gif.js', 'gif.worker.js']) {
 }
 await build({ entryPoints: [path.join(root, 'app', 'platform-native.js')], outfile: path.join(output, 'app', 'platform-native.js'),
   bundle: true, format: 'iife', target: 'chrome100', minify: false, sourcemap: false });
-for (const file of ['local-library.js']) {
+for (const file of ['local-library.js', 'feedback-client.js']) {
   try { await fs.copyFile(path.join(root, 'app', file), path.join(output, 'app', file)); }
   catch (error) { if (error.code !== 'ENOENT') throw error; }
 }
