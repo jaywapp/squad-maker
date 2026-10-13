@@ -1,0 +1,62 @@
+{
+  "patternSource": {
+    "appMode": "pattern",
+    "selectedPlayerId": null,
+    "selectedPlayerName": null,
+    "patternIndex": 0,
+    "stepIndex": 1,
+    "readOnly": false
+  },
+  "patternRecipient": {
+    "view": {
+      "appMode": "squad",
+      "selectedPlayerId": null,
+      "selectedPlayerName": null,
+      "patternIndex": 0,
+      "stepIndex": 0,
+      "readOnly": true
+    },
+    "selectedTab": "배치",
+    "notes": "기본 스쿼드 전체 지침\n라인 간격을 유지한다\n개별 선수 지침\n1. 김공격\n전방 압박 우선",
+    "overflow": false
+  },
+  "pngContents": {
+    "sourceTeamNote": "라인 간격을 유지한다",
+    "sceneText": "FC 회귀기본 스쿼드 · 9vs9 / 3-3-21김공격2이미드3박수비",
+    "includesTeamNote": false,
+    "includesPlayerNote": false
+  },
+  "clipboardFallback": {
+    "activeId": "",
+    "selectedText": "단톡방 공유 텍스트\n\n⚽ FC 회귀 전술 공유 (9vs9)\n──────────────────────\n\n🔵 기본 스쿼드 [3-3-2]\n  ① 김공격\n  ② 이미드\n  ③ 박수비\n\n⚔️ 공격 스쿼드 [3-2-3]\n  ① 김공격\n  ② 이미드\n  ③ 박수비\n\n🛡 수비 스쿼드 [4-3-1]\n  ① 김공격\n  ② 이미드\n  ③ 박수비\n\n──────────────────────\n📢 스쿼드별 전체 지침\n\n🔵 기본 스쿼드\n라인 간격을 유지한다\n\n──────────────────────\n👤 개별 선수 지침\n\n① 김공격\n  🔵 전방 압박 우선\n텍스트 복사\n텍스트 파일로 받기\n링크로 공유 (공유받은 사람이 동일한 화면을 볼 수 있습니다)\nhttp://127.0.0.1:4397/index.html#s=eyJ2IjoxLCJ0ZWFtIjoiRkMg7ZqM6reAIiwibW9kZSI6Ijl2OSIsInNxdWFkIjoiYmFzaWMiLCJyb3N0ZXIiOlt7ImlkIjoxLCJuYW1lIjoi6rmA6rO16rKpIiwiY29sb3IiOiIjRTUzOTM1In0seyJpZCI6MiwibmFtZSI6IuydtOuvuOuTnCIsImNvbG9yIjoiIzFFODhFNSJ9LHsiaWQiOjMsIm5hbWUiOiLrsJXsiJjruYQiLCJjb2xvciI6IiMwMEM4NTMifV0sInNxdWFkcyI6eyJiYXNpYyI6eyJmIjoiMy0zLTIiLCJwb3MiOnsiMSI6eyJ4IjoyNDAsInkiOjI0MH0sIjIiOnsieCI6MjQwLCJ5IjozODV9LCIzIjp7IngiOjI0MCwieSI6NTEwfX0sInRuIjoi65287J24IOqwhOqyqeydhCDsnKDsp4DtlZzri6QiLCJwbiI6eyIxIjoi7KCE67CpIOyVleuwlSDsmrDshKAifX0sImF0dGFjayI6eyJmIjoiMy0yLTMiLCJwb3MiOnsiMSI6eyJ4IjoxNjAsInkiOjI0MH0sIjIiOnsieCI6MjQwLCJ5IjozODV9LCIzIjp7IngiOjMyMCwieSI6NTEwfX0sInRuIjoiIiwicG4iOnt9fSwiZGVmZW5zZSI6eyJmIjoiNC0zLTEiLCJwb3MiOnsiMSI6eyJ4IjoyNDAsInkiOjIzMH0sIjIiOnsieCI6MjQwLCJ5IjozODB9LCIzIjp7IngiOjI0MCwieSI6NTEwfX0sInRuIjoiIiwicG4iOnt9fX0sInBhdCI6W3sibiI6IuyYpOuyhOueqSIsImJzIjp7IngiOjI0MCwieSI6MzMwfSwicyI6W3sibSI6eyIxIjp7IngiOjE2MCwieSI6MjAwfX0sImIiOnsieCI6MjAwLCJ5IjoyNjB9fSx7Im0iOnsiMiI6eyJ4IjozMDAsInkiOjMwMH19LCJiIjpudWxsfV19XX0\n링크 복사\n자동 복사하지 못했습니다. 링크를 직접 선택해 복사해 주세요.",
+    "toast": "자동 복사하지 못했습니다. 링크를 직접 선택해 복사해 주세요.",
+    "urlBoxTag": "DIV",
+    "urlBoxTabIndex": -1,
+    "pageErrors": [
+      "this.select is not a function"
+    ]
+  },
+  "malformedRecipient": {
+    "view": {
+      "appMode": "squad",
+      "selectedPlayerId": null,
+      "selectedPlayerName": null,
+      "patternIndex": 0,
+      "stepIndex": 0,
+      "readOnly": false
+    },
+    "team": "FC 회귀",
+    "visibleViewerBar": false,
+    "alerts": [],
+    "overflow": false
+  },
+  "strategy": {
+    "teamNote": "공을 빼앗으면 즉시 오른쪽 윙으로 길게 연결",
+    "playerNote": "측면을 넓게 벌리고 뒷공간으로 침투",
+    "matchNotes": "",
+    "manualText": "팀 전체 전달사항\n상대: 상대팀 | 일시: 미정\n포메이션: 11vs11 4-3-3 (밸런스 / 점유 기반)\n압박 전략: 미드필드에서 수비 블록을 형성하고, 공 소유 시 빌드업 플레이를 진행한다.\n수비 원칙: 수비 라인과 미드필더 간격을 30m 이내로 유지한다.\n전환 원칙: 공 탈취 후 무리한 전진보다 안전한 패스로 점유를 유지한다.\n전술 패턴 1가지(오버랩)를 숙지한다.\n세트피스 및 빠른 전환 상황에서 해당 패턴을 우선 시도한다.\n개별 선수 지침\n1. 선수 1 GK\n골 라인 수비 및 페널티 구역 제공권을 장악한다.\n수비진과 지속적으로 소통하여 위험 상황을 사전에 차단한다.\n점유 시 빌드업 첫 번째 패스 역할을 담당한다.\n[오버랩 1단계] 좌측 전방 침투 이동\n2. 선수 2 수비\n수비 라인 위치와 간격을 유지한다.\n측면 공간 커버 및 상대 윙어 대인 마크를 담당한다.\n공 소유 시 안전한 옆패스 또는 GK에게 리셋한다.\n[오버랩 2단계] 우측 전방 침투 이동\n3. 선수 3 수비\n수비 라인 위치와 간격을 유지한다.\n중앙 공간 차단 및 헤더 경합을 우선시한다.\n공 소유 시 안전한 옆패스 또는 GK에게 리셋한다.\n4. 선수 4 수비\n수비 라인 위치와 간격을 유지한다.\n중앙 공간 차단 및 헤더 경합을 우선시한다.\n공 소유 시 안전한 옆패스 또는 GK에게 리셋한다.\n5. 선수 5 수비\n수비 라인 위치와 간격을 유지한다.\n측면 공간 커버 및 상대 윙어 대인 마크를 담당한다.\n공 소유 시 안전한 옆패스 또는 GK에게 리셋한다.\n6. 선수 6 미드필더\n측면 공간을 활용한 드리블 돌파와 크로스를 시도한다.\n수비 시 빠른 압박으로 상대 전진을 차단한다.\n공격 시 공격수와의 원투패스 콤비네이션을 적극 활용한다.\n7. 선수 7 미드필더\n중앙 연결 및 공 순환 역할을 담당한다.\n수비 시 빠른 압박으로 상대 전진을 차단한다.\n공격 시 공격수와의 원투패스 콤비네이션을 적극 활용한다.\n8. 선수 8 미드필더\n측면 공간을 활용한 드리블 돌파와 크로스를 시도한다.\n수비 시 빠른 압박으로 상대 전진을 차단한다.\n공격 시 공격수와의 원투패스 콤비네이션을 적극 활용한다.\n9. 선수 9 공격\n측면에서 상대 수비를 끌어낸 뒤 중앙으로 컷인 또는 크로스를 시도한다.\n득점 기회에서 과감하게 슈팅한다.\n수비 전환 시 전방에서 압박의 첫 번째 역할을 수행한다.\n10. 선수 10 공격\n중앙에서 침투 움직임으로 상대 수비 라인을 압박한다.\n득점 기회에서 과감하게 슈팅한다.\n수비 전환 시 전방에서 압박의 첫 번째 역할을 수행한다.\n11. 선수 11 공격\n측면에서 상대 수비를 끌어낸 뒤 중앙으로 컷인 또는 크로스를 시도한다.\n득점 기회에서 과감하게 슈팅한다.\n수비 전환 시 전방에서 압박의 첫 번째 역할을 수행한다.",
+    "includesCoachTeamNote": false,
+    "includesCoachPlayerNote": false,
+    "includesContradictoryTransition": true
+  }
+}

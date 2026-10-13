@@ -108,7 +108,21 @@ window.SquadPlatform = Object.freeze({
   native,
   storage: native ? storage : null,
   exportFile,
-  publicShareBase: 'https://squad-maker.vercel.app/',
+  publicShareBase: 'https://jaywapp.github.io/squad-maker/',
+  async getAppInfo() {
+    if (!native) return null;
+    try {
+      const info = await App.getInfo();
+      const result = {};
+      for (const key of ['name', 'id', 'version', 'build']) {
+        if (typeof info?.[key] !== 'string' || !info[key].trim()) throw new Error('Invalid app metadata');
+        result[key] = info[key].trim();
+      }
+      return Object.freeze(result);
+    } catch {
+      throw Object.assign(new Error('App metadata unavailable'), { code: 'app-info-unavailable' });
+    }
+  },
   async showTestAd() {
     if (!native) return { status: 'unsupported' };
     return Ads.showTestBanner();

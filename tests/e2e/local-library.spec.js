@@ -1,6 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { stubExportCdn } = require('../helpers/stub-cdn');
 const fixture = require('../fixtures/snapshot-v1.json');
+const { withPinnedPatternStarts } = require('../helpers/pattern-start');
 
 const LEGACY_KEY = 'squad-maker-v1';
 const LIBRARY_KEY = 'squad-maker-library-v1';
@@ -20,7 +21,7 @@ function namedSnapshot(name) {
   value.squads.basic.pn['1'] = name + ' player note';
   value.squads.attack.pos['1'] = { x: 110, y: 210 };
   value.pat[0].n = 'Pattern ' + name[0];
-  return value;
+  return withPinnedPatternStarts(value);
 }
 
 async function boot(page, options = {}) {
@@ -38,7 +39,7 @@ async function boot(page, options = {}) {
     };
     window.SquadPlatform = {
       native: Boolean(native),
-      publicShareBase: 'https://squad-maker.vercel.app/',
+      publicShareBase: 'https://jaywapp.github.io/squad-maker/',
       showTestAd: async () => ({ status: 'unsupported' }),
       storage: {
         async getItem(key) {
@@ -114,12 +115,12 @@ async function pauseAutosaveClock(page) {
 
 test('legacy migration, file edits and names survive switching and restart', async ({ page }) => {
   const initial = await boot(page);
-  expect(initial.snapshot).toEqual(fixture);
+  expect(initial.snapshot).toEqual(withPinnedPatternStarts(fixture));
   expect(initial.localLibrary).toMatchObject({ supported: true,
     slots: { status: 'available', limit: null, used: 1, policy: 'preview-unlimited' } });
   expect(initial.localLibrary.items).toHaveLength(1);
   expect(initial.localLibrary.items[0]).not.toHaveProperty('snapshot');
-  expect(JSON.parse((await bytes(page))[1])).toEqual(fixture);
+  expect(JSON.parse((await bytes(page))[1])).toEqual(withPinnedPatternStarts(fixture));
   const firstId = initial.localLibrary.fileId;
 
   expectSuccess(await run(page, 'create-team', { name: 'Training team' }), 'create-team');
@@ -134,11 +135,11 @@ test('legacy migration, file edits and names survive switching and restart', asy
   expectSuccess(await run(page, 'rename-team', { id: secondTeam.id, name: 'Renamed training team' }), 'rename-team');
 
   expectSuccess(await run(page, 'open-file', { id: firstId }), 'open-file');
-  expect((await state(page)).snapshot).toEqual(fixture);
+  expect((await state(page)).snapshot).toEqual(withPinnedPatternStarts(fixture));
   await page.reload();
   const restored = await ready(page);
   expect(restored.localLibrary.fileId).toBe(firstId);
-  expect(restored.snapshot).toEqual(fixture);
+  expect(restored.snapshot).toEqual(withPinnedPatternStarts(fixture));
   expect(restored.localLibrary.items).toEqual(expect.arrayContaining([
     expect.objectContaining({ id: secondId, name: 'Renamed training plan', teamId: secondTeam.id }),
   ]));
@@ -229,7 +230,7 @@ test('undo restores deleted team files while retaining a tactic created after de
   expect(undone.snapshot).toEqual(later);
   for (const [id, snapshot] of [[firstId, fixture], [secondId, second], [otherId, other], [laterId, later]]) {
     expectSuccess(await run(page, 'open-file', { id }), 'open-file');
-    expect((await state(page)).snapshot).toEqual(snapshot);
+    expect((await state(page)).snapshot).toEqual(withPinnedPatternStarts(snapshot));
   }
   await page.reload();
   expect((await ready(page)).localLibrary.items).toHaveLength(4);
@@ -327,7 +328,7 @@ test('shared read-only navigation and library commands perform zero writes to ei
   expect(await bytes(page)).toEqual(originalBytes);
   await expect(page.getByRole('alertdialog')).toHaveCount(0);
   await page.goto('/index.html');
-  expect((await ready(page)).snapshot).toEqual(fixture);
+  expect((await ready(page)).snapshot).toEqual(withPinnedPatternStarts(fixture));
   expect(await bytes(page)).toEqual(originalBytes);
 });
 
@@ -390,8 +391,11 @@ for (const outcome of ['cancelled', 'error']) {
     const shared = await run(page, 'share-url');
     expectSuccess(shared, 'share-url');
     expect(shared.completion).toBe('url-created');
-    expect(new URL(shared.url).origin).toBe('https://squad-maker.vercel.app');
-    expect(JSON.parse(Buffer.from(shared.url.split('#s=')[1], 'base64url').toString())).toEqual(before.snapshot);
+    expect(new URL(shared.url).origin).toBe('https://jaywapp.github.io');
+    expect(new URL(shared.url).pathname).toBe('/squad-maker/');
+    expect(JSON.parse(Buffer.from(shared.url.split('#s=')[1], 'base64url').toString())).toEqual({
+      ...before.snapshot, view: { mode: 'squad', pattern: 0, step: 0 },
+    });
   });
 }
 

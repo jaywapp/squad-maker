@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108">
+  <!-- adaptive icon 전경 (108dp 캔버스, 안전 원 지름 66 안). 배경은 단색 #2b5e3f. -->
+  <g transform="translate(54 54) scale(0.78) translate(-50.5 -49.5)">
+    <circle cx="33" cy="70" r="11" fill="#b8e986"/>
+    <path d="M48 62C49.47 61.8 50.78 61.56 51.93 61.28M60.14 52.92C60.11 51.67 59.88 50.34 59.6 48.96M59.16 36.24C59.61 35.09 60.28 33.95 61.24 32.85M72.19 26.23C73.37 25.81 74.63 25.4 76 25" fill="none" stroke="#e8ede8" stroke-width="6" stroke-linecap="round"/>
+    <path d="M65.8 20.9L76 25L69.6 33.9" fill="none" stroke="#e8ede8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

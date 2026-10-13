@@ -8,6 +8,10 @@ const source = fs.readFileSync(require.resolve('../../app/platform-native.js'), 
 const compiled = transformSync(source, { format: 'cjs', platform: 'node', target: 'es2020' }).code;
 const copy = value => JSON.parse(JSON.stringify(value));
 
+test('native share URLs use the existing verified v1 tactics viewer', () => {
+  assert.equal(harness().platform.publicShareBase, 'https://jaywapp.github.io/squad-maker/');
+});
+
 function savedState(overrides = {}) {
   return { ready: true, revision: 4, savedRevision: 4, export: { busy: false }, busy: { mutation: false },
     view: { readOnly: false }, localLibrary: { fileId: 'file-one' }, ...overrides };
@@ -39,6 +43,12 @@ function harness(options = {}) {
   for (const close of ['closeShare', 'closePlayerView', 'closeHelp', 'closeFeedback'])
     window[close] = () => calls.push({ method: close });
   const App = {
+    async getInfo() {
+      calls.push({ method: 'app-info' });
+      if (options.infoError) throw options.infoError;
+      return options.info || { name: 'Squad Maker', id: 'com.jaywapp.squadmaker.preview',
+        version: '0.1.0.main.150.27a34ca9', build: '1152' };
+    },
     addListener(event, listener) { events.set(event, listener); return Promise.resolve({ remove() {} }); },
     async exitApp() {
       calls.push({ method: 'exit', inert: document.documentElement.inert });
@@ -316,3 +326,30 @@ for (const destination of ['save', 'share']) {
     if (destination === 'share') assert.ok(app.calls.find(call => call.method === 'share').payload.title.length <= 160);
   });
 }
+
+
+test('native app metadata comes from the installed APK through Capacitor App', async () => {
+  const app = harness();
+  const info = await app.platform.getAppInfo();
+  assert.deepEqual(copy(info), { name: 'Squad Maker', id: 'com.jaywapp.squadmaker.preview',
+    version: '0.1.0.main.150.27a34ca9', build: '1152' });
+  assert.equal(app.count('app-info'), 1);
+  assert.equal(Object.isFrozen(info), true);
+  assert.equal(app.count('storage-commit'), 0);
+});
+
+test('missing APK metadata and plugin failures return a safe error rather than a stale beta version', async () => {
+  for (const options of [{ info: { name: 'Squad Maker', id: 'com.jaywapp.squadmaker.preview', version: '', build: '1152' } },
+    { info: { name: 'Squad Maker', id: 'com.jaywapp.squadmaker.preview', version: '0.1.0', build: 1152 } },
+    { infoError: new Error('private plugin error') }]) {
+    const app = harness(options);
+    await assert.rejects(app.platform.getAppInfo(), error => error.code === 'app-info-unavailable'
+      && error.message === 'App metadata unavailable');
+  }
+});
+
+test('web app metadata does not invoke a native plugin', async () => {
+  const app = harness({ native: false });
+  assert.equal(await app.platform.getAppInfo(), null);
+  assert.equal(app.count('app-info'), 0);
+});

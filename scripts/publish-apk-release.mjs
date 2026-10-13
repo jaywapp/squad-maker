@@ -144,7 +144,7 @@ export async function publishApkRelease({ artifactDir, repository, sourceSha, ev
       const bodyFile = join(workspace, 'create-release.json');
       const notes = await readFile(join(directory, FILES[3]), 'utf8');
       await writeFile(bodyFile, JSON.stringify({ tag_name: tag, target_commitish: sourceSha,
-        name: `SQUAD MAKER Preview ${info.versionName}`, body: `${notes}\n\n${markerFor(info)}`,
+        name: `아이엠 헤드코치 Preview ${info.versionName}`, body: `${notes}\n\n${markerFor(info)}`,
         draft: true, prerelease: false }));
       release = await api('releases', ['--method', 'POST', '--input', bodyFile]);
       if (!release?.draft || release.tag_name !== tag || release.target_commitish !== sourceSha

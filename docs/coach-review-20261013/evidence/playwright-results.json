@@ -1,0 +1,302 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "D:\\station\\.worktrees\\squad-maker-korean-branding-20261010\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config=docs/coach-review-20261013/evidence/playwright-review.config.cjs",
+      "launch-readiness-20261010.spec.js",
+      "launch-share-errors-20261010.spec.js",
+      "--grep",
+      "edited share URL|edited portrait coordinates|real single and complete GIFs|small portrait supports|web encoding failure|web cannot open a sharing modal"
+    ],
+    "configFile": "D:\\station\\.worktrees\\squad-maker-korean-branding-20261010\\docs\\coach-review-20261013\\evidence\\playwright-review.config.cjs",
+    "rootDir": "D:/station/.worktrees/squad-maker-korean-branding-20261010/tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/station/.worktrees/squad-maker-korean-branding-20261010/docs/coach-review-20261013/evidence/playwright-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-390-review",
+        "name": "mobile-390-review",
+        "testDir": "D:/station/.worktrees/squad-maker-korean-branding-20261010/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "D:\\station\\.worktrees\\squad-maker-korean-branding-20261010\\docs\\coach-review-20261013\\evidence\\playwright-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.61.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "launch-readiness-20261010.spec.js",
+      "file": "launch-readiness-20261010.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "edited portrait coordinates produce a real PNG after landscape rotation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390-review",
+              "projectName": "mobile-390-review",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2109,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-13T08:23:38.248Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ccdf9adc490ffcd1e5a5-b2658c9bd650171ee2e4",
+          "file": "launch-readiness-20261010.spec.js",
+          "line": 219,
+          "column": 1
+        },
+        {
+          "title": "real single and complete GIFs preserve every step and the saved source",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390-review",
+              "projectName": "mobile-390-review",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12814,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-13T08:23:40.913Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ccdf9adc490ffcd1e5a5-d171cf3a37fe8ef29481",
+          "file": "launch-readiness-20261010.spec.js",
+          "line": 277,
+          "column": 1
+        },
+        {
+          "title": "the edited share URL opens a read-only viewer and protects both local originals",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390-review",
+              "projectName": "mobile-390-review",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1554,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-13T08:23:53.737Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ccdf9adc490ffcd1e5a5-7ba24b86e412bda7856e",
+          "file": "launch-readiness-20261010.spec.js",
+          "line": 300,
+          "column": 1
+        },
+        {
+          "title": "small portrait supports player counts five through eleven without losing pitch or saved edits",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390-review",
+              "projectName": "mobile-390-review",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4977,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-13T08:23:55.297Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ccdf9adc490ffcd1e5a5-d5b41b84ae9aa6c7b592",
+          "file": "launch-readiness-20261010.spec.js",
+          "line": 358,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "launch-share-errors-20261010.spec.js",
+      "file": "launch-share-errors-20261010.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "web encoding failure returns export-failed and no fallback URL while preserving canonical data",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390-review",
+              "projectName": "mobile-390-review",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 236,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-13T08:24:00.286Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c8e6295304d6184584a0-e08510fbe009969060b9",
+          "file": "launch-share-errors-20261010.spec.js",
+          "line": 121,
+          "column": 3
+        },
+        {
+          "title": "web cannot open a sharing modal or claim success after URL encoding fails",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390-review",
+              "projectName": "mobile-390-review",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 258,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-13T08:24:00.528Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c8e6295304d6184584a0-f799d849330e1c35da17",
+          "file": "launch-share-errors-20261010.spec.js",
+          "line": 136,
+          "column": 3
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-13T08:23:37.880Z",
+    "duration": 23316.703999999998,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

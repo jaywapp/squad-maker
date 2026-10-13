@@ -1,6 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { stubExportCdn } = require('../helpers/stub-cdn');
 const fixture = require('../fixtures/snapshot-v1.json');
+const { withPinnedPatternStarts } = require('../helpers/pattern-start');
 
 const snapshot = page => page.evaluate(() => window.SquadMakerContract.getState().snapshot);
 
@@ -85,7 +86,7 @@ test('feedback preparation failure disables submission, retries and returns focu
   });
   const opener = page.locator('.topbar').getByRole('button', { name: '제보', exact: true });
   await opener.click();
-  await expect(page.locator('#feedbackStatus')).toContainText('준비하지 못했습니다');
+  await expect(page.locator('#feedbackStatus')).toHaveText('제보 서버가 아직 연결되지 않았습니다. 입력 내용은 유지됩니다.');
   await expect(page.locator('#feedbackSubmit')).toBeDisabled();
   await expect(page.locator('#feedbackSubmit')).toHaveAttribute('aria-disabled', 'true');
   await page.locator('#feedbackRetryBtn').click();
@@ -115,9 +116,9 @@ test('backup restore keeps error, cancelled and saved results next to the action
   await page.getByRole('alertdialog').locator('[data-r="1"]').click();
   await expect(status).toHaveAttribute('data-tone', 'success');
   await expect(status).toContainText('복원');
-  expect(await snapshot(page)).toEqual(fixture);
+  expect(await snapshot(page)).toEqual(withPinnedPatternStarts(fixture));
   await page.reload();
-  expect(await snapshot(page)).toEqual(fixture);
+  expect(await snapshot(page)).toEqual(withPinnedPatternStarts(fixture));
 });
 
 test('capacity and name limits are readable and visible labels lead accessible names', async ({ page }) => {
@@ -139,7 +140,7 @@ test('capacity and name limits are readable and visible labels lead accessible n
   await expect(page.locator('#playerActionsName')).toHaveAttribute('title', /가나다라마바사아자차카타/);
 });
 
-test('playback owns step navigation and unlocks it when stopped', async ({ page }) => {
+test('playback owns step navigation and unlocks it when paused', async ({ page }) => {
   await seed(page);
   await page.locator('.app-tab[data-app="pattern"]').click();
   await page.locator('#playBtn').click();
@@ -147,7 +148,8 @@ test('playback owns step navigation and unlocks it when stopped', async ({ page 
   await expect(page.locator('.step-nav button').first()).toBeDisabled();
   await expect(page.locator('.step-nav button').last()).toBeDisabled();
   await page.locator('#playBtn').click();
-  await expect(page.locator('#stepCounter')).toHaveText(/^단계 [12] \/ 2$/);
+  await expect(page.locator('#stepCounter')).toHaveText(/^일시정지 [12]\/2$/);
+  await expect(page.locator('#playBtn')).toHaveText('이어서 재생');
   await expect(page.locator('.step-nav button').first()).toBeEnabled();
   await expect(page.locator('.step-nav button').last()).toBeEnabled();
 });

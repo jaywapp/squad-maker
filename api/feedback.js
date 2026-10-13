@@ -2,6 +2,8 @@
 
 const REPOSITORY = 'jaywapp/squad-maker';
 const LABEL = '제보';
+const ANDROID_ORIGIN = 'https://localhost';
+const PROVIDER_TIMEOUT_MS = 4000;
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT = 3;
 const attempts = globalThis.__squadMakerFeedbackAttempts || new Map();
@@ -26,7 +28,7 @@ function requestOrigin(request) {
     .split(',')
     .map(value => value.trim())
     .filter(Boolean);
-  return origin === sameOrigin || configured.includes(origin) ? origin : '';
+  return origin === sameOrigin || origin === ANDROID_ORIGIN || configured.includes(origin) ? origin : '';
 }
 
 function cleanText(value, maxLength, multiline = false) {
@@ -63,6 +65,7 @@ async function verifyTurnstile(token, ip) {
   const body = new URLSearchParams({ secret, response: token, remoteip: ip });
   const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
     method: 'POST',
+    signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     body,
   });
   if (!response.ok) return false;
@@ -88,6 +91,7 @@ async function createIssue(payload) {
   if (!token) return { ok: false, configurationError: true };
   const response = await fetch(`https://api.github.com/repos/${REPOSITORY}/issues`, {
     method: 'POST',
+    signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     headers: {
       Accept: 'application/vnd.github+json',
       Authorization: `Bearer ${token}`,
@@ -151,7 +155,7 @@ module.exports = async function handler(request, response) {
     description: cleanText(raw.description, 4000, true),
     contact: cleanText(raw.contact, 200),
     appVersion: cleanText(raw.appVersion, 80),
-    platform: raw.platform === 'web' ? 'web' : '',
+    platform: ['web', 'android'].includes(raw.platform) ? raw.platform : '',
     diagnostics: cleanText(raw.diagnostics?.summary, 1500, true),
   };
   if (!payload.title || !payload.description || !payload.appVersion || !payload.platform) {

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>작은 크기 적용 (아이콘·파비콘)</title>
+<style>
+  /* Actual-size check for the launcher icon (48dp), store listing and browser tab.
+     The Run Line icon and favicon are unchanged in both concepts; only the label text changes. */
+  :root { --night: #141a16; --chalk: #e8ede8; --muted: #8fa096; --line: #2a332d; }
+  body { margin: 0; background: var(--night); color: var(--chalk); font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; }
+  .wrap { width: 360px; padding: 16px; box-sizing: border-box; }
+  h2 { font-size: 13px; font-weight: 600; color: var(--muted); margin: 18px 0 10px; }
+  .home { background: #2f3a46; border-radius: 16px; padding: 18px 10px 14px; display: grid; grid-template-columns: repeat(4, 1fr); row-gap: 14px; }
+  .app { display: grid; justify-items: center; gap: 6px; }
+  .app img, .app .ph { width: 48px; height: 48px; }
+  .round { border-radius: 50%; }
+  .squircle { border-radius: 14px; }
+  .ph { border-radius: 50%; background: #4a5663; }
+  .label { width: 72px; text-align: center; font-size: 12px; line-height: 1.25; color: #fff; text-shadow: 0 1px 2px rgb(0 0 0 / .5);
+           display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: keep-all; }
+  .label.one { -webkit-line-clamp: 1; display: block; white-space: nowrap; text-overflow: ellipsis; }
+  .row { display: flex; gap: 16px; align-items: end; }
+  .row figure { margin: 0; display: grid; justify-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+  .tabs { background: #dfe3e8; border-radius: 10px 10px 0 0; padding: 6px 6px 0; display: flex; }
+  .tab { background: #fff; color: #1f2328; border-radius: 8px 8px 0 0; height: 30px; padding: 0 10px; display: flex; align-items: center; gap: 8px; font-size: 12px; width: 220px; box-sizing: border-box; }
+  .tab img { width: 16px; height: 16px; }
+  .tab span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>Android 홈 화면 48dp (원형 마스크, 라벨 2줄 허용 런처)</h2>
+  <div class="home">
+    <div class="app"><div class="ph"></div><div class="label">카메라</div></div>
+    <div class="app"><img class="round" src="icon-store-512.svg" alt=""><div class="label">아이엠 헤드코치</div></div>
+    <div class="app"><div class="ph"></div><div class="label">캘린더</div></div>
+    <div class="app"><div class="ph"></div><div class="label">메시지</div></div>
+  </div>
+  <h2>라벨 1줄 런처 (말줄임)</h2>
+  <div class="home">
+    <div class="app"><div class="ph"></div><div class="label one">카메라</div></div>
+    <div class="app"><img class="squircle" src="icon-store-512.svg" alt=""><div class="label one">아이엠 헤드코치</div></div>
+    <div class="app"><div class="ph"></div><div class="label one">캘린더</div></div>
+    <div class="app"><div class="ph"></div><div class="label one">메시지</div></div>
+  </div>
+  <h2>아이콘 크기별 (이름 없음, Run Line 아이콘 그대로)</h2>
+  <div class="row">
+    <figure><img src="icon-store-512.svg" width="96" height="96" class="squircle" alt=""><figcaption>96 스토어 목록</figcaption></figure>
+    <figure><img src="icon-store-512.svg" width="48" height="48" class="round" alt=""><figcaption>48 런처</figcaption></figure>
+    <figure><img src="icon-store-512.svg" width="24" height="24" class="round" alt=""><figcaption>24 설정 목록</figcaption></figure>
+  </div>
+  <h2>브라우저 탭 (파비콘 16px)</h2>
+  <div class="tabs"><div class="tab"><img src="favicon.svg" alt=""><span>아이엠 헤드코치</span></div></div>
+</div>
+</body>
+</html>

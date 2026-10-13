@@ -278,7 +278,9 @@ test('share-url reports URL creation without claiming clipboard or OS delivery',
   expect(result.revision).toBe(before.revision);
   expect(result.savedRevision).toBe(before.savedRevision);
   const encoded = result.url.split('#s=')[1];
-  expect(JSON.parse(Buffer.from(encoded, 'base64url').toString())).toEqual(before.snapshot);
+  expect(JSON.parse(Buffer.from(encoded, 'base64url').toString())).toEqual({
+    ...before.snapshot, view: { mode: 'squad', pattern: 0, step: 0 },
+  });
   expect(await state(page)).toEqual(before);
   expect(await storedRaw(page)).toBe(raw);
 });

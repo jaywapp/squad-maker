@@ -1,6 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { stubExportCdn } = require('../helpers/stub-cdn');
 const fixture = require('../fixtures/snapshot-v1.json');
+const { withPinnedPatternStarts } = require('../helpers/pattern-start');
 
 const snapshot = page => page.evaluate(() => window.SquadMakerContract.getState().snapshot);
 const run = (page, command, payload) => page.evaluate(([op, args]) => window.SquadMakerContract.run(op, args), [command, payload]);
@@ -118,7 +119,8 @@ test('pattern actions are compact and viewer GIF still uses the canonical export
   await seed(page);
   await page.locator('.app-tab[data-app="pattern"]').click();
   const visible = await page.locator('#patternUI button').evaluateAll(buttons => buttons.filter(button => button.checkVisibility()).length);
-  expect(visible).toBeLessThanOrEqual(7);
+  expect(visible).toBeLessThanOrEqual(8);
+  await expect(page.getByRole('button', { name: '처음부터 재생', exact: true })).toBeVisible();
   await expect(page.locator('#gifBtn')).toHaveCount(0);
   await expect(page.locator('#gifAllBtn')).toHaveCount(0);
   await page.locator('#patternMoreBtn').click();
@@ -134,7 +136,7 @@ test('pattern actions are compact and viewer GIF still uses the canonical export
   await page.reload();
   await expect(page.locator('body')).toHaveClass(/viewer-mode/);
   const viewerSnapshot = await snapshot(page);
-  expect(viewerSnapshot).toEqual(shared);
+  expect(viewerSnapshot).toEqual(withPinnedPatternStarts(shared));
   expect(await page.evaluate(() => window.SquadMakerContract.getState().view.readOnly)).toBe(true);
   await page.locator('.app-tab[data-app="pattern"]').click();
   await page.locator('#viewerExportBtn').click();
