@@ -431,10 +431,11 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
 .share-link-label { font-size:0.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; }
 .share-link-row { display:flex; gap:8px; align-items:center; }
 .share-url-box {
+  width:100%; min-width:0; resize:vertical; font:inherit;
   flex:1; padding:8px 10px;
   background:var(--bg); border:1px solid var(--border); border-radius:8px;
-  color:var(--muted); font-size:0.72rem; outline:none;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  color:var(--muted); font-size:1rem;
+  white-space:pre-wrap; overflow-wrap:anywhere;
   cursor:text; user-select:all;
 }
 
@@ -448,6 +449,14 @@ main { width: 100%; display: flex; flex-direction: column; align-items: center; 
   background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 14px;
 }
 .viewer-mode #viewerBar { display:flex; }
+body.share-error :is(main, .app-tabs, #viewerBar, #fileBar) { display:none !important; }
+#shareErrorPanel { max-width:560px; padding:24px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); }
+#shareErrorPanel[hidden] { display:none; }
+#shareErrorPanel p { margin:12px 0 20px; line-height:1.7; color:var(--ink2); }
+.pattern-start-label { font-size:0.875rem; color:var(--ink2); }
+#manualSuggestions { margin-top:20px; }
+#manualSuggestions summary { min-height:44px; cursor:pointer; font-weight:700; }
+#manualSuggestions p { color:var(--ink2); line-height:1.6; }
 #viewerBar .vb-title { flex:1 1 100%; font-weight:700; font-size:0.9rem; }
 #viewerBar .btn { padding:7px 12px; font-size:0.8rem; }
 .viewer-note-text {
@@ -573,7 +582,7 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
   border-bottom:1px solid var(--surface); padding-bottom:4px; margin-bottom:8px;
 }
 .tactic-player-title { color:var(--ink); font-weight:700; font-size:0.82rem; margin:10px 0 3px; }
-.tactic-line { color:var(--ink2); font-size:0.8rem; line-height:1.7; padding-left:12px; }
+.tactic-line { color:var(--ink2); font-size:0.8rem; line-height:1.7; padding-left:12px; white-space:pre-wrap; overflow-wrap:anywhere; }
 .tactic-line::before { content:'· '; color:var(--faint); }
 .tactic-tag {
   display:inline-block; background:var(--surface2); color:var(--ink);
@@ -1422,6 +1431,12 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
   <button class="btn-primary" type="button" id="viewerExportBtn" aria-haspopup="dialog" aria-controls="exportPanel">내보내기·공유</button>
 </div>
 
+<section id="shareErrorPanel" role="alert" aria-labelledby="shareErrorTitle" hidden>
+  <h2 id="shareErrorTitle">공유 전술을 열 수 없습니다</h2>
+  <p>링크가 잘렸거나 지원하지 않는 전술입니다. 코치에게 링크를 다시 보내 달라고 요청해 주세요. 내 기기에 저장된 전술은 그대로 보관됩니다.</p>
+  <button type="button" class="btn btn-slate" onclick="openMySquad()">내 전술로 돌아가기</button>
+</section>
+
 <!-- 앱 모드 탭 -->
 <div class="app-tabs" role="tablist" aria-label="앱 모드 선택">
   <button class="app-tab active" role="tab" aria-selected="true"  tabindex="0"  data-app="squad"    onclick="setAppMode('squad')">배치</button>
@@ -1512,6 +1527,7 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
 
 <!-- 전술 패턴 컨트롤 -->
 <div id="patternUI">
+  <p class="pattern-start-label" id="patternStartLabel"></p>
   <!-- 1) 움직임 패턴 고르기 -->
   <div class="pattern-bar pattern-pick" role="group" aria-label="움직임 패턴 선택">
     <label for="patternName" class="pattern-label">움직임 패턴</label>
@@ -1532,6 +1548,7 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
       <button aria-label="다음 단계" onclick="nextStep()"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></svg></button>
     </div>
     <button class="btn btn-slate play-btn" id="playBtn" onclick="togglePlay()">미리보기</button>
+    <button class="btn btn-slate" id="restartPlayBtn" onclick="restartAnimation()">처음부터 재생</button>
   </div>
   <!-- 3) 단계 편집 -->
   <div class="pattern-bar step-edit editor-only" role="group" aria-label="단계 편집">
@@ -1656,6 +1673,11 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
   <div class="strategy-card" id="manualCard" style="display:none;">
     <h3>전술 지침서</h3>
     <div id="manualOutput"></div>
+    <details id="manualSuggestions">
+      <summary>자동 제안 (검토 후 활용)</summary>
+      <p>배치에서 추정한 참고 문장입니다. 코치가 작성한 지침이 우선이며, 아래 제안은 복사·텍스트 저장에 포함하지 않습니다.</p>
+      <div id="manualSuggestionContent"></div>
+    </details>
     <div class="output-actions">
       <button class="btn btn-slate" onclick="copyManual()">클립보드 복사</button>
       <button class="btn btn-slate" onclick="saveManualTxt()">텍스트 저장</button>
@@ -1719,9 +1741,9 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
     </div>
     <div class="share-divider"></div>
     <div class="share-link-section">
-      <div class="share-link-label">링크로 공유 (공유받은 사람이 동일한 화면을 볼 수 있습니다)</div>
+      <div class="share-link-label">링크로 공유 (선택한 배치 또는 패턴·단계를 읽기 전용으로 공유합니다)</div>
       <div class="share-link-row">
-        <div class="share-url-box" id="shareUrlBox" onclick="this.select()"></div>
+        <textarea class="share-url-box" id="shareUrlBox" aria-label="공유 링크" readonly rows="3" onclick="this.select()"></textarea>
         <button class="btn btn-blue" style="white-space:nowrap;" onclick="copyShareUrl()">링크 복사</button>
       </div>
     </div>
@@ -2112,12 +2134,20 @@ let appMode = 'squad';
 
 // 뷰어 모드: 공유 링크(#s=)로 진입 — 편집·저장 차단, 열람 UI만 노출
 let viewerMode = false;
+let shareLinkError = false;
+let sharedView = null;
 
 // 전술 패턴 — 다단계(step) 시퀀스. 각 단계는 선수 이동 묶음 + 공 이동(선택).
-// 단계 N의 시작 위치 = 단계 N-1 종료 위치(누적), 1단계 시작은 현재 스쿼드 배치.
+// Each pattern owns its initial positions; later steps accumulate their endpoints.
 const BALL_START = { x: 240, y: 330 };
 function newStep() { return { moves: {}, ball: null }; }
-function newPattern(name) { return { name, ballStart: { ...BALL_START }, steps: [newStep()] }; }
+function newPattern(name) { return { name, start: null, ballStart: { ...BALL_START }, steps: [newStep()] }; }
+function ensurePatternStart(pattern) {
+  if (pattern.start) return false;
+  pattern.start = { squad: currentSquad, pos: Object.fromEntries(
+    getPlayers().map(player => [player.id, { x: player.x, y: player.y }])) };
+  return true;
+}
 
 let patterns = [newPattern('패턴 1')];
 let currentPatternIdx = 0;
@@ -2129,6 +2159,7 @@ const BALL_R = 9;
 const STEP_MS = 1800;   // 단계당 재생 시간
 const STEP_GAP = 400;   // 단계 사이 정지 시간
 let animRaf = null, animStart = null, animStep = 0, isPlaying = false;
+let isPaused = false, animElapsed = 0, animProgress = 0;
 let drawState = null; // { kind: 'player'|'ball', playerId?, fromX, fromY, curX, curY }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2175,6 +2206,7 @@ function setAppMode(mode) {
   if (mode === appMode) return;
   hidePatternMore();
   if (appMode === 'squad') saveCurrentNotes();
+  if (appMode === 'pattern') stopAnimation();
   appMode = mode;
 
   ['squad','pattern','strategy'].forEach(m =>
@@ -2200,9 +2232,11 @@ function setAppMode(mode) {
   applyFieldScale();
 
   if (mode === 'pattern') {
+    const pinnedStart = ensurePatternStart(currentPattern());
     stopAnimation();
     updatePatternUI();
     renderPatternFrame(0);
+    if (pinnedStart && !viewerMode) autoSave();
   } else if (mode === 'strategy') {
     refreshSquadSummary();
   }
@@ -2314,6 +2348,7 @@ function renderViewerBar() {
 }
 
 function importSharedSquad() {
+  if (shareLinkError) return;
   uiConfirm('공유받은 전술을 내 스쿼드로 가져올까요?\n기존 내 스쿼드는 덮어써집니다.', { confirmLabel: '내 스쿼드로 가져오기', tone: 'danger' }).then(async ok => {
     if (!ok) return;
     try {
@@ -3104,7 +3139,10 @@ function ctxRemove() {
     delete squads[type].positions[id];
     delete squads[type].playerNotes[id];
   });
-  patterns.forEach(pt => pt.steps.forEach(st => { delete st.moves[id]; }));
+  patterns.forEach(pt => {
+    if (pt.start) delete pt.start.pos[id];
+    pt.steps.forEach(st => { delete st.moves[id]; });
+  });
   clearSelectedPlayer(); renderPlayers(); renderNotesPanel(); updateAddPlayerBtn(); hideCtxMenu();
   showUndoToast(`${name} 선수를 삭제했습니다.`);
 }
@@ -3244,9 +3282,12 @@ function currentStep() { return currentPattern().steps[currentStepIdx]; }
 
 function updatePatternUI() {
   const pat = currentPattern();
+  ensurePatternStart(pat);
   currentStepIdx = Math.min(currentStepIdx, pat.steps.length - 1);
   document.getElementById('patternName').value = pat.name;
   document.getElementById('patternNameView').textContent = pat.name;
+  document.getElementById('patternStartLabel').textContent =
+    `${SQUAD_META[pat.start.squad].label}에서 시작 · 출발 배치 고정`;
   document.getElementById('patternCounter').textContent = `${currentPatternIdx+1} / ${patterns.length}`;
   updatePlaybackStep();
   updatePatternSummary();
@@ -3280,7 +3321,8 @@ function updatePatternSummary() {
 function updatePlaybackStep() {
   const total = currentPattern().steps.length;
   const label = isPlaying
-    ? `재생 중 ${animStep + 1}/${total}` : `단계 ${currentStepIdx + 1} / ${total}`;
+    ? `재생 중 ${animStep + 1}/${total}` : isPaused
+      ? `일시정지 ${animStep + 1}/${total}` : `단계 ${currentStepIdx + 1} / ${total}`;
   const counter = document.getElementById('stepCounter');
   if (counter.textContent !== label) counter.textContent = label;
   document.querySelectorAll('.step-nav button').forEach(button => { if (button.disabled !== isPlaying) button.disabled = isPlaying; });
@@ -3375,10 +3417,13 @@ async function clearCurrentStep() {
   showUndoToast('현재 단계의 경로를 초기화했습니다.');
 }
 
-// 단계 [0, uptoStep) 적용 후의 선수 위치 (1단계 시작 = 현재 스쿼드 배치)
+// Resolve every frame from the pattern's pinned initial positions.
 function positionsAfter(pat, uptoStep) {
   const pos = {};
-  getPlayers().forEach(p => { pos[p.id] = { x: p.x, y: p.y }; });
+  getPlayers().forEach(p => {
+    const start = pat.start ? pat.start.pos[p.id] || { x: 240, y: 330 } : p;
+    pos[p.id] = { x: start.x, y: start.y };
+  });
   for (let s = 0; s < uptoStep && s < pat.steps.length; s++) {
     Object.entries(pat.steps[s].moves).forEach(([id, mv]) => {
       if (pos[id]) pos[id] = { x: mv.toX, y: mv.toY };
@@ -3669,6 +3714,10 @@ function renderStepFrame(ctx, pat, stepIdx, t, label) {
 function renderPatternFrame(t) {
   updatePatternSummary();
   const pat = currentPattern();
+  if (isPaused) {
+    renderStepFrame(pCtx, pat, animStep, animProgress, `단계 ${animStep+1}/${pat.steps.length}`);
+    return;
+  }
   const label = pat.steps.length > 1 ? `단계 ${currentStepIdx+1}/${pat.steps.length}` : null;
   renderStepFrame(pCtx, pat, currentStepIdx, t || 0, label);
   if (drawState) {
@@ -3750,6 +3799,8 @@ function canvasCoords(e) {
 
 function beginDraw(x, y) {
   if (viewerMode) return false;
+  if (isPlaying || isPaused) stopAnimation();
+  ensurePatternStart(currentPattern());
   const b = hitBall(x, y);
   if (b) {
     stopAnimation();
@@ -3903,53 +3954,66 @@ pCanvas.addEventListener('touchend', e => {
 // ATTACK PATTERNS — 애니메이션
 // ═══════════════════════════════════════════════════════════════
 function togglePlay() {
-  isPlaying ? stopAnimation() : startAnimation();
+  isPlaying ? pauseAnimation() : startAnimation();
 }
 
 function startAnimation() {
+  ensurePatternStart(currentPattern());
+  if (!isPaused) { animElapsed = 0; animStep = 0; animProgress = 0; }
   isPlaying = true;
+  isPaused = false;
   animStart = null;
-  animStep = 0;
   document.getElementById('playBtn').textContent = '일시정지';
   updatePlaybackStep();
   animRaf = requestAnimationFrame(animTick);
 }
 
-function stopAnimation() {
-  if (animRaf) { cancelAnimationFrame(animRaf); animRaf = null; }
+function pauseAnimation() {
+  if (!isPlaying) return;
+  if (animRaf !== null) cancelAnimationFrame(animRaf);
+  animRaf = null;
   isPlaying = false;
+  isPaused = true;
+  currentStepIdx = animStep;
+  document.getElementById('playBtn').textContent = '이어서 재생';
+  updatePlaybackStep();
+  renderPatternFrame();
+  publishContractState();
+}
+
+function restartAnimation() {
+  stopAnimation();
+  currentStepIdx = 0;
+  startAnimation();
+}
+
+function stopAnimation() {
+  if (animRaf !== null) { cancelAnimationFrame(animRaf); animRaf = null; }
+  isPlaying = false;
+  isPaused = false;
+  animStart = null;
+  animElapsed = 0;
+  animProgress = 0;
   document.getElementById('playBtn').textContent = '미리보기';
   updatePlaybackStep();
   if (appMode === 'pattern') renderPatternFrame(0);
 }
 
-// 단계를 순서대로 재생: 단계당 STEP_MS, 사이 STEP_GAP 정지, 전체 후 1초 유지 → 루프
+// A single RAF timeline includes holds, so pause/resume cannot leave stale timers.
 function animTick(ts) {
-  if (!animStart) animStart = ts;
+  if (!isPlaying) return;
+  if (animStart === null) animStart = ts - animElapsed;
+  animElapsed = ts - animStart;
   const pat = currentPattern();
-  const t = (ts - animStart) / STEP_MS;
+  const cycle = pat.steps.length * STEP_MS + (pat.steps.length - 1) * STEP_GAP + 1000;
+  let elapsed = animElapsed % cycle;
+  animStep = Math.min(pat.steps.length - 1, Math.floor(elapsed / (STEP_MS + STEP_GAP)));
+  elapsed -= animStep * (STEP_MS + STEP_GAP);
+  animProgress = Math.min(elapsed / STEP_MS, 1);
   const label = pat.steps.length > 1 ? `단계 ${animStep+1}/${pat.steps.length}` : null;
   updatePlaybackStep();
-  renderStepFrame(pCtx, pat, animStep, Math.min(t, 1), label);
-  if (t < 1) {
-    animRaf = requestAnimationFrame(animTick);
-  } else if (animStep < pat.steps.length - 1) {
-    setTimeout(() => {
-      if (isPlaying) {
-        animStep++;
-        animStart = null;
-        animRaf = requestAnimationFrame(animTick);
-      }
-    }, STEP_GAP);
-  } else {
-    setTimeout(() => {
-      if (isPlaying) {
-        animStep = 0;
-        animStart = null;
-        animRaf = requestAnimationFrame(animTick);
-      }
-    }, 1000);
-  }
+  renderStepFrame(pCtx, pat, animStep, animProgress, label);
+  animRaf = requestAnimationFrame(animTick);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -4139,7 +4203,9 @@ function refreshSquadSummary() {
 let lastManualText = '';
 
 function generateManual() {
+  saveCurrentNotes();
   const players   = getPlayers();
+  const squad = squads[currentSquad];
   const opponent  = document.getElementById('opponent').value.trim() || '상대팀';
   const matchDate = document.getElementById('matchDate').value;
   const notes     = document.getElementById('matchNotes').value.trim();
@@ -4210,15 +4276,12 @@ function generateManual() {
 
   const teamLines = [
     `상대: ${opponent} | 일시: ${dateStr}`,
-    `포메이션: ${modeLabel} ${formation} (${tacticalStyle})`,
-    `압박 전략: ${pressLine}`,
-    `수비 원칙: ${defLine}`,
-    `전환 원칙: ${transitionMsg}`,
+    `포메이션: ${modeLabel} ${formation} · ${SQUAD_META[currentSquad].label}`,
+    squad.teamNote.trim() ? `코치 지침: ${squad.teamNote.trim()}` : '팀 전체 지침이 아직 작성되지 않았습니다.',
   ];
 
   if (activePats.length > 0) {
     teamLines.push(`전술 패턴 ${activePats.length}가지(${activePats.map(p=>p.name).join(', ')})를 숙지한다.`);
-    teamLines.push('세트피스 및 빠른 전환 상황에서 해당 패턴을 우선 시도한다.');
   }
   if (notes) {
     teamLines.push(`감독 지시: ${notes}`);
@@ -4259,8 +4322,9 @@ function generateManual() {
 
   const playerSections = players.map((p, i) => {
     const role = classifyPlayer(p);
-    const baseLines = roleInstructions[role](p);
-    return { player: p, num: i + 1, role, lines: [...baseLines, ...describeMoves(p.id)] };
+    const note = (squad.playerNotes[p.id] || '').trim();
+    const lines = [...(note ? [note] : []), ...describeMoves(p.id)];
+    return { player: p, num: i + 1, role, lines: lines.length ? lines : ['개인 지침이 아직 작성되지 않았습니다.'] };
   });
 
   // ── HTML 렌더링 ──────────────────────────────────────────────
@@ -4285,7 +4349,14 @@ function generateManual() {
     </div>
   `;
 
-  lastManualText = buildPlainText(opponent, dateStr, formation, modeLabel, tacticalStyle, teamLines, playerSections);
+  const suggestionLines = [`추정 성향: ${tacticalStyle}`, `압박 전략: ${pressLine}`,
+    `수비 원칙: ${defLine}`, `전환 원칙: ${transitionMsg}`];
+  document.getElementById('manualSuggestions').open = false;
+  document.getElementById('manualSuggestionContent').innerHTML =
+    suggestionLines.map(line => `<div class="tactic-line">${escHtml(line)}</div>`).join('') +
+    players.map(player => `<div class="tactic-player-title">${escHtml(player.name)}</div>` +
+      roleInstructions[classifyPlayer(player)](player).map(line => `<div class="tactic-line">${escHtml(line)}</div>`).join('')).join('');
+  lastManualText = buildPlainText(opponent, dateStr, formation, modeLabel, SQUAD_META[currentSquad].label, teamLines, playerSections);
 
   card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -4428,7 +4499,7 @@ function openShare() {
   if (!url) { showToast('공유 링크를 만들지 못했습니다. 전술은 그대로 보존됩니다. 다시 시도해 주세요.'); return; }
   lastShareText = buildShareText();
   document.getElementById('shareText').textContent = lastShareText;
-  document.getElementById('shareUrlBox').textContent = url;
+  document.getElementById('shareUrlBox').value = url;
   const modal = document.getElementById('shareModal');
   modal.classList.add('visible');
   activateModal(modal, '.share-actions button');
@@ -4476,6 +4547,8 @@ function saveShareTxt() {
 // ═══════════════════════════════════════════════════════════════
 function encodeState() {
   const snap = buildStateSnap();
+  snap.view = { mode: appMode === 'pattern' ? 'pattern' : 'squad', pattern: currentPatternIdx,
+    step: isPlaying || isPaused ? animStep : currentStepIdx };
   try {
     // URL-safe base64: replace +→- /→_ and strip padding =
     return btoa(unescape(encodeURIComponent(JSON.stringify(snap))))
@@ -4503,27 +4576,37 @@ function generateShareURL() {
 }
 
 function loadFromURL() {
-  const match = location.hash.match(/[#&]s=([A-Za-z0-9\-_]+)/);
-  if (!match || !match[1]) return false;
-  const state = decodeState(match[1]);
-  if (!state || state.v !== 1) return false;
-  try { restoreState(state); } catch { return false; }
+  const params = new URLSearchParams(location.hash.slice(1));
+  if (!params.has('s')) return false;
+  shareLinkError = true;
+  const encoded = params.get('s');
+  const state = encoded && /^[A-Za-z0-9_-]+$/.test(encoded) ? decodeState(encoded) : null;
+  if (!state || state.v !== 1) return true;
+  try { restoreState(state); } catch { return true; }
+  shareLinkError = false;
+  const index = (value, count) => Number.isSafeInteger(value) && value >= 0 ? Math.min(value, count - 1) : 0;
+  const pattern = index(state.view?.pattern, patterns.length);
+  sharedView = { mode: state.view?.mode === 'pattern' ? 'pattern' : 'squad', pattern,
+    step: index(state.view?.step, patterns[pattern].steps.length) };
   return true;
 }
 
-function copyShareUrl() {
+async function copyShareUrl() {
   const url = generateShareURL();
   if (!url) { showToast('공유 링크를 만들지 못했습니다. 전술은 그대로 보존됩니다. 다시 시도해 주세요.'); return; }
   track('share_link_created', { kind: 'public_url' });
   trackOutput();
-  navigator.clipboard.writeText(url)
-    .then(() => showToast('링크를 복사했습니다. 받는 사람은 열람 화면을 보게 됩니다.'))
-    .catch(() => {
-      const box = document.getElementById('shareUrlBox');
-      box.focus();
-      document.execCommand('selectAll');
-      showToast('자동 복사하지 못했습니다. 링크를 직접 선택해 복사해 주세요.');
-    });
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+    await navigator.clipboard.writeText(url);
+    showToast('링크를 복사했습니다. 받는 사람은 열람 화면을 보게 됩니다.');
+  } catch {
+    const box = document.getElementById('shareUrlBox');
+    box.value = url;
+    box.focus();
+    box.select();
+    showToast('자동 복사하지 못했습니다. 선택된 링크를 길게 누르거나 Ctrl+C로 복사해 주세요.');
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -4802,6 +4885,8 @@ function buildStateSnap() {
   });
   snap.pat = patterns.map(pt => ({
     n: pt.name,
+    start: pt.start ? { squad: pt.start.squad, pos: Object.fromEntries(
+      Object.entries(pt.start.pos).map(([id, p]) => [id, { x: Math.round(p.x), y: Math.round(p.y) }])) } : null,
     bs: { x: Math.round(pt.ballStart.x), y: Math.round(pt.ballStart.y) },
     s: pt.steps.map(st => {
       const m = {};
@@ -4930,8 +5015,11 @@ function normalizeSnapshot(input) {
     }
     result.squads[type] = { f: Object.hasOwn(formations, sq.f) ? sq.f : Object.keys(formations)[0], pos, tn: sq.tn, pn };
   }
-  result.pat = sanitizePatterns(input.pat).map(pt => ({
+  const legacyStart = { squad: result.squad, pos: result.squads[result.squad].pos };
+  result.pat = sanitizePatterns(input.pat, legacyStart).map(pt => ({
     n: pt.name, bs: pt.ballStart,
+    start: pt.start ? { squad: pt.start.squad, pos: Object.fromEntries(
+      Object.entries(pt.start.pos).filter(([id]) => ids.has(Number(id)))) } : null,
     s: pt.steps.map(st => ({
       m: Object.fromEntries(Object.entries(st.moves).filter(([id]) => ids.has(Number(id)))
         .map(([id, mv]) => [id, { x: mv.toX, y: mv.toY }])),
@@ -4964,7 +5052,7 @@ function restoreState(state) {
 
 // 복원된 패턴 데이터 정규화 — 이름 길이 제한, 좌표는 숫자·필드 범위로 강제.
 // 구형 단일 단계 형식({n, m})은 1단계 패턴으로 마이그레이션.
-function sanitizePatterns(list) {
+function sanitizePatterns(list, fallbackStart = null) {
   const point = o => {
     const x = Number(o?.x), y = Number(o?.y);
     if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
@@ -4982,8 +5070,15 @@ function sanitizePatterns(list) {
   const pats = (Array.isArray(list) ? list : []).map(pt => {
     const rawSteps = Array.isArray(pt?.s) ? pt.s : (pt?.m ? [{ m: pt.m, b: null }] : []);
     const steps = rawSteps.map(readStep);
+    const rawStart = pt?.start === null ? null : pt?.start || fallbackStart;
+    const start = rawStart ? {
+      squad: Object.hasOwn(SQUAD_META, rawStart.squad) ? rawStart.squad : fallbackStart?.squad || 'basic',
+      pos: Object.fromEntries(Object.entries(rawStart.pos || {}).map(([id, value]) => [id, point(value)])
+        .filter(([, value]) => value)),
+    } : null;
     return {
       name: String(pt?.n ?? '패턴').slice(0, 20),
+      start,
       ballStart: point(pt?.bs) || { ...BALL_START },
       steps: steps.length ? steps : [newStep()],
     };
@@ -5412,6 +5507,7 @@ window.SquadMakerContract = Object.freeze({
     const library = ['create-team', 'rename-team', 'create-file', 'rename-file', 'open-file', 'delete-file', 'delete-team', 'undo-delete'];
     const supported = [...reads, ...library, 'select-player', 'switch-squad', 'change-mode', 'reset-layout', 'undo', 'import-snapshot', 'retry-save'];
     if (!supported.includes(operation)) return contractResult(operation, 'unsupported', 'unsupported-operation');
+    if (shareLinkError) return contractResult(operation, 'error', 'invalid-input');
     if (_exportKind || _safetyPending || _libraryPending) return contractResult(operation, 'busy', 'busy');
     if (viewerMode && !reads.includes(operation)) return contractResult(operation, 'error', 'read-only');
     try {
@@ -5479,11 +5575,22 @@ setLibraryBusy(true);
 _readyPromise = (async () => {
   try {
     viewerMode = loadFromURL();
+    if (shareLinkError) {
+      document.body.classList.add('viewer-mode', 'share-error');
+      document.getElementById('shareErrorPanel').hidden = false;
+      setStorageStatus('read-only');
+      return;
+    }
     _library = makeLibrary();
     const result = await _library.initialize({ initialSnapshot: _initialSnapshot, readOnly: viewerMode });
     if (viewerMode) {
       document.body.classList.add('viewer-mode');
       refreshUI();
+      if (sharedView) {
+        currentPatternIdx = sharedView.pattern;
+        currentStepIdx = sharedView.step;
+        setAppMode(sharedView.mode);
+      }
       renderViewerBar();
       observeSnapshot();
       setStorageStatus('read-only');

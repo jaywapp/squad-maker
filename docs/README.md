@@ -4,6 +4,8 @@
 
 | 읽을 목적 | 문서 |
 |---|---|
+| 2026-10-13 코치 점검 6개 오류 수정 | [완료 결과](coach-review-20261013/fixes.md), [분석](coach-fixes-20261013-analysis.md), [설계](coach-fixes-20261013-design.md), [작업](coach-fixes-20261013-tasks.md) |
+| 2026-10-13 조기축구 코치의 전술 작성·설명·공유 관점 점검 | [점검 보고서](coach-review-20261013/report.md), [재현 가능한 이슈 6건](coach-review-20261013/issues.md) |
 | 사용자·문제·단계별 기능·화면·슬롯·출시 기준 | [상세 상품 기획서](product-plan.md) |
 | A의 실제 원본 캡처와 아직 반영되지 않은 개선 | [A 자료](design-a/README.md) |
 | 요청·권한·근거·이번 문서 작업 범위 | [분석](squad-product-20261007-analysis.md) |

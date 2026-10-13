@@ -110,7 +110,9 @@ for (const native of [false, true]) {
     expect(result.url.startsWith(expectedBase + '#s=')).toBe(true);
     const encoded = result.url.split('#s=')[1];
     expect(encoded).toMatch(/^[A-Za-z0-9_-]+$/);
-    expect(JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8'))).toEqual(before.snapshot);
+    expect(JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8'))).toEqual({
+      ...before.snapshot, view: { mode: 'squad', pattern: 0, step: 0 },
+    });
     expect(await page.evaluate(() => generateShareURL())).toBe(result.url);
     if (native) expect(result.url).not.toContain('localhost');
     expect(await page.evaluate(() => window.__shareClipboardWrites)).toEqual([]);
@@ -150,7 +152,7 @@ for (const native of [false, true]) {
     await page.evaluate(() => openShare());
     await page.clock.runFor(300);
     await expect(page.locator('#shareModal')).toBeVisible();
-    const initialUrl = await page.locator('#shareUrlBox').innerText();
+    const initialUrl = await page.locator('#shareUrlBox').inputValue();
     const expectedBase = native ? VERIFIED_SHARE_BASE : new URL(page.url()).origin + new URL(page.url()).pathname;
     expect(initialUrl.startsWith(expectedBase + '#s=')).toBe(true);
     const before = await state(page), saved = await stored(page);
