@@ -8,6 +8,8 @@
 
 이 요청은 정식 패키지/첫 버전·서명·TEEN 보호안의 확정, 운영 광고 활성화·공개 정책 게시·APK Release/배포·Play 제출·키 생성/서명·기기 설치를 승인한 것이 아니다. production gate와 테스트 광고·CI/자동 배포 비활성 상태를 유지한다. 커밋 후 Git 이력에 따른 Preview 버전/소스 SHA가 바뀌므로 최종 PR head에서 unit·전체 desktop/mobile E2E·bundle/sync·unsigned Preview APK/AAB·lint를 다시 확인하고 결과를 PR에 기록한다. 이 문서의 기존 dirty 소스 결과를 커밋 후 빌드 결과로 바꾸어 사용하지 않는다.
 
+첫 commit `3096da4`의 fresh 전체 E2E는399 통과/기존1skip/2실패였다. desktop/mobile의 같은 interest-preview 테스트가 폐기한 포괄적 개인정보 미수집 문구를 기대한 원인이다. 앱 문구를 되돌리거나 테스트를 skip하지 않고, 기존 이벤트 속성 `{source}` 검증을 유지하며 팀/선수/전술 분석 제외 안내와 포괄적 미수집 문구의 부재를 확인하도록 테스트를 수정한다. 실패 로그를 보존하고 새 정상 commit의 전체 검증 후 PR57을 병합한다.
+
 ## 확인한 기준
 
 - 최신 원격 main: `b6b0420f24d4b998a5e986fa0a5aaabfb1b0cbca`, PR56 병합 완료.

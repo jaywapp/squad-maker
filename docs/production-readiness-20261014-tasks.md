@@ -15,7 +15,7 @@ orchestrator=Codex, owner=Codex. 모델은 Codex 계열로 통일하고 파일 �
 | R8 후속 대상·화면·스토어/청소년 보호 점검 | Codex/current/high 및 기존 production_review | R0, 사용자 후속 답변 | audience-review | UI/문구 읽기 전용 및 audience-policy 문서 | 공식 Play/AdMob와 실제 코드 구분 | 읽기 검토 완료, TEEN 보호안 사용자 답변 대기 |
 | R9 공개 지원·방침/Data safety 초안 | Codex/current/high | R8 | policy-docs | index.html/README/product-plan 상단/분석·설계·표·체크리스트/새 정책3문서 | 문구/역할/링크·SDK data 대조 | 로컬 작성 완료, 실제 정책 URL/운영 세부 미확인 |
 | R10 후속 변경 영향 검증 | Codex/current/medium | R9 | audience-verification | ignored logs/최종 report | fresh unit·영향 E2E·sync/Preview unsigned/lint·hash | 완료: unit173/E2E72/Java23/unsigned/lint0/4/시각6·문서10, 이전 전체401 결과와 구분 |
-| R11 사용자 승인 Git 통합 | Codex/current/high 및 기존 production_review 읽기 전용 | R10, 사용자 commit/push/merge 지시 | git-integration | 이번 준비 소스/문서·PR 설명, ignored 최종 SHA 증거 | 최종 commit unit/full E2E/sync/unsigned/lint·PR/main/Actions 상태 | 진행 중: commit/push/현재 변경의 main PR 병합 승인. 키/배포/정식 결정 대기는 유지 |
+| R11 사용자 승인 Git 통합 | Codex/current/high 및 기존 production_review 읽기 전용 | R10, 사용자 commit/push/merge 지시 | git-integration | 이번 준비 소스/문서·interest-preview 기존 회귀·PR 설명, ignored 최종 SHA 증거 | 최종 commit unit/full E2E/sync/unsigned/lint·PR/main/Actions 상태 | 진행 중:3096da4 push/DraftPR57, fresh E2E399/skip1/fail2의 옛 개인정보 기대값 수정 후 새commit 재검증. 키/배포/정식 결정 대기는 유지 |
 
 후속 조정자는 Codex다. 기존 production_review는 문구/코드 읽기 전용, production_consent는 실제 SDK API 읽기 전용이며 root만 UI와 정책 문서를 수정한다. 새 모델/세션을 만들거나 같은 파일을 동시 수정하지 않는다. 네이티브 보호안은 사용자 답변 의존이므로 구현 차단 상태다. 이번 추가 문구는 기존 디자인 유지 범위이며 새로운 시안/재설계가 아니다. R11은 후속 Git 승인에 따라 실행하며 이전 원격 작업 금지 기록에 우선한다. 완료 SHA/커밋 기준 결과는 PR에 기록하여 추가 문서 커밋으로 versionCode가 다시 바뀌는 반복을 피한다.
 

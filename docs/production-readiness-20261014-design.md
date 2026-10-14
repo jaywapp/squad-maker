@@ -4,6 +4,8 @@
 
 사용자가 현재 변경의 commit/push/main 병합을 승인했다. 새 디자인/운영 정책을 추가하지 않고 현 feature branch에서 커밋 후 최종 head를 검증해 PR을 병합한다. GitHub Actions repository enabled:false 및 APK/웹 배포 워크플로 disabled_manually를 유지한다. 정식 ID/버전·서명과 TEEN 보호안 승인 대기는 해제하지 않는다. 실제 결과 SHA·검증은 PR/최종 인계에 기록하고 기존 로컬 검증 문서는 생성 시점의 기록으로 보존한다.
 
+첫 commit 전체검증의 interest-preview2 실패는 문구의 기존 기대값 누락이다. `interest-previews.spec.js`에서 scoped 분석 제외 문구와 잘못된 전역 미수집 문구의 부재를 확인하고 기존 실제 이벤트 속성 검증은 유지한다. 개인정보 경계를 약화하거나 제품 동작·광고 설정을 바꾸지 않는 회귀 테스트 수정이다. force push/amend 없이 후속 commit에서 재검증한다.
+
 ## 빌드 경계
 
 - `preview`는 기존 applicationId·Java namespace·저장 형식과 기존 Preview 서명 계보를 유지한다.

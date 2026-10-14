@@ -4,6 +4,8 @@
 
 사용자가 이후 현재 준비 변경의 commit·push·main 병합을 승인했다. 아래 결과는 커밋 전 생성 시점의 로컬 기록으로 보존하고, Git 통합의 최종 소스 SHA·fresh 검증·병합 결과는 해당 main 대상 PR에 기록한다. 패키지/키·서명·TEEN 보호안·배포/Play 승인과 혼동하지 않는다. CI·자동 배포는 비활성 유지다.
 
+첫 source commit3096da4를 push하고 DraftPR57을 만들었다. 해당 SHA의 unit173/Java23/unsigned Preview1100/lint0/4는 통과했지만 전체 E2E는399pass/skip1/fail2였다. 실패는 desktop/mobile의 기존 interest-preview가 더 이상 사용하지 않는 포괄적 개인정보 미수집 문구를 기대한 것이다. 기존 이벤트 속성 검증을 보존하면서 scoped 안내/옛 주장 부재를 검사하도록 수정하며, 새 commit 결과는 PR57에 갱신한다. 이 중간 실패를 최종 성공으로 숨기지 않고 `.work/git-integration-20261014/3096da4-failed/`에 결과를 보존한다.
+
 ## 후속 지원·대상 반영 — 현재 결과
 
 - 공개 지원은 blueheart.dev@gmail.com, 첫 배포는 대한민국·한국어, 제품 대상은16세 이상 축구·풋살 선수/성인 동호인·코치로 확정됐다. Play16~17세/18세 이상은 검토 기준이며 Console 제출/콘텐츠 등급은 미확인이다.

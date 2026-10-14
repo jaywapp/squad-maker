@@ -44,11 +44,12 @@ test.describe('출시 전 기능 미리보기', () => {
     await section.locator('button:has-text("클라우드에 팀 저장")').click();
     const modal = page.locator('#interestModal');
     await expect(modal).toBeVisible();
-    // Disclose the preview, undecided offer, and unchanged privacy boundary.
+    // Disclose the preview, undecided offer, and scoped analytics privacy boundary.
     await expect(modal).toContainText('아직 출시 전인 기능입니다');
     await expect(modal).toContainText('무료 기능은 그대로 무료');
     await expectUndecidedOffer(modal);
-    await expect(modal).toContainText('개인정보는 수집하지 않습니다');
+    await expect(modal).toContainText('팀·선수 이름과 전술 내용은 분석 데이터에 포함하지 않습니다');
+    await expect(modal).not.toContainText('개인정보는 수집하지 않습니다');
     await expect
       .poll(() => events.filter(e => e.name === 'cloud_save_interest_clicked').length)
       .toBe(1);
