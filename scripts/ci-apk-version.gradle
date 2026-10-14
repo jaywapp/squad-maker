@@ -1,4 +1,4 @@
-// Override only the CI APK version; local builds retain the checked-in base version.
+// CI overrides apply only to the Preview lineage; production has independent versions.
 gradle.beforeProject { project ->
     project.plugins.withId('com.android.application') {
         project.extensions.getByName('androidComponents').finalizeDsl { androidDsl ->
@@ -8,8 +8,13 @@ gradle.beforeProject { project ->
                     !name || !(name ==~ /[A-Za-z0-9][A-Za-z0-9._-]{0,180}/)) {
                 throw new GradleException('Valid squadVersionCode and squadVersionName are required')
             }
-            androidDsl.defaultConfig.versionCode = code.toInteger()
-            androidDsl.defaultConfig.versionName = name
+            def preview = androidDsl.productFlavors.findByName('preview')
+            if (!preview || code.toBigInteger() <= 1097 ||
+                    preview.versionCode != code.toInteger() || preview.versionName != name) {
+                throw new GradleException('CI version must match the full Git Preview lineage and exceed 1097')
+            }
+            preview.versionCode = code.toInteger()
+            preview.versionName = name
         }
     }
 }

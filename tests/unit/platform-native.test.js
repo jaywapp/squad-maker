@@ -78,6 +78,20 @@ function harness(options = {}) {
     },
     SquadAds: {
       async showTestBanner() { calls.push({ method: 'ads-show' }); return { status: 'loading', testOnly: true }; },
+      async showBanner() {
+        calls.push({ method: 'ads-banner' });
+        if (options.adError) throw options.adError;
+        return { status: 'loading', testOnly: options.adState?.testOnly !== false };
+      },
+      async showPrivacyOptions() {
+        calls.push({ method: 'ads-privacy' });
+        if (options.adError) throw options.adError;
+        return options.privacy ? options.privacy() : { status: 'shown' };
+      },
+      addListener(event, listener) {
+        events.set('ads-' + event, listener);
+        return options.adSubscription || Promise.resolve({ remove() { calls.push({ method: 'ads-remove' }); } });
+      },
       async prepareExportInterstitial() {
         calls.push({ method: 'ads-prepare' });
         if (options.adError) throw options.adError;
@@ -88,7 +102,11 @@ function harness(options = {}) {
         if (options.adError) throw options.adError;
         return options.exportAd ? options.exportAd(payload) : { status: 'shown', testOnly: true };
       },
-      async getState() { calls.push({ method: 'ads-state' }); return { status: 'loaded', testOnly: true }; }
+      async getState() {
+        calls.push({ method: 'ads-state' });
+        if (options.adStateError) throw options.adStateError;
+        return options.adState === undefined ? { status: 'loaded', testOnly: true } : options.adState;
+      }
     }
   };
   const Share = { async share(payload) {
@@ -308,10 +326,81 @@ test('storage exposes only allowed string error codes and sanitizes numeric DOME
   }
 });
 
-test('test advertisement facade returns plugin states without storage writes', async () => {
+test('advertisement facade returns bounded consent state without storage writes', async () => {
   const app = harness(); assert.deepEqual(copy(await app.platform.showTestAd()), { status: 'loading', testOnly: true });
-  assert.deepEqual(copy(await app.platform.getAdState()), { status: 'loaded', testOnly: true });
+  assert.deepEqual(copy(await app.platform.getAdState()), { status: 'loaded', testOnly: true,
+    adsMode: 'unavailable', canRequestAds: false, consentStatus: 'unknown',
+    privacyOptionsRequired: false, consentFormShowing: false });
   assert.equal(app.count('storage-commit'), 0); assert.equal(app.count('document-save'), 0);
+});
+
+test('production banner and consent state retain the configured mode without persisting choices', async () => {
+  const app = harness({ adState: { status: 'loaded', testOnly: false, adsMode: 'production',
+    canRequestAds: true, consentStatus: 'obtained', privacyOptionsRequired: true,
+    consentFormShowing: false, consentString: 'must not cross the bridge' } });
+  assert.deepEqual(copy(await app.platform.showBannerAd()), { status: 'loading', testOnly: false });
+  assert.deepEqual(copy(await app.platform.getAdState()), { status: 'loaded', testOnly: false,
+    adsMode: 'production', canRequestAds: true, consentStatus: 'obtained',
+    privacyOptionsRequired: true, consentFormShowing: false });
+  assert.equal(app.count('ads-show'), 0);
+  assert.equal(app.count('storage-commit'), 0);
+});
+
+test('unknown consent payloads and bridge failures never grant ad request permission', async () => {
+  for (const options of [{ adState: null }, { adStateError: new Error('private SDK detail') },
+    { adState: { status: 9, testOnly: 'false', canRequestAds: 'true', privacyOptionsRequired: 'true' } }]) {
+    const result = await harness(options).platform.getAdState();
+    assert.equal(result.canRequestAds, false);
+    assert.equal(result.privacyOptionsRequired, false);
+    assert.equal(result.testOnly, null);
+    assert.equal(result.consentStatus, 'unknown');
+  }
+});
+
+test('privacy option bridge stays pending until dismissal and resolves errors without private details', async () => {
+  let dismiss;
+  let complete = false;
+  const app = harness({ privacy: () => new Promise(resolve => { dismiss = resolve; }) });
+  const pending = app.platform.showAdPrivacyOptions().then(result => { complete = true; return result; });
+  await Promise.resolve();
+  assert.equal(complete, false);
+  assert.equal(app.count('ads-privacy'), 1);
+  dismiss({ status: 'shown' });
+  assert.deepEqual(copy(await pending), { status: 'shown' });
+  const unavailable = harness({ adError: new Error('private consent detail') });
+  assert.deepEqual(copy(await unavailable.platform.showAdPrivacyOptions()),
+    { status: 'failed', reason: 'privacy-unavailable' });
+  assert.equal(app.count('storage-commit'), 0);
+});
+
+test('ad state listeners sanitize updates and stop after page teardown', async () => {
+  const app = harness();
+  const states = [];
+  const stop = app.platform.onAdState(value => states.push(copy(value)));
+  await new Promise(resolve => setImmediate(resolve));
+  app.events.get('ads-state')({ status: 'loaded', canRequestAds: true, privacyOptionsRequired: true,
+    consentFormShowing: true, rawConsent: 'private' });
+  assert.equal(states.at(-1).privacyOptionsRequired, true);
+  assert.equal(states.at(-1).consentFormShowing, true);
+  assert.equal('rawConsent' in states.at(-1), false);
+  stop();
+  const count = states.length;
+  app.events.get('ads-state')({ privacyOptionsRequired: false });
+  assert.equal(states.length, count);
+  assert.equal(app.count('ads-remove'), 1);
+});
+
+test('late native subscriptions are removed if teardown precedes registration', async () => {
+  let registered;
+  let removed = 0;
+  const app = harness({ adSubscription: new Promise(resolve => { registered = resolve; }) });
+  let updates = 0;
+  const stop = app.platform.onAdState(() => updates++);
+  stop();
+  registered({ remove() { removed++; } });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(removed, 1);
+  assert.equal(updates, 0);
 });
 
 test('web evaluation registers no native listeners and cannot access native storage or export', async () => {
@@ -321,7 +410,11 @@ test('web evaluation registers no native listeners and cannot access native stor
   assert.deepEqual(copy(await app.platform.showTestAd()), { status: 'unsupported' });
   assert.deepEqual(copy(await app.platform.prepareExportAd()), { status: 'unsupported' });
   assert.deepEqual(copy(await app.platform.showExportAd('sq')), { status: 'unsupported' });
-  assert.deepEqual(copy(await app.platform.getAdState()), { status: 'unsupported' });
+  assert.equal((await app.platform.getAdState()).status, 'unsupported');
+  assert.equal((await app.platform.getAdState()).canRequestAds, false);
+  assert.deepEqual(copy(await app.platform.showBannerAd()), { status: 'unsupported' });
+  assert.deepEqual(copy(await app.platform.showAdPrivacyOptions()), { status: 'unsupported' });
+  app.platform.onAdState(() => { throw new Error('Unexpected web ad callback'); })();
   assert.equal(app.calls.length, 0); assert.equal(Object.isFrozen(app.platform), true);
 });
 
@@ -343,7 +436,7 @@ test('non-export placements cannot request an interstitial', async () => {
   const app = harness();
   for (const placement of ['png', 'auto-save', 'restore', 'share-url', undefined, { placement: 'sq' }]) {
     assert.deepEqual(copy(await app.platform.showExportAd(placement)),
-      { status: 'skipped', reason: 'invalid-placement', testOnly: true });
+      { status: 'skipped', reason: 'invalid-placement', testOnly: null });
   }
   assert.equal(app.calls.length, 0);
 });
@@ -351,7 +444,7 @@ test('non-export placements cannot request an interstitial', async () => {
 test('native ad bridge errors resolve safely without exposing private error details', async () => {
   const app = harness({ adError: new Error('private plugin diagnostic') });
   for (const action of [() => app.platform.prepareExportAd(), () => app.platform.showExportAd('sq')]) {
-    assert.deepEqual(copy(await action()), { status: 'failed', reason: 'ad-unavailable', testOnly: true });
+    assert.deepEqual(copy(await action()), { status: 'failed', reason: 'ad-unavailable', testOnly: null });
   }
   assert.equal(app.count('document-save'), 0);
 });

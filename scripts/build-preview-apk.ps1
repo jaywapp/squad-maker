@@ -13,7 +13,7 @@ foreach ($name in $required) {
 if (-not (Test-Path -LiteralPath $signingInputs['SQUAD_PREVIEW_KEYSTORE'] -PathType Leaf)) { throw 'The approved preview keystore does not exist.' }
 if (-not $AndroidSdk) { throw 'ANDROID_HOME or -AndroidSdk is required.' }
 $tools = Join-Path $AndroidSdk 'build-tools\36.0.0'
-$unsigned = Join-Path $repo 'android\app\build\outputs\apk\release\app-release-unsigned.apk'
+$unsigned = Join-Path $repo 'android\app\build\outputs\apk\preview\release\app-preview-release-unsigned.apk'
 $artifacts = Join-Path $repo '.work\artifacts'
 New-Item -ItemType Directory -Path $artifacts -Force | Out-Null
 $aligned = Join-Path $artifacts 'squad-maker-aligned-unsigned.apk'
@@ -26,7 +26,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Android sync failed.' }
     Push-Location (Join-Path $repo 'android')
     try {
-        & '.\gradlew.bat' :app:assembleRelease :app:lintRelease --console=plain --no-daemon
+        & '.\gradlew.bat' :app:assemblePreviewRelease :app:lintPreviewRelease --console=plain --no-daemon
         if ($LASTEXITCODE -ne 0) { throw 'Unsigned release build or lint failed.' }
     } finally { Pop-Location }
     & (Join-Path $tools 'zipalign.exe') -p -f 4 $unsigned $aligned

@@ -7,6 +7,20 @@ const Documents = registerPlugin('SquadDocuments');
 const Ads = registerPlugin('SquadAds');
 const native = Capacitor.isNativePlatform();
 
+function adState(value = {}) {
+  if (!value || typeof value !== 'object') value = {};
+  return Object.freeze({
+    status: typeof value.status === 'string' ? value.status.slice(0, 64) : 'unavailable',
+    testOnly: typeof value.testOnly === 'boolean' ? value.testOnly : null,
+    adsMode: ['test', 'production'].includes(value.adsMode) ? value.adsMode : 'unavailable',
+    canRequestAds: value.canRequestAds === true,
+    consentStatus: ['unknown', 'not-required', 'required', 'obtained'].includes(value.consentStatus)
+      ? value.consentStatus : 'unknown',
+    privacyOptionsRequired: value.privacyOptionsRequired === true,
+    consentFormShowing: value.consentFormShowing === true,
+  });
+}
+
 function nativeError(error) {
   const allowed = new Set(['storage-conflict', 'storage-unavailable', 'storage-quota', 'storage-verification', 'invalid-input', 'file-write-failed']);
   return Object.assign(new Error('Native operation failed'), {
@@ -127,19 +141,47 @@ window.SquadPlatform = Object.freeze({
     if (!native) return { status: 'unsupported' };
     return Ads.showTestBanner();
   },
+  async showBannerAd() {
+    if (!native) return { status: 'unsupported' };
+    try { return await Ads.showBanner(); }
+    catch { return { status: 'failed', reason: 'ad-unavailable', testOnly: null }; }
+  },
   async prepareExportAd() {
     if (!native) return { status: 'unsupported' };
     try { return await Ads.prepareExportInterstitial(); }
-    catch { return { status: 'failed', reason: 'ad-unavailable', testOnly: true }; }
+    catch { return { status: 'failed', reason: 'ad-unavailable', testOnly: null }; }
   },
   async showExportAd(placement) {
     if (!native) return { status: 'unsupported' };
     if (!['gif', 'sq', 'share-text'].includes(placement))
-      return { status: 'skipped', reason: 'invalid-placement', testOnly: true };
+      return { status: 'skipped', reason: 'invalid-placement', testOnly: null };
     try { return await Ads.showExportInterstitial({ placement }); }
-    catch { return { status: 'failed', reason: 'ad-unavailable', testOnly: true }; }
+    catch { return { status: 'failed', reason: 'ad-unavailable', testOnly: null }; }
   },
   async getAdState() {
-    return native ? Ads.getState() : { status: 'unsupported' };
+    if (!native) return adState({ status: 'unsupported' });
+    try { return adState(await Ads.getState()); }
+    catch { return adState(); }
+  },
+  onAdState(listener) {
+    if (!native || typeof listener !== 'function') return () => {};
+    let stopped = false;
+    let handle;
+    const publish = value => { if (!stopped) listener(adState(value)); };
+    const remove = subscription => {
+      try { Promise.resolve(subscription?.remove()).catch(() => {}); } catch {}
+    };
+    try {
+      Promise.resolve(Ads.addListener('state', publish)).then(subscription => {
+        if (stopped) remove(subscription); else handle = subscription;
+      }).catch(() => {});
+      Ads.getState().then(publish).catch(() => publish({}));
+    } catch { publish({}); }
+    return () => { stopped = true; remove(handle); };
+  },
+  async showAdPrivacyOptions() {
+    if (!native) return { status: 'unsupported' };
+    try { return await Ads.showPrivacyOptions(); }
+    catch { return { status: 'failed', reason: 'privacy-unavailable' }; }
   },
 });

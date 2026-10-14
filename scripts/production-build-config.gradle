@@ -1,0 +1,53 @@
+// Pure policy functions shared by Android configuration and standalone Groovy tests.
+ext.productionBuildPolicy = [
+    approvedProductionIdentity: null,
+    testAds: [app: 'ca-app-pub-3940256099942544~3347511713',
+              banner: 'ca-app-pub-3940256099942544/6300978111',
+              interstitial: 'ca-app-pub-3940256099942544/1033173712'],
+    productionAds: [app: 'ca-app-pub-3532115669945697~1919738204',
+                    banner: 'ca-app-pub-3532115669945697/4481041102',
+                    interstitial: 'ca-app-pub-3532115669945697/3966035787'],
+    adsMode: { Object value ->
+        def mode = value == null ? 'test' : value.toString()
+        if (!(mode in ['test', 'production'])) {
+            throw new IllegalArgumentException('squadAdsMode must be test or production')
+        }
+        mode
+    },
+    underAge: { Object value, String mode ->
+        if (value == null && mode == 'production') {
+            throw new IllegalArgumentException('Production ads require explicit squadUmpUnderAgeOfConsent=true or false')
+        }
+        if (value != null && !(value.toString() in ['true', 'false'])) {
+            throw new IllegalArgumentException('squadUmpUnderAgeOfConsent must be true or false')
+        }
+        value?.toString() == 'true'
+    },
+    validateVariant: { String flavor, String buildType, String mode, Map approvedIdentity ->
+        if (!(mode in ['test', 'production'])) {
+            throw new IllegalArgumentException('squadAdsMode must be test or production')
+        }
+        if (!(flavor in ['preview', 'production']) || !(buildType in ['debug', 'release'])) {
+            throw new IllegalArgumentException('Unsupported Android variant')
+        }
+        if (mode == 'production' && !(flavor == 'production' && buildType == 'release')) {
+            throw new IllegalArgumentException('Production ads are permitted only for productionRelease')
+        }
+        if (flavor == 'production' && !approvedIdentity) {
+            throw new IllegalArgumentException('Production package and first version require recorded user approval before building')
+        }
+    },
+    previewVersionCode: { Object countValue, Object overrideValue ->
+        def count = countValue?.toString()
+        if (!count || !(count ==~ /[1-9][0-9]*/)) {
+            throw new IllegalArgumentException('Full Git commit count is required for Preview versioning')
+        }
+        def expected = 1002G + count.toBigInteger()
+        def code = overrideValue == null ? expected.toString() : overrideValue.toString()
+        if (!(code ==~ /[1-9][0-9]*/) || code.toBigInteger() != expected ||
+                expected <= 1097 || expected > 2100000000) {
+            throw new IllegalArgumentException('Preview versionCode must equal 1002 + full Git commit count and exceed 1097')
+        }
+        expected.toInteger()
+    }
+]

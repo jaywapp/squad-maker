@@ -1,5 +1,31 @@
 apply plugin: 'com.android.application'
 
+apply from: '../../scripts/production-build-config.gradle'
+def buildPolicy = productionBuildPolicy
+def adsMode = buildPolicy.adsMode(findProperty('squadAdsMode'))
+def underAgeOfConsent = buildPolicy.underAge(findProperty('squadUmpUnderAgeOfConsent'), adsMode)
+def approvedProductionIdentity = buildPolicy.approvedProductionIdentity
+def shallowRepository = providers.exec {
+    workingDir rootProject.projectDir.parentFile
+    commandLine 'git', 'rev-parse', '--is-shallow-repository'
+}.standardOutput.asText.get().trim()
+if (shallowRepository != 'false') {
+    throw new GradleException('Preview versioning requires a full-history Git checkout')
+}
+def commitCount = providers.exec {
+    workingDir rootProject.projectDir.parentFile
+    commandLine 'git', 'rev-list', '--count', 'HEAD'
+}.standardOutput.asText.get().trim()
+def sourceSha = providers.exec {
+    workingDir rootProject.projectDir.parentFile
+    commandLine 'git', 'rev-parse', 'HEAD'
+}.standardOutput.asText.get().trim()
+def previewCode = buildPolicy.previewVersionCode(commitCount, findProperty('squadVersionCode'))
+def previewName = "0.1.0-preview.1.main.${commitCount}.${sourceSha.take(8)}"
+if (findProperty('squadVersionName') != null && findProperty('squadVersionName').toString() != previewName) {
+    throw new GradleException('Preview versionName must match the full Git source context')
+}
+
 android {
     namespace = "com.jaywapp.squadmaker.preview"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -9,6 +35,12 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1001
         versionName "0.1.0-preview.1"
+        manifestPlaceholders = [admobAppId: buildPolicy.testAds.app]
+        buildConfigField 'boolean', 'ADS_TEST_ONLY', 'true'
+        buildConfigField 'String', 'ADS_MODE', '"test"'
+        buildConfigField 'String', 'BANNER_AD_UNIT_ID', '"' + buildPolicy.testAds.banner + '"'
+        buildConfigField 'String', 'INTERSTITIAL_AD_UNIT_ID', '"' + buildPolicy.testAds.interstitial + '"'
+        buildConfigField 'boolean', 'UMP_UNDER_AGE_OF_CONSENT', underAgeOfConsent.toString()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,10 +48,52 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    buildFeatures {
+        buildConfig true
+    }
+    flavorDimensions 'channel'
+    productFlavors {
+        preview {
+            dimension 'channel'
+            applicationId 'com.jaywapp.squadmaker.preview'
+            versionCode previewCode
+            versionName previewName
+        }
+        production {
+            dimension 'channel'
+            // Reserved placeholder; every production task is blocked until approval is recorded.
+            applicationId approvedProductionIdentity?.applicationId ?: 'com.jaywapp.unapproved.production'
+            versionCode approvedProductionIdentity?.versionCode ?: 1
+            versionName approvedProductionIdentity?.versionName ?: 'unapproved'
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+androidComponents.onVariants(androidComponents.selector().withFlavor('channel', 'production').withBuildType('release')) { variant ->
+    def ids = adsMode == 'production' ? buildPolicy.productionAds : buildPolicy.testAds
+    variant.manifestPlaceholders.put('admobAppId', ids.app)
+    variant.buildConfigFields.put('ADS_TEST_ONLY', new com.android.build.api.variant.BuildConfigField('boolean', (adsMode != 'production').toString(), ''))
+    variant.buildConfigFields.put('ADS_MODE', new com.android.build.api.variant.BuildConfigField('String', '"' + adsMode + '"', ''))
+    variant.buildConfigFields.put('BANNER_AD_UNIT_ID', new com.android.build.api.variant.BuildConfigField('String', '"' + ids.banner + '"', ''))
+    variant.buildConfigFields.put('INTERSTITIAL_AD_UNIT_ID', new com.android.build.api.variant.BuildConfigField('String', '"' + ids.interstitial + '"', ''))
+}
+
+// Inspect the resolved graph, including abbreviated and aggregate task requests, before any task runs.
+gradle.taskGraph.whenReady { graph ->
+    graph.allTasks.findAll { it.project == project }.each { task ->
+        ['preview', 'production'].each { flavor ->
+            ['debug', 'release'].each { buildType ->
+                def marker = flavor.capitalize() + buildType.capitalize()
+                if (task.name.contains(marker)) {
+                    buildPolicy.validateVariant(flavor, buildType, adsMode, approvedProductionIdentity)
+                }
+            }
         }
     }
 }
@@ -37,6 +111,7 @@ dependencies {
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
     implementation 'com.google.android.gms:play-services-ads:25.5.0'
+    implementation 'com.google.android.ump:user-messaging-platform:4.0.0'
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"

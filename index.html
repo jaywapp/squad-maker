@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>아이엠 헤드코치, 축구 포메이션 & 전술 공유</title>
-<meta name="description" content="축구 스쿼드를 직접 만들고 팀원과 공유하세요. 포메이션 설정, 선수 배치, 전술 지침을 손쉽게 작성하고 링크로 공유할 수 있습니다.">
+<meta name="description" content="축구·풋살 선수와 동호인·코치를 위한 전술 편집 도구. 선수 배치와 움직임 패턴을 만들고 이미지·GIF·링크로 공유하세요.">
 <!-- Open Graph -->
 <meta property="og:type"        content="website">
 <meta property="og:title"       content="아이엠 헤드코치, 축구 포메이션 & 전술 공유">
-<meta property="og:description" content="축구 스쿼드를 직접 만들고 팀원과 공유하세요. 포메이션 설정, 선수 배치, 전술 지침을 손쉽게 작성하고 링크로 공유할 수 있습니다.">
+<meta property="og:description" content="축구·풋살 선수와 동호인·코치를 위한 전술 편집 도구. 선수 배치와 움직임 패턴을 만들고 이미지·GIF·링크로 공유하세요.">
   <meta property="og:url"         content="https://jaywapp.github.io/squad-maker/">
   <meta property="og:image"       content="https://jaywapp.github.io/squad-maker/og-image.png">
 <meta property="og:locale"      content="ko_KR">
 <!-- Twitter Card -->
 <meta name="twitter:card"        content="summary_large_image">
 <meta name="twitter:title"       content="아이엠 헤드코치, 축구 포메이션 & 전술 공유">
-<meta name="twitter:description" content="포메이션 설정, 선수 배치, 전술 지침을 만들고 링크로 공유하세요.">
+<meta name="twitter:description" content="축구·풋살 전술과 움직임 패턴을 만들고 이미지·GIF·링크로 공유하세요.">
   <meta name="twitter:image"       content="https://jaywapp.github.io/squad-maker/og-image.png">
 <!-- Run Line favicon -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%20width%3D%2232%22%20height%3D%2232%22%3E%20%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%232b5e3f%22%2F%3E%20%3Csvg%20x%3D%223%22%20y%3D%223%22%20width%3D%2226%22%20height%3D%2226%22%20viewBox%3D%2214%2014%2072%2072%22%3E%20%3Ccircle%20cx%3D%2231%22%20cy%3D%2272%22%20r%3D%2212%22%20fill%3D%22%23b8e986%22%2F%3E%20%3Cpath%20d%3D%22M48%2062C78%2058%2038%2036%2076%2025%22%20fill%3D%22none%22%20stroke%3D%22%23e8ede8%22%20stroke-width%3D%229%22%20stroke-linecap%3D%22round%22%2F%3E%20%3Cpath%20d%3D%22M63.9%2020.2L76%2025L68.4%2035.5%22%20fill%3D%22none%22%20stroke%3D%22%23e8ede8%22%20stroke-width%3D%229%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%20%3C%2Fsvg%3E%20%3C%2Fsvg%3E">
@@ -1801,7 +1801,7 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
     <div class="interest-price" id="interestPrice"></div>
     <div class="share-divider"></div>
     <div class="interest-note">
-      이 창을 연 클릭만 관심 신호로 집계하며, 개인정보는 수집하지 않습니다.<br>
+      이 창을 연 클릭을 관심 신호로 집계합니다. 팀·선수 이름과 전술 내용은 분석 데이터에 포함하지 않습니다.<br>
       더 자세한 의견을 주고 싶다면 <a id="interestMail" href="#">코치 인터뷰에 이메일로 참여</a>할 수 있습니다.
       이메일 주소는 인터뷰 연락에만 사용하고 분석 데이터에는 포함하지 않습니다.
     </div>
@@ -1868,12 +1868,22 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
 
     <div class="help-section">
       <h3>앱 정보</h3>
+      <p>16세 이상 축구·풋살 선수와 성인 동호인·코치를 위한 전술 편집 도구입니다.</p>
       <p id="helpAppVersion" aria-live="polite"></p>
     </div>
 
+    <div class="help-section" id="adPrivacySection" hidden>
+      <h3>광고 개인정보 설정</h3>
+      <p>광고에 사용하는 개인정보 선택을 확인하고 변경할 수 있습니다.</p>
+      <button class="btn btn-slate" type="button" id="adPrivacyOptionsBtn">광고 개인정보 옵션</button>
+      <p id="adPrivacyStatus" role="status" aria-live="polite"></p>
+    </div>
+
     <div class="help-report">
+      <p>비공개 문의는 지원 이메일 blueheart.dev@gmail.com으로 보내 주세요.</p>
       <p><b>잘 안 되거나 이상한가요?</b> 아래 버튼으로 알려 주세요. 어떤 화면에서 무엇을 하려다 문제가 생겼는지 적어 주시면 큰 도움이 됩니다.</p>
       <div class="help-actions">
+        <a class="btn btn-slate" href="mailto:blueheart.dev@gmail.com">이메일 지원</a>
         <button class="btn btn-orange" onclick="openFeedback()">제보</button>
         <button class="btn btn-slate" onclick="copyDiagnostics()">진단 정보 복사</button>
       </div>
@@ -5586,7 +5596,46 @@ renderAppVersion();
 if (NATIVE_PLATFORM && typeof window.SquadPlatform.getAppInfo === 'function') {
   window.SquadPlatform.getAppInfo().then(info => {
     APP_VERSION = info.version + ' (빌드 ' + info.build + ')'; renderAppVersion(info);
-  }).catch(() => { APP_VERSION = 'Android Preview (버전 미확인)'; renderAppVersion(); });
+  }).catch(() => { APP_VERSION = 'Android (버전 미확인)'; renderAppVersion(); });
+}
+
+let adPrivacyBusy = false;
+let latestAdPrivacyState = {};
+function renderAdPrivacyOptions(state = latestAdPrivacyState) {
+  latestAdPrivacyState = state || {};
+  const section = document.getElementById('adPrivacySection');
+  const button = document.getElementById('adPrivacyOptionsBtn');
+  const required = NATIVE_PLATFORM && latestAdPrivacyState.privacyOptionsRequired === true;
+  if (!required && !adPrivacyBusy && section.contains(document.activeElement)) {
+    document.getElementById('helpTitle').focus();
+  }
+  section.hidden = !required && !adPrivacyBusy;
+  button.disabled = adPrivacyBusy || latestAdPrivacyState.consentFormShowing === true;
+  button.setAttribute('aria-busy', String(adPrivacyBusy));
+}
+document.getElementById('adPrivacyOptionsBtn').addEventListener('click', async () => {
+  if (adPrivacyBusy || latestAdPrivacyState.consentFormShowing === true) return;
+  const status = document.getElementById('adPrivacyStatus');
+  adPrivacyBusy = true;
+  status.textContent = '광고 개인정보 옵션을 여는 중입니다.';
+  renderAdPrivacyOptions();
+  try {
+    const result = await window.SquadPlatform?.showAdPrivacyOptions?.();
+    if (result?.status === 'shown') status.textContent = '광고 개인정보 선택을 확인했습니다.';
+    else if (result?.reason === 'not-required') status.textContent = '현재 변경할 광고 개인정보 옵션이 없습니다.';
+    else status.textContent = '광고 개인정보 옵션을 열지 못했습니다. 잠시 후 다시 시도해 주세요.';
+  } catch {
+    status.textContent = '광고 개인정보 옵션을 열지 못했습니다. 잠시 후 다시 시도해 주세요.';
+  } finally {
+    try { latestAdPrivacyState = await window.SquadPlatform?.getAdState?.() || latestAdPrivacyState; } catch {}
+    adPrivacyBusy = false;
+    renderAdPrivacyOptions();
+  }
+});
+if (NATIVE_PLATFORM) {
+  const stopAdPrivacyListener = window.SquadPlatform?.onAdState?.(renderAdPrivacyOptions);
+  if (typeof stopAdPrivacyListener === 'function') window.addEventListener('pagehide', stopAdPrivacyListener, { once: true });
+  window.SquadPlatform?.getAdState?.().then(renderAdPrivacyOptions).catch(() => {});
 }
 drawHtmlField();
 initAllSquads();
@@ -5628,7 +5677,8 @@ _readyPromise = (async () => {
     setLibraryBusy(false);
     publishContractState();
     if (window.SquadPlatform?.native) {
-      window.SquadPlatform.showTestAd().catch(() => {});
+      const showBanner = window.SquadPlatform.showBannerAd || window.SquadPlatform.showTestAd;
+      showBanner?.call(window.SquadPlatform).catch(() => {});
       window.SquadPlatform.prepareExportAd?.().catch(() => {});
     }
   }
