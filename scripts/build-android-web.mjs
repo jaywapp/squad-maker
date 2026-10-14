@@ -27,9 +27,8 @@ for (const file of ['html2canvas.min.js', 'gif.js', 'gif.worker.js']) {
 }
 await build({ entryPoints: [path.join(root, 'app', 'platform-native.js')], outfile: path.join(output, 'app', 'platform-native.js'),
   bundle: true, format: 'iife', target: 'chrome100', minify: false, sourcemap: false });
-for (const file of ['local-library.js', 'feedback-client.js']) {
-  try { await fs.copyFile(path.join(root, 'app', file), path.join(output, 'app', file)); }
-  catch (error) { if (error.code !== 'ENOENT') throw error; }
+for (const file of ['local-library.js', 'feedback-client.js', 'update-controller.js']) {
+  await fs.copyFile(path.join(root, 'app', file), path.join(output, 'app', file));
 }
 await fs.cp(path.join(root, 'app', 'licenses'), path.join(output, 'app', 'licenses'), { recursive: true });
 const evidence = { contractVersion: 2, snapshotVersion: 1, libraryVersion: 1, format: 1, offlineExportAssets: {}, analytics: 'disabled', remoteServer: false };

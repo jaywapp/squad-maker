@@ -11,6 +11,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(SquadStoragePlugin.class);
         registerPlugin(SquadDocumentsPlugin.class);
         registerPlugin(SquadAdsPlugin.class);
+        registerPlugin(SquadUpdatesPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }
