@@ -78,6 +78,16 @@ function harness(options = {}) {
     },
     SquadAds: {
       async showTestBanner() { calls.push({ method: 'ads-show' }); return { status: 'loading', testOnly: true }; },
+      async prepareExportInterstitial() {
+        calls.push({ method: 'ads-prepare' });
+        if (options.adError) throw options.adError;
+        return { status: 'loading', testOnly: true };
+      },
+      async showExportInterstitial(payload) {
+        calls.push({ method: 'ads-export', payload: copy(payload) });
+        if (options.adError) throw options.adError;
+        return options.exportAd ? options.exportAd(payload) : { status: 'shown', testOnly: true };
+      },
       async getState() { calls.push({ method: 'ads-state' }); return { status: 'loaded', testOnly: true }; }
     }
   };
@@ -309,8 +319,53 @@ test('web evaluation registers no native listeners and cannot access native stor
   assert.deepEqual(copy(await app.platform.exportFile(new Blob(['data']), 'backup.sq', 'application/json')),
     { status: 'unsupported', code: 'native-unavailable' });
   assert.deepEqual(copy(await app.platform.showTestAd()), { status: 'unsupported' });
+  assert.deepEqual(copy(await app.platform.prepareExportAd()), { status: 'unsupported' });
+  assert.deepEqual(copy(await app.platform.showExportAd('sq')), { status: 'unsupported' });
   assert.deepEqual(copy(await app.platform.getAdState()), { status: 'unsupported' });
   assert.equal(app.calls.length, 0); assert.equal(Object.isFrozen(app.platform), true);
+});
+
+test('export ads prepare separately and pass only an allowed placement to the plugin', async () => {
+  const app = harness();
+  assert.deepEqual(copy(await app.platform.prepareExportAd()), { status: 'loading', testOnly: true });
+  assert.equal(app.count('ads-export'), 0);
+  for (const placement of ['gif', 'sq', 'share-text']) {
+    assert.deepEqual(copy(await app.platform.showExportAd(placement)), { status: 'shown', testOnly: true });
+  }
+  assert.deepEqual(app.calls.filter(call => call.method === 'ads-export').map(call => call.payload),
+    [{ placement: 'gif' }, { placement: 'sq' }, { placement: 'share-text' }]);
+  assert.equal(app.count('ads-show'), 0);
+  assert.equal(app.count('storage-commit'), 0);
+  assert.equal(app.count('document-save'), 0);
+});
+
+test('non-export placements cannot request an interstitial', async () => {
+  const app = harness();
+  for (const placement of ['png', 'auto-save', 'restore', 'share-url', undefined, { placement: 'sq' }]) {
+    assert.deepEqual(copy(await app.platform.showExportAd(placement)),
+      { status: 'skipped', reason: 'invalid-placement', testOnly: true });
+  }
+  assert.equal(app.calls.length, 0);
+});
+
+test('native ad bridge errors resolve safely without exposing private error details', async () => {
+  const app = harness({ adError: new Error('private plugin diagnostic') });
+  for (const action of [() => app.platform.prepareExportAd(), () => app.platform.showExportAd('sq')]) {
+    assert.deepEqual(copy(await action()), { status: 'failed', reason: 'ad-unavailable', testOnly: true });
+  }
+  assert.equal(app.count('document-save'), 0);
+});
+
+test('an active interstitial stays pending until the native dismissal callback resolves', async () => {
+  let dismiss;
+  let settled = false;
+  const app = harness({ exportAd: () => new Promise(resolve => { dismiss = resolve; }) });
+  const pending = app.platform.showExportAd('gif').then(result => { settled = true; return result; });
+  await Promise.resolve();
+  assert.equal(settled, false);
+  assert.equal(app.count('ads-export'), 1);
+  dismiss({ status: 'shown', testOnly: true });
+  assert.deepEqual(copy(await pending), { status: 'shown', testOnly: true });
 });
 
 for (const destination of ['save', 'share']) {
