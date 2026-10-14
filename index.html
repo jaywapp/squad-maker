@@ -730,6 +730,11 @@ textarea.strategy-input { resize:vertical; min-height:72px; line-height:1.5; }
 .help-report p { font-size:0.8rem; color:var(--ink2); line-height:1.6; }
 .help-actions { display:flex; gap:8px; flex-wrap:wrap; }
 .feedback-form { display:flex; flex-direction:column; gap:12px; }
+#appUpdateSection [hidden] { display:none; }
+#appUpdateStatus { overflow-wrap:anywhere; }
+#helpModal { width:100vw; max-width:100vw; }
+#helpModal .ui-sheet-head h2 { flex:1; min-width:0; overflow-wrap:anywhere; }
+#helpModal .ui-sheet-head .icon-btn { flex-shrink:0; }
 .feedback-field { display:flex; flex-direction:column; gap:5px; }
 .feedback-field label { font-size:0.78rem; font-weight:700; color:var(--ink2); }
 .feedback-field input, .feedback-field textarea {
@@ -1872,6 +1877,19 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
       <p id="helpAppVersion" aria-live="polite"></p>
     </div>
 
+    <div class="help-section" id="appUpdateSection">
+      <h3>앱 업데이트</h3>
+      <p>정식 앱의 자동 업데이트는 Google Play 설정에 따릅니다. 앱에서는 새 버전을 확인하고 동의한 경우 다운로드합니다. 설치 재시작 전에는 현재 전술의 저장을 확인합니다.</p>
+      <p id="appUpdateStatus" role="status" aria-live="polite">업데이트 채널을 확인하는 중입니다.</p>
+      <div class="help-actions">
+        <button class="btn btn-slate" type="button" id="appUpdateCheck" hidden>업데이트 확인</button>
+        <button class="btn btn-green" type="button" id="appUpdateDownload" hidden>새 버전 다운로드</button>
+        <button class="btn btn-green" type="button" id="appUpdateRestart" hidden>저장 확인 후 재시작</button>
+        <button class="btn btn-slate" type="button" id="appUpdateLater" hidden>나중에</button>
+        <a class="btn btn-slate" id="previewReleaseLink" href="https://github.com/jaywapp/squad-maker/releases/latest" target="_blank" rel="noopener noreferrer" hidden>Preview 릴리즈 정보</a>
+      </div>
+    </div>
+
     <div class="help-section" id="adPrivacySection" hidden>
       <h3>광고 개인정보 설정</h3>
       <p>광고에 사용하는 개인정보 선택을 확인하고 변경할 수 있습니다.</p>
@@ -1945,6 +1963,7 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
 <script src="app/local-library.js"></script>
 <script src="app/feedback-client.js"></script>
+<script src="app/update-controller.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
 // CONSTANTS
@@ -1958,6 +1977,7 @@ const EXPORT_HEADER_H = 72;
 // 베타 운영: 버전 표기와 같은 출처의 Vercel 제보 API.
 const NATIVE_PLATFORM = Boolean(window.SquadPlatform?.native);
 let APP_VERSION = NATIVE_PLATFORM ? 'Android Preview (버전 확인 중)' : '웹 개발본';
+let APP_INFO = null;
 const feedbackClient = window.SquadFeedbackClient.createClient({ native: NATIVE_PLATFORM });
 
 const MODES_CONFIG = {
@@ -2749,8 +2769,14 @@ function deactivateModal(modal) {
   inertedElements = [];
   activeModal = null;
   document.body.classList.remove('ui-modal-open');
+  syncEditorInert();
   if (modal._prevFocus && typeof modal._prevFocus.focus === 'function') modal._prevFocus.focus();
   modal._prevFocus = null;
+}
+
+function syncEditorInert() {
+  const locked = Boolean(activeModal || _updateRestartLocked || _libraryPending || _safetyPending || _exportKind);
+  for (const element of document.querySelectorAll('main, .app-tabs, #viewerBar, .topbar')) element.inert = locked;
 }
 
 document.addEventListener('keydown', e => {
@@ -3165,7 +3191,7 @@ function ctxRemove() {
 let _capturing = false; // 연속 실행 시 임시 480px 고정값이 원래 값으로 저장되는 것 방지
 function setExportBusy(kind) {
   _exportKind = kind;
-  for (const element of document.querySelectorAll('main, .app-tabs, #viewerBar, .topbar')) element.inert = Boolean(kind);
+  syncEditorInert();
   if (kind) hideCtxMenu();
   publishContractState();
 }
@@ -5289,6 +5315,8 @@ let _initialSnapshot = null;
 let _libraryPending = false;
 let _readyPromise = Promise.resolve();
 let _saveQueue = Promise.resolve();
+let _updateRestartLocked = false;
+let _updateRestartProof = null;
 let _dragSaveDeferred = false;
 const _dragSaveWaiters = [];
 
@@ -5344,7 +5372,9 @@ function getContractState() {
     storage,
     view: { appMode, selectedPlayerId: selected?.id ?? null, selectedPlayerName: selected?.name ?? null,
       patternIndex: currentPatternIdx, stepIndex: currentStepIdx, readOnly: viewerMode },
-    busy: { mutation: _safetyPending || _libraryPending }, undoAvailable: Boolean(lastUndo), export: { busy: Boolean(_exportKind), kind: _exportKind },
+    busy: { mutation: _safetyPending || _libraryPending, updateRestart: _updateRestartLocked,
+      gesture: Boolean(dragState || drawState), playback: isPlaying },
+    undoAvailable: Boolean(lastUndo), export: { busy: Boolean(_exportKind), kind: _exportKind },
     localLibrary: libraryView(), platform: { native: Boolean(window.SquadPlatform?.native) },
   }));
 }
@@ -5465,7 +5495,7 @@ function autoSave() {
 
 function setLibraryBusy(busy) {
   _libraryPending = busy;
-  for (const element of document.querySelectorAll('main, .app-tabs, #viewerBar, .topbar')) element.inert = busy;
+  syncEditorInert();
   publishContractState();
 }
 
@@ -5521,9 +5551,62 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') finishInactiveGestures();
 });
 
+function releaseUpdateRestart() {
+  if (!_updateRestartLocked) return;
+  _updateRestartLocked = false;
+  _updateRestartProof = null;
+  syncEditorInert();
+  publishContractState();
+}
+
+function validateUpdateRestart(receipt) {
+  const proof = _updateRestartProof;
+  return Boolean(_updateRestartLocked && proof && receipt === proof.receipt && !viewerMode &&
+    !dragState && !drawState && !isPlaying && !_exportKind && !_safetyPending && !_libraryPending &&
+    _library?.getState().activeFileId === proof.fileId && observeSnapshot() === proof.snapshot &&
+    _revision === proof.revision && _savedRevision === proof.revision && _storageStatus.status === 'saved');
+}
+
+async function prepareForUpdateRestart() {
+  if (_updateRestartLocked) return { ok: false, reason: 'restart-busy' };
+  if (!_appReady) return { ok: false, reason: 'app-not-ready' };
+  if (viewerMode) return { ok: false, reason: 'read-only' };
+  if (dragState || drawState || isPlaying) return { ok: false, reason: 'gesture-busy' };
+  if (_exportKind || _safetyPending || _libraryPending) return { ok: false, reason: 'editor-busy' };
+  const fileId = _library?.getState().activeFileId;
+  if (!fileId) return { ok: false, reason: 'no-active-file' };
+  _updateRestartLocked = true;
+  syncEditorInert();
+  publishContractState();
+  const deadline = promise => new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('save-timeout')), 8000);
+    Promise.resolve(promise).then(value => { clearTimeout(timer); resolve(value); }, error => { clearTimeout(timer); reject(error); });
+  });
+  let prepared = false;
+  try {
+    clearTimeout(_saveTimer); _saveTimer = null;
+    await deadline(_saveQueue);
+    const expected = observeSnapshot(), revision = _revision;
+    const saved = await deadline(flushSave());
+    const verified = () => !dragState && !drawState && !isPlaying && !_exportKind && !_safetyPending && !_libraryPending &&
+      !viewerMode && _library?.getState().activeFileId === fileId && observeSnapshot() === expected &&
+      _revision === revision && _savedRevision === revision && _storageStatus.status === 'saved';
+    if (saved.status !== 'success' || !verified()) return { ok: false, reason: 'save-unverified' };
+    const receipt = await deadline(window.SquadPlatform?.getStorageReceipt?.());
+    if (typeof receipt !== 'string' || !receipt || !verified()) return { ok: false, reason: 'storage-unverified' };
+    _updateRestartProof = { receipt, fileId, snapshot: expected, revision };
+    prepared = true;
+    return { ok: true, receipt };
+  } catch { return { ok: false, reason: 'save-unverified' }; }
+  finally { if (!prepared) releaseUpdateRestart(); }
+}
+
 window.SquadMakerContract = Object.freeze({
   version: 2,
   getState: getContractState,
+  prepareForUpdateRestart,
+  releaseUpdateRestart,
+  validateUpdateRestart,
   ready: () => _readyPromise.then(getContractState),
   subscribe(listener) {
     const handler = event => listener(JSON.parse(JSON.stringify(event.detail)));
@@ -5538,7 +5621,7 @@ window.SquadMakerContract = Object.freeze({
     const supported = [...reads, ...library, 'select-player', 'switch-squad', 'change-mode', 'reset-layout', 'undo', 'import-snapshot', 'retry-save'];
     if (!supported.includes(operation)) return contractResult(operation, 'unsupported', 'unsupported-operation');
     if (shareLinkError) return contractResult(operation, 'error', 'invalid-input');
-    if (_exportKind || _safetyPending || _libraryPending) return contractResult(operation, 'busy', 'busy');
+    if (_exportKind || _safetyPending || _libraryPending || _updateRestartLocked) return contractResult(operation, 'busy', 'busy');
     if (viewerMode && !reads.includes(operation)) return contractResult(operation, 'error', 'read-only');
     try {
       if (library.includes(operation)) return await runLibraryCommand(operation, payload);
@@ -5595,9 +5678,75 @@ function renderAppVersion(info) {
 renderAppVersion();
 if (NATIVE_PLATFORM && typeof window.SquadPlatform.getAppInfo === 'function') {
   window.SquadPlatform.getAppInfo().then(info => {
+    APP_INFO = info;
     APP_VERSION = info.version + ' (빌드 ' + info.build + ')'; renderAppVersion(info);
+    initializeAppUpdates(info);
   }).catch(() => { APP_VERSION = 'Android (버전 미확인)'; renderAppVersion(); });
 }
+
+let updateController = null;
+let updateInstalling = false;
+const shownUpdateNotices = new Set();
+function renderUpdateState(state) {
+  const status = document.getElementById('appUpdateStatus');
+  const messages = {
+    idle: '업데이트를 확인할 수 있습니다.', checking: 'Google Play에서 새 버전을 확인하는 중입니다.',
+    'not-available': '지금 설치할 수 있는 새 버전이 없습니다.',
+    available: '새 버전을 다운로드할 수 있습니다. 다운로드는 전술 편집을 멈추지 않습니다.',
+    pending: '다운로드를 준비하고 있습니다.', downloading: '새 버전을 다운로드하는 중입니다. 설치 전 다시 안내합니다.',
+    downloaded: '다운로드가 완료되었습니다. 현재 전술을 저장한 뒤 재시작하려면 아래 버튼을 누르세요.',
+    installing: '현재 전술의 저장을 확인했습니다. 업데이트를 설치하며 앱을 재시작합니다.',
+    installed: '업데이트 설치를 확인했습니다.', cancelled: '다운로드를 취소했습니다. 필요할 때 업데이트 확인을 눌러 다시 시도하세요.',
+    failed: '업데이트를 완료하지 못했습니다. 네트워크와 Play 설치 상태를 확인한 뒤 다시 시도하세요.',
+    blocked: '현재 전술의 안전한 저장을 확인하지 못해 재시작하지 않았습니다. 편집·내보내기를 마치고 전술을 보관한 뒤 다시 시도하세요.',
+    skipped: '재시작 조건을 확인하지 못했습니다. 현재 전술을 저장한 뒤 다시 확인해 주세요.',
+    unsupported: 'Google Play로 설치한 정식 앱에서 업데이트를 사용할 수 있습니다.',
+  };
+  status.textContent = messages[state.status] || messages.failed;
+  if (state.status === 'downloading' && state.totalBytes > 0)
+    status.textContent += ' ' + Math.min(100, Math.floor(state.bytesDownloaded * 100 / state.totalBytes)) + '%';
+  if (state.reason === 'complete-failed') status.textContent = messages.failed + ' 다운로드된 업데이트는 다시 저장 확인 후 설치할 수 있습니다.';
+  document.getElementById('appUpdateCheck').hidden = false;
+  document.getElementById('appUpdateDownload').hidden = state.status !== 'available';
+  document.getElementById('appUpdateRestart').hidden = !['downloaded', 'blocked', 'skipped'].includes(state.status) || !state.supported;
+  document.getElementById('appUpdateLater').hidden = !['available', 'downloaded', 'blocked'].includes(state.status);
+  for (const id of ['appUpdateCheck', 'appUpdateDownload', 'appUpdateRestart'])
+    document.getElementById(id).disabled = state.busy || state.status === 'installing';
+  if (updateInstalling && state.status !== 'installing') { updateInstalling = false; releaseUpdateRestart(); }
+  const notice = state.availableVersionCode + ':' + state.status;
+  if (state.shouldNotify && !shownUpdateNotices.has(notice)) {
+    shownUpdateNotices.add(notice);
+    showToast(state.status === 'downloaded' ? '새 버전 다운로드 완료. 저장 확인 후 재시작할 수 있습니다.' : '새 버전을 사용할 수 있습니다.', '업데이트 안내', openHelp, 6000);
+  }
+}
+function initializeAppUpdates(info) {
+  if (updateController) return;
+  const production = NATIVE_PLATFORM && info?.id === 'com.jaywapp.iamheadcoach';
+  const preview = NATIVE_PLATFORM && info?.id === 'com.jaywapp.squadmaker.preview';
+  document.getElementById('previewReleaseLink').hidden = !preview;
+  if (!production) {
+    document.getElementById('appUpdateStatus').textContent = preview
+      ? 'Preview는 별도 테스트 채널입니다. 릴리즈 정보를 확인하고 검증된 파일을 직접 설치하세요. 이 앱은 외부 APK를 자동 설치하지 않습니다.'
+      : '웹은 새로 열 때 제공된 버전을 사용합니다. Google Play 업데이트는 정식 Android 앱에서 지원합니다.';
+    return;
+  }
+  updateController = window.SquadUpdateController.createController({
+    platform: window.SquadPlatform, eligible: true, prepareRestart: prepareForUpdateRestart,
+    validateRestart: validateUpdateRestart,
+    releaseRestart: () => {
+      if (updateController?.getState().status === 'installing') updateInstalling = true;
+      else releaseUpdateRestart();
+    }, onState: renderUpdateState,
+  });
+  window.SquadMakerContract.ready().then(() => updateController.check({ manual: false }));
+}
+for (const [id, action] of [['appUpdateCheck', () => updateController?.check({ manual: true })],
+  ['appUpdateDownload', () => updateController?.start()], ['appUpdateRestart', () => updateController?.complete()],
+  ['appUpdateLater', () => updateController?.dismiss()]]) {
+  document.getElementById(id).addEventListener('click', action);
+}
+window.addEventListener('pagehide', () => updateController?.dispose(), { once: true });
+if (!NATIVE_PLATFORM) initializeAppUpdates(null);
 
 let adPrivacyBusy = false;
 let latestAdPrivacyState = {};

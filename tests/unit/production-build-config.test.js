@@ -46,6 +46,8 @@ test('Android wiring preserves Preview identity and defaults every variant to te
   assert.match(read('android/app/src/main/AndroidManifest.xml'), /android:value="\$\{admobAppId\}"/);
   assert.match(read('android/app/src/preview/res/values/strings.xml'), /아이엠 헤드코치 Preview/);
   assert.doesNotMatch(read('android/app/src/production/res/values/strings.xml'), /Preview/);
+  assert.match(read('android/app/src/main/java/com/jaywapp/squadmaker/preview/SquadAdsPlugin.java'),
+    /new ConsentAdPolicy\(BuildConfig\.ADS_TEST_ONLY\)/);
 });
 
 test('Preview metadata and the signed build helper use the Preview lineage', async () => {

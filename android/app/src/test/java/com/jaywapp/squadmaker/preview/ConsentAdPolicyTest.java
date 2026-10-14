@@ -8,7 +8,7 @@ import org.junit.Test;
 
 public class ConsentAdPolicyTest {
     private ConsentAdPolicy launched(boolean permission) {
-        ConsentAdPolicy policy = new ConsentAdPolicy();
+        ConsentAdPolicy policy = new ConsentAdPolicy(true);
         policy.resume();
         assertTrue(policy.beginUpdate());
         policy.updatePermission(permission);
@@ -17,7 +17,7 @@ public class ConsentAdPolicyTest {
 
     @Test
     public void permissionCannotBypassLaunchUpdate() {
-        ConsentAdPolicy policy = new ConsentAdPolicy();
+        ConsentAdPolicy policy = new ConsentAdPolicy(true);
         policy.resume();
         policy.updatePermission(true);
         assertFalse(policy.canRequestAds());
@@ -185,5 +185,42 @@ public class ConsentAdPolicyTest {
         policy.destroy();
         assertFalse(policy.hasPendingForm());
         assertFalse(policy.beginPendingForm(true, false));
+    }
+
+    @Test
+    public void unresolvedLiveAudienceRejectsEvenPositiveUmpCallbacksAndResume() {
+        ConsentAdPolicy policy = new ConsentAdPolicy(false);
+        for (int resume = 0; resume < 2; resume++) {
+            policy.resume();
+            assertFalse(policy.beginUpdate());
+            assertFalse(policy.updatePermission(true));
+            assertFalse(policy.beginForm(false));
+            policy.queueRequiredForm();
+            assertFalse(policy.hasPendingForm());
+            assertFalse(policy.beginPendingForm(false, false));
+            assertFalse(policy.beginPendingForm(true, false));
+            policy.finishForm(true);
+            assertFalse(policy.isFormShowing());
+            assertFalse(policy.canRequestAds());
+            assertFalse(policy.canUseAds());
+            assertFalse(policy.accepts(policy.generation()));
+            policy.pause();
+        }
+        policy.destroy();
+        policy.resume();
+        assertFalse(policy.beginUpdate());
+    }
+
+    @Test
+    public void unresolvedLiveAudienceCannotUseEvenAnAlreadyInitializedSdk() {
+        ConsentAdPolicy policy = new ConsentAdPolicy(false);
+        ConsentAdPolicy.InitializationGate gate = new ConsentAdPolicy.InitializationGate();
+        policy.resume();
+        policy.updatePermission(true);
+        assertFalse(gate.begin(policy.canUseAds()));
+        assertFalse(gate.isStarting());
+        gate.complete(); // Even a process-wide SDK already initialized by another Activity cannot authorize a request.
+        assertTrue(gate.isReady());
+        assertFalse(policy.canUseAds());
     }
 }

@@ -1,5 +1,7 @@
 # 정식 출시 결정·검증 체크리스트
 
+> 후속 승인: 정식 패키지/첫 버전/서명 전략은 [identity 적용](production-identity-20261014-report.md), TEEN/PPT OFF/G는 [최신 보호·unsigned 검증](teen-ad-protection-20261014-report.md)을 따른다. 아래는 PR57 당시 기록이며 키 생성·정책 URL·실제 연령/동의 처리·실기기/Play 확인은 여전히 미완료다.
+
 2026-10-14. 로컬 준비 문서이며 출시 승인·법적 검토 완료·Play 제출 결과가 아니다. [분석](production-readiness-20261014-analysis.md), [빌드 행렬](production-readiness-20261014-build-matrix.md), [SQ 이동](production-readiness-20261014-data-transfer.md)을 함께 읽는다.
 
 ## 아직 필요한 사용자 결정

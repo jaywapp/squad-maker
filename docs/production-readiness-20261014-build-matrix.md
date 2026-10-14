@@ -1,5 +1,7 @@
 # Android 채널별 빌드와 광고 설정
 
+> 후속 승인: 정식 `com.jaywapp.iamheadcoach`, `1.0.0/1`, Google 관리 Play App Signing + 별도 업로드 키 전략을 확정했다. [identity 적용](production-identity-20261014-report.md), [최신 TEEN/PPT OFF/G와 unsigned 검증](teen-ad-protection-20261014-report.md)이 아래 대기 기록을 대체한다. 실제 키 생성·이용자 연령/동의 처리·운영 광고 빌드는 계속 대기한다.
+
 2026-10-14. 로컬 준비 범위이며 CI 활성화·서명·키 생성·설치·배포는 하지 않는다.
 
 ## 빌드 행렬

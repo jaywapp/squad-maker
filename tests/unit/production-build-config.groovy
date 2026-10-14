@@ -10,7 +10,8 @@ def rejects = { Closure action, String message ->
     }
 }
 
-assert policy.approvedProductionIdentity == null
+assert policy.approvedProductionIdentity == [applicationId: 'com.jaywapp.iamheadcoach',
+                                             versionCode: 1, versionName: '1.0.0']
 assert policy.adsMode(null) == 'test'
 assert policy.adsMode('test') == 'test'
 assert policy.adsMode('production') == 'production'
@@ -18,15 +19,16 @@ assert policy.adsMode('production') == 'production'
     rejects({ policy.adsMode(value) }, 'squadAdsMode')
 }
 assert !policy.underAge(null, 'test')
-assert !policy.underAge('false', 'production')
-assert policy.underAge('true', 'production')
-rejects({ policy.underAge(null, 'production') }, 'explicit')
+assert !policy.underAge('false', 'test')
+assert policy.underAge('true', 'test')
+[null, 'true', 'false', '', 'False', 'yes', '0', ' false '].each { value ->
+    rejects({ policy.underAge(value, 'production') }, 'actual age and consent handling')
+}
 ['', 'False', 'yes', '0', ' false '].each { value ->
     rejects({ policy.underAge(value, 'test') }, 'must be true or false')
-    rejects({ policy.underAge(value, 'production') }, 'must be true or false')
 }
 
-def approved = [applicationId: 'com.example.approved', versionCode: 1, versionName: '1.0.0']
+def approved = policy.approvedProductionIdentity
 ['debug', 'release'].each { buildType ->
     policy.validateVariant('preview', buildType, 'test', null)
     rejects({ policy.validateVariant('preview', buildType, 'production', approved) }, 'only for productionRelease')
@@ -34,8 +36,8 @@ def approved = [applicationId: 'com.example.approved', versionCode: 1, versionNa
     policy.validateVariant('production', buildType, 'test', approved)
 }
 rejects({ policy.validateVariant('production', 'debug', 'production', approved) }, 'only for productionRelease')
-rejects({ policy.validateVariant('production', 'release', 'production', null) }, 'user approval')
-policy.validateVariant('production', 'release', 'production', approved)
+rejects({ policy.validateVariant('production', 'release', 'production', null) }, 'actual age and consent handling')
+rejects({ policy.validateVariant('production', 'release', 'production', approved) }, 'actual age and consent handling')
 rejects({ policy.validateVariant('unknown', 'release', 'test', approved) }, 'Unsupported')
 
 assert policy.previewVersionCode('97', null) == 1099

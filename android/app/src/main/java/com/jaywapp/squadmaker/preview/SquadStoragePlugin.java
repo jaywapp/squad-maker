@@ -18,7 +18,8 @@ import java.util.Set;
 
 @CapacitorPlugin(name = "SquadStorage")
 public class SquadStoragePlugin extends Plugin {
-    private static final Object LOCK = new Object();
+    static final Object LOCK = new Object();
+    static final VerifiedStorageReceipt RECEIPTS = new VerifiedStorageReceipt();
     private static final Set<String> KEYS = new HashSet<>(Arrays.asList("squad-maker-v1", "squad-maker-library-v1"));
     private static final int MAX_BYTES = 16 * 1024 * 1024;
 
@@ -57,10 +58,20 @@ public class SquadStoragePlugin extends Plugin {
     }
 
     @PluginMethod
+    public void getReceipt(PluginCall call) {
+        synchronized (LOCK) {
+            call.resolve(new JSObject().put("receipt", RECEIPTS.receipt() == null ? JSONObject.NULL : RECEIPTS.receipt())
+                .put("generation", RECEIPTS.generation()).put("verified", RECEIPTS.verified()));
+        }
+    }
+
+    @PluginMethod
     public void commit(PluginCall call) {
         JSObject values = call.getObject("values", new JSObject());
         JSObject expected = call.getObject("expected", new JSObject());
         synchronized (LOCK) {
+            long generation = RECEIPTS.beginWrite();
+            boolean verified = false;
             FileOutputStream stream = null;
             AtomicFile file = store();
             try {
@@ -97,10 +108,14 @@ public class SquadStoragePlugin extends Plugin {
                 if (!readStore().toString().equals(next.toString())) {
                     call.reject("Storage verification failed", "storage-verification"); return;
                 }
+                verified = true;
+                RECEIPTS.finishWrite(generation, true);
                 call.resolve(new JSObject().put("status", "success"));
             } catch (Exception error) {
                 if (stream != null) file.failWrite(stream);
                 call.reject("Data could not be committed", "storage-unavailable");
+            } finally {
+                if (!verified) RECEIPTS.finishWrite(generation, false);
             }
         }
     }

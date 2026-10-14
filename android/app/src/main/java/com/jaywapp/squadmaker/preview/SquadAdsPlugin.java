@@ -40,7 +40,7 @@ public class SquadAdsPlugin extends Plugin {
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private static final ConsentAdPolicy.InitializationGate SDK = new ConsentAdPolicy.InitializationGate();
-    private final ConsentAdPolicy consent = new ConsentAdPolicy();
+    private final ConsentAdPolicy consent = new ConsentAdPolicy(BuildConfig.ADS_TEST_ONLY);
     private ConsentInformation consentInformation;
     private PluginCall privacyCall;
     private FrameLayout bannerContainer;

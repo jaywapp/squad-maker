@@ -5,6 +5,7 @@ import { Share } from '@capacitor/share';
 const Storage = registerPlugin('SquadStorage');
 const Documents = registerPlugin('SquadDocuments');
 const Ads = registerPlugin('SquadAds');
+const Updates = registerPlugin('SquadUpdates');
 const native = Capacitor.isNativePlatform();
 
 function adState(value = {}) {
@@ -26,6 +27,27 @@ function nativeError(error) {
   return Object.assign(new Error('Native operation failed'), {
     code: allowed.has(error?.code) ? error.code : 'storage-unavailable',
   });
+}
+
+function updateState(value = {}) {
+  const statuses = ['unsupported', 'idle', 'checking', 'not-available', 'available', 'pending',
+    'downloading', 'downloaded', 'installing', 'installed', 'cancelled', 'failed', 'skipped'];
+  const result = {
+    supported: value?.supported === true,
+    status: statuses.includes(value?.status) ? value.status : 'unsupported',
+    reason: typeof value?.reason === 'string' ? value.reason.slice(0, 80) : null,
+    shouldNotify: value?.shouldNotify === true,
+  };
+  for (const key of ['availableVersionCode', 'bytesDownloaded', 'totalBytes']) {
+    if (Number.isSafeInteger(value?.[key]) && value[key] >= 0) result[key] = value[key];
+  }
+  return Object.freeze(result);
+}
+
+async function updateCall(method, options) {
+  if (!native) return updateState();
+  try { return updateState(await Updates[method](options)); }
+  catch { return updateState({ supported: true, status: 'failed', reason: 'update-unavailable' }); }
 }
 
 const storage = {
@@ -99,7 +121,7 @@ if (native) {
       }
     }
     const state = window.SquadMakerContract?.getState();
-    if (!state?.ready || state?.export?.busy || state?.busy?.mutation) return;
+    if (!state?.ready || state?.export?.busy || state?.busy?.mutation || state?.busy?.updateRestart) return;
     if (state?.view?.readOnly) { App.exitApp(); return; }
     exiting = true;
     document.documentElement.inert = true;
@@ -136,6 +158,46 @@ window.SquadPlatform = Object.freeze({
     } catch {
       throw Object.assign(new Error('App metadata unavailable'), { code: 'app-info-unavailable' });
     }
+  },
+  getUpdateState: () => updateCall('getState'),
+  checkForUpdate: ({ manual = false } = {}) => updateCall('check', { manual: manual === true }),
+  startFlexibleUpdate: () => updateCall('startFlexible'),
+  dismissUpdate: () => updateCall('dismiss'),
+  async getStorageReceipt() {
+    if (!native) return null;
+    try {
+      const value = await Storage.getReceipt();
+      return value?.verified === true && Number.isSafeInteger(value.generation) && value.generation > 0 &&
+        typeof value.receipt === 'string' && value.receipt.length > 0 ? value.receipt : null;
+    } catch { return null; }
+  },
+  async beginUpdateCompletion() {
+    if (!native) return { ...updateState(), challenge: null };
+    try {
+      const value = await Updates.beginCompletion();
+      return { ...updateState(value), challenge: typeof value?.challenge === 'string' ? value.challenge : null };
+    } catch { return { ...updateState({ status: 'failed' }), challenge: null }; }
+  },
+  completeUpdate: ({ challenge, receipt } = {}) => {
+    if (typeof challenge !== 'string' || !challenge || typeof receipt !== 'string' || !receipt)
+      return Promise.resolve(updateState({ supported: native, status: 'skipped', reason: 'storage-unverified' }));
+    if (window.SquadMakerContract?.validateUpdateRestart?.(receipt) !== true)
+      return Promise.resolve(updateState({ supported: native, status: 'skipped', reason: 'save-unverified' }));
+    return updateCall('complete', { challenge, receipt });
+  },
+  onUpdateState(listener) {
+    if (!native || typeof listener !== 'function') return () => {};
+    let stopped = false;
+    let handle;
+    const publish = value => { if (!stopped) listener(updateState(value)); };
+    const remove = subscription => {
+      try { Promise.resolve(subscription?.remove()).catch(() => {}); } catch {}
+    };
+    Promise.resolve(Updates.addListener('state', publish)).then(subscription => {
+      if (stopped) remove(subscription); else handle = subscription;
+    }).catch(() => {});
+    Updates.getState().then(publish).catch(() => {});
+    return () => { stopped = true; remove(handle); };
   },
   async showTestAd() {
     if (!native) return { status: 'unsupported' };

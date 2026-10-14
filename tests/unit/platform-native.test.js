@@ -33,6 +33,7 @@ function harness(options = {}) {
   const window = {
     SquadMakerContract: {
       getState: () => state,
+      validateUpdateRestart: receipt => options.validateUpdateRestart?.(receipt) === true,
       async run(operation) {
         calls.push({ method: 'run', operation, inert: document.documentElement.inert });
         return options.run ? options.run(operation) : { status: 'success', code: null };
@@ -57,6 +58,7 @@ function harness(options = {}) {
   };
   const plugins = {
     SquadStorage: {
+      async getReceipt() { calls.push({ method: 'storage-receipt' }); return options.receipt || {}; },
       async read(payload) {
         calls.push({ method: 'storage-read', payload: copy(payload) });
         return options.read ? options.read(payload) : { value: null };
@@ -75,6 +77,18 @@ function harness(options = {}) {
         calls.push({ method: 'document-stage', payload: copy(payload) });
         return options.stage ? options.stage(payload) : { uri: 'file:///cache/squad-exports/result.gif' };
       }
+    },
+    SquadUpdates: {
+      async getState() { calls.push({ method: 'updates-state' }); return options.updateState || { supported: true, status: 'downloaded', availableVersionCode: 2 }; },
+      async check(payload) { calls.push({ method: 'updates-check', payload: copy(payload) }); return options.updateState || { supported: true, status: 'available' }; },
+      async startFlexible() { calls.push({ method: 'updates-start' }); return { supported: true, status: 'pending' }; },
+      async dismiss() { calls.push({ method: 'updates-dismiss' }); return { supported: true, status: 'downloaded', shouldNotify: false }; },
+      async beginCompletion() { calls.push({ method: 'updates-gate' }); return { supported: true, status: 'downloaded', challenge: 'challenge-one' }; },
+      async complete(payload) { calls.push({ method: 'updates-complete', payload: copy(payload) }); return { supported: true, status: 'installing' }; },
+      addListener(event, listener) {
+        events.set('updates-' + event, listener);
+        return options.updateSubscription || Promise.resolve({ remove() { calls.push({ method: 'updates-remove' }); } });
+      },
     },
     SquadAds: {
       async showTestBanner() { calls.push({ method: 'ads-show' }); return { status: 'loading', testOnly: true }; },
@@ -500,4 +514,57 @@ test('web app metadata does not invoke a native plugin', async () => {
   const app = harness({ native: false });
   assert.equal(await app.platform.getAppInfo(), null);
   assert.equal(app.count('app-info'), 0);
+});
+
+test('native back keeps the editor locked during update restart', async () => {
+  const app = harness({ state: savedState({ busy: { mutation: false, updateRestart: true } }) });
+  await app.back();
+  assert.equal(app.count('run'), 0); assert.equal(app.count('exit'), 0);
+});
+
+test('update bridge only maps explicit flexible actions and strips unsupported metadata', async () => {
+  const app = harness({ updateState: { supported: true, status: 'available', shouldNotify: true,
+    availableVersionCode: 2, bytesDownloaded: 4, totalBytes: 8, privateDetail: 'not public' } });
+  assert.deepEqual(copy(await app.platform.checkForUpdate({ manual: true })), {
+    supported: true, status: 'available', shouldNotify: true, reason: null,
+    availableVersionCode: 2, bytesDownloaded: 4, totalBytes: 8 });
+  await app.platform.startFlexibleUpdate(); await app.platform.dismissUpdate();
+  assert.deepEqual(app.calls.find(call => call.method === 'updates-check').payload, { manual: true });
+  assert.equal(app.count('updates-start'), 1); assert.equal(app.count('updates-complete'), 0);
+});
+
+test('web facade cannot invoke Play update or native receipt methods', async () => {
+  const app = harness({ native: false });
+  await app.platform.checkForUpdate({ manual: true }); await app.platform.getUpdateState();
+  await app.platform.startFlexibleUpdate(); await app.platform.dismissUpdate();
+  await app.platform.beginUpdateCompletion(); await app.platform.completeUpdate({ challenge: 'one', receipt: 'proof' });
+  assert.equal(await app.platform.getStorageReceipt(), null);
+  assert.equal(app.calls.some(call => call.method.startsWith('updates-') || call.method === 'storage-receipt'), false);
+});
+
+test('receipt facade requires a successful nonzero native write generation', async () => {
+  for (const receipt of [{ receipt: 'proof', generation: 1, verified: false },
+    { receipt: 'proof', generation: 0, verified: true }, { receipt: null, generation: 1, verified: true }])
+    assert.equal(await harness({ receipt }).platform.getStorageReceipt(), null);
+  assert.equal(await harness({ receipt: { receipt: 'proof', generation: 1, verified: true } }).platform.getStorageReceipt(), 'proof');
+});
+
+test('native completion requires the current editor proof and passes only opaque strings', async () => {
+  const blocked = harness();
+  assert.equal((await blocked.platform.completeUpdate({ challenge: 'gate', receipt: 'proof' })).reason, 'save-unverified');
+  assert.equal(blocked.count('updates-complete'), 0);
+  const app = harness({ validateUpdateRestart: receipt => receipt === 'proof' });
+  assert.equal((await app.platform.completeUpdate({ challenge: 'gate', receipt: 'proof' })).status, 'installing');
+  assert.deepEqual(app.calls.find(call => call.method === 'updates-complete').payload, { challenge: 'gate', receipt: 'proof' });
+});
+
+test('a late update subscription is removed and cannot publish after disposal', async () => {
+  let resolve, notifications = 0;
+  const updateSubscription = new Promise(done => { resolve = done; });
+  const app = harness({ updateSubscription });
+  const stop = app.platform.onUpdateState(() => notifications++);
+  stop(); resolve({ remove() { app.calls.push({ method: 'updates-remove' }); } });
+  await new Promise(done => setImmediate(done));
+  app.events.get('updates-state')({ supported: true, status: 'downloaded' });
+  assert.equal(notifications, 0); assert.equal(app.count('updates-remove'), 1);
 });
