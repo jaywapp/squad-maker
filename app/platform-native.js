@@ -127,6 +127,18 @@ window.SquadPlatform = Object.freeze({
     if (!native) return { status: 'unsupported' };
     return Ads.showTestBanner();
   },
+  async prepareExportAd() {
+    if (!native) return { status: 'unsupported' };
+    try { return await Ads.prepareExportInterstitial(); }
+    catch { return { status: 'failed', reason: 'ad-unavailable', testOnly: true }; }
+  },
+  async showExportAd(placement) {
+    if (!native) return { status: 'unsupported' };
+    if (!['gif', 'sq', 'share-text'].includes(placement))
+      return { status: 'skipped', reason: 'invalid-placement', testOnly: true };
+    try { return await Ads.showExportInterstitial({ placement }); }
+    catch { return { status: 'failed', reason: 'ad-unavailable', testOnly: true }; }
+  },
   async getAdState() {
     return native ? Ads.getState() : { status: 'unsupported' };
   },

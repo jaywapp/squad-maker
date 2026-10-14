@@ -4,7 +4,7 @@
 
 [기존 웹 공유 뷰어](https://jaywapp.github.io/squad-maker/) · **[최신 문서 안내](docs/README.md)**
 
-**[Android Preview APK 다운로드](https://github.com/jaywapp/squad-maker/raw/refs/heads/main/build/squad-maker-latest.apk)** · [설치 안내·빌드 정보](docs/apk-build-download-20261014-design.md). Google 테스트 배너가 포함된 versionCode 1093입니다.
+**[Android Preview APK 다운로드](https://github.com/jaywapp/squad-maker/raw/refs/heads/main/build/squad-maker-latest.apk)** · [설치 안내·빌드 정보](docs/apk-build-download-20261014-design.md). Google 테스트 배너와 GIF·단톡방 텍스트·.sq 내보내기 전면 광고가 포함된 versionCode 1097입니다.
 
 공개 GitHub Pages는 과거 v1 전술 수신 화면입니다. 이번 Run Line·편집 데스크·한글 브랜딩 변경은 아직 배포되지 않았습니다. 기존 Vercel 주소는 현재 이 저장소의 전술 앱을 제공하지 않으며 제보 API도 404입니다. [정식 출시 준비와 남은 결정](docs/launch-readiness-20261010-report.md)을 확인하세요.
 
@@ -12,9 +12,9 @@
 
 ## 제품 방향과 구현 상태
 
-사용자가 **A — 피치 중심 코치형**을 선택했습니다. Android 첫 출시의 상세 기획과 미정 결정은 [상품 기획서](docs/product-plan.md)에 있습니다. 1차는 로그인 없이 편집·기기 저장·이미지/GIF 저장과 공유를 목표로 합니다. 첫 출시 광고 포함 여부는 미정이며 현재 테스트 광고를 유지합니다. 무료 슬롯은 동시에 보관하는 재사용 가능한 공간이고 삭제하면 다시 쓰며, 수정·자동저장은 차감하지 않습니다. 추가 슬롯은 단건 결제로 영구 확장하는 방향입니다. 수량·가격·슬롯 단위·결제 시점·Android 프레임워크는 아직 미정입니다.
+사용자가 **A — 피치 중심 코치형**을 선택했습니다. Android 첫 출시의 상세 기획과 미정 결정은 [상품 기획서](docs/product-plan.md)에 있습니다. 1차는 로그인 없이 편집·기기 저장·이미지/GIF 저장과 공유, 광고를 포함합니다. Preview에는 Google 테스트 배너와 [내보내기 전면 광고](docs/export-interstitial-20261014-design.md)를 적용하며 정식 광고 단위·동의 설정은 미정입니다. 무료 슬롯은 동시에 보관하는 재사용 가능한 공간이고 삭제하면 다시 쓰며, 수정·자동저장은 차감하지 않습니다. 추가 슬롯은 단건 결제로 영구 확장하는 방향입니다. 수량·가격·슬롯 단위·결제 시점·Android 프레임워크는 아직 미정입니다.
 
-현재 저장소에는 HTML/CSS/JavaScript 편집기, 다중 팀/전술 로컬 보관, Capacitor Android Preview와 테스트 배너가 구현되어 있습니다. 결제·클라우드 보관·정식 Play 출시는 미완료입니다. [현재 웹 구현·실행·검증 참고](docs/current-web-reference.md), [A 원본과 예정 개선](docs/design-a/README.md)을 구분해서 읽어 주세요.
+현재 저장소에는 HTML/CSS/JavaScript 편집기, 다중 팀/전술 로컬 보관, Capacitor Android Preview와 테스트 배너·전면 광고가 구현되어 있습니다. 결제·클라우드 보관·정식 Play 출시는 미완료입니다. [현재 웹 구현·실행·검증 참고](docs/current-web-reference.md), [A 원본과 예정 개선](docs/design-a/README.md)을 구분해서 읽어 주세요.
 
 ## 현재 웹 주요 기능
 

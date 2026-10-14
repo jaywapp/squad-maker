@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "repository": "jaywapp/squad-maker",
-  "sourceSha": "296741a4bcb58c182de4cdcd615bcf9e617b4491",
-  "commitCount": 91,
+  "sourceSha": "f1bb286362cfc12b39c967bb36ce9e80a6c504c5",
+  "commitCount": 95,
   "baseVersionCode": 1001,
   "baseVersionName": "0.1.0-preview.1",
-  "versionCode": 1093,
-  "versionName": "0.1.0-preview.1.main.91.296741a4",
+  "versionCode": 1097,
+  "versionName": "0.1.0-preview.1.main.95.f1bb2863",
   "applicationId": "com.jaywapp.squadmaker.preview",
   "minSdk": 24,
   "targetSdk": 36,
@@ -17,9 +17,9 @@
   ],
   "apk": {
     "fileName": "squad-maker-latest.apk",
-    "sha256": "1fe4824d75669e274c4ed7a151d92328eb2f69f57fa87327c1cef42c0c90b7a4",
-    "size": 7209427
+    "sha256": "af205a50cc170dc13150d0feef165a2ba9d5f11bd45abf4c24a9c4a90d252644",
+    "size": 7213523
   },
-  "unsignedApkSha256": "9757eacfaa5587a81a944e3036d11dfdeff6a47380168cc8579bca402841ea53",
-  "generatedAt": "2026-10-13T22:53:28.113Z"
+  "unsignedApkSha256": "bad382509c5a2f87fd5fcabafb429dc7c8ed42ed0817c2d9c1e23eef4d7c7b95",
+  "generatedAt": "2026-10-14T02:01:55.399Z"
 }
