@@ -4,7 +4,7 @@
 
 [기존 웹 공유 뷰어](https://jaywapp.github.io/squad-maker/) · **[최신 문서 안내](docs/README.md)**
 
-**[Android Preview APK 다운로드](https://github.com/jaywapp/squad-maker/raw/refs/heads/main/build/squad-maker-latest.apk)** · [설치 안내·빌드 정보](docs/apk-build-download-20261014-design.md). Google 테스트 배너가 포함된 versionCode 1093입니다.
+**[Android Preview APK 다운로드](https://github.com/jaywapp/squad-maker/raw/refs/heads/main/build/squad-maker-latest.apk)** · [설치 안내·빌드 정보](docs/apk-build-download-20261014-design.md). Google 테스트 배너와 GIF·단톡방 텍스트·.sq 내보내기 전면 광고가 포함된 versionCode 1097입니다.
 
 공개 GitHub Pages는 과거 v1 전술 수신 화면입니다. 이번 Run Line·편집 데스크·한글 브랜딩 변경은 아직 배포되지 않았습니다. 기존 Vercel 주소는 현재 이 저장소의 전술 앱을 제공하지 않으며 제보 API도 404입니다. [정식 출시 준비와 남은 결정](docs/launch-readiness-20261010-report.md)을 확인하세요.
 

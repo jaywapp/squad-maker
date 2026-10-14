@@ -9,7 +9,7 @@ orchestrator=Codex. 기존 세션 승인의 테스트 광고와 APK build 폴더
 | A3 | export facade·생성 경계·안내·단위 테스트 | Codex root | gpt-6.1-sol | high | A1 | implement | index.html, app/platform-native.js, tests/unit/platform-native.test.js | 오류 통과·중복 방지·기존 경로 유지 | 완료 |
 | A4 | native facade E2E 작성 | Codex export_qa | gpt-6.1-sol | high | A1 | implement | tests/e2e/export-interstitial-20261014.spec.js | GIF/SQ/text·실패·중복·비대상 | 완료 |
 | A5 | 통합 검증·리뷰 | Codex root, export_review | gpt-6.1-sol | high | A2,A3,A4 | verify | 위 파일·검증 기록 | unit/E2E/Java/Android/lint·기존 화면 확인 | 완료 |
-| A6 | 서명 APK·build 전달·PR | Codex root | gpt-6.1-sol | high | A5 | release | build/*, README·docs | source/서명/hash·익명 다운로드 | 진행 중 |
+| A6 | 서명 APK·build 전달·PR | Codex root | gpt-6.1-sol | high | A5 | release | build/*, README·docs | source/서명/hash·익명 다운로드 | APK 준비 완료, 게시 결과는 PR 이력에 기록 |
 
 ## 검증 결과
 
@@ -21,3 +21,12 @@ orchestrator=Codex. 기존 세션 승인의 테스트 광고와 APK build 폴더
 - 별도 읽기 전용 코드 리뷰에서 수정이 필요한 결함 없음. 루트도 JS diff·Java 정책/콜백·모바일/데스크톱 캡처를 직접 확인했다.
 - impeccable detector는 기존 경고 테두리 1건만 보고했다. 이번 안내 문구는 기존 패널 안에서 줄바꿈하며 가로 넘침이 없다.
 - `adb devices -l`에 연결 기기가 없다. 실제 SDK 표시·닫기·Activity 복귀·앱 재시작 후 간격 유지의 기기 실행 검증은 미실행이다. 브라우저는 native facade이고 GIF 경계 검증의 encoder는 fixture를 사용한다.
+
+## APK 전달
+
+- 소스: `f1bb286362cfc12b39c967bb36ce9e80a6c504c5`, commit count 95.
+- versionCode 1097, versionName `0.1.0-preview.1.main.95.f1bb2863`. 기존 1093보다 높고 같은 Preview 인증서를 사용한다.
+- 버전 지정 `:app:assembleRelease` 성공. 기존 서명 스크립트의 패키지·버전·인증서·v2/v3 서명·정렬 검증 통과.
+- APK 내부의 단톡방 텍스트·GIF/SQ 광고 연결 코드 포함을 확인했다. `build/` 복사 후 SHA-256과 메타데이터 일치 확인.
+- 크기 7,213,523 bytes. SHA-256 `af205a50cc170dc13150d0feef165a2ba9d5f11bd45abf4c24a9c4a90d252644`.
+- [APK 다운로드](https://github.com/jaywapp/squad-maker/raw/refs/heads/main/build/squad-maker-latest.apk). 게시 커밋은 APK 소스 커밋과 구분한다. push·PR 병합 후 익명 재다운로드 검증 결과는 해당 PR 이력과 최종 보고에 기록한다.
