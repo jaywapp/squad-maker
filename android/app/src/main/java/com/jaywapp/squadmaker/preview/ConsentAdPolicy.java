@@ -1,7 +1,8 @@
 package com.jaywapp.squadmaker.preview;
 
-/** Main-thread state; the UMP SDK alone supplies permission to request ads. */
+/** Main-thread state; UMP permission cannot override the unresolved live-audience gate. */
 final class ConsentAdPolicy {
+    private final boolean testAdsOnly;
     private boolean updateStarted;
     private boolean allowed;
     private boolean formShowing;
@@ -10,14 +11,19 @@ final class ConsentAdPolicy {
     private boolean destroyed;
     private long generation;
 
+    ConsentAdPolicy(boolean testAdsOnly) {
+        // No approved runtime age/region handling exists yet. Live ads remain blocked.
+        this.testAdsOnly = testAdsOnly;
+    }
+
     boolean beginUpdate() {
-        if (destroyed || updateStarted || !foreground) return false;
+        if (!testAdsOnly || destroyed || updateStarted || !foreground) return false;
         updateStarted = true;
         return true;
     }
 
     boolean updatePermission(boolean canRequestAds) {
-        boolean next = updateStarted && !destroyed && canRequestAds;
+        boolean next = testAdsOnly && updateStarted && !destroyed && canRequestAds;
         if (next == allowed) return false;
         allowed = next;
         generation++;
@@ -25,7 +31,7 @@ final class ConsentAdPolicy {
     }
 
     boolean beginForm(boolean adShowing) {
-        if (destroyed || !foreground || formShowing || adShowing) return false;
+        if (!testAdsOnly || destroyed || !foreground || formShowing || adShowing) return false;
         formShowing = true;
         generation++;
         return true;
@@ -37,10 +43,10 @@ final class ConsentAdPolicy {
         updatePermission(canRequestAds);
     }
 
-    void queueRequiredForm() { if (!destroyed) requiredFormPending = true; }
+    void queueRequiredForm() { if (testAdsOnly && !destroyed) requiredFormPending = true; }
 
     boolean beginPendingForm(boolean needsForm, boolean adShowing) {
-        if (!requiredFormPending || destroyed || !foreground || formShowing || adShowing) return false;
+        if (!testAdsOnly || !requiredFormPending || destroyed || !foreground || formShowing || adShowing) return false;
         if (needsForm && !beginForm(false)) return false;
         requiredFormPending = false;
         return true;
@@ -48,7 +54,7 @@ final class ConsentAdPolicy {
 
     boolean hasPendingForm() { return requiredFormPending; }
 
-    boolean canRequestAds() { return updateStarted && allowed && !destroyed; }
+    boolean canRequestAds() { return testAdsOnly && updateStarted && allowed && !destroyed; }
     boolean canUseAds() { return canRequestAds() && foreground && !formShowing && !requiredFormPending; }
     boolean isFormShowing() { return formShowing; }
     long generation() { return generation; }

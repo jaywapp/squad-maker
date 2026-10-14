@@ -61,7 +61,7 @@ android {
         }
         production {
             dimension 'channel'
-            // Reserved placeholder; every production task is blocked until approval is recorded.
+            // Use the recorded identity; retain the guarded placeholder if approval is removed.
             applicationId approvedProductionIdentity?.applicationId ?: 'com.jaywapp.unapproved.production'
             versionCode approvedProductionIdentity?.versionCode ?: 1
             versionName approvedProductionIdentity?.versionName ?: 'unapproved'

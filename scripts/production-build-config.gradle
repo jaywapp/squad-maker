@@ -1,6 +1,8 @@
 // Pure policy functions shared by Android configuration and standalone Groovy tests.
 ext.productionBuildPolicy = [
-    approvedProductionIdentity: null,
+    // User-approved 2026-10-14; signing/key creation and production ad policy remain separate gates.
+    approvedProductionIdentity: [applicationId: 'com.jaywapp.iamheadcoach',
+                                 versionCode: 1, versionName: '1.0.0'],
     testAds: [app: 'ca-app-pub-3940256099942544~3347511713',
               banner: 'ca-app-pub-3940256099942544/6300978111',
               interstitial: 'ca-app-pub-3940256099942544/1033173712'],
@@ -15,8 +17,8 @@ ext.productionBuildPolicy = [
         mode
     },
     underAge: { Object value, String mode ->
-        if (value == null && mode == 'production') {
-            throw new IllegalArgumentException('Production ads require explicit squadUmpUnderAgeOfConsent=true or false')
+        if (mode == 'production') {
+            throw new IllegalArgumentException('Production ads are blocked until actual age and consent handling is approved and implemented')
         }
         if (value != null && !(value.toString() in ['true', 'false'])) {
             throw new IllegalArgumentException('squadUmpUnderAgeOfConsent must be true or false')
@@ -32,6 +34,10 @@ ext.productionBuildPolicy = [
         }
         if (mode == 'production' && !(flavor == 'production' && buildType == 'release')) {
             throw new IllegalArgumentException('Production ads are permitted only for productionRelease')
+        }
+        // An explicit TFUA value or approved app identity is not an audience/consent decision.
+        if (mode == 'production') {
+            throw new IllegalArgumentException('Production ads are blocked until actual age and consent handling is approved and implemented')
         }
         if (flavor == 'production' && !approvedIdentity) {
             throw new IllegalArgumentException('Production package and first version require recorded user approval before building')

@@ -1,5 +1,7 @@
 # 첫 출시 대상·Play 연령·광고 보호 검토
 
+> 후속 승인: 패키지/첫 버전/서명 전략은 [identity 보고](production-identity-20261014-report.md), 승인된 TEEN/PPT OFF/G 구현은 [보호 후속 보고](teen-ad-protection-20261014-report.md)를 따른다. 실제 연령/UMP 동의 처리·별도 NPA·키 생성은 여전히 대기다.
+
 2026-10-14. orchestrator=Codex. 사용자 후속 답변을 반영한 로컬 준비 문서다. Console 설정·법적 검토 완료·출시 승인이 아니다.
 
 ## 확인된 결정

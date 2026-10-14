@@ -4,6 +4,8 @@
 
 | 읽을 목적 | 문서 |
 |---|---|
+| 2026-10-14 승인된 TEEN·개인화 OFF·G 적용, 미확정 연령 운영 광고 차단 | [분석](teen-ad-protection-20261014-analysis.md), [설계](teen-ad-protection-20261014-design.md), [작업표](teen-ad-protection-20261014-tasks.md), [새 산출물·검증·남은 결정](teen-ad-protection-20261014-report.md) — NPA·실제 연령/동의·운영 광고는 별도 |
+| 2026-10-14 승인된 정식 패키지·1.0.0/1 적용과 unsigned 검증 | [분석](production-identity-20261014-analysis.md), [설계](production-identity-20261014-design.md), [작업표](production-identity-20261014-tasks.md), [산출물·검증·남은 결정](production-identity-20261014-report.md) — PR57 문서의 패키지/버전/서명 전략 대기 상태를 대체. 키 생성·실제 연령/동의·정책 URL은 대기 |
 | 2026-10-14 정식/Preview 분리·운영 광고/UMP·SQ 이전 준비(로컬, 결정 대기) | [분석](production-readiness-20261014-analysis.md), [설계](production-readiness-20261014-design.md), [작업표](production-readiness-20261014-tasks.md), [빌드 행렬](production-readiness-20261014-build-matrix.md), [데이터 이동](production-readiness-20261014-data-transfer.md), [출시 결정/T7](production-readiness-20261014-release-checklist.md), [최종 보고](production-readiness-20261014-report.md) |
 | 2026-10-14 확정 지원·대한민국/한국어·16세 이상 대상과 정책 초안(미게시) | [Play 연령/문구·청소년 보호 검토](production-readiness-20261014-audience-policy.md), [개인정보처리방침 초안](production-readiness-20261014-privacy-draft.md), [Data safety 대조](production-readiness-20261014-data-safety.md) |
 | 2026-10-14 GIF·단체방 텍스트·SQ 전면 광고 | [분석](export-interstitial-20261014-analysis.md), [설계](export-interstitial-20261014-design.md), [작업·검증](export-interstitial-20261014-tasks.md) |
