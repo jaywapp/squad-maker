@@ -4,6 +4,8 @@
 
 | 읽을 목적 | 문서 |
 |---|---|
+| 2026-10-14 정식/Preview 분리·운영 광고/UMP·SQ 이전 준비(로컬, 결정 대기) | [분석](production-readiness-20261014-analysis.md), [설계](production-readiness-20261014-design.md), [작업표](production-readiness-20261014-tasks.md), [빌드 행렬](production-readiness-20261014-build-matrix.md), [데이터 이동](production-readiness-20261014-data-transfer.md), [출시 결정/T7](production-readiness-20261014-release-checklist.md), [최종 보고](production-readiness-20261014-report.md) |
+| 2026-10-14 확정 지원·대한민국/한국어·16세 이상 대상과 정책 초안(미게시) | [Play 연령/문구·청소년 보호 검토](production-readiness-20261014-audience-policy.md), [개인정보처리방침 초안](production-readiness-20261014-privacy-draft.md), [Data safety 대조](production-readiness-20261014-data-safety.md) |
 | 2026-10-14 GIF·단체방 텍스트·SQ 전면 광고 | [분석](export-interstitial-20261014-analysis.md), [설계](export-interstitial-20261014-design.md), [작업·검증](export-interstitial-20261014-tasks.md) |
 | 2026-10-14 휴대폰용 APK build 폴더 다운로드 | [다운로드·설치 안내](apk-build-download-20261014-design.md), [분석](apk-build-download-20261014-analysis.md), [작업](apk-build-download-20261014-tasks.md) |
 | 2026-10-13 코치 점검 6개 오류 수정 | [완료 결과](coach-review-20261013/fixes.md), [분석](coach-fixes-20261013-analysis.md), [설계](coach-fixes-20261013-design.md), [작업](coach-fixes-20261013-tasks.md) |
