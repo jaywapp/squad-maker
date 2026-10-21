@@ -116,6 +116,11 @@ function harness(options = {}) {
         if (options.adError) throw options.adError;
         return options.exportAd ? options.exportAd(payload) : { status: 'shown', testOnly: true };
       },
+      cancelExportInterstitial: options.cancelAdMissing ? undefined : async () => {
+        calls.push({ method: 'ads-cancel' });
+        if (options.adError) throw options.adError;
+        return options.cancelAd ? options.cancelAd() : { status: 'skipped', reason: 'opportunity-cancelled' };
+      },
       async getState() {
         calls.push({ method: 'ads-state' });
         if (options.adStateError) throw options.adStateError;
@@ -259,6 +264,7 @@ for (const [filename, mimeType, bytes] of [
   assert.equal(payload.filename, filename); assert.equal(payload.mimeType, mimeType);
   assert.deepEqual(Buffer.from(payload.data, 'base64'), bytes);
   assert.equal(app.count('document-stage'), 0); assert.equal(app.count('share'), 0);
+  assert.equal(app.count('ads-cancel'), 0);
 });
 
 test('SAF cancellation is distinct from failure and does not claim file completion', async () => {
@@ -283,6 +289,64 @@ test('share stages exact bytes and forwards only the returned file URI to the OS
     { title: 'pattern.gif', files: ['file:///cache/squad-exports/result.gif'] });
   assert.deepEqual(copy(result), { status: 'success', code: null, completion: 'share-sheet-finished' });
   assert.equal(app.count('document-save'), 0);
+});
+
+for (const [filename, mimeType, bytes] of [
+  ['pitch.png', 'image/png', Buffer.from([137, 80, 78, 71, 0, 128, 255])],
+  ['pattern.gif', 'image/gif', Buffer.from('GIF89a')],
+  ['backup.sq', 'application/json', Buffer.from('{"team":"한글 FC"}')],
+]) test('sharing ' + filename + ' proceeds without waiting for ad cancellation', async () => {
+  const app = harness({ cancelAd: () => new Promise(() => {}) });
+  const pending = app.platform.exportFile(new Blob([bytes]), filename, mimeType, 'share');
+  assert.equal(app.count('ads-cancel'), 1);
+  assert.equal(app.count('document-stage'), 0);
+  const result = await pending;
+  assert.equal(result.completion, 'share-sheet-finished');
+  const payload = app.calls.find(call => call.method === 'document-stage').payload;
+  assert.deepEqual(Buffer.from(payload.data, 'base64'), bytes);
+  assert.equal(payload.filename, filename); assert.equal(payload.mimeType, mimeType);
+  assert.equal(app.count('ads-prepare'), 0); assert.equal(app.count('ads-export'), 0);
+  assert.equal(app.count('storage-commit'), 0);
+});
+
+for (const options of [{ cancelAdMissing: true }, { adError: new Error('Cancellation unavailable') }]) {
+  test('unavailable ad cancellation preserves native file sharing ' + JSON.stringify(Object.keys(options)), async () => {
+    const app = harness(options);
+    const result = await app.platform.exportFile(new Blob(['original bytes']), 'backup.sq', 'application/json', 'share');
+    assert.equal(result.completion, 'share-sheet-finished');
+    assert.equal(app.count('document-stage'), 1); assert.equal(app.count('share'), 1);
+    assert.equal(app.count('ads-export'), 0);
+  });
+}
+
+test('direct facade ad requests are blocked throughout concurrent file shares', async () => {
+  let finishBytes;
+  let finishShare;
+  const bytes = new Promise(resolve => { finishBytes = resolve; });
+  const sheet = new Promise(resolve => { finishShare = resolve; });
+  let sheets = 0;
+  const app = harness({ share: () => ++sheets === 1 ? sheet : {} });
+  const first = app.platform.exportFile({ arrayBuffer: () => bytes }, 'pitch.png', 'image/png', 'share');
+  const blocked = { status: 'skipped', reason: 'sharing', testOnly: null };
+  assert.deepEqual(copy(await app.platform.showExportAd('gif')), blocked);
+  finishBytes(new Uint8Array([0, 128, 255]).buffer);
+  await new Promise(setImmediate);
+  assert.equal(app.count('share'), 1);
+  const second = await app.platform.exportFile(new Blob(['{}']), 'backup.sq', 'application/json', 'share');
+  assert.equal(second.completion, 'share-sheet-finished');
+  assert.deepEqual(copy(await app.platform.showExportAd('sq')), blocked);
+  assert.equal(app.count('ads-export'), 0);
+  finishShare({}); await first;
+  assert.equal((await app.platform.showExportAd('gif')).status, 'shown');
+  assert.equal(app.count('ads-export'), 1);
+});
+
+test('failed blob conversion releases the sharing ad guard for a later save', async () => {
+  const app = harness();
+  const result = await app.platform.exportFile({ arrayBuffer: async () => { throw new Error('Blob lost'); } },
+    'pitch.png', 'image/png', 'share');
+  assert.equal(result.status, 'error'); assert.equal(app.count('ads-cancel'), 1);
+  assert.equal((await app.platform.showExportAd('sq')).status, 'shown');
 });
 
 test('Share cancellation is a neutral cancelled result', async () => {
@@ -424,6 +488,7 @@ test('web evaluation registers no native listeners and cannot access native stor
   assert.deepEqual(copy(await app.platform.showTestAd()), { status: 'unsupported' });
   assert.deepEqual(copy(await app.platform.prepareExportAd()), { status: 'unsupported' });
   assert.deepEqual(copy(await app.platform.showExportAd('sq')), { status: 'unsupported' });
+  assert.deepEqual(copy(await app.platform.cancelExportAd()), { status: 'unsupported' });
   assert.equal((await app.platform.getAdState()).status, 'unsupported');
   assert.equal((await app.platform.getAdState()).canRequestAds, false);
   assert.deepEqual(copy(await app.platform.showBannerAd()), { status: 'unsupported' });
@@ -436,11 +501,11 @@ test('export ads prepare separately and pass only an allowed placement to the pl
   const app = harness();
   assert.deepEqual(copy(await app.platform.prepareExportAd()), { status: 'loading', testOnly: true });
   assert.equal(app.count('ads-export'), 0);
-  for (const placement of ['gif', 'sq', 'share-text']) {
+  for (const placement of ['gif', 'sq']) {
     assert.deepEqual(copy(await app.platform.showExportAd(placement)), { status: 'shown', testOnly: true });
   }
   assert.deepEqual(app.calls.filter(call => call.method === 'ads-export').map(call => call.payload),
-    [{ placement: 'gif' }, { placement: 'sq' }, { placement: 'share-text' }]);
+    [{ placement: 'gif' }, { placement: 'sq' }]);
   assert.equal(app.count('ads-show'), 0);
   assert.equal(app.count('storage-commit'), 0);
   assert.equal(app.count('document-save'), 0);
@@ -448,7 +513,7 @@ test('export ads prepare separately and pass only an allowed placement to the pl
 
 test('non-export placements cannot request an interstitial', async () => {
   const app = harness();
-  for (const placement of ['png', 'auto-save', 'restore', 'share-url', undefined, { placement: 'sq' }]) {
+  for (const placement of ['png', 'auto-save', 'restore', 'share', 'share-text', 'share-url', 'share-gif', 'share-sq', undefined, { placement: 'sq' }]) {
     assert.deepEqual(copy(await app.platform.showExportAd(placement)),
       { status: 'skipped', reason: 'invalid-placement', testOnly: null });
   }
@@ -457,7 +522,8 @@ test('non-export placements cannot request an interstitial', async () => {
 
 test('native ad bridge errors resolve safely without exposing private error details', async () => {
   const app = harness({ adError: new Error('private plugin diagnostic') });
-  for (const action of [() => app.platform.prepareExportAd(), () => app.platform.showExportAd('sq')]) {
+  for (const action of [() => app.platform.prepareExportAd(), () => app.platform.showExportAd('sq'),
+    () => app.platform.cancelExportAd()]) {
     assert.deepEqual(copy(await action()), { status: 'failed', reason: 'ad-unavailable', testOnly: null });
   }
   assert.equal(app.count('document-save'), 0);

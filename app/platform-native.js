@@ -78,8 +78,21 @@ async function toBase64(blob) {
   return btoa(chunks.join(''));
 }
 
+let fileShares = 0;
+
+async function cancelExportAd() {
+  if (!native) return { status: 'unsupported' };
+  try { return await Ads.cancelExportInterstitial(); }
+  catch { return { status: 'failed', reason: 'ad-unavailable', testOnly: null }; }
+}
+
 async function exportFile(blob, filename, mimeType, destination = 'save') {
   if (!native) return { status: 'unsupported', code: 'native-unavailable' };
+  const sharing = destination === 'share';
+  if (sharing) {
+    fileShares += 1;
+    void cancelExportAd();
+  }
   try {
     filename = String(filename).replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_').slice(0, 160) || 'squad-export';
     const data = await toBase64(blob);
@@ -95,6 +108,8 @@ async function exportFile(blob, filename, mimeType, destination = 'save') {
   } catch (error) {
     if (/cancel/i.test(error?.message || '')) return { status: 'cancelled', code: null, completion: null };
     return { status: 'error', code: 'export-failed', completion: null };
+  } finally {
+    if (sharing) fileShares -= 1;
   }
 }
 
@@ -144,6 +159,7 @@ window.SquadPlatform = Object.freeze({
   native,
   storage: native ? storage : null,
   exportFile,
+  cancelExportAd,
   publicShareBase: 'https://jaywapp.github.io/squad-maker/',
   async getAppInfo() {
     if (!native) return null;
@@ -215,8 +231,9 @@ window.SquadPlatform = Object.freeze({
   },
   async showExportAd(placement) {
     if (!native) return { status: 'unsupported' };
-    if (!['gif', 'sq', 'share-text'].includes(placement))
+    if (!['gif', 'sq'].includes(placement))
       return { status: 'skipped', reason: 'invalid-placement', testOnly: null };
+    if (fileShares > 0) return { status: 'skipped', reason: 'sharing', testOnly: null };
     try { return await Ads.showExportInterstitial({ placement }); }
     catch { return { status: 'failed', reason: 'ad-unavailable', testOnly: null }; }
   },

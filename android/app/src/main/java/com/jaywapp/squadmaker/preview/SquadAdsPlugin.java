@@ -39,6 +39,7 @@ public class SquadAdsPlugin extends Plugin {
     private static final long RETRY_DELAY_MS = 30_000L;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final ExportAdOpportunity exportOpportunity = new ExportAdOpportunity();
     private static final ConsentAdPolicy.InitializationGate SDK = new ConsentAdPolicy.InitializationGate();
     private final ConsentAdPolicy consent = new ConsentAdPolicy(BuildConfig.ADS_TEST_ONLY);
     private ConsentInformation consentInformation;
@@ -161,10 +162,21 @@ public class SquadAdsPlugin extends Plugin {
     }
 
     @PluginMethod
+    public void cancelExportInterstitial(PluginCall call) {
+        exportOpportunity.invalidate();
+        mainHandler.post(() -> resolveAd(call, "skipped", "opportunity-cancelled"));
+    }
+
+    @PluginMethod
     public void showExportInterstitial(PluginCall call) {
+        long opportunity = exportOpportunity.capture();
         mainHandler.post(() -> {
             if (!ExportAdPolicy.isSupportedPlacement(call.getString("placement"))) {
                 resolveAd(call, "skipped", "invalid-placement");
+                return;
+            }
+            if (!exportOpportunity.isCurrent(opportunity)) {
+                resolveAd(call, "skipped", "opportunity-cancelled");
                 return;
             }
             if (activeShow != null) { resolveAd(call, "skipped", "already-showing"); return; }
@@ -471,6 +483,7 @@ public class SquadAdsPlugin extends Plugin {
 
     private int dp(int value) { return Math.round(value * getContext().getResources().getDisplayMetrics().density); }
     @Override protected void handleOnPause() {
+        exportOpportunity.invalidate();
         foreground = false;
         consent.pause();
         mainHandler.removeCallbacks(retryLoad);
@@ -480,6 +493,7 @@ public class SquadAdsPlugin extends Plugin {
 
     @Override protected void handleOnResume() {
         if (destroyed) return;
+        exportOpportunity.invalidate();
         foreground = true;
         consent.resume();
         requestConsentUpdate();
@@ -490,6 +504,7 @@ public class SquadAdsPlugin extends Plugin {
     }
 
     @Override protected void handleOnDestroy() {
+        exportOpportunity.invalidate();
         destroyed = true;
         foreground = false;
         consent.destroy();

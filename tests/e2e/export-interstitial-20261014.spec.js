@@ -40,7 +40,7 @@ async function boot(page, options = {}) {
         abort() { if (this.handlers.abort) this.handlers.abort(); }
       };
     ` }));
-  await page.addInitScript(({ seed, native, adMode, gifMode }) => {
+  await page.addInitScript(({ seed, native, adMode, gifMode, shareMode, cancelMode }) => {
     if (!sessionStorage.getItem('export-interstitial-seeded')) {
       localStorage.setItem('squad-maker-v1', JSON.stringify(seed));
       sessionStorage.setItem('export-interstitial-seeded', '1');
@@ -69,6 +69,12 @@ async function boot(page, options = {}) {
       async getAppInfo() { return { name: 'Synthetic app', id: 'com.example.exporttest', version: '1.0', build: '1' }; },
       async showTestAd() { return { status: 'unsupported' }; },
       async getAdState() { return { status: 'unsupported' }; },
+      cancelExportAd() {
+        io.cancellations = (io.cancellations || 0) + 1;
+        if (cancelMode === 'pending') return new Promise(() => {});
+        if (cancelMode === 'reject') return Promise.reject(new Error('Injected cancel failure'));
+        return Promise.resolve({ status: 'skipped', reason: 'opportunity-cancelled' });
+      },
       async showExportAd(...args) {
         io.ads.push(args);
         io.events.push('ad:' + args[0]);
@@ -80,12 +86,18 @@ async function boot(page, options = {}) {
         io.events.push('file:' + destination);
         io.files.push({ bytes: Array.from(new Uint8Array(await blob.arrayBuffer())),
           filename, mimeType, destination, blobType: blob.type });
-        return { status: 'success', code: null, completion: destination === 'share' ? 'shared' : 'saved' };
+        if (destination === 'share') {
+          if (shareMode === 'pending') return new Promise(resolve => { window.__finishShare = resolve; });
+          if (shareMode === 'cancelled') return { status: 'cancelled', code: null, completion: null };
+          if (shareMode === 'failed') return { status: 'error', code: 'export-failed', completion: null };
+        }
+        return { status: 'success', code: null, completion: destination === 'share' ? 'share-sheet-finished' : 'saved' };
       },
     };
     if (adMode === 'missing') delete window.SquadPlatform.showExportAd;
   }, { seed: options.snapshot || fixture, native: options.native !== false,
-    adMode: options.adMode || 'pending', gifMode: options.gifMode || 'auto' });
+    adMode: options.adMode || 'pending', gifMode: options.gifMode || 'auto',
+    shareMode: options.shareMode, cancelMode: options.cancelMode });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/index.html');
   await page.evaluate(() => window.SquadMakerContract.ready());
@@ -110,7 +122,7 @@ async function readDownload(download) {
   return Buffer.concat(chunks);
 }
 
-for (const destination of ['save', 'share']) {
+for (const destination of ['save']) {
   test(`native SQ ${destination} waits for the ad, blocks duplicate edits and preserves exact backup bytes`, async ({ page }) => {
     const before = await boot(page);
     const saved = await stored(page);
@@ -168,17 +180,15 @@ for (const destination of ['save', 'share']) {
   });
 }
 
-test('native share text waits for dismissal, preserves coach instructions and copies or downloads without another ad', async ({ page }) => {
+test('native share text opens without waiting for any ad and preserves coach instructions, copy and download', async ({ page }) => {
   const before = await boot(page);
   const saved = await stored(page);
   await page.evaluate(() => { window.__pendingShare = openShare(); });
-  await expect.poll(async () => (await observed(page)).ads).toEqual([['share-text']]);
-  await expect(page.locator('#shareModal')).toBeHidden();
-  expect((await state(page)).export.busy).toBe(true);
+  await expect(page.locator('#shareModal')).toBeVisible();
+  expect((await state(page)).export.busy).toBe(false);
   await page.evaluate(() => openShare());
-  expect(await run(page, 'switch-squad', { squad: 'attack' })).toMatchObject({ status: 'busy' });
-  expect((await observed(page)).ads).toEqual([['share-text']]);
-  await closeAd(page);
+  expect(await page.locator('main').evaluate(element => element.inert)).toBe(true);
+  expect((await observed(page)).ads).toEqual([]);
   await page.evaluate(() => window.__pendingShare);
   await expect(page.locator('#shareModal')).toBeVisible();
   expect((await state(page)).export.busy).toBe(false);
@@ -195,8 +205,78 @@ test('native share text waits for dismissal, preserves coach instructions and co
   const downloaded = page.waitForEvent('download');
   await page.locator('#shareModal').getByRole('button', { name: '텍스트 파일로 받기', exact: true }).click();
   expect((await readDownload(await downloaded)).toString('utf8')).toBe(text);
-  expect((await observed(page)).ads).toEqual([['share-text']]);
+  expect((await observed(page)).ads).toEqual([]);
   expect((await observed(page)).files).toEqual([]);
+  expect((await state(page)).snapshot).toEqual(before.snapshot);
+  expect(await stored(page)).toEqual(saved);
+});
+
+for (const adMode of ['ready', 'loading', 'pending', 'failed', 'missing']) {
+  test(`native ${adMode} ads never block PNG, GIF, SQ or text sharing`, async ({ page }) => {
+    const before = await boot(page, { adMode, cancelMode: 'pending' });
+    const saved = await stored(page);
+    for (const operation of ['export-png', 'export-gif', 'export-sq']) {
+      expect(await run(page, operation, { destination: 'share' })).toMatchObject({
+        status: 'success', completion: 'share-sheet-finished',
+      });
+    }
+    await page.evaluate(() => openShare());
+    await expect(page.locator('#shareModal')).toBeVisible();
+    const outcome = await observed(page);
+    expect(outcome.ads).toEqual([]);
+    expect(outcome.files.map(file => file.mimeType)).toEqual(['image/png', 'image/gif', 'application/json']);
+    expect(outcome.files.every(file => file.destination === 'share')).toBe(true);
+    expect(Buffer.from(outcome.files[0].bytes).subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+    expect(Buffer.from(outcome.files[1].bytes)).toEqual(Buffer.from(GIF_BASE64, 'base64'));
+    expect(JSON.parse(Buffer.from(outcome.files[2].bytes).toString('utf8'))).toEqual(before.snapshot);
+    expect((await state(page)).export.busy).toBe(false);
+    expect((await state(page)).snapshot).toEqual(before.snapshot);
+    expect(await stored(page)).toEqual(saved);
+  });
+}
+
+for (const shareMode of ['cancelled', 'failed']) {
+  test(`native ${shareMode} sharing preserves input and never retries an ad after return`, async ({ page }) => {
+    const before = await boot(page, { shareMode, cancelMode: 'reject' });
+    const saved = await stored(page);
+    expect(await run(page, 'export-sq', { destination: 'share' })).toMatchObject({
+      status: shareMode === 'cancelled' ? 'cancelled' : 'error', completion: null,
+    });
+    await page.evaluate(() => {
+      document.dispatchEvent(new Event('visibilitychange'));
+      window.dispatchEvent(new Event('pageshow'));
+    });
+    await page.evaluate(() => openShare());
+    await expect(page.locator('#shareModal')).toBeVisible();
+    expect((await observed(page)).ads).toEqual([]);
+    expect((await observed(page)).files).toHaveLength(1);
+    expect((await state(page)).export.busy).toBe(false);
+    expect((await state(page)).snapshot).toEqual(before.snapshot);
+    expect(await stored(page)).toEqual(saved);
+  });
+}
+
+test('an open system share sheet blocks duplicate output and edits through rotation and return without an ad', async ({ page }) => {
+  const before = await boot(page, { shareMode: 'pending' });
+  const saved = await stored(page);
+  await startExport(page, 'export-sq', 'share');
+  await expect.poll(async () => (await observed(page)).files.length).toBe(1);
+  expect((await state(page)).export.busy).toBe(true);
+  for (const [operation, payload] of [['export-sq', { destination: 'share' }],
+    ['export-png', {}], ['switch-squad', { squad: 'attack' }]])
+    expect(await run(page, operation, payload)).toMatchObject({ status: 'busy' });
+  await page.evaluate(() => openShare());
+  await expect(page.locator('#shareModal')).toBeHidden();
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.evaluate(() => {
+    document.dispatchEvent(new Event('visibilitychange'));
+    window.dispatchEvent(new Event('pageshow'));
+    window.__finishShare({ status: 'success', code: null, completion: 'share-sheet-finished' });
+  });
+  expect(await page.evaluate(() => window.__pendingExport)).toMatchObject({ completion: 'share-sheet-finished' });
+  expect((await observed(page)).ads).toEqual([]);
+  expect((await observed(page)).files).toHaveLength(1);
+  expect((await state(page)).export.busy).toBe(false);
   expect((await state(page)).snapshot).toEqual(before.snapshot);
   expect(await stored(page)).toEqual(saved);
 });
@@ -209,7 +289,7 @@ for (const adMode of ['failed', 'reject', 'missing', 'skipped']) {
     await expect(page.locator('#shareModal')).toBeVisible();
     await expect(page.locator('#shareText')).toContainText(fixture.squads.basic.tn);
     const outcome = await observed(page);
-    expect(outcome.ads).toEqual(adMode === 'missing' ? [] : [['sq'], ['share-text']]);
+    expect(outcome.ads).toEqual(adMode === 'missing' ? [] : [['sq']]);
     expect(outcome.files).toHaveLength(1);
     expect(JSON.parse(Buffer.from(outcome.files[0].bytes).toString('utf8'))).toEqual(before.snapshot);
     expect((await state(page)).export.busy).toBe(false);
@@ -292,6 +372,7 @@ test('native export notice stays readable inside the export panel at either view
   await expect(notice).toBeVisible();
   await expect(notice).toContainText('광고를 닫으면 계속 진행');
   await expect(notice).toContainText('10분');
+  await expect(notice).toContainText('파일·텍스트 공유에는 전면 광고가 표시되지 않습니다');
   const bounds = await notice.boundingBox();
   expect(bounds.x).toBeGreaterThanOrEqual(0);
   expect(bounds.x + bounds.width).toBeLessThanOrEqual(page.viewportSize().width);
