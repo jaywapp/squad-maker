@@ -527,7 +527,7 @@ public class SquadAdsPlugin extends Plugin {
     private int dp(int value) { return Math.round(value * getContext().getResources().getDisplayMetrics().density); }
     @Override protected void handleOnPause() {
         exportOpportunity.invalidate();
-        exportReceipts.suspend();
+        exportReceipts.pause();
         foreground = false;
         consent.pause();
         mainHandler.removeCallbacks(retryLoad);
@@ -538,7 +538,7 @@ public class SquadAdsPlugin extends Plugin {
     @Override protected void handleOnResume() {
         if (destroyed) return;
         exportOpportunity.invalidate();
-        exportReceipts.suspend();
+        exportReceipts.resume();
         foreground = true;
         consent.resume();
         requestConsentUpdate();

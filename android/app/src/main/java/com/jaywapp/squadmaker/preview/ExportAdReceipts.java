@@ -5,6 +5,7 @@ import java.util.UUID;
 /** Activity-scoped, single-use proof of a just-completed native document write. */
 final class ExportAdReceipts {
     static final long MAX_RECEIPT_AGE_MS = 1_000L;
+    private enum DocumentState { ARMED, PAUSED, RESULT_BEFORE_RESUME, RESUMED_BEFORE_RESULT, WRITING }
 
     static final class Snapshot {
         final long epoch;
@@ -27,12 +28,22 @@ final class ExportAdReceipts {
     private String pending;
     private String pendingPlacement;
     private Snapshot completion;
+    private long documentGeneration;
+    private String documentToken;
+    private DocumentState documentState;
+    private boolean foreground;
 
     synchronized long captureEpoch() { return epoch; }
 
     synchronized boolean isCurrent(long capturedEpoch) { return capturedEpoch == epoch; }
 
     synchronized void invalidate() {
+        documentGeneration++;
+        clearDocument();
+        invalidateReceipt();
+    }
+
+    private void invalidateReceipt() {
         epoch++;
         pending = null;
         pendingPlacement = null;
@@ -45,8 +56,69 @@ final class ExportAdReceipts {
         loadedAt = -1;
     }
 
+    synchronized long prepareDocument() {
+        invalidate();
+        return documentGeneration;
+    }
+
+    synchronized boolean armDocument(String token, long preparation) {
+        if (token == null || !foreground || preparation != documentGeneration) return false;
+        invalidateReceipt();
+        documentGeneration++;
+        documentToken = token;
+        documentState = DocumentState.ARMED;
+        return true;
+    }
+
+    synchronized void pause() {
+        boolean pickerDeparture = foreground && documentState == DocumentState.ARMED;
+        documentGeneration++;
+        invalidateReceipt();
+        readyAd = null;
+        loadedAt = -1;
+        foreground = false;
+        if (pickerDeparture) documentState = DocumentState.PAUSED;
+        else clearDocument();
+    }
+
+    synchronized void resume() {
+        documentGeneration++;
+        invalidateReceipt();
+        readyAd = null;
+        loadedAt = -1;
+        foreground = true;
+        if (documentState == DocumentState.PAUSED) documentState = DocumentState.RESUMED_BEFORE_RESULT;
+        else if (documentState == DocumentState.RESULT_BEFORE_RESUME) documentState = DocumentState.WRITING;
+        else clearDocument();
+    }
+
+    synchronized void documentResult(String token) {
+        if (token == null || !token.equals(documentToken)) return;
+        if (documentState == DocumentState.PAUSED) documentState = DocumentState.RESULT_BEFORE_RESUME;
+        else if (foreground && (documentState == DocumentState.ARMED
+            || documentState == DocumentState.RESUMED_BEFORE_RESULT)) documentState = DocumentState.WRITING;
+        else clearDocument();
+    }
+
+    synchronized Snapshot completeDocument(String token, long nowElapsed, long nowWall) {
+        if (token == null || !token.equals(documentToken)) return null;
+        boolean eligible = foreground && documentState == DocumentState.WRITING;
+        // Completion is final even when resume, consent or a prepared ad is still unavailable.
+        clearDocument();
+        return eligible ? snapshot(epoch, nowElapsed, nowWall) : null;
+    }
+
+    synchronized void discardDocument(String token) {
+        if (token != null && token.equals(documentToken)) invalidate();
+    }
+
+    private void clearDocument() {
+        documentToken = null;
+        documentState = null;
+    }
+
     synchronized void ready(Object ad, long loadedAtElapsed, long shownAt) {
-        if (readyAd != ad || loadedAt != loadedAtElapsed) invalidate();
+        if (readyAd != ad || loadedAt != loadedAtElapsed) invalidateReceipt();
         readyAd = ad;
         loadedAt = ad == null ? -1 : loadedAtElapsed;
         lastShownAt = shownAt;

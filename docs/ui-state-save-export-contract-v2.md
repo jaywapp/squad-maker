@@ -60,6 +60,8 @@
 
 내부 facade의 `adReceipt`는 native 실제 저장 완료와 연결된 일회성 근거다. 공개 `Result`에는 노출하지 않는다. placement는 save-png/save-gif/save-sq이며 해당 근거가 필요하다. 공유 placement와 과거 gif/sq/share-text 직접 요청은 거부한다. 완료 시 미준비 광고를 기다리거나 다음 resume에 표시하지 않는다. 공통 10분은 실제 show 콜백에서만 갱신한다. SDK 닫힘 응답 대기는 30초로 제한하며 만료 뒤 편집기 busy를 해제하고 추가 표시 기회를 무효화한다. [설계·검증 기준](issue-59-60-save-20261021-design.md).
 
+2026-10-23 native 경계: 소유 파일 선택창의 정상 왕복 한 번은 쓰기 작업을 보존하고, close 때 이미 복귀·광고 준비가 완료된 경우만 평가한다. close가 resume/ready보다 먼저면 광고를 영구 생략한다. 별도 앱 전환·공유·취소·동의 초기화·재생성은 이 권한을 되살리지 않는다. 공개 JS `Result`/저장·공유 의미는 그대로다. [복귀 수정·검증](issue-64-picker-return-20261023-report.md).
+
 웹은 localStorage `squad-maker-library-v1` + active mirror `squad-maker-v1`을 CAS·재읽기·검증 rollback으로 보존한다. 웹의 두 키는 OS 종료를 넘는 원자적 transaction을 보장하지 않는다. Android는 두 키를 한 app-private AtomicFile `squad-store-v1.json` transaction에 기록한다. native 성공은 쓰기 완료와 재읽기 이후다. 저장 await 중 새 편집은 저장된 revision과 분리한다.
 
 기존 유효한 v1은 처음 보관으로 이전하며 선수 ID·배치·지침·패턴을 유지한다. 기존 container가 있고 active mirror가 달라졌다면 다른 파일은 유지하고 이전 active 한 본을 legacyRecovery로 남긴다. 손상·future 데이터는 기본값으로 덮지 않고 blocked 상태다. 유효한 .sq의 교체 확인이 끝난 경우만 recoverSnapshot을 호출하며 손상 원문은 container rawRecovery에 보존한다. rawRecovery는 정상 교환 파일이나 UI state로 내보내지 않는다.
