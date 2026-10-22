@@ -149,7 +149,7 @@ public class ConsentAdPolicyTest {
         policy.beginForm(false);
         policy.finishForm(false);
         assertFalse(ExportAdPolicy.isSupportedPlacement("share-text"));
-        for (String placement : new String[] { "gif", "sq" }) {
+        for (String placement : new String[] { "save-png", "save-gif", "save-sq" }) {
             assertTrue(ExportAdPolicy.isSupportedPlacement(placement));
             assertEquals("cooldown", ExportAdPolicy.cooldownReason(lastShownAt + 1, lastShownAt));
         }

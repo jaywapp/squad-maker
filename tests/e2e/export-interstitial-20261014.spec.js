@@ -40,10 +40,11 @@ async function boot(page, options = {}) {
         abort() { if (this.handlers.abort) this.handlers.abort(); }
       };
     ` }));
-  await page.addInitScript(({ seed, native, adMode, gifMode, shareMode, cancelMode }) => {
+  await page.addInitScript(({ seed, native, adMode, gifMode, shareMode, cancelMode, saveMode, firstSaveUsed }) => {
     if (!sessionStorage.getItem('export-interstitial-seeded')) {
       localStorage.setItem('squad-maker-v1', JSON.stringify(seed));
       sessionStorage.setItem('export-interstitial-seeded', '1');
+      localStorage.setItem('synthetic-first-save-used', firstSaveUsed ? '1' : '0');
     }
     window.SQUAD_MAKER_ANALYTICS_ID = '';
     const io = window.__exportIO = { ads: [], files: [], events: [], clipboard: [], gifMode };
@@ -78,6 +79,7 @@ async function boot(page, options = {}) {
       async showExportAd(...args) {
         io.ads.push(args);
         io.events.push('ad:' + args[0]);
+        io.adNotices = [...(io.adNotices || []), document.getElementById('exportStatus').textContent];
         if (adMode === 'reject') throw new Error('Injected ad failure');
         if (adMode === 'pending') return new Promise(resolve => { window.__closeExportAd = resolve; });
         return { status: adMode, reason: 'synthetic-result', testOnly: true };
@@ -91,13 +93,26 @@ async function boot(page, options = {}) {
           if (shareMode === 'cancelled') return { status: 'cancelled', code: null, completion: null };
           if (shareMode === 'failed') return { status: 'error', code: 'export-failed', completion: null };
         }
-        return { status: 'success', code: null, completion: destination === 'share' ? 'share-sheet-finished' : 'saved' };
+        if (destination === 'share') return { status: 'success', code: null, completion: 'share-sheet-finished' };
+        const complete = () => {
+          if (saveMode === 'cancelled') return { status: 'cancelled', code: null, completion: null, adReceipt: 'invalid' };
+          if (saveMode === 'failed') return { status: 'error', code: 'export-failed', completion: null, adReceipt: 'invalid' };
+          if (saveMode === 'unknown') return { status: 'success', code: null, completion: 'unknown', adReceipt: 'invalid' };
+          io.events.push('saved:save');
+          const first = localStorage.getItem('synthetic-first-save-used') !== '1';
+          localStorage.setItem('synthetic-first-save-used', '1');
+          const adReceipt = first || ['loading', 'skipped', 'missing'].includes(adMode) ? null : 'receipt-' + mimeType;
+          return { status: 'success', code: null, completion: 'file-saved', adReceipt };
+        };
+        if (saveMode === 'pending') return new Promise(resolve => { window.__finishSave = () => resolve(complete()); });
+        return complete();
       },
     };
     if (adMode === 'missing') delete window.SquadPlatform.showExportAd;
   }, { seed: options.snapshot || fixture, native: options.native !== false,
     adMode: options.adMode || 'pending', gifMode: options.gifMode || 'auto',
-    shareMode: options.shareMode, cancelMode: options.cancelMode });
+    shareMode: options.shareMode, cancelMode: options.cancelMode,
+    saveMode: options.saveMode, firstSaveUsed: options.firstSaveUsed !== false });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/index.html');
   await page.evaluate(() => window.SquadMakerContract.ready());
@@ -122,63 +137,126 @@ async function readDownload(download) {
   return Buffer.concat(chunks);
 }
 
-for (const destination of ['save']) {
-  test(`native SQ ${destination} waits for the ad, blocks duplicate edits and preserves exact backup bytes`, async ({ page }) => {
-    const before = await boot(page);
+for (const [operation, placement, mimeType] of [
+  ['export-png', 'save-png', 'image/png'], ['export-gif', 'save-gif', 'image/gif'],
+  ['export-sq', 'save-sq', 'application/json'],
+]) {
+  test(`native ${operation} saves bytes and announces success before a prepared ad, without duplicate output`, async ({ page }) => {
+    const before = await boot(page, { saveMode: 'pending' });
     const saved = await stored(page);
-    const expected = Buffer.from(JSON.stringify(before.snapshot, null, 2), 'utf8');
-    await startExport(page, 'export-sq', destination);
-    await expect.poll(async () => (await observed(page)).ads).toEqual([['sq']]);
-    expect((await observed(page)).files).toEqual([]);
+    await startExport(page, operation);
+    await expect.poll(async () => (await observed(page)).files.length).toBe(1);
+    expect((await observed(page)).ads).toEqual([]);
+    expect((await observed(page)).events.at(-1)).toBe('file:save');
+    for (const [command, payload] of [[operation, {}], ['switch-squad', { squad: 'attack' }],
+      ['import-snapshot', { snapshot: fixture }]])
+      expect(await run(page, command, payload)).toMatchObject({ status: 'busy' });
+    await page.evaluate(() => window.__finishSave());
+    await expect.poll(async () => (await observed(page)).ads).toEqual([[placement, 'receipt-' + mimeType]]);
+    await expect(page.locator('#exportStatus')).toContainText('선택한 위치에 저장했습니다');
+    expect(await page.evaluate(() => window.__exportIO.adNotices.every(text => text.includes('저장했습니다')))).toBe(true);
     expect((await state(page)).export.busy).toBe(true);
-    expect(await page.locator('main').evaluate(element => element.inert)).toBe(true);
-    for (const [operation, payload] of [['export-sq', { destination }], ['export-gif', {}],
-      ['switch-squad', { squad: 'attack' }], ['import-snapshot', { snapshot: fixture }]]) {
-      expect(await run(page, operation, payload)).toMatchObject({ status: 'busy', code: 'busy' });
-    }
     await page.evaluate(() => openShare());
     await expect(page.locator('#shareModal')).toBeHidden();
-    expect((await observed(page)).ads).toEqual([['sq']]);
-    expect((await state(page)).snapshot).toEqual(before.snapshot);
     await closeAd(page);
-    expect(await page.evaluate(() => window.__pendingExport)).toMatchObject({ operation: 'export-sq',
-      status: 'success', completion: destination === 'share' ? 'shared' : 'saved' });
+    const result = await page.evaluate(() => window.__pendingExport);
+    expect(result).toMatchObject({ status: 'success', completion: 'file-saved' });
+    expect(result.adReceipt).toBeUndefined();
     const outcome = await observed(page);
-    expect(outcome.events).toEqual(['ad:sq', 'file:' + destination]);
+    expect(outcome.events.slice(-3)).toEqual(['file:save', 'saved:save', 'ad:' + placement]);
     expect(outcome.files).toHaveLength(1);
-    expect(outcome.files[0]).toMatchObject({ filename: before.snapshot.team + '.sq',
-      destination, mimeType: 'application/json', blobType: 'application/json' });
-    expect(Buffer.from(outcome.files[0].bytes)).toEqual(expected);
+    expect(outcome.files[0]).toMatchObject({ destination: 'save', mimeType, blobType: mimeType });
+    if (operation === 'export-sq') expect(JSON.parse(Buffer.from(outcome.files[0].bytes).toString('utf8'))).toEqual(before.snapshot);
+    else if (operation === 'export-gif') expect(Buffer.from(outcome.files[0].bytes)).toEqual(Buffer.from(GIF_BASE64, 'base64'));
+    else expect(Buffer.from(outcome.files[0].bytes).subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
     expect((await state(page)).export.busy).toBe(false);
     expect((await state(page)).snapshot).toEqual(before.snapshot);
-    expect(await stored(page)).toEqual(saved);
-  });
-
-  test(`native GIF ${destination} finishes encoding before the ad and hands off the finished GIF once`, async ({ page }) => {
-    const before = await boot(page, { gifMode: 'hold' });
-    const saved = await stored(page);
-    await startExport(page, 'export-gif', destination);
-    await expect.poll(() => page.evaluate(() => window.__exportIO.gifFrames || 0)).toBeGreaterThan(0);
-    expect(await observed(page)).toEqual({ ads: [], files: [], events: ['gif-encoding'] });
-    expect(await run(page, 'export-gif', { destination })).toMatchObject({ status: 'busy' });
-    await page.evaluate(() => window.__finishGif());
-    await expect.poll(async () => (await observed(page)).ads).toEqual([['gif']]);
-    expect((await observed(page)).events).toEqual(['gif-encoding', 'gif-ready', 'ad:gif']);
-    expect((await observed(page)).files).toEqual([]);
-    expect((await state(page)).export.busy).toBe(true);
-    await closeAd(page);
-    expect(await page.evaluate(() => window.__pendingExport)).toMatchObject({ status: 'success' });
-    const outcome = await observed(page);
-    expect(outcome.files).toHaveLength(1);
-    expect(outcome.files[0]).toMatchObject({ filename: fixture.pat[0].n + '.gif', mimeType: 'image/gif', destination });
-    expect(Buffer.from(outcome.files[0].bytes)).toEqual(Buffer.from(GIF_BASE64, 'base64'));
-    expect(outcome.events).toEqual(['gif-encoding', 'gif-ready', 'ad:gif', 'file:' + destination]);
-    await expect(page.locator('#gifProgress')).toBeHidden();
-    expect((await state(page)).snapshot).toEqual(before.snapshot);
-    expect((await state(page)).export.busy).toBe(false);
     expect(await stored(page)).toEqual(saved);
   });
 }
+
+test('GIF encoding and file writing both finish before advertising', async ({ page }) => {
+  await boot(page, { gifMode: 'hold', saveMode: 'pending' });
+  await startExport(page, 'export-gif');
+  await expect.poll(() => page.evaluate(() => window.__exportIO.gifFrames || 0)).toBeGreaterThan(0);
+  expect(await observed(page)).toEqual({ ads: [], files: [], events: ['gif-encoding'] });
+  await page.evaluate(() => window.__finishGif());
+  await expect.poll(async () => (await observed(page)).files.length).toBe(1);
+  expect((await observed(page)).events).toEqual(['gif-encoding', 'gif-ready', 'file:save']);
+  await page.evaluate(() => window.__finishSave());
+  await expect.poll(async () => (await observed(page)).ads.length).toBe(1);
+  await closeAd(page);
+  expect(await page.evaluate(() => window.__pendingExport)).toMatchObject({ status: 'success', completion: 'file-saved' });
+  expect((await observed(page)).files).toHaveLength(1);
+});
+
+test('the first successful save is common to formats, persists across reload, and sharing does not spend it', async ({ page }) => {
+  const before = await boot(page, { firstSaveUsed: false, adMode: 'failed' });
+  await run(page, 'export-sq', { destination: 'share' });
+  expect(await page.evaluate(() => localStorage.getItem('synthetic-first-save-used'))).toBe('0');
+  expect(await run(page, 'export-png')).toMatchObject({ status: 'success', completion: 'file-saved' });
+  expect((await observed(page)).ads).toEqual([]);
+  expect(await page.evaluate(() => localStorage.getItem('synthetic-first-save-used'))).toBe('1');
+  await page.reload();
+  await page.evaluate(() => window.SquadMakerContract.ready());
+  expect(await run(page, 'export-gif')).toMatchObject({ status: 'success', completion: 'file-saved' });
+  expect(await run(page, 'export-sq')).toMatchObject({ status: 'success', completion: 'file-saved' });
+  expect((await observed(page)).ads).toEqual([
+    ['save-gif', 'receipt-image/gif'], ['save-sq', 'receipt-application/json'],
+  ]);
+  expect((await state(page)).snapshot).toEqual(before.snapshot);
+});
+
+for (const saveMode of ['cancelled', 'failed', 'unknown']) {
+  test(`a ${saveMode} native save never spends the exemption or asks for an ad`, async ({ page }) => {
+    const before = await boot(page, { saveMode, firstSaveUsed: false });
+    const saved = await stored(page);
+    const result = await run(page, 'export-sq');
+    expect(result.completion).not.toBe('file-saved');
+    expect((await observed(page)).ads).toEqual([]);
+    expect(await page.evaluate(() => localStorage.getItem('synthetic-first-save-used'))).toBe('0');
+    expect((await state(page)).export.busy).toBe(false);
+    expect((await state(page)).snapshot).toEqual(before.snapshot);
+    expect(await stored(page)).toEqual(saved);
+  });
+}
+
+test('a missing ad dismissal callback cannot turn saved output into a failure or permanent busy', async ({ page }) => {
+  const before = await boot(page);
+  await page.evaluate(() => {
+    const original = withTimeout;
+    withTimeout = (promise, duration) => original(promise, duration === 30000 ? 25 : duration);
+  });
+  expect(await run(page, 'export-sq')).toMatchObject({ status: 'success', completion: 'file-saved' });
+  expect((await observed(page)).files).toHaveLength(1);
+  expect((await observed(page)).ads).toHaveLength(1);
+  expect((await state(page)).export.busy).toBe(false);
+  expect(await page.evaluate(() => window.__exportIO.cancellations)).toBeGreaterThan(0);
+  await closeAd(page);
+  expect((await observed(page)).files).toHaveLength(1);
+  expect((await state(page)).snapshot).toEqual(before.snapshot);
+});
+
+test('completion in the background is saved without an ad and returning never replays the opportunity', async ({ page }) => {
+  const before = await boot(page, { saveMode: 'pending' });
+  await startExport(page, 'export-sq');
+  await expect.poll(async () => (await observed(page)).files.length).toBe(1);
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });
+    document.dispatchEvent(new Event('visibilitychange'));
+    window.__finishSave();
+  });
+  expect(await page.evaluate(() => window.__pendingExport)).toMatchObject({ status: 'success', completion: 'file-saved' });
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
+    document.dispatchEvent(new Event('visibilitychange'));
+    window.dispatchEvent(new Event('pageshow'));
+  });
+  expect((await observed(page)).ads).toEqual([]);
+  expect((await observed(page)).files).toHaveLength(1);
+  expect((await state(page)).export.busy).toBe(false);
+  expect((await state(page)).snapshot).toEqual(before.snapshot);
+});
 
 test('native share text opens without waiting for any ad and preserves coach instructions, copy and download', async ({ page }) => {
   const before = await boot(page);
@@ -281,15 +359,15 @@ test('an open system share sheet blocks duplicate output and edits through rotat
   expect(await stored(page)).toEqual(saved);
 });
 
-for (const adMode of ['failed', 'reject', 'missing', 'skipped']) {
+for (const adMode of ['failed', 'reject', 'missing', 'skipped', 'loading']) {
   test(`native ${adMode} ad does not prevent SQ delivery or displaying share text`, async ({ page }) => {
     const before = await boot(page, { adMode });
-    expect(await run(page, 'export-sq')).toMatchObject({ status: 'success', completion: 'saved' });
+    expect(await run(page, 'export-sq')).toMatchObject({ status: 'success', completion: 'file-saved' });
     await page.evaluate(() => openShare());
     await expect(page.locator('#shareModal')).toBeVisible();
     await expect(page.locator('#shareText')).toContainText(fixture.squads.basic.tn);
     const outcome = await observed(page);
-    expect(outcome.ads).toEqual(adMode === 'missing' ? [] : [['sq']]);
+    expect(outcome.ads).toEqual(['missing', 'skipped', 'loading'].includes(adMode) ? [] : [['save-sq', 'receipt-application/json']]);
     expect(outcome.files).toHaveLength(1);
     expect(JSON.parse(Buffer.from(outcome.files[0].bytes).toString('utf8'))).toEqual(before.snapshot);
     expect((await state(page)).export.busy).toBe(false);
@@ -297,9 +375,9 @@ for (const adMode of ['failed', 'reject', 'missing', 'skipped']) {
   });
 }
 
-test('native PNG, URL creation, local saves, backup restore and reload do not request export ads', async ({ page }) => {
-  await boot(page);
-  expect(await run(page, 'export-png')).toMatchObject({ status: 'success', completion: 'saved' });
+test('first native PNG save is exempt and URL creation, auto saves, backup restore and reload do not request export ads', async ({ page }) => {
+  await boot(page, { firstSaveUsed: false });
+  expect(await run(page, 'export-png')).toMatchObject({ status: 'success', completion: 'file-saved' });
   const png = (await observed(page)).files[0];
   expect(png.mimeType).toBe('image/png');
   expect(Buffer.from(png.bytes).subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
@@ -370,7 +448,8 @@ test('native export notice stays readable inside the export panel at either view
   await page.locator('#exportOpenBtn').click();
   const notice = page.locator('.export-ad-note');
   await expect(notice).toBeVisible();
-  await expect(notice).toContainText('광고를 닫으면 계속 진행');
+  await expect(notice).toContainText('파일을 저장한 뒤');
+  await expect(notice).toContainText('첫 성공 저장 1회');
   await expect(notice).toContainText('10분');
   await expect(notice).toContainText('파일·텍스트 공유에는 전면 광고가 표시되지 않습니다');
   const bounds = await notice.boundingBox();

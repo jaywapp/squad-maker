@@ -102,9 +102,11 @@ async function exportFile(blob, filename, mimeType, destination = 'save') {
       return { status: 'success', code: null, completion: 'share-sheet-finished' };
     }
     const result = await Documents.save({ data, filename, mimeType });
-    return result.status === 'cancelled'
-      ? { status: 'cancelled', code: null, completion: null }
-      : { status: 'success', code: null, completion: 'file-saved' };
+    if (result?.status === 'cancelled') return { status: 'cancelled', code: null, completion: null };
+    if (result?.status !== 'success') return { status: 'error', code: 'export-failed', completion: null };
+    return { status: 'success', code: null, completion: 'file-saved',
+      adReceipt: typeof result.adReceipt === 'string' && result.adReceipt.length > 0
+        && result.adReceipt.length <= 128 ? result.adReceipt : null };
   } catch (error) {
     if (/cancel/i.test(error?.message || '')) return { status: 'cancelled', code: null, completion: null };
     return { status: 'error', code: 'export-failed', completion: null };
@@ -229,12 +231,14 @@ window.SquadPlatform = Object.freeze({
     try { return await Ads.prepareExportInterstitial(); }
     catch { return { status: 'failed', reason: 'ad-unavailable', testOnly: null }; }
   },
-  async showExportAd(placement) {
+  async showExportAd(placement, receipt) {
     if (!native) return { status: 'unsupported' };
-    if (!['gif', 'sq'].includes(placement))
+    if (!['save-png', 'save-gif', 'save-sq'].includes(placement))
       return { status: 'skipped', reason: 'invalid-placement', testOnly: null };
     if (fileShares > 0) return { status: 'skipped', reason: 'sharing', testOnly: null };
-    try { return await Ads.showExportInterstitial({ placement }); }
+    if (typeof receipt !== 'string' || !receipt || receipt.length > 128)
+      return { status: 'skipped', reason: 'missing-save-receipt', testOnly: null };
+    try { return await Ads.showExportInterstitial({ placement, receipt }); }
     catch { return { status: 'failed', reason: 'ad-unavailable', testOnly: null }; }
   },
   async getAdState() {

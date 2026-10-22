@@ -7,7 +7,14 @@ final class ExportAdPolicy {
     private ExportAdPolicy() {}
 
     static boolean isSupportedPlacement(String placement) {
-        return "gif".equals(placement) || "sq".equals(placement);
+        return "save-png".equals(placement) || "save-gif".equals(placement) || "save-sq".equals(placement);
+    }
+
+    static String placementForMime(String mime) {
+        if ("image/png".equals(mime)) return "save-png";
+        if ("image/gif".equals(mime)) return "save-gif";
+        if ("application/json".equals(mime)) return "save-sq";
+        return null;
     }
 
     static String cooldownReason(long now, long lastShownAt) {

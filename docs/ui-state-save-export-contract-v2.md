@@ -50,7 +50,15 @@
 
 ### 공유와 광고 (#61, 2026-10-21)
 
-`destination:'share'`인 PNG/GIF/SQ와 텍스트 공유는 전면광고 로드·표시·닫힘을 기다리지 않는다. 공유창 진입을 실제 외부 전송 성공으로 집계하지 않는다. Android 파일 공유의 `completion:'share-sheet-finished'`는 시스템 공유창 반환만 의미하며 취소·실패는 원래 결과를 유지한다. `destination:'save'`의 GIF/SQ 광고는 기존 계약을 유지하며 #59/#60의 저장 순서·첫 저장 면제 변경과 구분한다. [상세 계약](issue-61-share-20261021-design.md).
+`destination:'share'`인 PNG/GIF/SQ와 텍스트 공유는 전면광고 로드·표시·닫힘을 기다리지 않는다. 공유창 진입을 실제 외부 전송 성공으로 집계하지 않는다. Android 파일 공유의 `completion:'share-sheet-finished'`는 시스템 공유창 반환만 의미하며 취소·실패는 원래 결과를 유지한다. [공유 상세](issue-61-share-20261021-design.md).
+
+### 실제 저장과 선택적 광고 (#59/#60, 2026-10-22)
+
+명시적 `destination:'save'`의 PNG/GIF/SQ는 native 파일 쓰기·flush·close 성공을 먼저 확인하고 `completion:'file-saved'` 안내를 확정한 뒤 준비된 광고만 평가한다. 광고 결과가 파일 저장 결과를 실패로 바꾸거나 다시 저장하지 않는다. 웹의 download-requested는 실제 파일 저장 확인이 아니므로 광고 대상이 아니다.
+
+앱 데이터 기준 첫 성공 명시 저장 1회는 세 형식 공통으로 면제하며 native에 영속 기록한다. 기존 설치에 기록이 없으면 업데이트 후 첫 성공을 면제한다. 공유·자동저장·취소·실패는 기록을 소모하지 않는다. 재시작에도 유지하며 .sq 복원은 광고 기록을 가져오거나 초기화하지 않는다. 새 설치/앱 데이터 삭제는 초기화한다. 기록 쓰기 실패/중복/오래된 완료는 광고 skip이며 파일 성공은 유지한다.
+
+내부 facade의 `adReceipt`는 native 실제 저장 완료와 연결된 일회성 근거다. 공개 `Result`에는 노출하지 않는다. placement는 save-png/save-gif/save-sq이며 해당 근거가 필요하다. 공유 placement와 과거 gif/sq/share-text 직접 요청은 거부한다. 완료 시 미준비 광고를 기다리거나 다음 resume에 표시하지 않는다. 공통 10분은 실제 show 콜백에서만 갱신한다. SDK 닫힘 응답 대기는 30초로 제한하며 만료 뒤 편집기 busy를 해제하고 추가 표시 기회를 무효화한다. [설계·검증 기준](issue-59-60-save-20261021-design.md).
 
 웹은 localStorage `squad-maker-library-v1` + active mirror `squad-maker-v1`을 CAS·재읽기·검증 rollback으로 보존한다. 웹의 두 키는 OS 종료를 넘는 원자적 transaction을 보장하지 않는다. Android는 두 키를 한 app-private AtomicFile `squad-store-v1.json` transaction에 기록한다. native 성공은 쓰기 완료와 재읽기 이후다. 저장 await 중 새 편집은 저장된 revision과 분리한다.
 

@@ -10,8 +10,11 @@ import org.junit.Test;
 public class ExportAdPolicyTest {
     @Test
     public void onlyExportPlacementsAreSupported() {
-        assertTrue(ExportAdPolicy.isSupportedPlacement("gif"));
-        assertTrue(ExportAdPolicy.isSupportedPlacement("sq"));
+        assertTrue(ExportAdPolicy.isSupportedPlacement("save-png"));
+        assertTrue(ExportAdPolicy.isSupportedPlacement("save-gif"));
+        assertTrue(ExportAdPolicy.isSupportedPlacement("save-sq"));
+        assertFalse(ExportAdPolicy.isSupportedPlacement("gif"));
+        assertFalse(ExportAdPolicy.isSupportedPlacement("sq"));
         assertFalse(ExportAdPolicy.isSupportedPlacement("share-text"));
         assertFalse(ExportAdPolicy.isSupportedPlacement("share"));
         assertFalse(ExportAdPolicy.isSupportedPlacement("share-gif"));
@@ -42,7 +45,7 @@ public class ExportAdPolicyTest {
     @Test
     public void oneTimestampAppliesToAllSupportedPlacements() {
         long persistedShownAt = 1_000_000L;
-        for (String placement : new String[] { "gif", "sq" }) {
+        for (String placement : new String[] { "save-png", "save-gif", "save-sq" }) {
             assertTrue(ExportAdPolicy.isSupportedPlacement(placement));
             assertEquals("cooldown", ExportAdPolicy.cooldownReason(persistedShownAt + 1, persistedShownAt));
         }

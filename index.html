@@ -1600,7 +1600,7 @@ body.pitch-horizontal.mode-strategy .pane-side { max-height: none; overflow: vis
     <button type="button" class="icon-btn export-close" id="exportCloseBtn" aria-label="내보내기·공유 닫기"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
   </div>
   <p class="export-target" id="exportTarget"></p>
-  <p class="export-ad-note native-only">GIF·.sq 파일 저장 시 전면 광고가 표시될 수 있습니다. 광고를 닫으면 계속 진행되며, 광고 간격은 최소 10분입니다. 파일·텍스트 공유에는 전면 광고가 표시되지 않습니다.</p>
+  <p class="export-ad-note native-only">PNG·GIF·.sq 파일을 저장한 뒤 준비된 전면 광고가 표시될 수 있습니다. 첫 성공 저장 1회는 광고 없이 진행되며, 이후 광고 간격은 최소 10분입니다. 파일·텍스트 공유에는 전면 광고가 표시되지 않습니다.</p>
   <div class="export-group exp-png">
     <h3>이미지 (PNG)</h3>
     <p>지금 보이는 상태의 배치를 그림으로 만듭니다.</p>
@@ -4949,18 +4949,29 @@ function buildStateSnap() {
   return snap;
 }
 
-async function showPreparedExportAd(placement) {
-  try { await window.SquadPlatform?.showExportAd?.(placement); }
-  catch { /* Export remains available when the ad bridge is unavailable. */ }
+async function showPreparedExportAd(placement, receipt) {
+  if (typeof receipt !== 'string' || !receipt || document.visibilityState === 'hidden') return;
+  try { await withTimeout(Promise.resolve(window.SquadPlatform?.showExportAd?.(placement, receipt)), 30_000); }
+  catch {
+    try { Promise.resolve(window.SquadPlatform?.cancelExportAd?.()).catch(() => {}); }
+    catch { /* A completed save remains successful even when cancellation is unavailable. */ }
+  }
 }
 
 async function deliverExport(operation, blob, filename, mimeType, destination = 'save') {
   if (destination !== 'save' && destination !== 'share') return contractResult(operation, 'error', 'invalid-input');
   if (window.SquadPlatform?.native) {
-    if (destination === 'save' && (operation === 'export-gif' || operation === 'export-sq'))
-      await showPreparedExportAd(operation === 'export-gif' ? 'gif' : 'sq');
     const result = await window.SquadPlatform.exportFile(blob, filename, mimeType, destination);
-    return contractResult(operation, result.status, result.code, result.completion);
+    const saved = contractResult(operation, result.status, result.code, result.completion);
+    if (destination === 'save' && result.status === 'success' && result.completion === 'file-saved') {
+      const placement = { 'export-png': 'save-png', 'export-gif': 'save-gif', 'export-sq': 'save-sq' }[operation];
+      const kind = { 'export-png': '이미지', 'export-gif': 'GIF', 'export-sq': '백업 파일' }[operation] || '결과물';
+      const message = `${kind}을(를) 선택한 위치에 저장했습니다.`;
+      setRestoreStatus(message, 'success');
+      showToast(message);
+      if (placement) await showPreparedExportAd(placement, result.adReceipt);
+    }
+    return saved;
   }
   if (destination === 'share') return contractResult(operation, 'unsupported', 'native-unavailable');
   const url = URL.createObjectURL(blob);

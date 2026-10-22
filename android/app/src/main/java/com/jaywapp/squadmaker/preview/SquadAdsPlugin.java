@@ -40,6 +40,8 @@ public class SquadAdsPlugin extends Plugin {
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final ExportAdOpportunity exportOpportunity = new ExportAdOpportunity();
+    private ExportAdReceipts exportReceipts;
+    private Object interstitialIdentity;
     private static final ConsentAdPolicy.InitializationGate SDK = new ConsentAdPolicy.InitializationGate();
     private final ConsentAdPolicy consent = new ConsentAdPolicy(BuildConfig.ADS_TEST_ONLY);
     private ConsentInformation consentInformation;
@@ -75,6 +77,7 @@ public class SquadAdsPlugin extends Plugin {
 
     @Override
     public void load() {
+        exportReceipts = ExportAdBridge.session(getActivity());
         adPreferences = getContext().getSharedPreferences(AD_PREFERENCES, Context.MODE_PRIVATE);
         lastShownAt = adPreferences.getLong(LAST_SHOWN_AT, 0);
         consentInformation = UserMessagingPlatform.getConsentInformation(getContext());
@@ -106,6 +109,7 @@ public class SquadAdsPlugin extends Plugin {
 
     private void publish(String next) {
         status = next;
+        refreshReceiptReadiness();
         if (!destroyed) notifyListeners("state", state());
     }
 
@@ -163,7 +167,10 @@ public class SquadAdsPlugin extends Plugin {
 
     @PluginMethod
     public void cancelExportInterstitial(PluginCall call) {
-        exportOpportunity.invalidate();
+        synchronized (exportReceipts) {
+            exportOpportunity.invalidate();
+            exportReceipts.invalidate();
+        }
         mainHandler.post(() -> resolveAd(call, "skipped", "opportunity-cancelled"));
     }
 
@@ -171,12 +178,18 @@ public class SquadAdsPlugin extends Plugin {
     public void showExportInterstitial(PluginCall call) {
         long opportunity = exportOpportunity.capture();
         mainHandler.post(() -> {
+            ExportAdReceipts.Snapshot proof = exportReceipts.consumeProof(call.getString("receipt"),
+                call.getString("placement"), interstitialIdentity, SystemClock.elapsedRealtime());
             if (!ExportAdPolicy.isSupportedPlacement(call.getString("placement"))) {
                 resolveAd(call, "skipped", "invalid-placement");
                 return;
             }
             if (!exportOpportunity.isCurrent(opportunity)) {
                 resolveAd(call, "skipped", "opportunity-cancelled");
+                return;
+            }
+            if (proof == null) {
+                resolveAd(call, "skipped", "invalid-save-receipt");
                 return;
             }
             if (activeShow != null) { resolveAd(call, "skipped", "already-showing"); return; }
@@ -189,39 +202,56 @@ public class SquadAdsPlugin extends Plugin {
             if (interstitial == null) { resolveAd(call, "skipped", "not-ready"); return; }
             if (!ExportAdPolicy.isFresh(SystemClock.elapsedRealtime(), loadedAtElapsed)) {
                 interstitial = null;
+                interstitialIdentity = null;
                 loadedAtElapsed = -1;
+                refreshReceiptReadiness();
                 resolveAd(call, "skipped", "expired");
                 return;
             }
 
-            ShowAttempt attempt = new ShowAttempt(call, interstitial);
-            activeShow = attempt;
-            interstitial = null;
-            loadedAtElapsed = -1;
-            mainHandler.removeCallbacks(retryLoad);
-            try {
-                attempt.ad.setFullScreenContentCallback(new FullScreenContentCallback() {
-                    @Override public void onAdShowedFullScreenContent() {
-                        if (destroyed || activeShow != attempt || attempt.shown) return;
-                        attempt.shown = true;
-                        lastShownAt = System.currentTimeMillis();
-                        adPreferences.edit().putLong(LAST_SHOWN_AT, lastShownAt).apply();
-                    }
-
-                    @Override public void onAdDismissedFullScreenContent() {
-                        finishShow(attempt, attempt.shown ? "shown" : "failed",
-                            attempt.shown ? null : "not-shown");
-                    }
-
-                    @Override public void onAdFailedToShowFullScreenContent(AdError error) {
-                        finishShow(attempt, "failed", "show-failed");
-                    }
-                });
-                attempt.ad.show(getActivity());
-            } catch (RuntimeException error) {
-                finishShow(attempt, "failed", "show-failed");
+            // Serialize the final SDK handoff with bridge-thread cancel/share/new-save invalidation.
+            synchronized (exportReceipts) {
+                if (!exportReceipts.isCurrent(proof, SystemClock.elapsedRealtime())
+                    || !exportOpportunity.isCurrent(opportunity)) {
+                    resolveAd(call, "skipped", "opportunity-cancelled");
+                    return;
+                }
+                showPreparedInterstitial(call);
             }
         });
+    }
+
+    private void showPreparedInterstitial(PluginCall call) {
+        ShowAttempt attempt = new ShowAttempt(call, interstitial);
+        activeShow = attempt;
+        interstitial = null;
+        interstitialIdentity = null;
+        loadedAtElapsed = -1;
+        refreshReceiptReadiness();
+        mainHandler.removeCallbacks(retryLoad);
+        try {
+            attempt.ad.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override public void onAdShowedFullScreenContent() {
+                    if (destroyed || activeShow != attempt || attempt.shown) return;
+                    attempt.shown = true;
+                    lastShownAt = System.currentTimeMillis();
+                    adPreferences.edit().putLong(LAST_SHOWN_AT, lastShownAt).apply();
+                    refreshReceiptReadiness();
+                }
+
+                @Override public void onAdDismissedFullScreenContent() {
+                    finishShow(attempt, attempt.shown ? "shown" : "failed",
+                        attempt.shown ? null : "not-shown");
+                }
+
+                @Override public void onAdFailedToShowFullScreenContent(AdError error) {
+                    finishShow(attempt, "failed", "show-failed");
+                }
+            });
+            attempt.ad.show(getActivity());
+        } catch (RuntimeException error) {
+            finishShow(attempt, "failed", "show-failed");
+        }
     }
 
     private void resolveAd(PluginCall call, String result, String reason) {
@@ -313,6 +343,13 @@ public class SquadAdsPlugin extends Plugin {
             && consentInformation != null && consentInformation.canRequestAds();
     }
 
+    private void refreshReceiptReadiness() {
+        if (exportReceipts == null) return;
+        Object ready = foreground && hasActivity() && adsAllowed() && activeShow == null
+            && interstitial != null ? interstitialIdentity : null;
+        exportReceipts.ready(ready, loadedAtElapsed, lastShownAt);
+    }
+
     private void syncConsentPermission() {
         if (destroyed || consentInformation == null) return;
         boolean changed = consent.updatePermission(consentInformation.canRequestAds());
@@ -328,9 +365,11 @@ public class SquadAdsPlugin extends Plugin {
     }
 
     private void clearAds() {
+        if (exportReceipts != null) exportReceipts.suspend();
         mainHandler.removeCallbacks(retryLoad);
         mainHandler.removeCallbacks(awaitSdk);
         interstitial = null;
+        interstitialIdentity = null;
         loadedAtElapsed = -1;
         interstitialLoading = false;
         nextLoadAtElapsed = 0;
@@ -421,7 +460,9 @@ public class SquadAdsPlugin extends Plugin {
             return;
         }
         interstitial = null;
+        interstitialIdentity = null;
         loadedAtElapsed = -1;
+        refreshReceiptReadiness();
         long retryAfter = nextLoadAtElapsed - SystemClock.elapsedRealtime();
         if (retryAfter > 0) { scheduleRetry(); return; }
         if (!SDK.isReady()) { initializeSdk(); return; }
@@ -436,7 +477,9 @@ public class SquadAdsPlugin extends Plugin {
                         if (!consentInformation.canRequestAds()) { syncConsentPermission(); return; }
                         interstitialLoading = false;
                         interstitial = ad;
+                        interstitialIdentity = new Object();
                         loadedAtElapsed = SystemClock.elapsedRealtime();
+                        refreshReceiptReadiness();
                         nextLoadAtElapsed = 0;
                         scheduleCacheRefresh();
                     }
@@ -484,6 +527,7 @@ public class SquadAdsPlugin extends Plugin {
     private int dp(int value) { return Math.round(value * getContext().getResources().getDisplayMetrics().density); }
     @Override protected void handleOnPause() {
         exportOpportunity.invalidate();
+        exportReceipts.suspend();
         foreground = false;
         consent.pause();
         mainHandler.removeCallbacks(retryLoad);
@@ -494,6 +538,7 @@ public class SquadAdsPlugin extends Plugin {
     @Override protected void handleOnResume() {
         if (destroyed) return;
         exportOpportunity.invalidate();
+        exportReceipts.suspend();
         foreground = true;
         consent.resume();
         requestConsentUpdate();
@@ -505,6 +550,7 @@ public class SquadAdsPlugin extends Plugin {
 
     @Override protected void handleOnDestroy() {
         exportOpportunity.invalidate();
+        exportReceipts.suspend();
         destroyed = true;
         foreground = false;
         consent.destroy();

@@ -3,6 +3,7 @@ package com.jaywapp.squadmaker.preview;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.util.Base64;
 import androidx.activity.result.ActivityResult;
 import com.getcapacitor.JSObject;
@@ -14,17 +15,24 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import org.json.JSONObject;
 
 @CapacitorPlugin(name = "SquadDocuments")
 public class SquadDocumentsPlugin extends Plugin {
     private static final Set<String> MIME_TYPES = new HashSet<>(Arrays.asList("image/png", "image/gif", "application/json"));
     private static final int MAX_BYTES = 64 * 1024 * 1024;
-    private volatile boolean choosingDocument = false;
+    private final DocumentSaveAttempts saveAttempts = new DocumentSaveAttempts();
+    private ExportAdReceipts exportReceipts;
+    private FirstSuccessfulSave firstSave;
+
+    @Override public void load() {
+        exportReceipts = ExportAdBridge.session(getActivity());
+        firstSave = ExportAdBridge.firstSave(getContext());
+    }
 
     private byte[] data(PluginCall call) {
         String encoded = call.getString("data", "");
@@ -49,16 +57,14 @@ public class SquadDocumentsPlugin extends Plugin {
     public void save(PluginCall call) {
         String mime = call.getString("mimeType");
         if (!MIME_TYPES.contains(mime)) { call.reject("Unsupported export format", "invalid-input"); return; }
-        synchronized (this) {
-            if (choosingDocument) { call.reject("Another document picker is open", "busy"); return; }
-            choosingDocument = true;
-        }
+        String token = UUID.randomUUID().toString() + ".bin";
+        if (!saveAttempts.reserve(token)) { call.reject("Another document picker is open", "busy"); return; }
+        exportReceipts.invalidate();
         execute(() -> {
             File staged = null;
             try {
                 File directory = new File(getContext().getCacheDir(), "squad-documents");
                 if (!directory.exists() && !directory.mkdirs()) throw new IllegalStateException("Cache unavailable");
-                String token = UUID.randomUUID().toString() + ".bin";
                 staged = new File(directory, token);
                 try (FileOutputStream output = new FileOutputStream(staged)) { output.write(data(call)); }
                 // Capacitor persists this call in Activity saved state. Keep the large bytes out of its Bundle.
@@ -76,7 +82,7 @@ public class SquadDocumentsPlugin extends Plugin {
                 startActivityForResult(call, intent, "documentCreated");
             } catch (Exception error) {
                 if (staged != null) staged.delete();
-                choosingDocument = false;
+                saveAttempts.release(token);
                 call.reject("Export could not be prepared", "file-write-failed");
             }
         });
@@ -84,31 +90,42 @@ public class SquadDocumentsPlugin extends Plugin {
 
     @ActivityCallback
     private void documentCreated(PluginCall call, ActivityResult result) {
-        if (call == null) { choosingDocument = false; return; }
+        if (call == null) { saveAttempts.abandon(); return; }
         final File staged;
         try { staged = stagedDocument(call); }
-        catch (Exception error) { choosingDocument = false; call.reject("Export interrupted", "file-write-failed"); return; }
+        catch (Exception error) { saveAttempts.abandon(); call.reject("Export interrupted", "file-write-failed"); return; }
+        // A restored Capacitor callback can finish its file, but cannot restore an ad opportunity.
+        DocumentSaveAttempts.Claim claim = saveAttempts.claim(staged.getName());
+        if (claim == DocumentSaveAttempts.Claim.DUPLICATE) return;
+        long opportunity = claim == DocumentSaveAttempts.Claim.OWNED ? exportReceipts.captureEpoch() : -1;
         Uri uri = result.getData() == null ? null : result.getData().getData();
         if (result.getResultCode() != Activity.RESULT_OK || uri == null) {
             staged.delete();
-            choosingDocument = false;
+            saveAttempts.release(staged.getName());
             call.resolve(new JSObject().put("status", "cancelled"));
             return;
         }
         // Documents providers may block on network I/O; stream off the Activity result thread.
         execute(() -> {
+            String[] receipt = { null };
+            boolean saved = false;
             try {
-                try (FileInputStream input = new FileInputStream(staged);
-                     OutputStream output = getContext().getContentResolver().openOutputStream(uri, "wt")) {
-                    if (output == null) throw new IllegalStateException("No document output");
-                    byte[] buffer = new byte[65536];
-                    int count;
-                    while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
-                    output.flush();
-                }
-                call.resolve(new JSObject().put("status", "success"));
-            } catch (Exception error) { call.reject("The document could not be saved", "file-write-failed"); }
-            finally { staged.delete(); choosingDocument = false; }
+                SavedDocumentWriter.write(new FileInputStream(staged),
+                    () -> getContext().getContentResolver().openOutputStream(uri, "wt"), () -> {
+                        // Every stream close has succeeded. Snapshot before a disk commit can wait.
+                        ExportAdReceipts.Snapshot snapshot = exportReceipts.snapshot(opportunity,
+                            SystemClock.elapsedRealtime(), System.currentTimeMillis());
+                        try {
+                            if (firstSave.recordSuccess()) receipt[0] = exportReceipts.issue(call.getString("mimeType"),
+                                snapshot, SystemClock.elapsedRealtime());
+                        } catch (RuntimeException error) { /* Ad bookkeeping cannot undo a saved file. */ }
+                    });
+                saved = true;
+            } catch (Exception error) { /* Resolve only after releasing the picker reservation below. */ }
+            finally { staged.delete(); saveAttempts.release(staged.getName()); }
+            if (saved) call.resolve(new JSObject().put("status", "success")
+                .put("adReceipt", receipt[0] == null ? JSONObject.NULL : receipt[0]));
+            else call.reject("The document could not be saved", "file-write-failed");
         });
     }
 
@@ -116,6 +133,7 @@ public class SquadDocumentsPlugin extends Plugin {
     public void stage(PluginCall call) {
         String mime = call.getString("mimeType");
         if (!MIME_TYPES.contains(mime)) { call.reject("Unsupported format", "invalid-input"); return; }
+        exportReceipts.invalidate();
         execute(() -> {
             try {
                 File directory = new File(getContext().getCacheDir(), "squad-exports");
@@ -126,5 +144,10 @@ public class SquadDocumentsPlugin extends Plugin {
                 call.resolve(new JSObject().put("uri", Uri.fromFile(file).toString()));
             } catch (Exception error) { call.reject("The sharing file could not be prepared", "file-write-failed"); }
         });
+    }
+
+    @Override protected void handleOnDestroy() {
+        exportReceipts.suspend();
+        saveAttempts.abandon();
     }
 }
