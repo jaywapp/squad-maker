@@ -259,7 +259,7 @@ for (const [filename, mimeType, bytes] of [
   ['pattern.gif', 'image/gif', Buffer.concat([Buffer.from('GIF89a'), Buffer.from(Array.from({ length: 70000 }, (_, index) => index % 256))])]
 ]) test('SAF forwards exact ' + filename + ' bytes, filename and allowed MIME metadata', async () => {
   const app = harness(); const result = await app.platform.exportFile(new Blob([bytes]), filename, mimeType);
-  assert.deepEqual(copy(result), { status: 'success', code: null, completion: 'file-saved' });
+  assert.deepEqual(copy(result), { status: 'success', code: null, completion: 'file-saved', adReceipt: null });
   const payload = app.calls.find(call => call.method === 'document-save').payload;
   assert.equal(payload.filename, filename); assert.equal(payload.mimeType, mimeType);
   assert.deepEqual(Buffer.from(payload.data, 'base64'), bytes);
@@ -277,6 +277,48 @@ test('SAF rejection reports export failure without reporting success', async () 
   const app = harness({ save: async () => { throw { code: 'file-write-failed', message: 'Document write failed' }; } });
   const result = await app.platform.exportFile(new Blob(['original']), 'backup.sq', 'application/json');
   assert.deepEqual(copy(result), { status: 'error', code: 'export-failed', completion: null });
+});
+
+for (const result of [undefined, null, {}, { status: 'unknown' }, { status: 'error' },
+  { status: 'file-saved' }, { status: 'success-pending', adReceipt: 'untrusted-proof' }]) {
+  test('ambiguous native document result cannot claim file completion: ' + JSON.stringify(result), async () => {
+    const app = harness({ save: async () => result });
+    const saved = await app.platform.exportFile(new Blob(['original']), 'backup.sq', 'application/json');
+    assert.deepEqual(copy(saved), { status: 'error', code: 'export-failed', completion: null });
+    assert.equal(app.count('ads-export'), 0);
+  });
+}
+
+test('explicit native file success carries only its bounded opaque ad receipt', async () => {
+  const app = harness({ save: async () => ({ status: 'success', adReceipt: 'native-proof',
+    path: '/private/user-document', bytes: 'private bytes' }) });
+  const saved = await app.platform.exportFile(new Blob(['original']), 'pitch.png', 'image/png');
+  assert.deepEqual(copy(saved), { status: 'success', code: null, completion: 'file-saved', adReceipt: 'native-proof' });
+  assert.equal(app.count('ads-export'), 0);
+  await app.platform.showExportAd('save-png', saved.adReceipt);
+  assert.deepEqual(app.calls.find(call => call.method === 'ads-export').payload,
+    { placement: 'save-png', receipt: 'native-proof' });
+});
+
+test('missing or malformed ad proof preserves the successful file and skips native ad calls', async () => {
+  for (const adReceipt of [undefined, null, '', 7, {}, 'x'.repeat(129)]) {
+    const app = harness({ save: async () => ({ status: 'success', adReceipt }) });
+    const saved = await app.platform.exportFile(new Blob(['original']), 'backup.sq', 'application/json');
+    assert.equal(saved.completion, 'file-saved');
+    assert.equal(saved.adReceipt, null);
+    assert.equal((await app.platform.showExportAd('save-sq', saved.adReceipt)).reason, 'missing-save-receipt');
+    assert.equal(app.count('ads-export'), 0);
+  }
+});
+
+test('a successful share cannot surface a forged save proof from the staging response', async () => {
+  const app = harness({ stage: async () => ({ uri: 'file:///cache/result.sq', adReceipt: 'must-not-forward' }) });
+  const shared = await app.platform.exportFile(new Blob(['{}']), 'backup.sq', 'application/json', 'share');
+  assert.equal(shared.completion, 'share-sheet-finished');
+  assert.equal('adReceipt' in shared, false);
+  assert.equal(app.count('document-save'), 0);
+  assert.equal(app.count('ads-export'), 0);
+  assert.equal(app.count('storage-commit'), 0);
 });
 
 test('share stages exact bytes and forwards only the returned file URI to the OS adapter', async () => {
@@ -328,16 +370,16 @@ test('direct facade ad requests are blocked throughout concurrent file shares', 
   const app = harness({ share: () => ++sheets === 1 ? sheet : {} });
   const first = app.platform.exportFile({ arrayBuffer: () => bytes }, 'pitch.png', 'image/png', 'share');
   const blocked = { status: 'skipped', reason: 'sharing', testOnly: null };
-  assert.deepEqual(copy(await app.platform.showExportAd('gif')), blocked);
+  assert.deepEqual(copy(await app.platform.showExportAd('save-gif', 'native-proof')), blocked);
   finishBytes(new Uint8Array([0, 128, 255]).buffer);
   await new Promise(setImmediate);
   assert.equal(app.count('share'), 1);
   const second = await app.platform.exportFile(new Blob(['{}']), 'backup.sq', 'application/json', 'share');
   assert.equal(second.completion, 'share-sheet-finished');
-  assert.deepEqual(copy(await app.platform.showExportAd('sq')), blocked);
+  assert.deepEqual(copy(await app.platform.showExportAd('save-sq', 'native-proof')), blocked);
   assert.equal(app.count('ads-export'), 0);
   finishShare({}); await first;
-  assert.equal((await app.platform.showExportAd('gif')).status, 'shown');
+  assert.equal((await app.platform.showExportAd('save-gif', 'native-proof')).status, 'shown');
   assert.equal(app.count('ads-export'), 1);
 });
 
@@ -346,7 +388,7 @@ test('failed blob conversion releases the sharing ad guard for a later save', as
   const result = await app.platform.exportFile({ arrayBuffer: async () => { throw new Error('Blob lost'); } },
     'pitch.png', 'image/png', 'share');
   assert.equal(result.status, 'error'); assert.equal(app.count('ads-cancel'), 1);
-  assert.equal((await app.platform.showExportAd('sq')).status, 'shown');
+  assert.equal((await app.platform.showExportAd('save-sq', 'native-proof')).status, 'shown');
 });
 
 test('Share cancellation is a neutral cancelled result', async () => {
@@ -487,7 +529,7 @@ test('web evaluation registers no native listeners and cannot access native stor
     { status: 'unsupported', code: 'native-unavailable' });
   assert.deepEqual(copy(await app.platform.showTestAd()), { status: 'unsupported' });
   assert.deepEqual(copy(await app.platform.prepareExportAd()), { status: 'unsupported' });
-  assert.deepEqual(copy(await app.platform.showExportAd('sq')), { status: 'unsupported' });
+  assert.deepEqual(copy(await app.platform.showExportAd('save-sq', 'native-proof')), { status: 'unsupported' });
   assert.deepEqual(copy(await app.platform.cancelExportAd()), { status: 'unsupported' });
   assert.equal((await app.platform.getAdState()).status, 'unsupported');
   assert.equal((await app.platform.getAdState()).canRequestAds, false);
@@ -497,15 +539,15 @@ test('web evaluation registers no native listeners and cannot access native stor
   assert.equal(app.calls.length, 0); assert.equal(Object.isFrozen(app.platform), true);
 });
 
-test('export ads prepare separately and pass only an allowed placement to the plugin', async () => {
+test('export ads prepare separately and pass only an allowed placement and opaque proof to the plugin', async () => {
   const app = harness();
   assert.deepEqual(copy(await app.platform.prepareExportAd()), { status: 'loading', testOnly: true });
   assert.equal(app.count('ads-export'), 0);
-  for (const placement of ['gif', 'sq']) {
-    assert.deepEqual(copy(await app.platform.showExportAd(placement)), { status: 'shown', testOnly: true });
+  for (const placement of ['save-png', 'save-gif', 'save-sq']) {
+    assert.deepEqual(copy(await app.platform.showExportAd(placement, 'native-proof')), { status: 'shown', testOnly: true });
   }
   assert.deepEqual(app.calls.filter(call => call.method === 'ads-export').map(call => call.payload),
-    [{ placement: 'gif' }, { placement: 'sq' }]);
+    ['save-png', 'save-gif', 'save-sq'].map(placement => ({ placement, receipt: 'native-proof' })));
   assert.equal(app.count('ads-show'), 0);
   assert.equal(app.count('storage-commit'), 0);
   assert.equal(app.count('document-save'), 0);
@@ -513,7 +555,7 @@ test('export ads prepare separately and pass only an allowed placement to the pl
 
 test('non-export placements cannot request an interstitial', async () => {
   const app = harness();
-  for (const placement of ['png', 'auto-save', 'restore', 'share', 'share-text', 'share-url', 'share-gif', 'share-sq', undefined, { placement: 'sq' }]) {
+  for (const placement of ['png', 'gif', 'sq', 'auto-save', 'restore', 'share', 'share-text', 'share-url', 'share-gif', 'share-sq', undefined, { placement: 'sq' }]) {
     assert.deepEqual(copy(await app.platform.showExportAd(placement)),
       { status: 'skipped', reason: 'invalid-placement', testOnly: null });
   }
@@ -522,7 +564,7 @@ test('non-export placements cannot request an interstitial', async () => {
 
 test('native ad bridge errors resolve safely without exposing private error details', async () => {
   const app = harness({ adError: new Error('private plugin diagnostic') });
-  for (const action of [() => app.platform.prepareExportAd(), () => app.platform.showExportAd('sq'),
+  for (const action of [() => app.platform.prepareExportAd(), () => app.platform.showExportAd('save-sq', 'native-proof'),
     () => app.platform.cancelExportAd()]) {
     assert.deepEqual(copy(await action()), { status: 'failed', reason: 'ad-unavailable', testOnly: null });
   }
@@ -533,7 +575,7 @@ test('an active interstitial stays pending until the native dismissal callback r
   let dismiss;
   let settled = false;
   const app = harness({ exportAd: () => new Promise(resolve => { dismiss = resolve; }) });
-  const pending = app.platform.showExportAd('gif').then(result => { settled = true; return result; });
+  const pending = app.platform.showExportAd('save-gif', 'native-proof').then(result => { settled = true; return result; });
   await Promise.resolve();
   assert.equal(settled, false);
   assert.equal(app.count('ads-export'), 1);

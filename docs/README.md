@@ -4,6 +4,8 @@
 
 | 읽을 목적 | 문서 |
 |---|---|
+| PR64 P2 정상 파일 선택창 복귀·저장 광고 경계 수정 | [분석](issue-64-picker-return-20261023-analysis.md), [설계](issue-64-picker-return-20261023-design.md), [작업표](issue-64-picker-return-20261023-tasks.md), [검증 보고](issue-64-picker-return-20261023-report.md) |
+| #59·#60 저장 완료 후 광고·첫 성공 저장 공통1회 면제 | [승인 근거·분석](issue-59-60-save-20261021-analysis.md), [설계](issue-59-60-save-20261021-design.md), [작업표](issue-59-60-save-20261021-tasks.md), [실제 검증](issue-59-60-save-20261021-report.md), [실기기 미검증](issue-59-60-save-20261021-device-checklist.md) |
 | #59~61 Issue-based: 공유 광고 제거·저장 정책 확인 | [분석](issue-61-share-20261021-analysis.md), [설계](issue-61-share-20261021-design.md), [작업표](issue-61-share-20261021-tasks.md), [결과](issue-61-share-20261021-report.md), [실기기 미검증](issue-61-share-20261021-device-checklist.md) |
 | 2026-10-14 Play 업데이트 commit/push/main merge 승인·수동 배포 준비 | [분석·최신 Git 승인](play-updates-merge-prep-20261014-analysis.md), [설계](play-updates-merge-prep-20261014-design.md), [진행표](play-updates-merge-prep-20261014-tasks.md), [실제 출시 게이트](play-updates-merge-prep-20261014-release-checklist.md) |
 | 2026-10-14 정식 Play flexible 업데이트·저장 보호 (로컬, 제보 보강 취소) | [분석](play-updates-20261014-analysis.md), [설계·계약](play-updates-20261014-design.md), [작업](play-updates-20261014-tasks.md), [실기기·정책 체크리스트](play-updates-20261014-device-checklist.md), [검증 결과](play-updates-20261014-report.md) |
