@@ -7,7 +7,7 @@ final class ExportAdPolicy {
     private ExportAdPolicy() {}
 
     static boolean isSupportedPlacement(String placement) {
-        return "gif".equals(placement) || "sq".equals(placement) || "share-text".equals(placement);
+        return "gif".equals(placement) || "sq".equals(placement);
     }
 
     static String cooldownReason(long now, long lastShownAt) {

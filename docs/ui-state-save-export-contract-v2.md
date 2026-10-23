@@ -48,6 +48,10 @@
 
 ## 저장과 복구
 
+### 공유와 광고 (#61, 2026-10-21)
+
+`destination:'share'`인 PNG/GIF/SQ와 텍스트 공유는 전면광고 로드·표시·닫힘을 기다리지 않는다. 공유창 진입을 실제 외부 전송 성공으로 집계하지 않는다. Android 파일 공유의 `completion:'share-sheet-finished'`는 시스템 공유창 반환만 의미하며 취소·실패는 원래 결과를 유지한다. `destination:'save'`의 GIF/SQ 광고는 기존 계약을 유지하며 #59/#60의 저장 순서·첫 저장 면제 변경과 구분한다. [상세 계약](issue-61-share-20261021-design.md).
+
 웹은 localStorage `squad-maker-library-v1` + active mirror `squad-maker-v1`을 CAS·재읽기·검증 rollback으로 보존한다. 웹의 두 키는 OS 종료를 넘는 원자적 transaction을 보장하지 않는다. Android는 두 키를 한 app-private AtomicFile `squad-store-v1.json` transaction에 기록한다. native 성공은 쓰기 완료와 재읽기 이후다. 저장 await 중 새 편집은 저장된 revision과 분리한다.
 
 기존 유효한 v1은 처음 보관으로 이전하며 선수 ID·배치·지침·패턴을 유지한다. 기존 container가 있고 active mirror가 달라졌다면 다른 파일은 유지하고 이전 active 한 본을 legacyRecovery로 남긴다. 손상·future 데이터는 기본값으로 덮지 않고 blocked 상태다. 유효한 .sq의 교체 확인이 끝난 경우만 recoverSnapshot을 호출하며 손상 원문은 container rawRecovery에 보존한다. rawRecovery는 정상 교환 파일이나 UI state로 내보내지 않는다.

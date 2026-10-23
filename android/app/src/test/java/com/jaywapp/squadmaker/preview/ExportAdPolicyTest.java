@@ -12,7 +12,10 @@ public class ExportAdPolicyTest {
     public void onlyExportPlacementsAreSupported() {
         assertTrue(ExportAdPolicy.isSupportedPlacement("gif"));
         assertTrue(ExportAdPolicy.isSupportedPlacement("sq"));
-        assertTrue(ExportAdPolicy.isSupportedPlacement("share-text"));
+        assertFalse(ExportAdPolicy.isSupportedPlacement("share-text"));
+        assertFalse(ExportAdPolicy.isSupportedPlacement("share"));
+        assertFalse(ExportAdPolicy.isSupportedPlacement("share-gif"));
+        assertFalse(ExportAdPolicy.isSupportedPlacement("share-sq"));
         assertFalse(ExportAdPolicy.isSupportedPlacement(null));
         assertFalse(ExportAdPolicy.isSupportedPlacement(""));
         assertFalse(ExportAdPolicy.isSupportedPlacement("png"));
@@ -39,7 +42,7 @@ public class ExportAdPolicyTest {
     @Test
     public void oneTimestampAppliesToAllSupportedPlacements() {
         long persistedShownAt = 1_000_000L;
-        for (String placement : new String[] { "gif", "sq", "share-text" }) {
+        for (String placement : new String[] { "gif", "sq" }) {
             assertTrue(ExportAdPolicy.isSupportedPlacement(placement));
             assertEquals("cooldown", ExportAdPolicy.cooldownReason(persistedShownAt + 1, persistedShownAt));
         }
